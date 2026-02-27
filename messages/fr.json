@@ -46,10 +46,10 @@
     },
     "testimonials": {
       "title": "Ils nous font confiance",
-      "subtitle": "+2 400 établissements gèrent leur réputation avec RepuAI",
+      "subtitle": "+2 400 établissements gèrent leur réputation avec REPUTEXA",
       "items": {
         "1": {
-          "quote": "RepuAI a transformé notre gestion des avis. En 3 mois, notre note Google est passée de 3.8 à 4.7 !",
+          "quote": "REPUTEXA a transformé notre gestion des avis. En 3 mois, notre note Google est passée de 3.8 à 4.7 !",
           "name": "Sophie Renaud",
           "role": "Propriétaire, Brasserie Le Comptoir"
         },
@@ -87,11 +87,11 @@
     },
     "cta": {
       "title": "Prêt à booster votre réputation ?",
-      "subtitle": "Rejoignez 2 400+ établissements qui font confiance à RepuAI.",
+      "subtitle": "Rejoignez 2 400+ établissements qui font confiance à REPUTEXA.",
       "button": "Commencer maintenant"
     },
     "footer": {
-      "rights": "© 2026 RepuAI - Tous droits réservés"
+      "rights": "© 2026 REPUTEXA - Tous droits réservés"
     }
   },
   "Dashboard": {

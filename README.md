@@ -1,4 +1,4 @@
-# AAA Empire - Reputation AI
+# REPUTEXA - Reputation AI
 
 SaaS de réputation IA international (Next.js 14, App Router, TypeScript, Tailwind).
 
@@ -54,6 +54,7 @@ Routes : `http://localhost:3000/en` ou `http://localhost:3000/fr`
 ## Déploiement & configuration
 
 - **[docs/DEPLOI_COMPLET.md](./docs/DEPLOI_COMPLET.md)** — Guide A à Z : GitHub, Vercel, base de données, Stripe, Clerk
+- **[docs/VERIFICATION.md](./docs/VERIFICATION.md)** — Checklist pour tout vérifier (variables, API, flux)
 - **[docs/STRIPE_SETUP.md](./docs/STRIPE_SETUP.md)** — Configuration Stripe (webhook, variables)
 
 ## Installer des packages additionnels

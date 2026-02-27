@@ -40,14 +40,14 @@ Ta base actuelle est en local. Pour la production, il faut une base accessible s
 
 1. Va sur [github.com](https://github.com) → Sign in
 2. Clique **+** (en haut à droite) → **New repository**
-3. Nom : `reputexa` (ou `aaaempire-reputation-ai`)
+3. Nom : `reputexa`
 4. Visibilité : **Private** ou **Public**
 5. Ne coche **pas** "Add a README" (ton projet en a déjà un)
 6. Clique **Create repository**
 
 ### 2.2 Pousser ton code
 
-Ouvre un terminal dans ton dossier projet (`d:\aaaempire-reputation-ai`) et exécute :
+Ouvre un terminal dans ton dossier projet et exécute :
 
 ```bash
 # Initialiser Git si pas déjà fait
@@ -87,7 +87,7 @@ Avant de déployer, ajoute les variables. Clique **Environment Variables** et aj
 
 | Nom | Valeur | À copier depuis |
 |-----|--------|-----------------|
-| `DATABASE_URL` | `postgresql://...` | Neon ou Supabase (étape 1) |
+| `DATABASE_URL` | `postgresql://...` (mot de passe : si `?` → `%3F`, pas de `[]`) | Neon ou Supabase (étape 1) |
 | `OPENAI_API_KEY` | `sk-proj-...` | Ton `.env` local |
 | `MAPS_API_KEY` | `AIza...` | Ton `.env` local |
 | `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` | `pk_test_...` | Ton `.env` local |
@@ -214,6 +214,12 @@ https://reputexa-abc123.vercel.app/api/stripe/webhook
 7. Clerk → ajouter le domaine Vercel
 8. Stripe → créer le webhook avec l’URL
 9. Vercel → ajouter `STRIPE_WEBHOOK_SECRET`, redeploy
+
+---
+
+## Checklist de vérification
+
+**[VERIFICATION.md](./VERIFICATION.md)** — Liste à cocher pour tout vérifier (variables, API, flux, erreurs courantes).
 
 ---
 

@@ -17,7 +17,7 @@ const geistMono = localFont({
 });
 
 export const metadata: Metadata = {
-  title: 'AAA Empire - Reputation AI',
+  title: 'REPUTEXA - Reputation AI',
   description: 'Manage your online reputation with AI',
 };
 

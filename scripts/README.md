@@ -1,4 +1,4 @@
-# Scripts - AAA Empire Reputation AI
+# Scripts - REPUTEXA
 
 Dossier dédié aux scripts utilitaires, notamment le **Sniper de prospection**.
 

@@ -30,7 +30,7 @@ export default async function HomePage({ params }: Props) {
         <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
           <Link href="/" className="flex items-center gap-2">
             <span className="text-xl font-bold tracking-tight text-white">
-              RepuAI
+              REPUTEXA
             </span>
           </Link>
           <nav className="hidden items-center gap-8 md:flex">
@@ -368,7 +368,7 @@ export default async function HomePage({ params }: Props) {
       <footer className="border-t border-zinc-800 bg-zinc-950 py-8">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-6">
           <div className="flex items-center gap-2">
-            <span className="font-bold text-white">RepuAI</span>
+            <span className="font-bold text-white">REPUTEXA</span>
           </div>
           <p className="text-sm text-zinc-500">{t('footer.rights')}</p>
         </div>

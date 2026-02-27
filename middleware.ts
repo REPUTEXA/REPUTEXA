@@ -44,7 +44,19 @@ export default clerkMiddleware(async (auth, request: NextRequest) => {
     return NextResponse.redirect(url);
   }
 
-  // Protéger dashboard et checkout
+  // Les routes /api ne passent pas par intlMiddleware (sinon redirection → HTML au lieu de JSON)
+  if (request.nextUrl.pathname.startsWith('/api/')) {
+    // Webhook Stripe : pas d'auth (appelé par Stripe)
+    if (request.nextUrl.pathname === '/api/stripe/webhook') {
+      return NextResponse.next();
+    }
+    if (!isPublicRoute(request)) {
+      await auth.protect({ unauthenticatedUrl: '/fr/sign-in' });
+    }
+    return NextResponse.next();
+  }
+
+  // Protéger dashboard et checkout (pages)
   if (!isPublicRoute(request)) {
     const pathname = request.nextUrl.pathname;
     const locale = VALID_LOCALES.find((l) => pathname.startsWith(`/${l}/`) || pathname === `/${l}`) ?? 'fr';

@@ -21,6 +21,12 @@ export default function CheckoutPage() {
       const res = await fetch(`/api/stripe/checkout?locale=${locale}`, {
         method: 'POST',
       });
+      const contentType = res.headers.get('content-type');
+      if (!contentType?.includes('application/json')) {
+        const text = await res.text();
+        console.error('[checkout] Réponse non-JSON:', res.status, text.slice(0, 200));
+        throw new Error(`Erreur serveur (${res.status}). Vérifiez les logs Vercel.`);
+      }
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? 'Erreur');
       if (data.url) {

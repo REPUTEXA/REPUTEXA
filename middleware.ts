@@ -8,9 +8,14 @@ const intlMiddleware = createMiddleware(routing);
 const VALID_LOCALES = [...routing.locales];
 
 // Routes publiques (pas d'auth requise)
+// Note: /:locale matcherait /api → on exclut explicitement /api/* sauf le webhook
 const isPublicRoute = createRouteMatcher([
   '/',
-  '/:locale',
+  '/en',
+  '/fr',
+  '/es',
+  '/de',
+  '/ja',
   '/:locale/sign-up(.*)',
   '/:locale/sign-in(.*)',
   '/sign-up(.*)',
@@ -44,18 +49,6 @@ export default clerkMiddleware(async (auth, request: NextRequest) => {
     return NextResponse.redirect(url);
   }
 
-  // Les routes /api ne passent pas par intlMiddleware (sinon redirection → HTML au lieu de JSON)
-  if (request.nextUrl.pathname.startsWith('/api/')) {
-    // Webhook Stripe : pas d'auth (appelé par Stripe)
-    if (request.nextUrl.pathname === '/api/stripe/webhook') {
-      return NextResponse.next();
-    }
-    if (!isPublicRoute(request)) {
-      await auth.protect({ unauthenticatedUrl: '/fr/sign-in' });
-    }
-    return NextResponse.next();
-  }
-
   // Protéger dashboard et checkout (pages)
   if (!isPublicRoute(request)) {
     const pathname = request.nextUrl.pathname;
@@ -67,7 +60,7 @@ export default clerkMiddleware(async (auth, request: NextRequest) => {
 });
 
 export const config = {
-  // Inclure /api pour que clerkMiddleware s'exécute (requis pour auth() dans les API routes)
-  // Exclure uniquement _next, _vercel et les fichiers statiques
-  matcher: ['/((?!_next|_vercel|.*\\..*).*)'],
+  // Exclure /api pour éviter 404 (next-intl + auth.protect)
+  // Les routes API utilisent getAuth(request) au lieu de auth()
+  matcher: ['/((?!api|_next|_vercel|.*\\..*).*)'],
 };

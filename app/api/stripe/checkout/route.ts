@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { auth } from '@clerk/nextjs/server';
+import { getAuth, clerkClient } from '@clerk/nextjs/server';
 import Stripe from 'stripe';
 import { prisma } from '@/lib/prisma';
 
@@ -16,7 +16,7 @@ export async function POST(request: Request) {
     }
 
     const stripe = new Stripe(secretKey);
-    const { userId } = await auth();
+    const { userId } = getAuth(request);
     if (!userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
@@ -40,8 +40,8 @@ export async function POST(request: Request) {
     });
 
     if (!user) {
-      const { sessionClaims } = await auth();
-      const email = (sessionClaims?.email as string) ?? '';
+      const clerkUser = await clerkClient().users.getUser(userId);
+      const email = clerkUser?.primaryEmailAddress?.emailAddress ?? '';
       user = await prisma.user.create({
         data: {
           clerkUserId: userId,

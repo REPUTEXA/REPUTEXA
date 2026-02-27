@@ -20,6 +20,7 @@ export default function CheckoutPage() {
     try {
       const res = await fetch(`/api/stripe/checkout?locale=${locale}`, {
         method: 'POST',
+        credentials: 'include', // Envoie les cookies Clerk pour l'auth
       });
       const contentType = res.headers.get('content-type');
       if (!contentType?.includes('application/json')) {

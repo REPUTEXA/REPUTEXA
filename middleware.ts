@@ -55,5 +55,7 @@ export default clerkMiddleware(async (auth, request: NextRequest) => {
 });
 
 export const config = {
-  matcher: ['/((?!api|trpc|_next|_vercel|.*\\..*).*)'],
+  // Inclure /api pour que clerkMiddleware s'exécute (requis pour auth() dans les API routes)
+  // Exclure uniquement _next, _vercel et les fichiers statiques
+  matcher: ['/((?!_next|_vercel|.*\\..*).*)'],
 };

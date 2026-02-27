@@ -1,9 +1,11 @@
 import { NextResponse } from 'next/server';
-import { getAuth, clerkClient } from '@clerk/nextjs/server';
+import { auth, clerkClient } from '@clerk/nextjs/server';
 import Stripe from 'stripe';
 import { prisma } from '@/lib/prisma';
 
 const TRIAL_DAYS = 14;
+
+export const dynamic = 'force-dynamic';
 
 export async function POST(request: Request) {
   try {
@@ -16,7 +18,7 @@ export async function POST(request: Request) {
     }
 
     const stripe = new Stripe(secretKey);
-    const { userId } = getAuth(request);
+    const { userId } = await auth();
     if (!userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
@@ -40,8 +42,10 @@ export async function POST(request: Request) {
     });
 
     if (!user) {
-      const clerkUser = await clerkClient().users.getUser(userId);
-      const email = clerkUser?.primaryEmailAddress?.emailAddress ?? '';
+      const { sessionClaims } = await auth();
+      const client = await clerkClient();
+      const clerkUser = await client.users.getUser(userId);
+      const email = clerkUser?.primaryEmailAddress?.emailAddress ?? (sessionClaims?.email as string) ?? '';
       user = await prisma.user.create({
         data: {
           clerkUserId: userId,

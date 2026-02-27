@@ -18,9 +18,10 @@ export default function CheckoutPage() {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch(`/api/stripe/checkout?locale=${locale}`, {
+      const base = typeof window !== 'undefined' ? window.location.origin : '';
+      const res = await fetch(`${base}/api/stripe/checkout?locale=${locale}`, {
         method: 'POST',
-        credentials: 'include', // Envoie les cookies Clerk pour l'auth
+        credentials: 'include',
       });
       const contentType = res.headers.get('content-type');
       if (!contentType?.includes('application/json')) {

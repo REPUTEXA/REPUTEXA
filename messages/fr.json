@@ -1,0 +1,159 @@
+{
+  "HomePage": {
+    "nav": {
+      "features": "Fonctionnalités",
+      "pricing": "Tarifs",
+      "testimonials": "Témoignages",
+      "login": "Connexion",
+      "trial": "Essai gratuit"
+    },
+    "hero": {
+      "pill": "IA de réputation - Restaurants, Coiffeurs, Hôtels...",
+      "title1": "Votre réputation, ",
+      "titleHighlight": "pilotée par l'IA",
+      "subtitle": "Répondez à tous vos avis en quelques secondes, surveillez votre e-réputation en temps réel et augmentez votre note moyenne — automatiquement.",
+      "ctaPrimary": "Essayer gratuitement",
+      "ctaSecondary": "Voir la démo",
+      "trialInfo": "Aucune CB requise - 14 jours d'essai - Annulation à tout moment"
+    },
+    "features": {
+      "title": "Tout pour votre réputation",
+      "subtitle": "Des outils puissants, une interface simple.",
+      "ai": {
+        "title": "Réponses IA personnalisées",
+        "desc": "L'IA rédige des réponses adaptées à chaque avis en quelques secondes, dans votre ton de marque."
+      },
+      "alerts": {
+        "title": "Alertes en temps réel",
+        "desc": "Recevez une notification dès qu'un nouvel avis négatif apparaît sur vos plateformes connectées."
+      },
+      "tracking": {
+        "title": "Suivi de réputation",
+        "desc": "Visualisez l'évolution de votre note sur Google, TripAdvisor et Yelp sur un seul tableau de bord."
+      },
+      "sentiment": {
+        "title": "Analyse de sentiment",
+        "desc": "Comprenez ce que vos clients pensent vraiment grâce à l'analyse sémantique de tous les avis."
+      },
+      "multiplatform": {
+        "title": "Multi-plateformes",
+        "desc": "Google, TripAdvisor, Yelp, Pages Jaunes – gérez tout depuis une seule interface unifiée."
+      },
+      "brand": {
+        "title": "Protection de marque",
+        "desc": "Détection automatique des avis frauduleux et outils de signalement intégrés."
+      }
+    },
+    "testimonials": {
+      "title": "Ils nous font confiance",
+      "subtitle": "+2 400 établissements gèrent leur réputation avec RepuAI",
+      "items": {
+        "1": {
+          "quote": "RepuAI a transformé notre gestion des avis. En 3 mois, notre note Google est passée de 3.8 à 4.7 !",
+          "name": "Sophie Renaud",
+          "role": "Propriétaire, Brasserie Le Comptoir"
+        },
+        "2": {
+          "quote": "Les réponses IA sont bluffantes. Mes clients pensent que je réponds personnellement à chacun. Un gain de temps phénoménal.",
+          "name": "Marc Fontaine",
+          "role": "Gérant, Salon Coiffure Elite"
+        },
+        "3": {
+          "quote": "L'outil idéal pour notre chaîne de 8 hôtels. Tout centralisé, tout automatisé. Je recommande à 100%.",
+          "name": "Isabelle Moreau",
+          "role": "Directrice, Hôtel Les Pins"
+        }
+      }
+    },
+    "pricing": {
+      "title": "Tarifs simples et transparents",
+      "subtitle": "Commencez gratuitement, évoluez à votre rythme.",
+      "starter": {
+        "name": "Starter",
+        "for": "Pour les indépendants",
+        "cta": "Commencer gratuitement"
+      },
+      "pro": {
+        "name": "Pro",
+        "for": "Pour les PME",
+        "badge": "Le plus populaire",
+        "cta": "Essai 14 jours gratuit"
+      },
+      "agency": {
+        "name": "Agence",
+        "for": "Pour les agences",
+        "cta": "Contactez-nous"
+      }
+    },
+    "cta": {
+      "title": "Prêt à booster votre réputation ?",
+      "subtitle": "Rejoignez 2 400+ établissements qui font confiance à RepuAI.",
+      "button": "Commencer maintenant"
+    },
+    "footer": {
+      "rights": "© 2026 RepuAI - Tous droits réservés"
+    }
+  },
+  "Dashboard": {
+    "sidebar": {
+      "overview": "Vue d'ensemble",
+      "establishments": "Mes Établissements",
+      "prospects": "Prospects (Sniper)",
+      "settings": "Paramètres",
+      "upgrade": "Upgrader",
+      "unlockCta": "Débloquez les réponses illimitées"
+    },
+    "overview": {
+      "title": "Vue d'ensemble",
+      "stats": {
+        "avgRating": "Note Moyenne",
+        "reviewsProcessed": "Avis Traités",
+        "securityAlerts": "Alertes de sécurité",
+        "timeSaved": "Temps gagné"
+      },
+      "reviewsTitle": "Flux d'Avis en Temps Réel",
+      "reviewsEmpty": "Aucun avis pour le moment. Simulez un avis ci-dessous.",
+      "simulateTitle": "Simuler un avis",
+      "chartTitle": "Tendance des notes"
+    },
+    "prospects": {
+      "title": "Prospects (Sniper)",
+      "subtitle": "{{count}} prospect à contacter",
+      "subtitle_plural": "{{count}} prospects à contacter",
+      "empty": "Aucun prospect. Lancez le script Sniper pour en trouver.",
+      "generatePitch": "Générer Pitch",
+      "contact": "Contacter",
+      "copyPitch": "Copier le pitch",
+      "copied": "Copié !",
+      "pitchTitle": "Pitch personnalisé",
+      "noPitch": "Aucun pitch généré pour ce prospect."
+    },
+    "establishments": {
+      "title": "Mes Établissements",
+      "description": "Connectez vos établissements pour gérer leurs avis",
+      "comingSoon": "Cette fonctionnalité arrive bientôt."
+    },
+    "settings": {
+      "title": "Paramètres",
+      "description": "Gérez votre compte et vos préférences",
+      "comingSoon": "Cette fonctionnalité arrive bientôt."
+    },
+    "form": {
+      "review": "Avis",
+      "rating": "Note",
+      "establishment": "Établissement",
+      "city": "Ville",
+      "simulate": "Simuler",
+      "placeholder": {
+        "review": "Super restaurant !",
+        "establishment": "Le Bistro",
+        "city": "Paris"
+      },
+      "error": "Erreur lors de l'envoi"
+    }
+  },
+  "common": {
+    "loading": "Chargement...",
+    "error": "Une erreur s'est produite"
+  }
+}

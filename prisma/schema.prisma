@@ -1,0 +1,100 @@
+// AAA Empire - Reputation AI SaaS (International First)
+// https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============ CORE MODELS ============
+
+model User {
+  id                     String    @id @default(cuid())
+  clerkUserId            String    @unique // sync depuis Clerk
+  email                  String
+  stripeCustomerId       String?
+  stripeSubscriptionId   String?
+  trialEndsAt            DateTime? // fin de l'essai 14 jours
+  preferredLanguage      String    @default("fr")
+  createdAt              DateTime  @default(now())
+  updatedAt              DateTime  @updatedAt
+  establishments         Establishment[]
+}
+
+enum Tier {
+  MANAGER   // 62€
+  DOMINATOR // 127€
+}
+
+model Establishment {
+  id            String    @id @default(cuid())
+  ownerId       String
+  owner         User      @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  name          String
+  googlePlaceId String?   @unique
+  industry      String?   // restaurant, hotel, etc.
+  city          String
+  timezone      String    @default("Europe/Paris")
+  platformLang  String    @default("fr") // langue du dashboard pour ce patron
+  tier          Tier      @default(MANAGER)
+  isActive      Boolean   @default(true)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  reviews       Review[]
+}
+
+enum ReviewStatus {
+  PENDING
+  REPLIED
+  FLAGGED
+}
+
+model Review {
+  id                 String       @id @default(cuid())
+  establishmentId    String?
+  establishment      Establishment? @relation(fields: [establishmentId], references: [id])
+  reviewText         String
+  rating             Int
+  establishmentName  String       // gardé pour rétro-compat (simulate)
+  city               String
+  detectedLanguage   String?
+  responseText       String?
+  status             ReviewStatus @default(PENDING)
+  isSecurityFlagged  Boolean      @default(false)
+  securityAdvice     String?
+  createdAt          DateTime     @default(now())
+}
+
+enum ProspectStatus {
+  TO_CONTACT
+  CONTACTED
+  TRIAL
+  CONVERTED
+  LOST
+}
+
+model Prospect {
+  id                 String         @id @default(cuid())
+  placeId            String         @unique
+  establishmentName  String
+  email              String?
+  address            String?
+  city               String
+  category           String
+  countryCode        String?        // US, FR, JP pour localisation
+  rating             Float
+  reviewCount        Int
+  lastReviewText     String?
+  lastReviewDate     DateTime?
+  lastReviewAuthor   String?
+  lastReviewRelative String?
+  pitch              String?
+  status             ProspectStatus @default(TO_CONTACT)
+  metadata           Json?
+  createdAt          DateTime       @default(now())
+  updatedAt          DateTime       @updatedAt
+}

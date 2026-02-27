@@ -1,0 +1,159 @@
+{
+  "HomePage": {
+    "nav": {
+      "features": "Features",
+      "pricing": "Pricing",
+      "testimonials": "Testimonials",
+      "login": "Login",
+      "trial": "Free trial"
+    },
+    "hero": {
+      "pill": "Reputation AI - Restaurants, Hairdressers, Hotels...",
+      "title1": "Your reputation, ",
+      "titleHighlight": "powered by AI",
+      "subtitle": "Reply to all your reviews in seconds, monitor your online reputation in real time and increase your average rating — automatically.",
+      "ctaPrimary": "Try for free",
+      "ctaSecondary": "See demo",
+      "trialInfo": "No credit card required - 14-day trial - Cancel anytime"
+    },
+    "features": {
+      "title": "Everything for your reputation",
+      "subtitle": "Powerful tools, simple interface.",
+      "ai": {
+        "title": "Personalized AI responses",
+        "desc": "The AI writes responses tailored to each review in seconds, in your brand voice."
+      },
+      "alerts": {
+        "title": "Real-time alerts",
+        "desc": "Get notified as soon as a new negative review appears on your connected platforms."
+      },
+      "tracking": {
+        "title": "Reputation tracking",
+        "desc": "Visualize your rating evolution on Google, TripAdvisor and Yelp on a single dashboard."
+      },
+      "sentiment": {
+        "title": "Sentiment analysis",
+        "desc": "Understand what your customers really think with semantic analysis of all reviews."
+      },
+      "multiplatform": {
+        "title": "Multi-platform",
+        "desc": "Google, TripAdvisor, Yelp, Yellow Pages – manage everything from one unified interface."
+      },
+      "brand": {
+        "title": "Brand protection",
+        "desc": "Automatic detection of fraudulent reviews and integrated reporting tools."
+      }
+    },
+    "testimonials": {
+      "title": "They trust us",
+      "subtitle": "+2,400 establishments manage their reputation with RepuAI",
+      "items": {
+        "1": {
+          "quote": "RepuAI transformed our review management. In 3 months, our Google rating went from 3.8 to 4.7!",
+          "name": "Sophie Renaud",
+          "role": "Owner, Brasserie Le Comptoir"
+        },
+        "2": {
+          "quote": "The AI responses are amazing. My clients think I respond personally to each one. A phenomenal time-saver.",
+          "name": "Marc Fontaine",
+          "role": "Manager, Salon Coiffure Elite"
+        },
+        "3": {
+          "quote": "The ideal tool for our chain of 8 hotels. Everything centralized, everything automated. I recommend it 100%.",
+          "name": "Isabelle Moreau",
+          "role": "Director, Hôtel Les Pins"
+        }
+      }
+    },
+    "pricing": {
+      "title": "Simple and transparent pricing",
+      "subtitle": "Start for free, evolve at your own pace.",
+      "starter": {
+        "name": "Starter",
+        "for": "For independents",
+        "cta": "Start for free"
+      },
+      "pro": {
+        "name": "Pro",
+        "for": "For SMEs",
+        "badge": "Most popular",
+        "cta": "14-day free trial"
+      },
+      "agency": {
+        "name": "Agency",
+        "for": "For agencies",
+        "cta": "Contact us"
+      }
+    },
+    "cta": {
+      "title": "Ready to boost your reputation?",
+      "subtitle": "Join 2,400+ establishments that trust RepuAI.",
+      "button": "Start now"
+    },
+    "footer": {
+      "rights": "© 2026 RepuAI - All rights reserved"
+    }
+  },
+  "Dashboard": {
+    "sidebar": {
+      "overview": "Overview",
+      "establishments": "My Establishments",
+      "prospects": "Prospects (Sniper)",
+      "settings": "Settings",
+      "upgrade": "Upgrade",
+      "unlockCta": "Unlock unlimited responses"
+    },
+    "overview": {
+      "title": "Overview",
+      "stats": {
+        "avgRating": "Average Rating",
+        "reviewsProcessed": "Reviews Processed",
+        "securityAlerts": "Security Alerts",
+        "timeSaved": "Time Saved"
+      },
+      "reviewsTitle": "Real-Time Reviews",
+      "reviewsEmpty": "No reviews yet. Simulate one below.",
+      "simulateTitle": "Simulate a review",
+      "chartTitle": "Rating Trend"
+    },
+    "prospects": {
+      "title": "Prospects (Sniper)",
+      "subtitle": "{{count}} prospect to contact",
+      "subtitle_plural": "{{count}} prospects to contact",
+      "empty": "No prospects. Run the Sniper script to find some.",
+      "generatePitch": "Generate Pitch",
+      "contact": "Contact",
+      "copyPitch": "Copy pitch",
+      "copied": "Copied!",
+      "pitchTitle": "Personalized pitch",
+      "noPitch": "No pitch generated for this prospect."
+    },
+    "establishments": {
+      "title": "My Establishments",
+      "description": "Connect your establishments to manage their reviews",
+      "comingSoon": "This feature is coming soon."
+    },
+    "settings": {
+      "title": "Settings",
+      "description": "Manage your account and preferences",
+      "comingSoon": "This feature is coming soon."
+    },
+    "form": {
+      "review": "Review",
+      "rating": "Rating",
+      "establishment": "Establishment",
+      "city": "City",
+      "simulate": "Simulate",
+      "placeholder": {
+        "review": "Great restaurant!",
+        "establishment": "The Bistro",
+        "city": "Paris"
+      },
+      "error": "Error while sending"
+    }
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "An error occurred"
+  }
+}

@@ -7,6 +7,14 @@ import GooglePlacesAutocomplete, {
 } from 'react-google-places-autocomplete';
 import { MapPin } from 'lucide-react';
 
+function highlightMatch(text: string, query: string): React.ReactNode {
+  if (!query.trim()) return text;
+  const escaped = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const re = new RegExp(`(${escaped})`, 'gi');
+  const parts = text.split(re);
+  return parts.map((part, i) => (i % 2 === 1 ? <strong key={i}>{part}</strong> : part));
+}
+
 export interface AddressResult {
   fullAddress: string;
   street: string;
@@ -101,6 +109,27 @@ export function AddressAutocomplete({
       isClearable: true,
       noOptionsMessage: () => 'Aucune adresse trouvée',
       loadingMessage: () => 'Recherche...',
+      menuPortalTarget: typeof document !== 'undefined' ? document.body : undefined,
+      menuPosition: 'fixed' as const,
+      formatOptionLabel: (option: { label: string }, meta: { inputValue?: string }) =>
+        highlightMatch(option.label, meta.inputValue ?? ''),
+      components: {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        Option: (props: any) => (
+          <div
+            ref={props.innerRef}
+            {...props.innerProps}
+            className="flex items-center gap-2 px-3 py-2.5 cursor-pointer text-slate-700 hover:bg-slate-50 text-sm"
+            onMouseDown={(e: React.MouseEvent) => {
+              e.preventDefault();
+              props.selectOption(props.data);
+            }}
+          >
+            <MapPin className="shrink-0 w-4 h-4 text-slate-400" />
+            <span>{props.children}</span>
+          </div>
+        ),
+      },
       styles: {
         control: (base: object) => ({
           ...base,
@@ -125,25 +154,22 @@ export function AddressAutocomplete({
         singleValue: (base: object) => ({ ...base, margin: 0 }),
         menu: (base: object) => ({
           ...base,
+          position: 'absolute' as const,
+          zIndex: 9999,
           backgroundColor: '#fff',
-          borderRadius: 12,
+          borderRadius: 8,
           overflow: 'hidden',
-          boxShadow: '0 1px 3px 0 rgba(0,0,0,0.08)',
+          border: '1px solid #e2e8f0',
+          boxShadow: '0 4px 6px -1px rgba(0,0,0,0.07), 0 2px 4px -2px rgba(0,0,0,0.05)',
           marginTop: 4,
           width: '100%',
         }),
         menuList: (base: object) => ({
           ...base,
           padding: 4,
+          maxHeight: 240,
         }),
-        option: (base: object, state: { isFocused?: boolean }) => ({
-          ...base,
-          backgroundColor: state.isFocused ? '#f8fafc' : 'transparent',
-          color: '#334155',
-          cursor: 'pointer',
-          padding: '10px 12px',
-          fontSize: 'inherit',
-        }),
+        option: () => ({}),
       },
     }),
     [id, value, placeholder, onChange]
@@ -176,8 +202,9 @@ export function AddressAutocomplete({
         <GooglePlacesAutocomplete
           apiKey={apiKey}
           selectProps={selectProps}
+          debounce={300}
           autocompletionRequest={{
-            componentRestrictions: { country: ['fr'] },
+            componentRestrictions: { country: 'fr' },
           }}
           minLengthAutocomplete={2}
         />

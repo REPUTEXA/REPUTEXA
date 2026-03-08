@@ -278,7 +278,7 @@ export default function SignupPage() {
                 />
               </div>
 
-              <div className="space-y-3">
+              <div>
                 <label htmlFor="signup-address" className="block text-sm font-medium text-slate-700 mb-1.5">
                   Adresse
                 </label>
@@ -301,47 +301,9 @@ export default function SignupPage() {
                   }}
                   placeholder="Saisissez votre adresse..."
                 />
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                  <div>
-                    <label htmlFor="signup-street" className="block text-xs font-medium text-slate-500 mb-1">
-                      Rue
-                    </label>
-                    <input
-                      id="signup-street"
-                      type="text"
-                      value={street}
-                      onChange={(e) => setStreet(e.target.value)}
-                      placeholder="Rue"
-                      className="w-full px-4 py-2.5 rounded-2xl border border-slate-200/80 bg-slate-50/50 text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/25 focus:border-blue-400 transition-all"
-                    />
-                  </div>
-                  <div>
-                    <label htmlFor="signup-city" className="block text-xs font-medium text-slate-500 mb-1">
-                      Ville
-                    </label>
-                    <input
-                      id="signup-city"
-                      type="text"
-                      value={city}
-                      onChange={(e) => setCity(e.target.value)}
-                      placeholder="Ville"
-                      className="w-full px-4 py-2.5 rounded-2xl border border-slate-200/80 bg-slate-50/50 text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/25 focus:border-blue-400 transition-all"
-                    />
-                  </div>
-                  <div>
-                    <label htmlFor="signup-postal" className="block text-xs font-medium text-slate-500 mb-1">
-                      Code postal
-                    </label>
-                    <input
-                      id="signup-postal"
-                      type="text"
-                      value={postalCode}
-                      onChange={(e) => setPostalCode(e.target.value)}
-                      placeholder="Code postal"
-                      className="w-full px-4 py-2.5 rounded-2xl border border-slate-200/80 bg-slate-50/50 text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/25 focus:border-blue-400 transition-all"
-                    />
-                  </div>
-                </div>
+                <input type="hidden" name="address_street" value={street} />
+                <input type="hidden" name="address_city" value={city} />
+                <input type="hidden" name="address_postal_code" value={postalCode} />
               </div>
 
               <div>

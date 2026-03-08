@@ -5,7 +5,6 @@ import GooglePlacesAutocomplete, {
   geocodeByPlaceId,
   getLatLng,
 } from 'react-google-places-autocomplete';
-import type { OptionTypeBase } from 'react-select';
 import { MapPin } from 'lucide-react';
 
 export interface AddressResult {
@@ -59,7 +58,7 @@ export function AddressAutocomplete({
     () => ({
       placeholder,
       value: value ? { label: value, value: { place_id: value } } : null,
-      onChange: async (opt: OptionTypeBase | null) => {
+      onChange: async (opt: { label: string; value?: { place_id?: string } } | null) => {
         if (!opt) {
           onChange('');
           return;
@@ -72,7 +71,7 @@ export function AddressAutocomplete({
         try {
           const [result] = await geocodeByPlaceId(placeId);
           const fullAddress = result?.formatted_address ?? opt.label ?? '';
-          const { city, postalCode } = extractComponents(result?.address_components);
+          const { street, city, postalCode } = extractComponents(result?.address_components);
           let lat = 0;
           let lng = 0;
           if (result?.geometry?.location) {
@@ -82,6 +81,7 @@ export function AddressAutocomplete({
           }
           onChange(fullAddress, {
             fullAddress,
+            street,
             city,
             postalCode,
             lat,

@@ -3,14 +3,14 @@
  * Support multi-devise et formats de date par locale
  */
 
-export type SupportedLocale = 'fr' | 'en' | 'es' | 'de' | 'ja';
+export type SupportedLocale = 'fr' | 'en' | 'es' | 'de' | 'it';
 
 const LOCALE_MAP: Record<SupportedLocale, string> = {
   fr: 'fr-FR',
   en: 'en-US',
   es: 'es-ES',
   de: 'de-DE',
-  ja: 'ja-JP',
+  it: 'it-IT',
 };
 
 export function formatDate(

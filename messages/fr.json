@@ -1,88 +1,278 @@
 {
+  "Pricing": {
+    "starter_title": "STARTER",
+    "starter_price": "59€",
+    "starter_desc": "L'essentiel pour votre enseigne",
+    "manager_title": "MANAGER",
+    "manager_price": "97€",
+    "manager_desc": "Idéal pour les zones touristiques",
+    "dominator_title": "DOMINATOR",
+    "dominator_price": "157€",
+    "dominator_desc": "La protection absolue de votre CA"
+  },
+  "Features": {
+    "starter_replies": "Réponses illimitées (Langue locale uniquement)",
+    "starter_pdf": "Reporting PDF mensuel",
+    "manager_replies": "Réponses illimitées (Toutes langues / Natif)",
+    "manager_whatsapp": "Alertes mauvais avis sur WhatsApp",
+    "manager_reporting": "Reporting PDF + Recap Hebdo WhatsApp",
+    "dominator_capture": "IA de Capture (Avis WhatsApp 30 min après encaissement)",
+    "dominator_pos": "Connecteur Caisse OAuth (Square, SumUp)",
+    "dominator_shield": "LE BOUCLIER (Filtre anti-avis négatifs, redirection vers patron)",
+    "vision_replies": "Réponses IA illimitées (Langue locale)",
+    "pulse_whatsapp": "Alertes WhatsApp temps réel",
+    "pulse_languages": "Toutes langues",
+    "zenith_shield": "Bouclier Anti-Abus IA",
+    "zenith_google": "Signalement automatique Google",
+    "zenith_recap": "Recap WhatsApp Hebdo",
+    "cta_choose": "Choisir ce plan",
+    "human_response_guarantee": "Réponse humaine garantie (25-45min)"
+  },
   "HomePage": {
     "nav": {
+      "home": "Accueil",
       "features": "Fonctionnalités",
       "pricing": "Tarifs",
       "testimonials": "Témoignages",
+      "faq": "FAQ",
+      "contact": "Contact",
       "login": "Connexion",
       "trial": "Essai gratuit"
     },
     "hero": {
-      "pill": "IA de réputation - Restaurants, Coiffeurs, Hôtels...",
-      "title1": "Votre réputation, ",
-      "titleHighlight": "pilotée par l'IA",
-      "subtitle": "Répondez à tous vos avis en quelques secondes, surveillez votre e-réputation en temps réel et augmentez votre note moyenne — automatiquement.",
+      "pill": "IA de réputation • Restaurants, Coiffeurs, Hôtels...",
+      "headline": "Votre réputation, pilotée par l'",
+      "headlineHighlight": "IA",
+      "promise": "Réponse humaine garantie (25-45min)",
+      "tagline": "Répondez à tous vos avis en quelques secondes, surveillez votre e-réputation en temps réel et augmentez votre note moyenne — automatiquement.",
       "ctaPrimary": "Essayer gratuitement",
       "ctaSecondary": "Voir la démo",
-      "trialInfo": "Aucune CB requise - 14 jours d'essai - Annulation à tout moment"
+      "trialInfo": "Aucune CB requise · 14 jours d'essai · Annulation à tout moment"
     },
-    "features": {
-      "title": "Tout pour votre réputation",
+    "demo": {
+      "title": "Démo : L'IA en action",
+      "subtitle": "Voyez comment REPUTEXA répond automatiquement à un avis négatif pour {business}",
+      "aiResponseLabel": "Réponse générée par l'IA",
+      "readyToPublish": "Prête à publier",
+      "verified": "Double vérification IA passée",
+      "publishNow": "Publier maintenant",
+      "whatsappAlert": "Alerte Dominator : Nouvel avis critique intercepté !",
+      "statsScore": "Score de réputation",
+      "statsReviews": "Avis traités",
+      "statsTime": "Temps gagné",
+      "close": "Fermer",
+      "examples": {
+        "0": {
+          "sector": "salon",
+          "business": "Salon Élégance",
+          "reviewer": "Sophie M.",
+          "review": "Coupe complètement ratée ! J'avais montré une photo précise et le résultat n'a rien à voir. En plus, on m'a facturé un soin que je n'avais pas demandé. Je suis vraiment dégoûtée.",
+          "response": "Madame M., Nous sommes sincèrement désolés que votre expérience n'ait pas été à la hauteur de vos attentes. Un écart entre la coupe souhaitée et le résultat est inacceptable pour nous. Nous aimerions échanger avec vous pour trouver une solution. Merci de nous recontacter à votre convenance. — L'équipe du Salon Élégance"
+        },
+        "1": {
+          "sector": "restaurant",
+          "business": "Le Bistro Parisien",
+          "reviewer": "Jean D.",
+          "review": "Service catastrophique, 45 min d'attente pour l'entrée. Le plat était froid et le serveur nous a ignorés. Jamais plus.",
+          "response": "Monsieur D., nous vous prions de nous excuser pour cette attente et ce service en dessous de nos standards. Votre retour est précieux pour nous améliorer. Nous serions ravis de vous accueillir à nouveau pour vous offrir l'expérience que vous méritez. Contactez-nous en privé pour en discuter. — L'équipe du Bistro Parisien"
+        },
+        "2": {
+          "sector": "hôtel",
+          "business": "Hôtel Les Pins",
+          "reviewer": "Marie L.",
+          "review": "Chambre bruyante, vue sur le parking. Pour le prix payé, on s'attendait à bien mieux. Le petit-déjeuner était correct mais pas exceptionnel.",
+          "response": "Madame L., nous regrettons que votre séjour n'ait pas répondu à vos attentes, notamment concernant la tranquillité et la vue. Nous prenons bonne note pour améliorer l'expérience de nos clients. N'hésitez pas à nous contacter pour un prochain séjour — nous nous ferons un plaisir de vous proposer une chambre adaptée. — La direction des Pins"
+        },
+        "3": {
+          "sector": "spa",
+          "business": "Spa Zenitude",
+          "reviewer": "Pierre T.",
+          "review": "Massage bâclé, la praticienne avait l'air pressée. L'ambiance était bien mais l'expérience globale décevante pour le tarif.",
+          "response": "Monsieur T., nous sommes désolés que votre massage n'ait pas été à la hauteur. La qualité de nos soins est notre priorité absolue. Nous aimerions vous offrir une seconde chance : contactez-nous pour reprogrammer un soin dans des conditions optimales. — L'équipe Spa Zenitude"
+        },
+        "4": {
+          "sector": "café",
+          "business": "Café des Artistes",
+          "reviewer": "Anne B.",
+          "review": "Commande perdue, café servi tiède. Le personnel avait l'air débordé et personne ne s'est excusé. Très déçue.",
+          "response": "Madame B., nous nous excusons sincèrement pour cette erreur et le manque de réactivité de notre équipe. Ce n'est pas le niveau de service que nous visons. Merci de nous recontacter — nous serons ravis de vous offrir un café gratuit lors de votre prochaine visite. — L'équipe du Café des Artistes"
+        }
+      }
+    },
+    "problem": {
+      "headline": "La Menace Silencieuse : Les Retours Clients Non Gérés.",
+      "intro": "Chaque jour, les restaurateurs perdent des heures à gérer les avis, subissent des notes 1 étoile dévastatrices et ne parviennent pas à amplifier les retours positifs. Un seul mauvais avis peut détruire votre note Google—et vos réservations.",
+      "solution": "Présentation de votre Directeur Relation Client 24/7. Une IA qui ne dort jamais, protège votre réputation et transforme vos clients satisfaits en ambassadeurs."
+    },
+    "negativeFilter": {
+      "headline": "Le Bouclier Ultime : Comment Nous Éradiquons les Avis 1 Étoile.",
+      "step1": "L'IA contacte le client via WhatsApp : « Comment était votre expérience ? »",
+      "step2": "Si négatif, l'IA répond : « Nous sommes désolés. Plutôt que de publier sur Google, préféreriez-vous contacter le propriétaire en privé pour résoudre cela ? »",
+      "step3": "Le client s'exprime en privé. Le propriétaire reçoit une alerte WhatsApp discrète.",
+      "result": "L'avis 1 étoile n'apparaît jamais sur Google. Cette fonctionnalité seule vaut plus que l'abonnement.",
+      "cta": "Sécurisez Votre Réputation – Voir les Tarifs"
+    },
+    "socialProof": ["Restaurants", "Coiffeurs", "Hôtels", "Spas & Beauté", "Cafés", "Cliniques"],
+    "commandCenter": {
+      "badge": "Centre de Commande IA",
+      "title": "Dashboard e-réputation intelligent",
+      "flux": "Le Flux",
+      "action": "L'Action",
+      "actionBadge": "Optimisé par REPUTEXA",
+      "control": "Le Contrôle",
+      "fluxItem1Name": "Restaurant La Bella Vista",
+      "fluxItem1Status": "Nouvel avis",
+      "fluxItem2Name": "Hôtel Les Jardins",
+      "fluxItem2Status": "En cours",
+      "fluxItem3Name": "Salon Coiffure Élite",
+      "fluxItem3Status": "Traité",
+      "actionReviewLabel": "Avis",
+      "actionReviewText": "Bon séjour mais le petit-déjeuner mériterait d'être amélioré. Chambre impeccable.",
+      "actionResponseLabel": "Réponse IA (typing...)",
+      "actionResponseText": "Merci Thomas pour votre retour. Nous prenons bonne note concernant le petit-déjeuner et sommes ravis que la chambre vous ait plu.",
+      "controlScore": "Score 3.2 → 4.8",
+      "controlShield": "Bouclier Anti-Avis Actif",
+      "controlTime": "gagnées cette semaine",
+      "cta": "Activer mon plan Dominator — 157€/mois"
+    },
+    "preuve": {
+      "trustLine": "Déjà +200 entreprises font confiance à REPUTEXA pour automatiser leur e-réputation.",
+      "stat1Title": "Humain natif",
+      "stat1Desc": "Réponses ultra-pro comme un humain",
+      "stat2Title": "Feedback pro",
+      "stat2Desc": "Ce qui va et va pas pour progresser",
+      "stat3Title": "Plus d'avis",
+      "stat3Desc": "On vous aide à en collecter",
+      "joinCta": "Rejoindre le mouvement"
+    },
+    "howItWorks": {
+      "headline": "Tout pour votre réputation",
       "subtitle": "Des outils puissants, une interface simple.",
-      "ai": {
-        "title": "Réponses IA personnalisées",
-        "desc": "L'IA rédige des réponses adaptées à chaque avis en quelques secondes, dans votre ton de marque."
+      "aiReplies": {
+        "title": "Réponses aux Avis Automatisées",
+        "desc": "Autopilote IA : Réponses illimitées, ultra-rapides à tous vos avis en ligne, personnalisées pour chaque interaction."
       },
-      "alerts": {
-        "title": "Alertes en temps réel",
-        "desc": "Recevez une notification dès qu'un nouvel avis négatif apparaît sur vos plateformes connectées."
+      "badReviewAlerts": {
+        "title": "Alertes Avis Négatifs Temps Réel",
+        "desc": "Contrôle de crise instantané : Alertes WhatsApp directes pour tout retour potentiellement négatif, permettant une intervention immédiate."
       },
-      "tracking": {
-        "title": "Suivi de réputation",
-        "desc": "Visualisez l'évolution de votre note sur Google, TripAdvisor et Yelp sur un seul tableau de bord."
+      "reporting": {
+        "title": "Rapports de Performance",
+        "desc": "Insights à la demande : Rapports PDF mensuels et récap WhatsApp hebdomadaires, sans vous submerger."
       },
-      "sentiment": {
-        "title": "Analyse de sentiment",
-        "desc": "Comprenez ce que vos clients pensent vraiment grâce à l'analyse sémantique de tous les avis."
+      "reviewCapture": {
+        "title": "Capture d'Avis IA",
+        "desc": "Génération proactive : Notre IA incite en douceur vos clients satisfaits via WhatsApp 30 min après la visite à laisser un avis positif."
       },
-      "multiplatform": {
-        "title": "Multi-plateformes",
-        "desc": "Google, TripAdvisor, Yelp, Pages Jaunes – gérez tout depuis une seule interface unifiée."
+      "posIntegration": {
+        "title": "Intégration Caisse",
+        "desc": "Connectivité fluide : Intégration Square, SumUp et plus via OAuth pour une approche client intelligente."
       },
-      "brand": {
-        "title": "Protection de marque",
-        "desc": "Détection automatique des avis frauduleux et outils de signalement intégrés."
+      "negativeFilter": {
+        "title": "Filtre Avis Négatifs",
+        "desc": "Le protecteur ultime : Redirige les clients mécontents vers une résolution privée avant qu'ils n'atteignent Google—évitant les notes 1 étoile publiques."
+      },
+      "weeklyAnalysis": {
+        "title": "Analyse hebdo & mensuelle",
+        "desc": "Tendances, problèmes récurrents, succès — tout est synthétisé pour vous."
+      },
+      "aiChat": {
+        "title": "Chat IA intégré",
+        "desc": "Posez vos questions, obtenez des conseils personnalisés instantanément."
+      }
+    },
+    "perMonth": "/mois",
+    "pricingTrial": "14 jours d'essai gratuit — Sans carte bancaire",
+    "pricing": {
+      "headline": "Tarifs simples et transparents",
+      "subtitle": "Commencez gratuitement, évoluez à votre rythme.",
+      "ctaSubscribe": "S'abonner maintenant",
+      "ctaTrial": "Essayer gratuitement 14j",
+      "trialMention": "14 jours d'essai gratuit — Sans CB",
+      "vision": {
+        "name": "Vision",
+        "for": "L'essentiel pour votre image",
+        "price": "59",
+        "cta": "S'abonner maintenant",
+        "trialMention": "14 jours d'essai gratuit — Sans carte bancaire"
+      },
+      "pulse": {
+        "name": "Pulse",
+        "badge": "LE PLUS POPULAIRE",
+        "for": "Réactivité et contrôle total",
+        "price": "97",
+        "cta": "S'abonner maintenant"
+      },
+      "zenith": {
+        "name": "Zenith",
+        "for": "La forteresse de votre réputation",
+        "price": "179",
+        "cta": "S'abonner maintenant"
+      },
+      "comparison": {
+        "ai_local": "Réponses IA (Langue locale uniquement)",
+        "ai_all_languages": "Réponses IA (Toutes langues / Natif)",
+        "reporting_pdf": "Reporting PDF mensuel",
+        "triple_verification": "Triple Vérification IA (3 options, choisit la meilleure)",
+        "whatsapp_alerts": "Alertes WhatsApp immédiates (avis négatifs)",
+        "reporting_whatsapp_recap": "Reporting PDF + Récap Hebdo WhatsApp",
+        "shield_alert": "Alerte immédiate & Procédure de suppression",
+        "ai_capture": "IA Capture (WhatsApp 30 min après visite)",
+        "pos_connector": "Connecteurs Caisse OAuth (Square, SumUp)"
       }
     },
     "testimonials": {
-      "title": "Ils nous font confiance",
-      "subtitle": "+2 400 établissements gèrent leur réputation avec REPUTEXA",
+      "headline": "Ils nous font confiance",
+      "subtitle": "+2 400 établissements gèrent leur réputation avec REPUTEXA.",
       "items": {
         "1": {
-          "quote": "REPUTEXA a transformé notre gestion des avis. En 3 mois, notre note Google est passée de 3.8 à 4.7 !",
-          "name": "Sophie Renaud",
-          "role": "Propriétaire, Brasserie Le Comptoir"
+          "quote": "Le Filtre Avis Négatifs à lui seul nous a sauvés. On avait 2-3 avis 1 étoile par mois de clients frustrés qui ne nous laissaient jamais corriger. Maintenant ? Zéro catastrophe publique. Ça vaut chaque euro.",
+          "name": "Sophie M.",
+          "role": "Propriétaire, Le Bistro Parisien"
         },
         "2": {
-          "quote": "Les réponses IA sont bluffantes. Mes clients pensent que je réponds personnellement à chacun. Un gain de temps phénoménal.",
-          "name": "Marc Fontaine",
-          "role": "Gérant, Salon Coiffure Elite"
+          "quote": "C'est comme avoir un directeur de réputation qui ne dort jamais. Je reçois des alertes WhatsApp quand il faut intervenir, et l'IA gère le reste. Notre note Google est passée de 3,9 à 4,6 en 4 mois.",
+          "name": "Marco D.",
+          "role": "Chef-Propriétaire, Trattoria Milano"
         },
         "3": {
-          "quote": "L'outil idéal pour notre chaîne de 8 hôtels. Tout centralisé, tout automatisé. Je recommande à 100%.",
-          "name": "Isabelle Moreau",
+          "quote": "La sérénité. C'est ce que je paie. Savoir que les clients mécontents ont un canal privé avant d'aller sur Google ? Révolutionnaire. Le plan DOMINATOR est le meilleur investissement qu'on ait fait.",
+          "name": "Isabelle R.",
           "role": "Directrice, Hôtel Les Pins"
         }
       }
     },
-    "pricing": {
-      "title": "Tarifs simples et transparents",
-      "subtitle": "Commencez gratuitement, évoluez à votre rythme.",
-      "starter": {
-        "name": "Starter",
-        "for": "Pour les indépendants",
-        "cta": "Commencer gratuitement"
-      },
-      "pro": {
-        "name": "Pro",
-        "for": "Pour les PME",
-        "badge": "Le plus populaire",
-        "cta": "Essai 14 jours gratuit"
-      },
-      "agency": {
-        "name": "Agence",
-        "for": "Pour les agences",
-        "cta": "Contactez-nous"
+    "faq": {
+      "headline": "Questions fréquentes",
+      "items": {
+        "autoRepondre": {
+          "q": "Ce n'est pas juste un auto-répondeur ?",
+          "a": "Absolument pas. La plupart des outils se contentent de répondre aux avis. REPUTEXA va beaucoup plus loin : notre IA détecte les tendances, identifie les risques, priorise les actions et vous aide à améliorer concrètement votre business."
+        },
+        "natural": {
+          "q": "Les réponses sont-elles vraiment naturelles ?",
+          "a": "Oui. Notre IA suit des règles strictes : jamais de phrases génériques, référence systématique au contenu spécifique de l'avis, ton adapté à votre établissement. Le résultat est indistinguable d'une réponse humaine."
+        },
+        "publishing": {
+          "q": "Comment fonctionne la publication automatique ?",
+          "a": "Les avis positifs (3-5 étoiles) sont automatiquement publiés sur Google. Les avis négatifs (1-2 étoiles) passent par une double vérification IA avant publication. Vous gardez le contrôle total."
+        },
+        "cancel": {
+          "q": "Puis-je annuler à tout moment ?",
+          "a": "Oui, sans engagement. Vous pouvez annuler votre abonnement à tout moment depuis votre tableau de bord."
+        }
+      }
+    },
+    "contact": {
+      "headline": "Prêt à Transformer Votre Présence en Ligne ?",
+      "subtitle": "Parlez à notre équipe. Nous vous montrerons exactement comment fonctionne votre Directeur.",
+      "cta": "Parler à Notre Équipe",
+      "form": {
+        "name": "Nom",
+        "email": "Email",
+        "phone": "Téléphone",
+        "message": "Message",
+        "submit": "Réserver une Démo"
       }
     },
     "cta": {
@@ -91,12 +281,16 @@
       "button": "Commencer maintenant"
     },
     "footer": {
-      "rights": "© 2026 REPUTEXA - Tous droits réservés"
+      "rights": "© 2026 REPUTEXA. Tous droits réservés.",
+      "privacy": "Politique de confidentialité",
+      "terms": "Conditions d'utilisation"
     }
   },
   "Dashboard": {
     "sidebar": {
       "overview": "Vue d'ensemble",
+      "aiResponses": "Réponses IA",
+      "statistics": "Statistiques",
       "establishments": "Mes Établissements",
       "prospects": "Prospects (Sniper)",
       "settings": "Paramètres",
@@ -126,17 +320,17 @@
       "copyPitch": "Copier le pitch",
       "copied": "Copié !",
       "pitchTitle": "Pitch personnalisé",
-      "noPitch": "Aucun pitch généré pour ce prospect."
+      "noPitch": "Aucun pitch généré."
     },
     "establishments": {
       "title": "Mes Établissements",
       "description": "Connectez vos établissements pour gérer leurs avis",
-      "comingSoon": "Cette fonctionnalité arrive bientôt."
+      "comingSoon": "Bientôt disponible."
     },
     "settings": {
       "title": "Paramètres",
       "description": "Gérez votre compte et vos préférences",
-      "comingSoon": "Cette fonctionnalité arrive bientôt."
+      "comingSoon": "Bientôt disponible."
     },
     "form": {
       "review": "Avis",

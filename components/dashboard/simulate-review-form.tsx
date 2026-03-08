@@ -41,25 +41,25 @@ export function SimulateReviewForm() {
   return (
     <form
       onSubmit={handleSubmit}
-      className="flex flex-wrap items-end gap-4 rounded-xl border border-gray-200 bg-white p-5"
+      className="flex flex-wrap items-end gap-4 rounded-2xl border border-white/10 bg-white/5 p-5"
     >
       <div className="flex min-w-[200px] flex-1 flex-col gap-1">
-        <label className="text-xs font-medium text-zinc-500">{t('review')}</label>
+        <label className="text-xs font-medium text-white/60">{t('review')}</label>
         <input
           type="text"
           required
           value={form.reviewText}
           onChange={(e) => setForm({ ...form, reviewText: e.target.value })}
           placeholder={t('placeholder.review')}
-          className="rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-zinc-900 placeholder-zinc-400 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+          className="rounded-lg border border-white/20 bg-white/10 px-3 py-2 text-sm text-white placeholder-white/40 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
         />
       </div>
       <div className="flex w-24 flex-col gap-1">
-        <label className="text-xs font-medium text-zinc-500">{t('rating')}</label>
+        <label className="text-xs font-medium text-white/60">{t('rating')}</label>
         <select
           value={form.rating}
           onChange={(e) => setForm({ ...form, rating: Number(e.target.value) })}
-          className="rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-zinc-900 focus:border-blue-500 focus:outline-none"
+          className="rounded-lg border border-white/20 bg-white/10 px-3 py-2 text-sm text-white focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
         >
           {[1, 2, 3, 4, 5].map((n) => (
             <option key={n} value={n}>
@@ -69,25 +69,25 @@ export function SimulateReviewForm() {
         </select>
       </div>
       <div className="flex min-w-[140px] flex-col gap-1">
-        <label className="text-xs font-medium text-zinc-500">{t('establishment')}</label>
+        <label className="text-xs font-medium text-white/60">{t('establishment')}</label>
         <input
           type="text"
           required
           value={form.establishmentName}
           onChange={(e) => setForm({ ...form, establishmentName: e.target.value })}
           placeholder={t('placeholder.establishment')}
-          className="rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-zinc-900 placeholder-zinc-400 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+          className="rounded-lg border border-white/20 bg-white/10 px-3 py-2 text-sm text-white placeholder-white/40 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
         />
       </div>
       <div className="flex min-w-[120px] flex-col gap-1">
-        <label className="text-xs font-medium text-zinc-500">{t('city')}</label>
+        <label className="text-xs font-medium text-white/60">{t('city')}</label>
         <input
           type="text"
           required
           value={form.city}
           onChange={(e) => setForm({ ...form, city: e.target.value })}
           placeholder={t('placeholder.city')}
-          className="rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-zinc-900 placeholder-zinc-400 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+          className="rounded-lg border border-white/20 bg-white/10 px-3 py-2 text-sm text-white placeholder-white/40 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
         />
       </div>
       <button

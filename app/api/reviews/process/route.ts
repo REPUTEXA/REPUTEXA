@@ -6,16 +6,20 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-const POLYGLOT_SYSTEM_PROMPT = `Tu es l'expert n°1 en e-réputation mondiale. Ton rôle est de répondre aux avis clients pour des établissements locaux.
+const POLYGLOT_BASE = `Tu es l'expert n°1 en e-réputation mondiale pour REPUTEXA. Réponds aux avis clients pour des établissements locaux.
 
-RÈGLES ABSOLUES :
-1. LANGUE : Détecte la langue de l'avis client et réponds systématiquement dans la MÊME langue (Espagnol pour Espagnol, Japonais pour Japonais, etc.). Respecte les nuances locales (ex: espagnol d'Espagne vs Mexique).
-2. TON : Chaleureux, professionnel et court.
-3. SEO : Inclus naturellement des mots-clés liés à l'activité et à la ville pour booster le référencement local.
-4. ALERTE : Si l'avis est inférieur à 3 étoiles OU contient des mots de colère/insatisfaction forte, NE réponds pas et renvoie UNIQUEMENT : {"action":"FLAG","reason":"negative","detectedLanguage":"CODE_ISO"}.
-5. Si l'avis est neutre ou positif (>= 3), rédige une réponse et renvoie : {"action":"REPLY","content":"Ta réponse ici","detectedLanguage":"CODE_ISO"}.
+RÈGLES :
+1. LANGUE : {LANGUE_RULE}
+2. TON CULTUREL (adapte selon la langue de réponse) :
+   - EN/US : ROI, résultats mesurables, efficacité. Ton direct et orienté valeur.
+   - FR : Qualité, expertise, professionnalisme. Ton raffiné et rassurant.
+   - ES/IT/JP : Courtoisie, attention client, hospitalité. Ton chaleureux et respectueux.
+   - DE : Précision, fiabilité, rigueur. Ton professionnel et factuel.
+3. SEO : Injecte naturellement {city} et {industry} (activité) dans ta réponse pour le référencement local.
+4. ALERTE : Si avis < 3 étoiles OU colère/insatisfaction forte -> {"action":"FLAG","reason":"negative","detectedLanguage":"CODE_ISO"}
+5. Si avis >= 3 -> {"action":"REPLY","content":"Ta réponse","detectedLanguage":"CODE_ISO"}
 
-Réponds UNIQUEMENT en JSON valide, sans markdown ni texte avant/après.`;
+Réponds UNIQUEMENT en JSON valide.`;
 
 type ProcessReviewBody = {
   reviewText: string;
@@ -23,11 +27,16 @@ type ProcessReviewBody = {
   establishmentName: string;
   city: string;
   industry?: string;
+  establishmentId?: string;
 };
 
 type GptResponse =
   | { action: 'FLAG'; reason: string; detectedLanguage: string }
   | { action: 'REPLY'; content: string; detectedLanguage: string };
+
+function randomDelayMinutes(min: number, max: number): number {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
 
 export async function POST(request: Request) {
   try {
@@ -38,8 +47,9 @@ export async function POST(request: Request) {
       );
     }
 
-    const body: ProcessReviewBody = await request.json();
-    const { reviewText, rating, establishmentName, city, industry } = body;
+    const raw = await request.json().catch(() => ({}));
+    const body = raw as ProcessReviewBody;
+    const { reviewText, rating, establishmentName, city, industry, establishmentId } = body;
 
     if (!reviewText || rating == null || !establishmentName || !city) {
       return NextResponse.json(
@@ -50,22 +60,41 @@ export async function POST(request: Request) {
       );
     }
 
+    // Charger l'établissement si fourni (tier + platformLang pour segmentation)
+    let tier: 'STARTER' | 'MANAGER' | 'DOMINATOR' | null = null;
+    let platformLang = 'fr';
+
+    if (establishmentId) {
+      const establishment = await prisma.establishment.findUnique({
+        where: { id: establishmentId },
+      });
+      if (establishment) {
+        tier = establishment.tier as 'STARTER' | 'MANAGER' | 'DOMINATOR';
+        platformLang = establishment.platformLang ?? 'fr';
+      }
+    }
+
+    const isStarter = tier === 'STARTER';
+    const langRule = isStarter
+      ? `IMPORTANT : Réponds UNIQUEMENT en ${platformLang.toUpperCase()}. L'établissement est en plan STARTER, donc limite tes réponses à la langue de l'enseigne. Ignore la langue de l'avis.`
+      : `Détecte la langue de l'avis et réponds dans la MÊME langue (natif). L'établissement est en plan MANAGER/DOMINATOR avec IA polyglotte. Respecte les nuances locales.`;
+
+    const systemPrompt = POLYGLOT_BASE.replace('{LANGUE_RULE}', langRule);
+
     const completion = await openai.chat.completions.create({
       model: 'gpt-4o',
       messages: [
-        { role: 'system', content: POLYGLOT_SYSTEM_PROMPT },
+        { role: 'system', content: systemPrompt },
         {
           role: 'user',
           content: `Avis reçu:
 - Texte: "${reviewText}"
 - Note: ${rating}/5
 - Établissement: ${establishmentName}
-- Ville: ${city}
-${industry ? `- Activité: ${industry}` : ''}
+- Ville: {city} = ${city}
+- Activité/Industry: {industry} = ${industry ?? 'restaurant'}
 
-Retourne un JSON avec action (FLAG ou REPLY), detectedLanguage (code ISO), et selon le cas :
-- FLAG : reason
-- REPLY : content (ta réponse optimisée SEO local)`,
+Génère une réponse optimisée SEO en injectant {city} et {industry}. Retourne JSON : action, detectedLanguage, et (FLAG: reason | REPLY: content).`,
         },
       ],
       response_format: { type: 'json_object' },
@@ -82,17 +111,23 @@ Retourne un JSON avec action (FLAG ou REPLY), detectedLanguage (code ISO), et se
     const responseText = parsed.action === 'REPLY' ? parsed.content : null;
     const status = parsed.action === 'FLAG' ? 'FLAGGED' : responseText ? 'REPLIED' : 'PENDING';
 
+    // Délai humain : 25-45 min avant publication effective (tous plans)
+    const delayMin = randomDelayMinutes(25, 45);
+    const scheduledPublishAt = new Date(Date.now() + delayMin * 60 * 1000);
+
     const review = await prisma.review.create({
       data: {
         reviewText,
         rating,
         establishmentName,
         city,
+        establishmentId: establishmentId ?? undefined,
         detectedLanguage: parsed.detectedLanguage,
         responseText,
         status,
         isSecurityFlagged,
         securityAdvice: parsed.action === 'FLAG' ? parsed.reason : null,
+        scheduledPublishAt,
       },
     });
 
@@ -103,7 +138,7 @@ Retourne un JSON avec action (FLAG ou REPLY), detectedLanguage (code ISO), et se
       isSecurityFlagged,
       reason: parsed.action === 'FLAG' ? parsed.reason : undefined,
       responseText,
-      // Si FLAG : idéalement déclencher webhook Twilio/WhatsApp côté client ou cron
+      scheduledPublishAt: scheduledPublishAt.toISOString(),
     });
   } catch (error) {
     console.error('[reviews/process]', error);

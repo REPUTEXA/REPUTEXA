@@ -1,27 +1,11 @@
-import { auth } from '@clerk/nextjs/server';
-import { prisma } from '@/lib/prisma';
+import { createClient } from '@/lib/supabase/server';
 
 /**
- * Récupère ou crée l'utilisateur Prisma à partir de Clerk
+ * Récupère l'utilisateur Supabase courant (auth unifiée Supabase).
+ * Pour compatibilité si des routes utilisent getOrCreateUser.
  */
 export async function getOrCreateUser() {
-  const { userId, sessionClaims } = await auth();
-  if (!userId) return null;
-
-  const email = (sessionClaims?.email as string) ?? '';
-
-  let user = await prisma.user.findUnique({
-    where: { clerkUserId: userId },
-  });
-
-  if (!user) {
-    user = await prisma.user.create({
-      data: {
-        clerkUserId: userId,
-        email: email || `user-${userId}@placeholder.local`,
-      },
-    });
-  }
-
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
   return user;
 }

@@ -1,39 +1,54 @@
 import createMiddleware from 'next-intl/middleware';
-import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server';
 import { NextRequest, NextResponse } from 'next/server';
 import { routing } from './i18n/routing';
+import { updateSession } from '@/lib/supabase/middleware';
 
 const intlMiddleware = createMiddleware(routing);
 
 const VALID_LOCALES = [...routing.locales];
 
-// Routes publiques (pas d'auth requise)
-const isPublicRoute = createRouteMatcher([
-  '/',
-  '/en',
-  '/fr',
-  '/es',
-  '/de',
-  '/ja',
-  '/:locale/sign-up(.*)',
-  '/:locale/sign-in(.*)',
-  '/sign-up(.*)',
-  '/sign-in(.*)',
-]);
+/**
+ * Routes publiques (pas d'auth requise).
+ * Toutes les autres routes (ex: /dashboard, /dashboard/*, /checkout, /upgrade)
+ * exigent une session Supabase active ; sinon redirection vers /login.
+ */
+const PUBLIC_PATTERNS = [
+  /^\/?$/,
+  /^\/(fr|en|es|de|it)(\/?)$/,
+  /^\/(fr|en|es|de|it)\/sign-up(\/.*)?$/,
+  /^\/(fr|en|es|de|it)\/sign-in(\/.*)?$/,
+  /^\/(fr|en|es|de|it)\/login$/,
+  /^\/(fr|en|es|de|it)\/signup$/,
+  /^\/(fr|en|es|de|it)\/choose-plan$/,
+  /^\/(fr|en|es|de|it)\/pricing$/,
+  /^\/sign-up(\/.*)?$/,
+  /^\/pricing$/,
+  /^\/sign-in(\/.*)?$/,
+  /^\/login$/,
+  /^\/signup$/,
+  /^\/choose-plan$/,
+  /^\/(fr|en|es|de|it)\/quick-reply\/[^/]+$/, // Magic link sans login
+];
+
+function isPublicRoute(pathname: string): boolean {
+  const p = pathname.replace(/^\/+/, '/');
+  return PUBLIC_PATTERNS.some((re) => re.test(p));
+}
 
 /**
- * 1. Routes /api → passer directement (pas de next-intl, pas d'auth)
- * 2. Magic link ?lang=es → redirect
- * 3. Clerk auth pour /dashboard et /checkout
- * 4. next-intl pour les locales (pages)
+ * Auth Supabase uniquement (Clerk retiré pour éviter conflits).
+ * 1. Routes /api → passer directement
+ * 2. Magic link ?lang=... → redirect
+ * 3. Routes protégées : redirection vers /login si pas de session Supabase
  */
-export default clerkMiddleware(async (auth, request: NextRequest) => {
+export default async function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
 
-  // Routes API : passer sans toucher (évite 404 et conflits next-intl)
   if (pathname.startsWith('/api/')) {
     return NextResponse.next();
   }
+
+  const { response: supabaseResponse, user: supabaseUser } = await updateSession(request);
 
   const url = request.nextUrl.clone();
   const lang = url.searchParams.get('lang') ?? url.searchParams.get('locale');
@@ -53,19 +68,30 @@ export default clerkMiddleware(async (auth, request: NextRequest) => {
       }
     }
     url.pathname = p === '/' ? `/${lang}` : `/${lang}/${p.replace(/^\//, '')}`;
-    return NextResponse.redirect(url);
+    const response = NextResponse.redirect(url);
+    response.cookies.set('NEXT_LOCALE', lang, {
+      path: '/',
+      maxAge: 60 * 60 * 24 * 365,
+      sameSite: 'lax',
+    });
+    return response;
   }
 
-  // Protéger dashboard et checkout (pages)
-  if (!isPublicRoute(request)) {
+  if (!isPublicRoute(pathname) && !supabaseUser) {
     const locale = VALID_LOCALES.find((l) => pathname.startsWith(`/${l}/`) || pathname === `/${l}`) ?? 'fr';
-    await auth.protect({ unauthenticatedUrl: `/${locale}/sign-in` });
+    const nextUrl = encodeURIComponent(pathname + (request.nextUrl.search || ''));
+    const loginUrl = new URL(`/${locale}/login`, request.url);
+    loginUrl.searchParams.set('next', nextUrl);
+    return NextResponse.redirect(loginUrl);
   }
 
-  return intlMiddleware(request);
-});
+  const intlResponse = intlMiddleware(request);
+  supabaseResponse.cookies.getAll().forEach((c) => {
+    intlResponse.cookies.set(c.name, c.value, { path: '/' });
+  });
+  return intlResponse;
+}
 
 export const config = {
-  // Inclure /api pour que Clerk passe la requête (on la forward immédiatement)
   matcher: ['/((?!_next|_vercel|.*\\..*).*)'],
 };

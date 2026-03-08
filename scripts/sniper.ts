@@ -162,7 +162,7 @@ async function generatePitch(
     messages: [
       {
         role: 'system',
-        content: `Tu es un commercial Reputexa. Tu rédiges des messages d'accroche ultra-personnalisés pour contacter des propriétaires d'établissements.
+        content: `Tu es un commercial REPUTEXA. Tu rédiges des messages d'accroche ultra-personnalisés pour contacter des propriétaires d'établissements.
 Le message doit être rédigé en ${targetLang}.
 Ton à adopter: ${toneGuide}
 Maximum 3 phrases. Personnalise selon leur note (${rating}/5) et leur situation.`,
@@ -193,7 +193,7 @@ async function main() {
   const query = `${category} à ${city}`;
 
   console.log('\n' + '='.repeat(60));
-  console.log('🎯 Sniper - Prospection Reputexa (International)');
+  console.log('🎯 Sniper - Prospection REPUTEXA (International)');
   console.log('='.repeat(60));
   console.log(`📌 Recherche: "${query}"`);
   console.log(`🌍 Pays: ${countryCode} → langue: ${targetLang}`);

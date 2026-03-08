@@ -1,159 +1,231 @@
 {
+  "Pricing": {
+    "starter_title": "STARTER",
+    "starter_price": "$59",
+    "manager_title": "MANAGER",
+    "manager_price": "$97",
+    "dominator_title": "DOMINATOR",
+    "dominator_price": "$157"
+  },
+  "Features": {
+    "starter_replies": "Unlimited replies (Local language only)",
+    "starter_pdf": "Monthly PDF reporting",
+    "manager_replies": "Unlimited replies (All languages / Native)",
+    "manager_whatsapp": "BAD review alerts on WhatsApp",
+    "manager_reporting": "PDF reporting + Weekly WhatsApp Recap",
+    "dominator_capture": "AI Capture (WhatsApp review 30 min after payment)",
+    "dominator_pos": "OAuth POS Connector (Square, SumUp)",
+    "dominator_shield": "THE SHIELD (Negative review filter, redirect to owner)",
+    "vision_replies": "Unlimited AI replies (Local language)",
+    "pulse_whatsapp": "Real-time WhatsApp alerts",
+    "pulse_languages": "All languages",
+    "zenith_shield": "AI Anti-Abuse Shield",
+    "zenith_google": "Automatic Google reporting",
+    "zenith_recap": "Weekly WhatsApp Recap",
+    "cta_choose": "Choose this plan",
+    "human_response_guarantee": "Human response guaranteed (25-45min)"
+  },
   "HomePage": {
     "nav": {
+      "home": "Home",
       "features": "Features",
       "pricing": "Pricing",
       "testimonials": "Testimonials",
+      "faq": "FAQ",
+      "contact": "Contact",
       "login": "Login",
       "trial": "Free trial"
     },
     "hero": {
-      "pill": "Reputation AI - Restaurants, Hairdressers, Hotels...",
-      "title1": "Your reputation, ",
-      "titleHighlight": "powered by AI",
-      "subtitle": "Reply to all your reviews in seconds, monitor your online reputation in real time and increase your average rating — automatically.",
-      "ctaPrimary": "Try for free",
-      "ctaSecondary": "See demo",
-      "trialInfo": "No credit card required - 14-day trial - Cancel anytime"
+      "pill": "24/7 AI-Powered Customer Relationship Director",
+      "headline": "Your 24/7 Customer Relationship Director.",
+      "headlineHighlight": "Protect Your Reputation, Effortlessly.",
+      "tagline": "Automate feedback, prevent negative reviews, and elevate your brand with AI.",
+      "ctaPrimary": "Start free trial",
+      "ctaSecondary": "See How It Works",
+      "trialInfo": "No credit card required · 14-day free trial · Cancel anytime"
     },
-    "features": {
-      "title": "Everything for your reputation",
-      "subtitle": "Powerful tools, simple interface.",
-      "ai": {
-        "title": "Personalized AI responses",
-        "desc": "The AI writes responses tailored to each review in seconds, in your brand voice."
-      },
-      "alerts": {
-        "title": "Real-time alerts",
-        "desc": "Get notified as soon as a new negative review appears on your connected platforms."
-      },
-      "tracking": {
-        "title": "Reputation tracking",
-        "desc": "Visualize your rating evolution on Google, TripAdvisor and Yelp on a single dashboard."
-      },
-      "sentiment": {
-        "title": "Sentiment analysis",
-        "desc": "Understand what your customers really think with semantic analysis of all reviews."
-      },
-      "multiplatform": {
-        "title": "Multi-platform",
-        "desc": "Google, TripAdvisor, Yelp, Yellow Pages – manage everything from one unified interface."
-      },
-      "brand": {
-        "title": "Brand protection",
-        "desc": "Automatic detection of fraudulent reviews and integrated reporting tools."
-      }
-    },
-    "testimonials": {
-      "title": "They trust us",
-      "subtitle": "+2,400 establishments manage their reputation with REPUTEXA",
-      "items": {
+    "demo": {
+      "title": "Demo: AI in Action",
+      "subtitle": "See how REPUTEXA automatically responds to a negative review for {business}",
+      "aiResponseLabel": "AI-generated response",
+      "readyToPublish": "Ready to publish",
+      "verified": "Double AI verification passed",
+      "publishNow": "Publish now",
+      "whatsappAlert": "Dominator Alert: New critical review intercepted!",
+      "statsScore": "Reputation score",
+      "statsReviews": "Reviews processed",
+      "statsTime": "Time saved",
+      "close": "Close",
+      "examples": {
+        "0": {
+          "sector": "salon",
+          "business": "Elegance Salon",
+          "reviewer": "Sophie M.",
+          "review": "Complete haircut disaster! I showed a precise photo and the result has nothing to do with it. Plus, I was charged for a treatment I didn't ask for. Really disgusted.",
+          "response": "Mrs. M., we sincerely apologize that your experience did not meet your expectations. A gap between the desired cut and the result is unacceptable to us. We would like to discuss with you to find a solution. Please contact us at your convenience. — The Elegance Salon Team"
+        },
         "1": {
-          "quote": "REPUTEXA transformed our review management. In 3 months, our Google rating went from 3.8 to 4.7!",
-          "name": "Sophie Renaud",
-          "role": "Owner, Brasserie Le Comptoir"
+          "sector": "restaurant",
+          "business": "Le Bistro Parisien",
+          "reviewer": "Jean D.",
+          "review": "Disastrous service, 45 min wait for the appetizer. The dish was cold and the waiter ignored us. Never again.",
+          "response": "Mr. D., we sincerely apologize for this wait and service below our standards. Your feedback is valuable for us to improve. We would be delighted to welcome you back. Please contact us privately to discuss. — The Le Bistro Parisien Team"
         },
         "2": {
-          "quote": "The AI responses are amazing. My clients think I respond personally to each one. A phenomenal time-saver.",
-          "name": "Marc Fontaine",
-          "role": "Manager, Salon Coiffure Elite"
+          "sector": "hotel",
+          "business": "Hotel Les Pins",
+          "reviewer": "Marie L.",
+          "review": "Noisy room, parking lot view. For the price paid, we expected much better. Breakfast was okay but not exceptional.",
+          "response": "Mrs. L., we regret that your stay did not meet your expectations, especially regarding peace and the view. We take note to improve our guests' experience. Feel free to contact us for a future stay. — Hotel Les Pins"
         },
         "3": {
-          "quote": "The ideal tool for our chain of 8 hotels. Everything centralized, everything automated. I recommend it 100%.",
-          "name": "Isabelle Moreau",
-          "role": "Director, Hôtel Les Pins"
+          "sector": "spa",
+          "business": "Spa Zenitude",
+          "reviewer": "Pierre T.",
+          "review": "Rushed massage, the practitioner seemed in a hurry. The ambiance was nice but the overall experience disappointing for the price.",
+          "response": "Mr. T., we are sorry that your massage did not meet expectations. The quality of our treatments is our top priority. We would like to give you a second chance: contact us to reschedule. — The Spa Zenitude Team"
+        },
+        "4": {
+          "sector": "café",
+          "business": "Café des Artistes",
+          "reviewer": "Anne B.",
+          "review": "Order lost, coffee served lukewarm. Staff seemed overwhelmed and nobody apologized. Very disappointed.",
+          "response": "Mrs. B., we sincerely apologize for this error and our team's lack of responsiveness. This is not the service level we aim for. Please contact us — we will be happy to offer you a free coffee on your next visit. — Café des Artistes Team"
         }
       }
     },
+    "problem": {
+      "headline": "The Silent Threat to Your Business: Unmanaged Feedback.",
+      "intro": "Every day, restaurant owners lose hours managing reviews, suffer from damaging 1-star ratings, and miss out on amplifying positive feedback. One bad review can tank your Google rating—and your bookings.",
+      "solution": "Introducing your 24/7 Customer Relationship Director. An AI that never sleeps, protects your reputation, and turns satisfied customers into your best advocates."
+    },
+    "negativeFilter": {
+      "headline": "The Ultimate Reputation Shield: How We Eradicate 1-Star Reviews.",
+      "step1": "AI engages customer via WhatsApp: \"How was your experience?\"",
+      "step2": "If negative, AI responds: \"We're truly sorry. Instead of posting on Google, would you like to privately message the owner to resolve this directly?\"",
+      "step3": "Customer vents privately. Owner receives discreet WhatsApp alert.",
+      "result": "A 1-star review never appears on Google. This feature alone is worth more than the subscription.",
+      "cta": "Secure Your Reputation – Explore Pricing"
+    },
+    "commandCenter": {
+      "badge": "AI Command Center",
+      "title": "Smart e-reputation dashboard",
+      "flux": "The Flow",
+      "action": "The Action",
+      "actionBadge": "Powered by REPUTEXA",
+      "control": "The Control",
+      "fluxItem1Name": "Restaurant La Bella Vista",
+      "fluxItem1Status": "New review",
+      "fluxItem2Name": "Hotel Les Jardins",
+      "fluxItem2Status": "In progress",
+      "fluxItem3Name": "Salon Coiffure Elite",
+      "fluxItem3Status": "Processed",
+      "actionReviewLabel": "Review",
+      "actionReviewText": "Good stay but breakfast could be improved. Room was spotless.",
+      "actionResponseLabel": "AI Response (typing...)",
+      "actionResponseText": "Thank you Thomas for your feedback. We take note regarding breakfast and are glad the room met your expectations.",
+      "controlScore": "Score 3.2 → 4.8",
+      "controlShield": "Anti-Review Shield Active",
+      "controlTime": "saved this week",
+      "cta": "Activate my Dominator plan — $157/month"
+    },
+    "preuve": {
+      "trustLine": "Already +200 companies trust REPUTEXA to automate their e-reputation.",
+      "stat1Title": "Native human",
+      "stat1Desc": "Ultra-pro responses like a human",
+      "stat2Title": "Pro feedback",
+      "stat2Desc": "What works and what doesn't to improve",
+      "stat3Title": "More reviews",
+      "stat3Desc": "We help you collect them",
+      "joinCta": "Join the movement"
+    },
+    "perMonth": "/month",
+    "howItWorks": {
+      "headline": "All you need for your reputation",
+      "subtitle": "Powerful tools, simple interface.",
+      "aiReplies": { "title": "Automated Review Responses", "desc": "Intelligent AI Autopilot: Unlimited, lightning-fast responses to all your online reviews, tailored to each interaction." },
+      "badReviewAlerts": { "title": "Real-time Bad Review Alerts", "desc": "Instant Crisis Control: Direct WhatsApp alerts for potential negative feedback, allowing immediate intervention." },
+      "reporting": { "title": "Performance Reporting", "desc": "Insights on Demand: Monthly PDF reports and weekly WhatsApp recaps, keeping you informed without overwhelming you." },
+      "reviewCapture": { "title": "AI Review Capture", "desc": "Proactive Feedback Generation: Our AI gently nudges satisfied customers via WhatsApp 30 mins post-visit to leave positive reviews." },
+      "posIntegration": { "title": "POS Integration", "desc": "Seamless Connectivity: Integrates with Square, SumUp, and more via OAuth for intelligent customer outreach." },
+      "negativeFilter": { "title": "Negative Review Filter", "desc": "The Ultimate Protector: Redirects unhappy customers to private resolution before they ever hit Google—preventing public 1-star ratings." },
+      "weeklyAnalysis": { "title": "Weekly & Monthly Analysis", "desc": "Trends, recurring issues, successes — everything synthesized for you." },
+      "aiChat": { "title": "Integrated AI Chat", "desc": "Ask your questions, get personalized advice instantly." }
+    },
+    "pricingTrial": "14-day free trial - No credit card required",
     "pricing": {
-      "title": "Simple and transparent pricing",
-      "subtitle": "Start for free, evolve at your own pace.",
-      "starter": {
-        "name": "Starter",
-        "for": "For independents",
-        "cta": "Start for free"
+      "headline": "Invest in Your Reputation. Not Just a Tool—Your 24/7 Digital Director.",
+      "subtitle": "Three plans. One mission: protect and grow your reputation.",
+      "ctaSubscribe": "Subscribe now",
+      "ctaTrial": "Try free for 14 days",
+      "trialMention": "14-day free trial — No credit card required",
+      "vision": {
+        "name": "Vision",
+        "for": "The essentials for your image",
+        "price": "59",
+        "cta": "Try for Free",
+        "trialMention": "14-day free trial - No credit card required"
       },
-      "pro": {
-        "name": "Pro",
-        "for": "For SMEs",
-        "badge": "Most popular",
-        "cta": "14-day free trial"
+      "pulse": {
+        "name": "Pulse",
+        "badge": "MOST POPULAR",
+        "for": "Responsiveness and total control",
+        "price": "97",
+        "cta": "Try for Free"
       },
-      "agency": {
-        "name": "Agency",
-        "for": "For agencies",
-        "cta": "Contact us"
+      "zenith": {
+        "name": "Zenith",
+        "for": "The fortress of your reputation",
+        "price": "179",
+        "cta": "Try for Free"
+      },
+      "comparison": {
+        "ai_local": "AI replies (Local language only)",
+        "ai_all_languages": "AI replies (All languages / Native)",
+        "reporting_pdf": "Monthly PDF reporting",
+        "triple_verification": "Triple AI verification (3 options, best pick)",
+        "whatsapp_alerts": "Instant WhatsApp alerts (negative reviews)",
+        "reporting_whatsapp_recap": "PDF reporting + Weekly WhatsApp recap",
+        "shield_alert": "Instant alert & Removal procedure",
+        "ai_capture": "AI Capture (WhatsApp 30 min after visit)",
+        "pos_connector": "POS connectors OAuth (Square, SumUp)"
       }
     },
-    "cta": {
-      "title": "Ready to boost your reputation?",
-      "subtitle": "Join 2,400+ establishments that trust REPUTEXA.",
-      "button": "Start now"
+    "testimonials": {
+      "headline": "What Restaurant Owners Say About Their New Director.",
+      "subtitle": "Join hundreds of restaurant owners who sleep better at night.",
+      "items": {
+        "1": { "quote": "The Negative Review Filter alone has saved us. We used to get 2-3 one-star reviews a month. Now? Zero public disasters. Worth every euro.", "name": "Sophie M.", "role": "Owner, Le Bistro Parisien" },
+        "2": { "quote": "It's like having a reputation manager who never sleeps. Our Google rating went from 3.9 to 4.6 in 4 months.", "name": "Marco D.", "role": "Chef-Owner, Trattoria Milano" },
+        "3": { "quote": "Peace of mind. Knowing that unhappy customers get a private channel before they hit Google? Game-changer.", "name": "Isabelle R.", "role": "Director, Hôtel Les Pins" }
+      }
     },
-    "footer": {
-      "rights": "© 2026 REPUTEXA - All rights reserved"
-    }
+    "faq": {
+      "headline": "Frequently asked questions",
+      "items": {
+        "autoRepondre": { "q": "Isn't it just an auto-responder?", "a": "Absolutely not. Most tools simply reply to reviews. REPUTEXA goes much further: our AI detects trends, identifies risks, prioritizes actions, and helps you improve your business concretely." },
+        "natural": { "q": "Are the responses really natural?", "a": "Yes. Our AI follows strict rules: never generic phrases, systematic reference to the specific content of the review, tone adapted to your establishment. The result is indistinguishable from a human response." },
+        "publishing": { "q": "How does automatic publishing work?", "a": "Positive reviews (3-5 stars) are automatically published on Google. Negative reviews (1-2 stars) go through double AI verification before publication. You keep full control." },
+        "cancel": { "q": "Can I cancel anytime?", "a": "Yes, with no commitment. You can cancel your subscription at any time from your dashboard." }
+      }
+    },
+    "contact": {
+      "headline": "Ready to Transform Your Online Presence?",
+      "subtitle": "Talk to our team. We'll show you exactly how your Director works.",
+      "cta": "Talk to Our Team",
+      "form": { "name": "Name", "email": "Email", "phone": "Phone", "message": "Message", "submit": "Schedule a Demo" }
+    },
+    "cta": { "title": "Your Reputation Deserves a 24/7 Director.", "subtitle": "Join restaurant owners who've stopped worrying about reviews.", "button": "Start free trial" },
+    "footer": { "rights": "© 2026 REPUTEXA. All rights reserved.", "privacy": "Privacy Policy", "terms": "Terms of Service" }
   },
   "Dashboard": {
-    "sidebar": {
-      "overview": "Overview",
-      "establishments": "My Establishments",
-      "prospects": "Prospects (Sniper)",
-      "settings": "Settings",
-      "upgrade": "Upgrade",
-      "unlockCta": "Unlock unlimited responses"
-    },
-    "overview": {
-      "title": "Overview",
-      "stats": {
-        "avgRating": "Average Rating",
-        "reviewsProcessed": "Reviews Processed",
-        "securityAlerts": "Security Alerts",
-        "timeSaved": "Time Saved"
-      },
-      "reviewsTitle": "Real-Time Reviews",
-      "reviewsEmpty": "No reviews yet. Simulate one below.",
-      "simulateTitle": "Simulate a review",
-      "chartTitle": "Rating Trend"
-    },
-    "prospects": {
-      "title": "Prospects (Sniper)",
-      "subtitle": "{{count}} prospect to contact",
-      "subtitle_plural": "{{count}} prospects to contact",
-      "empty": "No prospects. Run the Sniper script to find some.",
-      "generatePitch": "Generate Pitch",
-      "contact": "Contact",
-      "copyPitch": "Copy pitch",
-      "copied": "Copied!",
-      "pitchTitle": "Personalized pitch",
-      "noPitch": "No pitch generated for this prospect."
-    },
-    "establishments": {
-      "title": "My Establishments",
-      "description": "Connect your establishments to manage their reviews",
-      "comingSoon": "This feature is coming soon."
-    },
-    "settings": {
-      "title": "Settings",
-      "description": "Manage your account and preferences",
-      "comingSoon": "This feature is coming soon."
-    },
-    "form": {
-      "review": "Review",
-      "rating": "Rating",
-      "establishment": "Establishment",
-      "city": "City",
-      "simulate": "Simulate",
-      "placeholder": {
-        "review": "Great restaurant!",
-        "establishment": "The Bistro",
-        "city": "Paris"
-      },
-      "error": "Error while sending"
-    }
+    "sidebar": { "overview": "Overview", "aiResponses": "AI Responses", "statistics": "Statistics", "establishments": "My Establishments", "prospects": "Prospects (Sniper)", "settings": "Settings", "upgrade": "Upgrade", "unlockCta": "Unlock unlimited responses" },
+    "overview": { "title": "Overview", "stats": { "avgRating": "Average Rating", "reviewsProcessed": "Reviews Processed", "securityAlerts": "Security Alerts", "timeSaved": "Time Saved" }, "reviewsTitle": "Real-Time Review Feed", "reviewsEmpty": "No reviews yet. Simulate one below.", "simulateTitle": "Simulate Review", "chartTitle": "Rating Trend" },
+    "prospects": { "title": "Prospects (Sniper)", "subtitle": "{{count}} prospect to contact", "subtitle_plural": "{{count}} prospects to contact", "empty": "No prospects. Run the Sniper script to find some.", "generatePitch": "Generate Pitch", "contact": "Contact", "copyPitch": "Copy pitch", "copied": "Copied!", "pitchTitle": "Custom pitch", "noPitch": "No pitch generated yet." },
+    "establishments": { "title": "My Establishments", "description": "Connect your establishments to manage their reviews", "comingSoon": "Coming soon." },
+    "settings": { "title": "Settings", "description": "Manage your account and preferences", "comingSoon": "Coming soon." },
+    "form": { "review": "Review", "rating": "Rating", "establishment": "Establishment", "city": "City", "simulate": "Simulate", "placeholder": { "review": "Great restaurant!", "establishment": "Le Bistro", "city": "Paris" }, "error": "Error sending" }
   },
-  "common": {
-    "loading": "Loading...",
-    "error": "An error occurred"
-  }
+  "common": { "loading": "Loading...", "error": "An error occurred" }
 }

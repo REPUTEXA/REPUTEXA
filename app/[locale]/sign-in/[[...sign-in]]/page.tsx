@@ -1,4 +1,4 @@
-import { SignIn } from '@clerk/nextjs';
+import { redirect } from 'next/navigation';
 import { setRequestLocale } from 'next-intl/server';
 import { routing } from '@/i18n/routing';
 
@@ -14,18 +14,5 @@ export default async function SignInPage({ params }: Props) {
     return null;
   }
 
-  return (
-    <div className="flex min-h-[80vh] items-center justify-center bg-zinc-950 py-12">
-      <SignIn
-        appearance={{
-          elements: {
-            rootBox: 'mx-auto',
-            card: 'bg-zinc-900 border border-zinc-800 shadow-xl',
-          },
-        }}
-        afterSignInUrl={`/${locale}/dashboard`}
-        signUpUrl={`/${locale}/sign-up`}
-      />
-    </div>
-  );
+  redirect(`/${locale}/login`);
 }

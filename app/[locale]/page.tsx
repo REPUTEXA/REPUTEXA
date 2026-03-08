@@ -1,378 +1,961 @@
-import { setRequestLocale } from 'next-intl/server';
-import { getTranslations } from 'next-intl/server';
+'use client';
+
+import { useState } from 'react';
 import { Link } from '@/i18n/navigation';
-import {
-  Star,
-  Bell,
-  TrendingUp,
-  BarChart2,
-  MessageCircle,
-  Shield,
-  ChevronRight,
-  FileText,
-  Check,
-} from 'lucide-react';
+import { useTranslations, useLocale } from 'next-intl';
+import { Bell, TrendingUp, MessageCircle, MessageSquare, ShieldCheck, ChevronRight, Check, BarChart2 } from 'lucide-react';
+import { Chatbot } from '@/components/chatbot';
+import { LanguageSelector } from '@/components/language-selector';
+import { DemoDashboard } from '@/components/demo-dashboard';
+import { Logo } from '@/components/logo';
+import { formatPrice } from '@/lib/format-price';
 
-type Props = {
-  params: Promise<{ locale: string }>;
-};
+function StarIcon() {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className="lucide lucide-star w-4 h-4 fill-star text-star"
+      aria-hidden="true"
+    >
+      <path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z" />
+    </svg>
+  );
+}
 
-export default async function HomePage({ params }: Props) {
-  const { locale } = await params;
-  setRequestLocale(locale);
+const FAQ_KEYS = ['autoRepondre', 'natural', 'publishing', 'cancel'] as const;
 
-  const t = await getTranslations('HomePage');
+export default function HomePage() {
+  const t = useTranslations('HomePage');
+  const locale = useLocale();
+  const [openFaq, setOpenFaq] = useState<string | null>(null);
+  const [openDemo, setOpenDemo] = useState(false);
 
   return (
-    <div className="min-h-screen">
-      {/* Header - Dark */}
-      <header className="fixed top-0 left-0 right-0 z-50 border-b border-zinc-800/50 bg-zinc-950/95 backdrop-blur">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
-          <Link href="/" className="flex items-center gap-2">
-            <span className="text-xl font-bold tracking-tight text-white">
-              REPUTEXA
-            </span>
+    <div className="min-h-screen bg-background overflow-x-hidden">
+      {/* NAVBAR */}
+      <nav className="fixed top-0 inset-x-0 z-50 h-14 sm:h-16 border-b border-white/10 bg-navy/60 backdrop-blur-xl backdrop-saturate-150">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 h-full flex items-center justify-between gap-2 safe-area-nav">
+          <Link href="/" className="flex items-center gap-2 sm:gap-2.5 shrink-0" aria-label="REPUTEXA">
+            <Logo />
+            <span className="font-display font-bold text-white text-base sm:text-lg tracking-heading">REPUTEXA</span>
           </Link>
-          <nav className="hidden items-center gap-8 md:flex">
-            <Link href="#features" className="text-sm text-zinc-300 hover:text-white">
+          <div className="hidden md:flex items-center gap-6">
+            <a
+              href="#fonctionnalités"
+              className="text-sm text-white/60 hover:text-white transition-colors font-medium"
+            >
               {t('nav.features')}
-            </Link>
-            <Link href="#pricing" className="text-sm text-zinc-300 hover:text-white">
+            </a>
+            <a
+              href="#tarifs"
+              className="text-sm text-white/60 hover:text-white transition-colors font-medium"
+            >
               {t('nav.pricing')}
-            </Link>
-            <Link href="#testimonials" className="text-sm text-zinc-300 hover:text-white">
+            </a>
+            <a
+              href="#témoignages"
+              className="text-sm text-white/60 hover:text-white transition-colors font-medium"
+            >
               {t('nav.testimonials')}
-            </Link>
-          </nav>
+            </a>
+            <a
+              href="#faq"
+              className="text-sm text-white/60 hover:text-white transition-colors font-medium"
+            >
+              {t('nav.faq')}
+            </a>
+          </div>
           <div className="flex items-center gap-3">
+            <LanguageSelector variant="dark" />
             <Link
-              href="/sign-in"
-              className="text-sm text-zinc-300 hover:text-white"
+              href="/login"
+              className="text-sm text-white/70 hover:text-white font-medium transition-colors"
             >
               {t('nav.login')}
             </Link>
             <Link
-              href="/sign-up"
-              className="shiny-button rounded-lg bg-blue-500 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-blue-600"
+              href="/signup?mode=trial"
+              className="gradient-primary text-white text-sm font-semibold px-4 py-2 rounded-xl hover:opacity-90 transition-opacity"
             >
               {t('nav.trial')}
             </Link>
           </div>
         </div>
-      </header>
+      </nav>
 
-      {/* Hero - Dark */}
-      <section className="bg-zinc-950 pt-28 pb-16">
-        <div className="mx-auto max-w-6xl px-6">
-          <div className="rounded-full border border-zinc-700/50 bg-zinc-900/50 px-4 py-1.5 text-sm text-zinc-300 w-fit mb-8">
-            {t('hero.pill')}
-          </div>
-          <h1 className="max-w-3xl text-4xl font-bold tracking-tight text-white sm:text-5xl lg:text-6xl">
-            {t('hero.title1')}
-            <span className="text-blue-400">{t('hero.titleHighlight')}</span>
-          </h1>
-          <p className="mt-6 max-w-2xl text-lg text-zinc-400">
-            {t('hero.subtitle')}
-          </p>
-          <div className="mt-8 flex flex-wrap gap-4">
-            <Link
-              href="/sign-up"
-              className="shiny-button inline-flex items-center gap-2 rounded-lg bg-blue-500 px-6 py-3 font-medium text-white transition hover:bg-blue-600"
+      {/* HERO + DASHBOARD WRAPPER (fond dégradé continu) */}
+      <div className="hero-dashboard-bg">
+        {/* HERO */}
+        <section className="pt-24 sm:pt-28 md:pt-32 pb-12 sm:pb-20 relative overflow-hidden">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 relative safe-area-section">
+            <div className="text-center max-w-3xl mx-auto">
+            <div
+              className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-white/15 bg-white/5 text-xs text-white/70 font-medium mb-4 sm:mb-6 animate-fade-up tracking-prose"
+              style={{ animationDelay: '0.1s', opacity: 0 }}
             >
-              {t('hero.ctaPrimary')}
-              <ChevronRight className="h-4 w-4" />
-            </Link>
-            <Link
-              href="#dashboard-preview"
-              className="inline-flex items-center gap-2 rounded-lg border border-zinc-600 px-6 py-3 font-medium text-white transition hover:bg-zinc-800"
+              <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
+              {t('hero.pill')}
+            </div>
+            <h1
+              className="font-display text-4xl sm:text-5xl md:text-6xl font-bold text-white leading-tight mb-4 sm:mb-6 animate-fade-up tracking-heading"
+              style={{ animationDelay: '0.1s', opacity: 0 }}
             >
-              {t('hero.ctaSecondary')}
-            </Link>
+              {t('hero.headline')}
+              <span className="text-gradient">{t('hero.headlineHighlight')}</span>
+            </h1>
+            <p
+              className="text-base sm:text-lg text-white/60 leading-relaxed mb-6 sm:mb-8 animate-fade-up tracking-prose"
+              style={{ animationDelay: '0.2s', opacity: 0 }}
+            >
+              {t('hero.tagline')}
+            </p>
+            <div
+              className="flex flex-col sm:flex-row items-center justify-center gap-3 animate-fade-up"
+              style={{ animationDelay: '0.3s', opacity: 0 }}
+            >
+              <Link
+                href="/signup?mode=trial"
+                className="gradient-primary text-white font-semibold px-5 py-2.5 sm:px-6 sm:py-3 rounded-xl flex items-center gap-2 hover:opacity-90 transition-opacity shadow-glow cta-pulse-soft text-sm sm:text-base"
+              >
+                {t('hero.ctaPrimary')} <ChevronRight className="w-4 h-4" aria-hidden="true" />
+              </Link>
+              <button
+                type="button"
+                onClick={() => setOpenDemo(true)}
+                className="text-white/70 font-semibold px-5 py-2.5 sm:px-6 sm:py-3 rounded-xl flex items-center gap-2 border border-white/15 hover:bg-white/5 transition-colors text-sm sm:text-base"
+              >
+                {t('hero.ctaSecondary')}
+              </button>
+            </div>
+            <p className="text-xs text-white/30 mt-4 tracking-prose">{t('hero.trialInfo')}</p>
           </div>
-          <p className="mt-6 text-sm text-zinc-500">
-            {t('hero.trialInfo')}
-          </p>
-        </div>
+          </div>
+        </section>
 
-        {/* Dashboard Preview */}
-        <div
-          id="dashboard-preview"
-          className="mx-auto mt-16 max-w-6xl px-6"
-        >
-          <div className="overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900/80 p-6 shadow-2xl backdrop-blur">
-            <div className="flex items-center justify-between border-b border-zinc-700 pb-4">
-              <span className="text-sm font-medium text-zinc-400">
-                Reputation Analytics
+        {/* CENTRE DE COMMANDE IA */}
+        <section className="py-12 sm:py-20 md:py-24 relative overflow-hidden">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 relative safe-area-section">
+            <div className="text-center mb-6 sm:mb-10">
+              <span className="inline-block bg-blue-500/15 text-blue-300 px-2.5 sm:px-3 py-1 rounded-full text-[10px] sm:text-xs font-semibold uppercase tracking-wider mb-3 sm:mb-4">
+                CENTRE DE COMMANDE IA
               </span>
-              <div className="flex items-center gap-2">
-                <div className="h-2 w-2 rounded-full bg-emerald-500" />
-                <span className="text-xs text-zinc-500">Live</span>
-              </div>
+              <h2 className="font-display text-2xl sm:text-3xl md:text-4xl font-bold text-white tracking-heading">
+                Dashboard e-réputation intelligent
+              </h2>
             </div>
-            <div className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              <div className="rounded-xl border border-zinc-700 bg-zinc-800/50 p-4">
-                <p className="text-xs text-zinc-500">Note moyenne</p>
-                <p className="mt-1 text-2xl font-bold text-white">4.2</p>
-                <div className="mt-2 flex gap-0.5">
-                  {[1, 2, 3, 4].map((i) => (
-                    <Star key={i} className="h-4 w-4 fill-amber-400 text-amber-400" />
-                  ))}
+
+            <div className="rounded-2xl sm:rounded-[32px] border border-white/10 bg-white/5 shadow-[0_24px_64px_rgba(15,23,42,0.85)] sm:shadow-[0_40px_120px_rgba(15,23,42,0.9)] p-1 sm:p-1.5 dashboard-glow min-w-0">
+              <div className="rounded-xl sm:rounded-2xl md:rounded-3xl border border-slate-200/80 shadow-2xl overflow-hidden bg-white backdrop-blur-sm">
+                <div className="bg-gradient-to-b from-slate-100 to-slate-50 px-3 sm:px-4 py-2.5 sm:py-3 flex items-center gap-2 sm:gap-3 border-b border-slate-200 min-w-0">
+                  <div className="flex gap-2">
+                    <div className="w-3 h-3 rounded-full bg-rose-400 shadow-sm" />
+                    <div className="w-3 h-3 rounded-full bg-amber-400 shadow-sm" />
+                    <div className="w-3 h-3 rounded-full bg-emerald-400 shadow-sm" />
+                  </div>
+                  <div className="flex-1 flex justify-center min-w-0">
+                    <div className="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-4 py-1 sm:py-1.5 bg-white rounded-lg border border-slate-200 shadow-sm max-w-full">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        className="lucide lucide-lock w-2.5 h-2.5 sm:w-3 sm:h-3 text-emerald-500 shrink-0"
+                        aria-hidden="true"
+                      >
+                        <rect width="18" height="11" x="3" y="11" rx="2" ry="2" />
+                        <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                      </svg>
+                      <span className="text-[10px] sm:text-xs text-slate-600 font-medium truncate">
+                        app.reputexa.ai/dashboard
+                      </span>
+                    </div>
+                  </div>
+                  <div className="w-8 sm:w-16 shrink-0" />
+                </div>
+
+                <div className="p-3 sm:p-4 md:p-6 bg-gradient-to-br from-[#f8fafc] to-white">
+                  <div className="flex items-center justify-between mb-4 sm:mb-6 gap-2 flex-wrap">
+                    <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+                      <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-gradient-to-br from-blue-600 to-blue-500 flex items-center justify-center shadow-lg shadow-blue-500/20 shrink-0">
+                        <span className="text-white font-bold text-xs sm:text-sm">R</span>
+                      </div>
+                      <div className="min-w-0">
+                        <h3 className="font-semibold text-slate-900 text-xs sm:text-sm truncate">Mon Restaurant</h3>
+                        <p className="text-[10px] sm:text-xs text-slate-500">Tableau de bord</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+                      <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-slate-100 flex items-center justify-center">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="24"
+                          height="24"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          className="lucide lucide-bell w-3.5 h-3.5 sm:w-4 sm:h-4 text-slate-500"
+                          aria-hidden="true"
+                        >
+                          <path d="M10.268 21a2 2 0 0 0 3.464 0" />
+                          <path d="M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326" />
+                        </svg>
+                      </div>
+                    <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-blue-100 flex items-center justify-center">
+                      <span className="text-[10px] sm:text-xs font-semibold text-blue-600">JD</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3 md:gap-4 mb-4 sm:mb-6">
+                  <div className="bg-white p-2.5 sm:p-3 md:p-4 rounded-lg sm:rounded-xl border border-slate-200 shadow-soft min-w-0">
+                    <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-lg bg-emerald-100 flex items-center justify-center mb-1.5 sm:mb-2">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="24"
+                          height="24"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        className="lucide lucide-trending-up w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-600"
+                        aria-hidden="true"
+                      >
+                        <polyline points="22 7 13.5 15.5 8.5 10.5 2 17" />
+                        <polyline points="16 7 22 7 22 13" />
+                      </svg>
+                    </div>
+                    <p className="text-lg sm:text-xl md:text-2xl font-display font-bold text-slate-900">
+                      4.6/5
+                    </p>
+                    <p className="text-[10px] sm:text-xs text-slate-500">Note moyenne</p>
+                  </div>
+
+                  <div className="bg-white p-2.5 sm:p-3 md:p-4 rounded-lg sm:rounded-xl border border-slate-200 shadow-soft min-w-0">
+                    <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-lg bg-blue-100 flex items-center justify-center mb-1.5 sm:mb-2">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="24"
+                          height="24"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        className="lucide lucide-message-square-text w-3.5 h-3.5 sm:w-4 sm:h-4 text-blue-600"
+                        aria-hidden="true"
+                      >
+                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                        <path d="M13 8H7" />
+                        <path d="M17 12H7" />
+                      </svg>
+                    </div>
+                    <p className="text-lg sm:text-xl md:text-2xl font-display font-bold text-slate-900">
+                      127
+                    </p>
+                    <p className="text-[10px] sm:text-xs text-slate-500">Avis ce mois</p>
+                  </div>
+
+                  <div className="bg-white p-2.5 sm:p-3 md:p-4 rounded-lg sm:rounded-xl border border-slate-200 shadow-soft min-w-0">
+                    <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-lg bg-purple-100 flex items-center justify-center mb-1.5 sm:mb-2">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="24"
+                          height="24"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        className="lucide lucide-zap w-3.5 h-3.5 sm:w-4 sm:h-4 text-purple-600"
+                        aria-hidden="true"
+                      >
+                        <path d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z" />
+                      </svg>
+                    </div>
+                    <p className="text-lg sm:text-xl md:text-2xl font-display font-bold text-slate-900">
+                      ~10 min
+                    </p>
+                    <p className="text-[10px] sm:text-xs text-slate-500">Temps de réponse</p>
+                  </div>
+
+                  <div className="bg-white p-2.5 sm:p-3 md:p-4 rounded-lg sm:rounded-xl border border-slate-200 shadow-soft min-w-0">
+                    <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-lg bg-amber-100 flex items-center justify-center mb-1.5 sm:mb-2">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="24"
+                          height="24"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        className="lucide lucide-triangle-alert w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-600"
+                        aria-hidden="true"
+                      >
+                        <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3" />
+                        <path d="M12 9v4" />
+                        <path d="M12 17h.01" />
+                      </svg>
+                    </div>
+                    <p className="text-lg sm:text-xl md:text-2xl font-display font-bold text-slate-900">
+                      3
+                    </p>
+                    <p className="text-[10px] sm:text-xs text-slate-500">Actions prioritaires</p>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                  <div className="bg-white p-3 sm:p-4 rounded-lg sm:rounded-xl border border-slate-200 shadow-soft min-w-0">
+                    <h4 className="font-semibold text-slate-900 text-xs sm:text-sm mb-2 sm:mb-3 flex items-center gap-2 tracking-prose">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="24"
+                          height="24"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        className="lucide lucide-brain w-3.5 h-3.5 sm:w-4 sm:h-4 text-blue-600 shrink-0"
+                        aria-hidden="true"
+                      >
+                          <path d="M12 5a3 3 0 1 0-5.997.125 4 4 0 0 0-2.526 5.77 4 4 0 0 0 .556 6.588A4 4 0 1 0 12 18Z" />
+                          <path d="M12 5a3 3 0 1 1 5.997.125 4 4 0 0 1 2.526 5.77 4 4 0 0 1-.556 6.588A4 4 0 1 1 12 18Z" />
+                          <path d="M15 13a4.5 4.5 0 0 1-3-4 4.5 4.5 0 0 1-3 4" />
+                          <path d="M17.599 6.5a3 3 0 0 0 .399-1.375" />
+                          <path d="M6.003 5.125A3 3 0 0 0 6.401 6.5" />
+                          <path d="M3.477 10.896a4 4 0 0 1 .585-.396" />
+                          <path d="M19.938 10.5a4 4 0 0 1 .585.396" />
+                          <path d="M6 18a4 4 0 0 1-1.967-.516" />
+                          <path d="M19.967 17.484A4 4 0 0 1 18 18" />
+                        </svg>
+                        Insights IA de la semaine
+                      </h4>
+                      <div className="space-y-2">
+                        <div className="flex items-start gap-2 p-2 rounded-lg bg-rose-50 border border-rose-100">
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="24"
+                            height="24"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            className="lucide lucide-triangle-alert w-4 h-4 text-rose-600 mt-0.5 flex-shrink-0"
+                            aria-hidden="true"
+                          >
+                            <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3" />
+                            <path d="M12 9v4" />
+                            <path d="M12 17h.01" />
+                          </svg>
+                          <div>
+                            <p className="text-xs font-medium text-rose-700">
+                              Temps d&apos;attente mentionné 8x
+                            </p>
+                            <p className="text-xs text-rose-600">
+                              Impact estimé : -12 clients/mois
+                            </p>
+                          </div>
+                        </div>
+                        <div className="flex items-start gap-2 p-2 rounded-lg bg-emerald-50 border border-emerald-100">
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="24"
+                            height="24"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            className="lucide lucide-circle-check w-4 h-4 text-emerald-600 mt-0.5 flex-shrink-0"
+                            aria-hidden="true"
+                          >
+                            <circle cx="12" cy="12" r="10" />
+                            <path d="m9 12 2 2 4-4" />
+                          </svg>
+                          <div>
+                            <p className="text-xs font-medium text-emerald-700">
+                              Qualité du service saluée
+                            </p>
+                            <p className="text-xs text-emerald-600">+23 mentions positives</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="bg-white p-3 sm:p-4 rounded-lg sm:rounded-xl border border-slate-200 shadow-soft min-w-0">
+                      <h4 className="font-semibold text-slate-900 text-xs sm:text-sm mb-2 sm:mb-3 flex items-center gap-2 tracking-prose">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="24"
+                          height="24"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          className="lucide lucide-chart-no-axes-column w-3.5 h-3.5 sm:w-4 sm:h-4 text-blue-600 shrink-0"
+                          aria-hidden="true"
+                        >
+                          <line x1="18" x2="18" y1="20" y2="10" />
+                          <line x1="12" x2="12" y1="20" y2="4" />
+                          <line x1="6" x2="6" y1="20" y2="14" />
+                        </svg>
+                        Évolution cette semaine
+                      </h4>
+                      <div className="flex items-end gap-1 sm:gap-2 h-14 sm:h-20">
+                        {['L', 'M', 'M', 'J', 'V', 'S', 'D'].map((day, idx) => {
+                          const heights = ['35%', '42%', '28%', '45%', '38%', '52%', '48%'];
+                          const isToday = idx === 6;
+                          return (
+                            <div key={day + idx} className="flex-1 flex flex-col items-center">
+                              <div
+                                className={`w-full rounded-t transition-all duration-500 ${
+                                  isToday ? 'bg-blue-500' : 'bg-slate-200'
+                                }`}
+                                style={{ height: heights[idx] }}
+                              />
+                              <span className="text-[10px] text-slate-400 mt-1">{day}</span>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
-              <div className="rounded-xl border border-zinc-700 bg-zinc-800/50 p-4">
-                <p className="text-xs text-zinc-500">Avis traités</p>
-                <p className="mt-1 text-2xl font-bold text-white">127</p>
-              </div>
-              <div className="rounded-xl border border-zinc-700 bg-zinc-800/50 p-4">
-                <p className="text-xs text-zinc-500">Tendance</p>
-                <div className="mt-1 flex items-center gap-1 text-emerald-400">
-                  <TrendingUp className="h-5 w-5" />
-                  <span className="font-semibold">+12%</span>
-                </div>
-              </div>
             </div>
-            <div className="mt-4 h-24 rounded-lg bg-zinc-800/50 flex items-center justify-center">
-              <span className="text-sm text-zinc-500">Graphique d&apos;évolution</span>
+          </div>
+        </section>
+      </div>
+
+      {/* SÉPARATEUR + SECTEURS (blanc cassé) */}
+      <div className="border-t border-white/5" />
+
+      <section className="py-10 border-y border-slate-200/30" style={{ backgroundColor: 'hsl(var(--navy) / 0.05)' }}>
+        <div className="max-w-6xl mx-auto px-6 flex flex-wrap justify-center items-center gap-8">
+          {(['0', '1', '2', '3', '4', '5'] as const).map((i) => (
+            <span key={i} className="text-sm font-semibold text-muted-foreground">
+              {t(`socialProof.${i}`)}
+            </span>
+          ))}
+        </div>
+      </section>
+
+      {/* FONCTIONNALITÉS (blanc) */}
+      <section id="fonctionnalités" className="py-20 bg-white">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="text-center mb-12">
+            <h2 className="font-display text-4xl font-bold text-foreground mb-3">
+              {t('howItWorks.headline')}
+            </h2>
+            <p className="text-muted-foreground text-lg">{t('howItWorks.subtitle')}</p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            <div className="bg-card rounded-2xl border border-border p-6 hover:shadow-md transition-all duration-200 group">
+              <div className="w-10 h-10 rounded-xl flex items-center justify-center mb-4 bg-blue-50 text-blue-600">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="lucide lucide-bot w-5 h-5"
+                >
+                  <path d="M12 8V4H8" />
+                  <rect width="16" height="12" x="4" y="8" rx="2" />
+                  <path d="M2 14h2" />
+                  <path d="M20 14h2" />
+                  <path d="M15 13v2" />
+                  <path d="M9 13v2" />
+                </svg>
+              </div>
+              <h3 className="font-display font-bold text-base text-foreground mb-2">
+                {t('howItWorks.aiReplies.title')}
+              </h3>
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                {t('howItWorks.aiReplies.desc')}
+              </p>
+            </div>
+
+            <div className="bg-card rounded-2xl border border-border p-6 hover:shadow-md transition-all duration-200 group">
+              <div className="w-10 h-10 rounded-xl flex items-center justify-center mb-4 bg-indigo-50 text-indigo-600">
+                <BarChart2 className="w-5 h-5" aria-hidden="true" />
+              </div>
+              <h3 className="font-display font-bold text-base text-foreground mb-2">
+                {t('howItWorks.weeklyAnalysis.title')}
+              </h3>
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                {t('howItWorks.weeklyAnalysis.desc')}
+              </p>
+            </div>
+
+            <div className="bg-card rounded-2xl border border-border p-6 hover:shadow-md transition-all duration-200 group">
+              <div className="w-10 h-10 rounded-xl flex items-center justify-center mb-4 bg-amber-50 text-amber-600">
+                <Bell className="w-5 h-5" aria-hidden="true" />
+              </div>
+              <h3 className="font-display font-bold text-base text-foreground mb-2">
+                {t('howItWorks.badReviewAlerts.title')}
+              </h3>
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                {t('howItWorks.badReviewAlerts.desc')}
+              </p>
+            </div>
+
+            <div className="bg-card rounded-2xl border border-border p-6 hover:shadow-md transition-all duration-200 group">
+              <div className="w-10 h-10 rounded-xl flex items-center justify-center mb-4 bg-green-50 text-green-600">
+                <TrendingUp className="w-5 h-5" aria-hidden="true" />
+              </div>
+              <h3 className="font-display font-bold text-base text-foreground mb-2">
+                {t('howItWorks.reporting.title')}
+              </h3>
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                {t('howItWorks.reporting.desc')}
+              </p>
+            </div>
+
+            <div className="bg-card rounded-2xl border border-border p-6 hover:shadow-md transition-all duration-200 group">
+              <div className="w-10 h-10 rounded-xl flex items-center justify-center mb-4 bg-purple-50 text-purple-600">
+                <BarChart2 className="w-5 h-5" aria-hidden="true" />
+              </div>
+              <h3 className="font-display font-bold text-base text-foreground mb-2">
+                {t('howItWorks.reviewCapture.title')}
+              </h3>
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                {t('howItWorks.reviewCapture.desc')}
+              </p>
+            </div>
+
+            <div className="bg-card rounded-2xl border border-border p-6 hover:shadow-md transition-all duration-200 group">
+              <div className="w-10 h-10 rounded-xl flex items-center justify-center mb-4 bg-blue-100 text-indigo-600">
+                <MessageSquare className="w-5 h-5" aria-hidden="true" />
+              </div>
+              <h3 className="font-display font-bold text-base text-foreground mb-2">
+                {t('howItWorks.aiChat.title')}
+              </h3>
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                {t('howItWorks.aiChat.desc')}
+              </p>
+            </div>
+
+            <div className="bg-card rounded-2xl border border-border p-6 hover:shadow-md transition-all duration-200 group">
+              <div className="w-10 h-10 rounded-xl flex items-center justify-center mb-4 bg-teal-50 text-teal-600">
+                <MessageCircle className="w-5 h-5" aria-hidden="true" />
+              </div>
+              <h3 className="font-display font-bold text-base text-foreground mb-2">
+                {t('howItWorks.posIntegration.title')}
+              </h3>
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                {t('howItWorks.posIntegration.desc')}
+              </p>
+            </div>
+
+            <div className="relative bg-card rounded-2xl border border-border p-6 hover:shadow-md transition-all duration-200 group">
+              <div className="w-10 h-10 rounded-xl flex items-center justify-center mb-4 bg-red-50 text-red-500">
+                <ShieldCheck className="w-5 h-5" aria-hidden="true" />
+              </div>
+              <h3 className="font-display font-bold text-base text-foreground mb-2">
+                Bouclier Anti-Abus IA
+              </h3>
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                <span className="font-semibold">Nettoyage Automatique :</span> Détection des insultes, spams et faux avis.
+                L&apos;IA génère et envoie directement une requête de suppression officielle à Google selon leurs règles
+                communautaires.
+              </p>
+              <p className="mt-2 text-xs font-semibold text-emerald-600">
+                Exclusif au plan DOMINATOR.
+              </p>
+              <span className="absolute top-4 right-4 inline-flex items-center rounded-full border border-emerald-400/60 bg-emerald-500/15 px-2 py-0.5 text-[10px] font-semibold tracking-wide text-emerald-300">
+                PROTECTION ACTIVE
+              </span>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Features - Light */}
-      <section id="features" className="scroll-mt-20 border-t border-zinc-200 bg-[#f8f8f8] py-20">
-        <div className="mx-auto max-w-6xl px-6">
-          <div className="mb-8 flex flex-wrap justify-center gap-3">
-            {['Restaurants', 'Coiffeurs', 'Hôtels', 'Spas & Beauté', 'Cafés', 'Cliniques'].map(
-              (cat) => (
+      {/* TÉMOIGNAGES (blanc cassé) */}
+      <section id="témoignages" className="py-20 bg-muted/40">
+        <div className="max-w-6xl mx-auto px-6">
+          <div className="text-center mb-12">
+            <h2 className="font-display text-4xl font-bold text-foreground mb-3">
+              {t('testimonials.headline')}
+            </h2>
+            <p className="text-muted-foreground">{t('testimonials.subtitle')}</p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+            <div className="bg-card rounded-2xl border border-border p-6">
+              <div className="flex gap-0.5 mb-4">
+                <StarIcon />
+                <StarIcon />
+                <StarIcon />
+                <StarIcon />
+                <StarIcon />
+              </div>
+              <p className="text-sm text-foreground/80 leading-relaxed mb-5">
+                &quot;{t('testimonials.items.1.quote')}&quot;
+              </p>
+              <div>
+                <p className="text-sm font-semibold text-foreground">
+                  {t('testimonials.items.1.name')}
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  {t('testimonials.items.1.role')}
+                </p>
+              </div>
+            </div>
+
+            <div className="bg-card rounded-2xl border border-border p-6">
+              <div className="flex gap-0.5 mb-4">
+                <StarIcon />
+                <StarIcon />
+                <StarIcon />
+                <StarIcon />
+                <StarIcon />
+              </div>
+              <p className="text-sm text-foreground/80 leading-relaxed mb-5">
+                &quot;{t('testimonials.items.2.quote')}&quot;
+              </p>
+              <div>
+                <p className="text-sm font-semibold text-foreground">
+                  {t('testimonials.items.2.name')}
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  {t('testimonials.items.2.role')}
+                </p>
+              </div>
+            </div>
+
+            <div className="bg-card rounded-2xl border border-border p-6">
+              <div className="flex gap-0.5 mb-4">
+                <StarIcon />
+                <StarIcon />
+                <StarIcon />
+                <StarIcon />
+                <StarIcon />
+              </div>
+              <p className="text-sm text-foreground/80 leading-relaxed mb-5">
+                &quot;{t('testimonials.items.3.quote')}&quot;
+              </p>
+              <div>
+                <p className="text-sm font-semibold text-foreground">
+                  {t('testimonials.items.3.name')}
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  {t('testimonials.items.3.role')}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* TARIFS (blanc) */}
+      <section id="tarifs" className="py-20 bg-white">
+        <div className="max-w-6xl mx-auto px-6">
+          <div className="text-center mb-12">
+            <h2 className="font-display text-4xl font-bold text-foreground mb-3">
+              {t('pricing.headline')}
+            </h2>
+            <p className="text-muted-foreground">{t('pricing.subtitle')}</p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5 items-stretch">
+            {/* Plan Vision */}
+            <div className="flex flex-col h-full rounded-2xl border p-6 relative bg-card border-border transition-all duration-300 ease-out hover:-translate-y-3 hover:shadow-[0_20px_40px_rgba(75,115,255,0.2)]">
+              <div className="mb-5">
+                <p className="font-display font-bold text-lg text-foreground">
+                  {t('pricing.vision.name')}
+                </p>
+                <p className="text-xs font-medium mt-0.5 text-muted-foreground">
+                  {t('pricing.vision.for')}
+                </p>
+              </div>
+              <div className="mb-6">
+                <span className="text-4xl font-display font-bold text-foreground">
+                  {formatPrice(locale, t('pricing.vision.price'))}
+                </span>
+                <span className="text-sm text-muted-foreground">{t('perMonth')}</span>
+              </div>
+              <ul className="space-y-2.5 mb-6 flex-1">
+                <li className="flex items-center gap-2.5 text-sm">
+                  <Check className="w-4 h-4 flex-shrink-0 text-primary" aria-hidden="true" />
+                  <span className="text-foreground/80">{t('pricing.comparison.ai_local')}</span>
+                </li>
+                <li className="flex items-center gap-2.5 text-sm">
+                  <Check className="w-4 h-4 flex-shrink-0 text-primary" aria-hidden="true" />
+                  <span className="text-foreground/80">{t('pricing.comparison.reporting_pdf')}</span>
+                </li>
+              </ul>
+              <p className="text-xs text-emerald-600 font-medium mb-4">{t('pricing.trialMention')}</p>
+              <Link
+                href="/signup?mode=checkout&plan=vision"
+                className="block text-center py-2.5 text-sm font-semibold rounded-xl transition-all duration-300 gradient-primary text-white hover:opacity-90"
+              >
+                {t('pricing.ctaSubscribe')}
+              </Link>
+              <Link
+                href="/signup?mode=trial"
+                className="block text-center py-2 mt-2 text-sm font-medium text-primary underline underline-offset-2 hover:no-underline transition-all duration-300"
+              >
+                {t('pricing.ctaTrial')}
+              </Link>
+            </div>
+
+            {/* Plan Pulse - LE PLUS POPULAIRE */}
+            <div className="flex flex-col h-full rounded-2xl border p-6 relative gradient-primary text-white border-transparent shadow-glow scale-105 transition-all duration-300 ease-out hover:-translate-y-3 hover:shadow-[0_20px_40px_rgba(75,115,255,0.2)]">
+              <span className="absolute -top-3 left-1/2 -translate-x-1/2 text-xs font-bold px-3 py-1 bg-white text-primary rounded-full">
+                {t('pricing.pulse.badge')}
+              </span>
+              <div className="mb-5">
+                <p className="font-display font-bold text-lg text-white">
+                  {t('pricing.pulse.name')}
+                </p>
+                <p className="text-xs font-medium mt-0.5 text-white/70">
+                  {t('pricing.pulse.for')}
+                </p>
+              </div>
+              <div className="mb-6">
+                <span className="text-4xl font-display font-bold text-white">
+                  {formatPrice(locale, t('pricing.pulse.price'))}
+                </span>
+                <span className="text-sm text-white/70">{t('perMonth')}</span>
+                </div>
+              <ul className="space-y-2.5 mb-6 flex-1">
+                <li className="flex items-center gap-2.5 text-sm">
+                  <Check className="w-4 h-4 flex-shrink-0 text-white" aria-hidden="true" />
+                  <span className="text-white/80">{t('pricing.comparison.ai_local')}</span>
+                </li>
+                <li className="flex items-center gap-2.5 text-sm">
+                  <Check className="w-4 h-4 flex-shrink-0 text-white" aria-hidden="true" />
+                  <span className="text-white/80">{t('pricing.comparison.ai_all_languages')}</span>
+                </li>
+                <li className="flex items-center gap-2.5 text-sm">
+                  <Check className="w-4 h-4 flex-shrink-0 text-white" aria-hidden="true" />
+                  <span className="text-white/80">{t('pricing.comparison.reporting_pdf')}</span>
+                </li>
+                <li className="flex items-center gap-2.5 text-sm">
+                  <Check className="w-4 h-4 flex-shrink-0 text-white" aria-hidden="true" />
+                  <span className="text-white/80">{t('pricing.comparison.triple_verification')}</span>
+                </li>
+                <li className="flex items-center gap-2.5 text-sm">
+                  <Check className="w-4 h-4 flex-shrink-0 text-white" aria-hidden="true" />
+                  <span className="text-white/80">{t('pricing.comparison.whatsapp_alerts')}</span>
+                </li>
+                <li className="flex items-center gap-2.5 text-sm">
+                  <Check className="w-4 h-4 flex-shrink-0 text-white" aria-hidden="true" />
+                  <span className="text-white/80">{t('pricing.comparison.reporting_whatsapp_recap')}</span>
+                </li>
+                <li className="flex items-center gap-2.5 text-sm">
+                  <Check className="w-4 h-4 flex-shrink-0 text-white" aria-hidden="true" />
+                  <span className="text-white/80">{t('pricing.comparison.shield_alert')}</span>
+                </li>
+              </ul>
+              <p className="text-xs text-emerald-200 font-medium mb-4">{t('pricing.trialMention')}</p>
+              <Link
+                href="/signup?mode=checkout&plan=pulse"
+                className="block text-center py-2.5 text-sm font-semibold rounded-xl transition-all duration-300 bg-white text-primary hover:bg-white/90"
+              >
+                {t('pricing.ctaSubscribe')}
+              </Link>
+              <Link
+                href="/signup?mode=trial"
+                className="block text-center py-2 mt-2 text-sm font-medium text-white/90 underline underline-offset-2 hover:no-underline transition-all duration-300"
+              >
+                {t('pricing.ctaTrial')}
+              </Link>
+            </div>
+
+            {/* Plan Zenith - bordure lumineuse bleue (offre ultime) */}
+            <div className="flex flex-col h-full rounded-2xl border p-6 relative bg-card border-border transition-all duration-300 ease-out hover:-translate-y-3 hover:shadow-[0_20px_40px_rgba(75,115,255,0.2)] hover:border-primary/50 border-2 border-blue-500/50 shadow-[0_0_20px_rgba(59,130,246,0.15)]">
+              <div className="mb-5">
+                <p className="font-display font-bold text-lg text-foreground">
+                  {t('pricing.zenith.name')}
+                </p>
+                <p className="text-xs font-medium mt-0.5 text-muted-foreground">
+                  {t('pricing.zenith.for')}
+                </p>
+              </div>
+              <div className="mb-6">
+                <span className="text-4xl font-display font-bold text-foreground">
+                  {formatPrice(locale, t('pricing.zenith.price'))}
+                </span>
+                <span className="text-sm text-muted-foreground">{t('perMonth')}</span>
+              </div>
+              <ul className="space-y-2.5 mb-6 flex-1">
+                <li className="flex items-center gap-2.5 text-sm">
+                  <Check className="w-4 h-4 flex-shrink-0 text-primary" aria-hidden="true" />
+                  <span className="text-foreground/80">{t('pricing.comparison.ai_local')}</span>
+                </li>
+                <li className="flex items-center gap-2.5 text-sm">
+                  <Check className="w-4 h-4 flex-shrink-0 text-primary" aria-hidden="true" />
+                  <span className="text-foreground/80">{t('pricing.comparison.ai_all_languages')}</span>
+                </li>
+                <li className="flex items-center gap-2.5 text-sm">
+                  <Check className="w-4 h-4 flex-shrink-0 text-primary" aria-hidden="true" />
+                  <span className="text-foreground/80">{t('pricing.comparison.reporting_pdf')}</span>
+                </li>
+                <li className="flex items-center gap-2.5 text-sm">
+                  <Check className="w-4 h-4 flex-shrink-0 text-primary" aria-hidden="true" />
+                  <span className="text-foreground/80">{t('pricing.comparison.triple_verification')}</span>
+                </li>
+                <li className="flex items-center gap-2.5 text-sm">
+                  <Check className="w-4 h-4 flex-shrink-0 text-primary" aria-hidden="true" />
+                  <span className="text-foreground/80">{t('pricing.comparison.whatsapp_alerts')}</span>
+                </li>
+                <li className="flex items-center gap-2.5 text-sm">
+                  <Check className="w-4 h-4 flex-shrink-0 text-primary" aria-hidden="true" />
+                  <span className="text-foreground/80">{t('pricing.comparison.reporting_whatsapp_recap')}</span>
+                </li>
+                <li className="flex items-center gap-2.5 text-sm">
+                  <Check className="w-4 h-4 flex-shrink-0 text-primary" aria-hidden="true" />
+                  <span className="text-foreground/80">{t('pricing.comparison.shield_alert')}</span>
+                </li>
+                <li className="flex items-center gap-2.5 text-sm">
+                  <Check className="w-4 h-4 flex-shrink-0 text-primary" aria-hidden="true" />
+                  <span className="text-foreground/80">{t('pricing.comparison.ai_capture')}</span>
+                </li>
+                <li className="flex items-center gap-2.5 text-sm">
+                  <Check className="w-4 h-4 flex-shrink-0 text-primary" aria-hidden="true" />
+                  <span className="text-foreground/80">{t('pricing.comparison.pos_connector')}</span>
+                </li>
+              </ul>
+              <p className="text-xs text-emerald-600 font-medium mb-4">{t('pricing.trialMention')}</p>
+              <Link
+                href="/signup?mode=checkout&plan=zenith"
+                className="block text-center py-2.5 text-sm font-semibold rounded-xl transition-all duration-300 gradient-primary text-white hover:opacity-90"
+              >
+                {t('pricing.ctaSubscribe')}
+              </Link>
+              <Link
+                href="/signup?mode=trial"
+                className="block text-center py-2 mt-2 text-sm font-medium text-primary underline underline-offset-2 hover:no-underline transition-all duration-300"
+              >
+                {t('pricing.ctaTrial')}
+              </Link>
+            </div>
+          </div>
+          <p className="text-center mt-8">
+            <Link
+              href="/pricing"
+              className="text-sm font-medium text-blue-600 hover:text-blue-700"
+            >
+              Voir le tableau comparatif →
+            </Link>
+          </p>
+        </div>
+      </section>
+
+      {/* FAQ (blanc cassé) */}
+      <section
+        id="faq"
+        className="scroll-mt-20 py-16 sm:py-20 px-4 sm:px-6 lg:px-8 bg-muted/40"
+      >
+        <div className="max-w-3xl mx-auto">
+          <div className="text-center mb-12">
+            <span className="inline-flex items-center rounded-md px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 border-transparent shadow hover:bg-primary/80 bg-blue-100 text-blue-700 border-0 mb-4">
+              {t('nav.faq')}
+            </span>
+            <h2 className="font-display text-3xl sm:text-4xl font-bold text-slate-900">
+              {t('faq.headline')}
+            </h2>
+          </div>
+          <div className="space-y-4">
+            {FAQ_KEYS.map((key) => (
+              <div
+                key={key}
+                className="bg-white rounded-2xl border border-slate-200 overflow-hidden transition-all duration-300 hover:shadow-soft"
+              >
                 <button
-                  key={cat}
-                  className="rounded-full border border-zinc-200 bg-white px-4 py-2 text-sm text-zinc-700 transition hover:border-blue-200 hover:bg-blue-50"
+                  type="button"
+                  onClick={() => setOpenFaq(openFaq === key ? null : key)}
+                  className="w-full p-5 text-left flex items-center justify-between focus:outline-none focus:ring-2 focus:ring-primary focus:ring-inset"
                 >
-                  {cat}
+                  <span className="font-display font-semibold text-slate-900 pr-4">
+                    {t(`faq.items.${key}.q`)}
+                  </span>
+                  <ChevronRight
+                    className={`w-5 h-5 text-slate-400 transition-transform duration-300 flex-shrink-0 ${
+                      openFaq === key ? 'rotate-90' : ''
+                    }`}
+                    aria-hidden="true"
+                  />
                 </button>
-              )
-            )}
-          </div>
-          <h2 className="text-center text-3xl font-bold text-zinc-900">
-            {t('features.title')}
-          </h2>
-          <p className="mx-auto mt-2 max-w-xl text-center text-zinc-600">
-            {t('features.subtitle')}
-          </p>
-          <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {[
-              {
-                icon: FileText,
-                iconBg: 'bg-blue-100 text-blue-600',
-                titleKey: 'features.ai.title',
-                descKey: 'features.ai.desc',
-              },
-              {
-                icon: Bell,
-                iconBg: 'bg-purple-100 text-purple-600',
-                titleKey: 'features.alerts.title',
-                descKey: 'features.alerts.desc',
-              },
-              {
-                icon: TrendingUp,
-                iconBg: 'bg-emerald-100 text-emerald-600',
-                titleKey: 'features.tracking.title',
-                descKey: 'features.tracking.desc',
-              },
-              {
-                icon: BarChart2,
-                iconBg: 'bg-amber-100 text-amber-600',
-                titleKey: 'features.sentiment.title',
-                descKey: 'features.sentiment.desc',
-              },
-              {
-                icon: MessageCircle,
-                iconBg: 'bg-cyan-100 text-cyan-600',
-                titleKey: 'features.multiplatform.title',
-                descKey: 'features.multiplatform.desc',
-              },
-              {
-                icon: Shield,
-                iconBg: 'bg-red-100 text-red-600',
-                titleKey: 'features.brand.title',
-                descKey: 'features.brand.desc',
-              },
-            ].map((item) => (
-              <div
-                key={item.titleKey}
-                className="rounded-xl border border-zinc-200 bg-white p-6 shadow-sm"
-              >
                 <div
-                  className={`inline-flex rounded-lg p-3 ${item.iconBg}`}
+                  className={`overflow-hidden transition-all duration-300 ease-out ${
+                    openFaq === key ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
+                  }`}
                 >
-                  <item.icon className="h-6 w-6" />
+                  <div className="px-5 pb-5 pt-0">
+                    <p className="text-slate-600 leading-relaxed">
+                      {t(`faq.items.${key}.a`)}
+                    </p>
+                  </div>
                 </div>
-                <h3 className="mt-4 font-semibold text-zinc-900">
-                  {t(item.titleKey as 'features.ai.title')}
-                </h3>
-                <p className="mt-2 text-sm text-zinc-600">
-                  {t(item.descKey as 'features.ai.desc')}
-                </p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Testimonials - Light */}
-      <section id="testimonials" className="scroll-mt-20 border-t border-zinc-200 bg-white py-20">
-        <div className="mx-auto max-w-6xl px-6">
-          <h2 className="text-center text-3xl font-bold text-zinc-900">
-            {t('testimonials.title')}
-          </h2>
-          <p className="mx-auto mt-2 max-w-xl text-center text-zinc-600">
-            {t('testimonials.subtitle')}
-          </p>
-          <div className="mt-12 grid gap-6 md:grid-cols-3">
-            {[1, 2, 3].map((i) => (
-              <div
-                key={i}
-                className="rounded-xl border border-zinc-200 bg-white p-6 shadow-sm"
-              >
-                <div className="flex gap-0.5">
-                  {[1, 2, 3, 4, 5].map((s) => (
-                    <Star key={s} className="h-5 w-5 fill-amber-400 text-amber-400" />
-                  ))}
-                </div>
-                <p className="mt-4 text-zinc-700">
-                  &quot;{t(`testimonials.items.${i}.quote`)}&quot;
-                </p>
-                <p className="mt-4 font-semibold text-zinc-900">
-                  {t(`testimonials.items.${i}.name`)}
-                </p>
-                <p className="text-sm text-zinc-500">
-                  {t(`testimonials.items.${i}.role`)}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Pricing - Light */}
-      <section id="pricing" className="scroll-mt-20 border-t border-zinc-200 bg-[#f8f8f8] py-20">
-        <div className="mx-auto max-w-6xl px-6">
-          <h2 className="text-center text-3xl font-bold text-zinc-900">
-            {t('pricing.title')}
-          </h2>
-          <p className="mx-auto mt-2 max-w-xl text-center text-zinc-600">
-            {t('pricing.subtitle')}
-          </p>
-          <div className="mt-12 grid gap-6 md:grid-cols-3">
-            {/* Starter */}
-            <div className="rounded-xl border border-zinc-200 bg-white p-6 shadow-sm">
-              <h3 className="font-bold text-zinc-900">{t('pricing.starter.name')}</h3>
-              <p className="mt-1 text-sm text-zinc-500">{t('pricing.starter.for')}</p>
-              <p className="mt-4 text-3xl font-bold text-zinc-900">
-                29€<span className="text-base font-normal text-zinc-500">/mois</span>
-              </p>
-              <ul className="mt-6 space-y-3">
-                {['1 établissement', '50 réponses IA/mois', 'Google & TripAdvisor', 'Alertes email', 'Dashboard basique'].map(
-                  (f) => (
-                    <li key={f} className="flex items-center gap-2 text-sm text-zinc-700">
-                      <Check className="h-4 w-4 shrink-0 text-emerald-500" />
-                      {f}
-                    </li>
-                  )
-                )}
-              </ul>
-              <Link
-                href="/sign-up"
-                className="mt-6 block w-full rounded-lg bg-blue-500 py-3 text-center text-sm font-medium text-white transition hover:bg-blue-600"
-              >
-                {t('pricing.starter.cta')}
-              </Link>
-            </div>
-
-            {/* Pro - Highlighted */}
-            <div className="relative rounded-xl border-2 border-blue-500 bg-gradient-to-b from-blue-600 to-blue-700 p-6 text-white shadow-xl">
-              <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-blue-800 px-3 py-0.5 text-xs font-medium">
-                {t('pricing.pro.badge')}
-              </span>
-              <h3 className="mt-2 font-bold">{t('pricing.pro.name')}</h3>
-              <p className="mt-1 text-sm text-blue-100">{t('pricing.pro.for')}</p>
-              <p className="mt-4 text-3xl font-bold">
-                79€<span className="text-base font-normal text-blue-200">/mois</span>
-              </p>
-              <ul className="mt-6 space-y-3">
-                {['5 établissements', 'Réponses IA illimitées', 'Toutes les plateformes', 'Alertes temps réel', 'Analytics avancés', 'Support prioritaire'].map(
-                  (f) => (
-                    <li key={f} className="flex items-center gap-2 text-sm text-blue-50">
-                      <Check className="h-4 w-4 shrink-0 text-blue-200" />
-                      {f}
-                    </li>
-                  )
-                )}
-              </ul>
-              <Link
-                href="/sign-up"
-                className="mt-6 block w-full rounded-lg border-2 border-white bg-white py-3 text-center text-sm font-medium text-blue-600 transition hover:bg-blue-50"
-              >
-                {t('pricing.pro.cta')}
-              </Link>
-            </div>
-
-            {/* Agence */}
-            <div className="rounded-xl border border-zinc-200 bg-white p-6 shadow-sm">
-              <h3 className="font-bold text-zinc-900">{t('pricing.agency.name')}</h3>
-              <p className="mt-1 text-sm text-zinc-500">{t('pricing.agency.for')}</p>
-              <p className="mt-4 text-3xl font-bold text-zinc-900">
-                199€<span className="text-base font-normal text-zinc-500">/mois</span>
-              </p>
-              <ul className="mt-6 space-y-3">
-                {['Établissements illimités', 'Réponses IA illimitées', 'White-label', 'API access', 'Manager de comptes', 'Intégration CRM'].map(
-                  (f) => (
-                    <li key={f} className="flex items-center gap-2 text-sm text-zinc-700">
-                      <Check className="h-4 w-4 shrink-0 text-emerald-500" />
-                      {f}
-                    </li>
-                  )
-                )}
-              </ul>
-              <Link
-                href="/sign-up"
-                className="mt-6 block w-full rounded-lg bg-blue-500 py-3 text-center text-sm font-medium text-white transition hover:bg-blue-600"
-              >
-                {t('pricing.agency.cta')}
-              </Link>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* CTA Final - Dark */}
-      <section className="bg-zinc-950 py-24">
-        <div className="mx-auto max-w-3xl px-6 text-center">
-          <h2 className="text-3xl font-bold text-white sm:text-4xl">
+      {/* CTA FINALE */}
+      <section className="py-20 gradient-hero">
+        <div className="max-w-2xl mx-auto px-6 text-center">
+          <h2 className="font-display text-4xl font-bold text-white mb-4">
             {t('cta.title')}
           </h2>
-          <p className="mt-4 text-lg text-zinc-400">
-            {t('cta.subtitle')}
-          </p>
-          <Link
-            href="/sign-up"
-            className="shiny-button mt-8 inline-flex items-center gap-2 rounded-lg bg-blue-500 px-8 py-4 text-lg font-medium text-white transition hover:bg-blue-600"
-          >
-            {t('cta.button')}
-            <ChevronRight className="h-5 w-5" />
+          <p className="text-white/60 mb-8">{t('cta.subtitle')}</p>
+              <Link
+                href="/signup?mode=trial"
+                className="inline-flex items-center gap-2 gradient-primary text-white font-semibold px-8 py-3 rounded-xl hover:opacity-90 transition-opacity shadow-glow"
+              >
+            {t('cta.button')} <ChevronRight className="w-4 h-4" aria-hidden="true" />
           </Link>
         </div>
       </section>
 
-      {/* Footer - Dark */}
-      <footer className="border-t border-zinc-800 bg-zinc-950 py-8">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-6">
-          <div className="flex items-center gap-2">
-            <span className="font-bold text-white">REPUTEXA</span>
-          </div>
-          <p className="text-sm text-zinc-500">{t('footer.rights')}</p>
+      {/* FOOTER */}
+      <footer className="bg-navy py-8">
+        <div className="max-w-6xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-4">
+          <Link href="/" className="flex items-center gap-2" aria-label="REPUTEXA">
+            <Logo size="sm" />
+            <span className="font-display font-bold text-white">REPUTEXA</span>
+          </Link>
+          <p className="text-sm text-white/30">{t('footer.rights')}</p>
         </div>
       </footer>
+
+      {/* DEMO + CHATBOT */}
+      {openDemo && <DemoDashboard onClose={() => setOpenDemo(false)} />}
+      {!openDemo && <Chatbot />}
     </div>
   );
 }

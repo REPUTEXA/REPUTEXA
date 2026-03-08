@@ -1,8 +1,7 @@
 import type { Metadata } from 'next';
 import { headers } from 'next/headers';
 import localFont from 'next/font/local';
-import { ClerkProvider } from '@clerk/nextjs';
-import { frFR } from '@clerk/localizations';
+import { Toaster } from 'sonner';
 import './globals.css';
 
 const geistSans = localFont({
@@ -17,8 +16,12 @@ const geistMono = localFont({
 });
 
 export const metadata: Metadata = {
-  title: 'REPUTEXA - Reputation AI',
-  description: 'Manage your online reputation with AI',
+  title: 'REPUTEXA - Your 24/7 Customer Relationship Director',
+  description: 'Automate feedback, prevent negative reviews, and elevate your restaurant brand with AI. The ultimate reputation shield for restaurant owners.',
+  openGraph: {
+    title: 'REPUTEXA - Your 24/7 Customer Relationship Director',
+    description: 'Automate feedback, prevent negative reviews, and elevate your restaurant brand with AI.',
+  },
 };
 
 export default async function RootLayout({
@@ -31,21 +34,13 @@ export default async function RootLayout({
   const dir = ['ar', 'he'].includes(locale) ? 'rtl' : 'ltr';
 
   return (
-    <ClerkProvider
-      localization={frFR}
-      appearance={{
-        layout: {
-          unsafe_disableDevelopmentModeWarnings: true,
-        },
-      }}
-    >
-      <html lang={locale} dir={dir}>
-        <body
-          className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-        >
-          {children}
-        </body>
-      </html>
-    </ClerkProvider>
+    <html lang={locale} dir={dir}>
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+      >
+        {children}
+        <Toaster richColors position="top-center" />
+      </body>
+    </html>
   );
 }

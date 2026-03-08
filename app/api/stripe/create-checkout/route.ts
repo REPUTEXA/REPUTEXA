@@ -1,9 +1,24 @@
 import { NextResponse } from 'next/server';
-import { auth } from '@clerk/nextjs/server';
 import Stripe from 'stripe';
-import { prisma } from '@/lib/prisma';
+import { createClient } from '@/lib/supabase/server';
+import { getSiteUrl } from '@/lib/site-url';
 
 const TRIAL_DAYS = 14;
+
+const PLAN_PRICES: Record<string, number> = {
+  vision: 5900,
+  pulse: 9700,
+  zenith: 17900,
+};
+
+const PLAN_TO_PRICE_ENV: Record<string, string> = {
+  vision: 'STRIPE_PRICE_STARTER',
+  pulse: 'STRIPE_PRICE_MANAGER',
+  zenith: 'STRIPE_PRICE_DOMINATOR',
+  starter: 'STRIPE_PRICE_STARTER',
+  manager: 'STRIPE_PRICE_MANAGER',
+  dominator: 'STRIPE_PRICE_DOMINATOR',
+};
 
 export async function POST(request: Request) {
   try {
@@ -16,81 +31,77 @@ export async function POST(request: Request) {
     }
 
     const stripe = new Stripe(secretKey);
-    const { userId } = await auth();
-    if (!userId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+    const { searchParams } = new URL(request.url);
+    const locale = searchParams.get('locale') ?? 'fr';
+    const planType = searchParams.get('planType') ?? 'manager';
+    const planSlug = (searchParams.get('planSlug') ?? (planType === 'dominator' ? 'zenith' : planType === 'manager' ? 'pulse' : 'vision')) as string;
+    const skipTrial = searchParams.get('skipTrial') === '1' || searchParams.get('skipTrial') === 'true';
+    const baseUrl = getSiteUrl();
 
+    const priceId = process.env[PLAN_TO_PRICE_ENV[planSlug] ?? PLAN_TO_PRICE_ENV.pulse];
     const productId = process.env.STRIPE_PRODUCT_ID;
-    if (!productId) {
+
+    if (!priceId && !productId) {
       return NextResponse.json(
-        { error: 'STRIPE_PRODUCT_ID not configured' },
+        { error: 'STRIPE_PRICE_* ou STRIPE_PRODUCT_ID requis' },
         { status: 500 }
       );
     }
 
-    const amountCents = Number(process.env.STRIPE_PRICE_AMOUNT_CENTS) || 7900; // 79€ par défaut
+    let customerEmail = '';
+    let customerId: string | null = null;
 
-    const { searchParams } = new URL(request.url);
-    const locale = searchParams.get('locale') ?? 'fr';
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000';
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
 
-    // Récupérer ou créer l'utilisateur
-    let user = await prisma.user.findUnique({
-      where: { clerkUserId: userId },
-    });
-
-    if (!user) {
-      const { sessionClaims } = await auth();
-      const email = (sessionClaims?.email as string) ?? '';
-      user = await prisma.user.create({
-        data: {
-          clerkUserId: userId,
-          email: email || `user-${userId}@placeholder.local`,
-        },
-      });
+    if (!user?.email) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    let customerId = user.stripeCustomerId;
-
+    customerEmail = user.email;
+    const existing = await stripe.customers.list({ email: customerEmail, limit: 1 });
+    customerId = existing.data[0]?.id ?? null;
     if (!customerId) {
       const customer = await stripe.customers.create({
-        email: user.email,
-        metadata: { clerkUserId: userId },
+        email: customerEmail,
+        metadata: { supabaseUserId: user.id },
       });
       customerId = customer.id;
-      await prisma.user.update({
-        where: { id: user.id },
-        data: { stripeCustomerId: customerId },
-      });
     }
 
     const successUrl = `${baseUrl}/${locale}/dashboard?welcome=1&session_id={CHECKOUT_SESSION_ID}`;
-    const cancelUrl = `${baseUrl}/${locale}/checkout`;
+    const cancelUrl = `${baseUrl}/${locale}/choose-plan`;
 
-    const session = await stripe.checkout.sessions.create({
-      customer: customerId,
-      mode: 'subscription',
-      payment_method_collection: 'always',
-      line_items: [
-        {
+    const lineItems: Stripe.Checkout.SessionCreateParams['line_items'] = priceId
+      ? [{ price: priceId, quantity: 1 }]
+      : [{
           price_data: {
-            product: productId,
+            product: productId!,
             currency: 'eur',
-            unit_amount: amountCents,
+            unit_amount: (PLAN_PRICES[planSlug] ?? Number(process.env.STRIPE_PRICE_AMOUNT_CENTS)) || 9700,
             recurring: { interval: 'month' },
           },
           quantity: 1,
-        },
-      ],
+        }];
+
+    const sessionParams: Stripe.Checkout.SessionCreateParams = {
+      mode: 'subscription',
+      payment_method_collection: 'always',
+      ...(customerId
+        ? { customer: customerId }
+        : { customer_email: customerEmail }),
+      line_items: lineItems,
       subscription_data: {
-        trial_period_days: TRIAL_DAYS,
-        metadata: { userId: user.id },
+        metadata: { planSlug },
+        ...(skipTrial ? {} : { trial_period_days: TRIAL_DAYS }),
       },
+      metadata: { planSlug },
       success_url: successUrl,
       cancel_url: cancelUrl,
       allow_promotion_codes: true,
-    });
+    };
+
+    const session = await stripe.checkout.sessions.create(sessionParams);
 
     return NextResponse.json({ url: session.url });
   } catch (error) {

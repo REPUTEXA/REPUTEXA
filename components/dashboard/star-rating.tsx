@@ -8,7 +8,7 @@ export function StarRating({ rating }: Props) {
       {[1, 2, 3, 4, 5].map((i) => (
         <Star
           key={i}
-          className={`h-4 w-4 ${i <= rating ? 'fill-amber-400' : 'fill-zinc-700'}`}
+          className={`h-4 w-4 ${i <= rating ? 'fill-amber-400' : 'fill-white/30'}`}
         />
       ))}
     </span>

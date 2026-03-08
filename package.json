@@ -15,16 +15,24 @@
     "stripe:listen": "stripe listen --forward-to localhost:3000/api/stripe/webhook"
   },
   "dependencies": {
-    "@clerk/localizations": "^3.37.1",
-    "@clerk/nextjs": "^6.38.3",
+    "@react-email/components": "^1.0.8",
     "@stripe/stripe-js": "^8.8.0",
+    "@supabase/ssr": "^0.9.0",
+    "@supabase/supabase-js": "^2.98.0",
+    "date-fns": "^4.1.0",
+    "framer-motion": "^12.34.5",
     "lucide-react": "^0.575.0",
     "next": "14.2.35",
     "next-intl": "^3.26.5",
     "openai": "^6.25.0",
     "react": "^18",
     "react-dom": "^18",
-    "stripe": "^20.4.0"
+    "react-email": "^5.2.9",
+    "react-phone-number-input": "^3.4.16",
+    "resend": "^6.9.3",
+    "sonner": "^2.0.7",
+    "stripe": "^20.4.0",
+    "zod": "^4.3.6"
   },
   "devDependencies": {
     "@prisma/client": "^6.8.0",

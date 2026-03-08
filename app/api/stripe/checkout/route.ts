@@ -1,9 +1,21 @@
 import { NextResponse } from 'next/server';
-import { auth, clerkClient } from '@clerk/nextjs/server';
 import Stripe from 'stripe';
-import { prisma } from '@/lib/prisma';
+import { createClient } from '@/lib/supabase/server';
+import { getSiteUrl } from '@/lib/site-url';
 
 const TRIAL_DAYS = 14;
+
+const PLAN_ENV_KEYS = {
+  starter: 'STRIPE_PRICE_STARTER',
+  manager: 'STRIPE_PRICE_MANAGER',
+  dominator: 'STRIPE_PRICE_DOMINATOR',
+} as const;
+
+type PlanType = keyof typeof PLAN_ENV_KEYS;
+
+function isValidPlan(plan: string | null): plan is PlanType {
+  return plan !== null && plan in PLAN_ENV_KEYS;
+}
 
 export const dynamic = 'force-dynamic';
 
@@ -17,54 +29,36 @@ export async function POST(request: Request) {
       );
     }
 
-    const stripe = new Stripe(secretKey);
-    const { userId } = await auth();
-    if (!userId) {
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user?.email) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const productId = process.env.STRIPE_PRODUCT_ID;
-    if (!productId) {
+    const stripe = new Stripe(secretKey);
+    const { searchParams } = new URL(request.url);
+    const locale = searchParams.get('locale') ?? 'fr';
+    const planType: PlanType = isValidPlan(searchParams.get('planType'))
+      ? searchParams.get('planType') as PlanType
+      : 'manager';
+
+    const priceId = process.env[PLAN_ENV_KEYS[planType]];
+    if (!priceId) {
       return NextResponse.json(
-        { error: 'STRIPE_PRODUCT_ID not configured' },
+        { error: `${PLAN_ENV_KEYS[planType]} not configured` },
         { status: 500 }
       );
     }
+    const baseUrl = getSiteUrl();
 
-    const amountCents = Number(process.env.STRIPE_PRICE_AMOUNT_CENTS) || 7900; // 79€ par défaut
-
-    const { searchParams } = new URL(request.url);
-    const locale = searchParams.get('locale') ?? 'fr';
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000';
-
-    let user = await prisma.user.findUnique({
-      where: { clerkUserId: userId },
-    });
-
-    if (!user) {
-      const { sessionClaims } = await auth();
-      const client = await clerkClient();
-      const clerkUser = await client.users.getUser(userId);
-      const email = clerkUser?.primaryEmailAddress?.emailAddress ?? (sessionClaims?.email as string) ?? '';
-      user = await prisma.user.create({
-        data: {
-          clerkUserId: userId,
-          email: email || `user-${userId}@placeholder.local`,
-        },
-      });
-    }
-
-    let customerId = user.stripeCustomerId;
+    const existing = await stripe.customers.list({ email: user.email, limit: 1 });
+    let customerId = existing.data[0]?.id ?? null;
     if (!customerId) {
       const customer = await stripe.customers.create({
         email: user.email,
-        metadata: { clerkUserId: userId },
+        metadata: { supabaseUserId: user.id },
       });
       customerId = customer.id;
-      await prisma.user.update({
-        where: { id: user.id },
-        data: { stripeCustomerId: customerId },
-      });
     }
 
     const successUrl = `${baseUrl}/${locale}/dashboard?welcome=1&session_id={CHECKOUT_SESSION_ID}`;
@@ -74,20 +68,10 @@ export async function POST(request: Request) {
       customer: customerId,
       mode: 'subscription',
       payment_method_collection: 'always',
-      line_items: [
-        {
-          price_data: {
-            product: productId,
-            currency: 'eur',
-            unit_amount: amountCents,
-            recurring: { interval: 'month' },
-          },
-          quantity: 1,
-        },
-      ],
+      line_items: [{ price: priceId, quantity: 1 }],
       subscription_data: {
         trial_period_days: TRIAL_DAYS,
-        metadata: { userId: user.id },
+        metadata: { supabaseUserId: user.id },
       },
       success_url: successUrl,
       cancel_url: cancelUrl,

@@ -13,6 +13,7 @@ import { getAuthErrorMessage } from '@/lib/auth/errors';
 import { toast } from 'sonner';
 import { Loader2 } from 'lucide-react';
 import { PhoneInput, isValidPhoneNumber } from '@/components/phone-input';
+import { AddressAutocomplete } from '@/components/address-autocomplete';
 
 function getPasswordStrength(password: string): { level: 0 | 1 | 2 | 3; label: string; color: string } {
   if (!password.length) return { level: 0, label: '', color: '' };
@@ -56,6 +57,10 @@ export default function SignupPage() {
   const [fullName, setFullName] = useState('');
   const [establishmentName, setEstablishmentName] = useState('');
   const [address, setAddress] = useState('');
+  const [street, setStreet] = useState('');
+  const [city, setCity] = useState('');
+  const [postalCode, setPostalCode] = useState('');
+  const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(null);
   const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -123,6 +128,11 @@ export default function SignupPage() {
           business_name: data.establishmentName,
           establishment_name: data.establishmentName,
           address: data.address || undefined,
+          address_street: street || undefined,
+          address_city: city || undefined,
+          address_postal_code: postalCode || undefined,
+          address_lat: coords?.lat,
+          address_lng: coords?.lng,
           phone: data.phone || undefined,
           subscription_plan: subscriptionPlan,
           selected_plan: selectedPlan,
@@ -268,19 +278,70 @@ export default function SignupPage() {
                 />
               </div>
 
-              <div>
+              <div className="space-y-3">
                 <label htmlFor="signup-address" className="block text-sm font-medium text-slate-700 mb-1.5">
                   Adresse
                 </label>
-                <input
+                <AddressAutocomplete
                   id="signup-address"
-                  type="text"
                   value={address}
-                  onChange={(e) => setAddress(e.target.value)}
-                  autoComplete="street-address"
-                  className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-all duration-200"
-                  placeholder="12 rue de la Paix, 75001 Paris"
+                  onChange={(addr, details) => {
+                    setAddress(addr);
+                    if (details) {
+                      setStreet(details.street);
+                      setCity(details.city);
+                      setPostalCode(details.postalCode);
+                      setCoords({ lat: details.lat, lng: details.lng });
+                    } else {
+                      setStreet('');
+                      setCity('');
+                      setPostalCode('');
+                      setCoords(null);
+                    }
+                  }}
+                  placeholder="Tapez votre adresse (ex: 599 chemin de Guiran)"
                 />
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <div>
+                    <label htmlFor="signup-street" className="block text-xs font-medium text-slate-500 mb-1">
+                      Rue
+                    </label>
+                    <input
+                      id="signup-street"
+                      type="text"
+                      value={street}
+                      onChange={(e) => setStreet(e.target.value)}
+                      placeholder="Rue"
+                      className="w-full px-4 py-2.5 rounded-2xl border border-slate-200/80 bg-slate-50/50 text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/25 focus:border-blue-400 transition-all"
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="signup-city" className="block text-xs font-medium text-slate-500 mb-1">
+                      Ville
+                    </label>
+                    <input
+                      id="signup-city"
+                      type="text"
+                      value={city}
+                      onChange={(e) => setCity(e.target.value)}
+                      placeholder="Ville"
+                      className="w-full px-4 py-2.5 rounded-2xl border border-slate-200/80 bg-slate-50/50 text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/25 focus:border-blue-400 transition-all"
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="signup-postal" className="block text-xs font-medium text-slate-500 mb-1">
+                      Code postal
+                    </label>
+                    <input
+                      id="signup-postal"
+                      type="text"
+                      value={postalCode}
+                      onChange={(e) => setPostalCode(e.target.value)}
+                      placeholder="Code postal"
+                      className="w-full px-4 py-2.5 rounded-2xl border border-slate-200/80 bg-slate-50/50 text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/25 focus:border-blue-400 transition-all"
+                    />
+                  </div>
+                </div>
               </div>
 
               <div>

@@ -299,7 +299,7 @@ export default function SignupPage() {
                       setCoords(null);
                     }
                   }}
-                  placeholder="Tapez votre adresse (ex: 599 chemin de Guiran)"
+                  placeholder="Saisissez votre adresse..."
                 />
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                   <div>

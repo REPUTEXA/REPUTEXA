@@ -49,7 +49,7 @@ export function AddressAutocomplete({
   value,
   onChange,
   id = 'address',
-  placeholder = 'Tapez votre adresse (ex: 599 chemin de Guiran)',
+  placeholder = 'Saisissez votre adresse...',
   className = '',
 }: Props) {
   const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY ?? '';
@@ -106,8 +106,8 @@ export function AddressAutocomplete({
           ...base,
           border: 'none',
           boxShadow: 'none',
-          minHeight: 42,
-          '&:hover': { border: 'none' },
+          minHeight: 40,
+          '&:hover': { border: 'none', boxShadow: 'none' },
         }),
         valueContainer: (base: object) => ({
           ...base,
@@ -121,21 +121,28 @@ export function AddressAutocomplete({
         }),
         indicatorSeparator: () => ({ display: 'none' }),
         dropdownIndicator: () => ({ display: 'none' }),
-        clearIndicator: (base: object) => ({ ...base, padding: '4px 2px' }),
+        clearIndicator: (base: object) => ({ ...base, padding: '4px 2px', color: '#94a3b8' }),
         singleValue: (base: object) => ({ ...base, margin: 0 }),
         menu: (base: object) => ({
           ...base,
-          borderRadius: 16,
+          backgroundColor: '#fff',
+          borderRadius: 12,
           overflow: 'hidden',
-          boxShadow: '0 10px 40px -10px rgba(0,0,0,0.15), 0 0 1px rgba(0,0,0,0.05)',
-          marginTop: 6,
+          boxShadow: '0 1px 3px 0 rgba(0,0,0,0.08)',
+          marginTop: 4,
+          width: '100%',
+        }),
+        menuList: (base: object) => ({
+          ...base,
+          padding: 4,
         }),
         option: (base: object, state: { isFocused?: boolean }) => ({
           ...base,
-          backgroundColor: state.isFocused ? '#eff6ff' : 'white',
+          backgroundColor: state.isFocused ? '#f8fafc' : 'transparent',
+          color: '#334155',
           cursor: 'pointer',
-          padding: '12px 18px',
-          fontSize: 15,
+          padding: '10px 12px',
+          fontSize: 'inherit',
         }),
       },
     }),
@@ -143,12 +150,12 @@ export function AddressAutocomplete({
   );
 
   const inputClasses =
-    'flex items-center gap-3 w-full pl-4 pr-4 py-3 rounded-2xl border border-slate-200/80 bg-white text-slate-900 placeholder:text-slate-400 focus-within:outline-none focus-within:ring-2 focus-within:ring-blue-500/25 focus-within:border-blue-400 transition-all duration-200 shadow-sm focus-within:shadow-[0_0_0_4px_rgba(59,130,246,0.12)]';
+    'flex items-center gap-2 w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-slate-900 placeholder:text-slate-400 focus-within:outline-none focus-within:ring-2 focus-within:ring-blue-500/30 focus-within:border-blue-500 transition-all duration-200';
 
   if (!apiKey) {
     return (
       <div className={`${inputClasses} ${className}`}>
-        <MapPin className="shrink-0 w-5 h-5 text-blue-500/70" aria-hidden />
+        <MapPin className="shrink-0 w-4 h-4 text-slate-400" aria-hidden />
         <input
           id={id}
           type="text"
@@ -163,9 +170,9 @@ export function AddressAutocomplete({
   }
 
   return (
-    <div className={`${inputClasses} ${className}`}>
-      <MapPin className="shrink-0 w-5 h-5 text-blue-500/70" aria-hidden />
-      <div className="flex-1 min-w-0 [&_.react-select__control]:!min-h-0 [&_.react-select__control]:!border-0 [&_.react-select__value-container]:!p-0">
+    <div className={`${inputClasses} ${className} relative`}>
+      <MapPin className="shrink-0 w-4 h-4 text-slate-400" aria-hidden />
+      <div className="flex-1 min-w-0 [&_.react-select__control]:!min-h-0 [&_.react-select__control]:!border-0 [&_.react-select__control]:!shadow-none [&_.react-select__value-container]:!p-0">
         <GooglePlacesAutocomplete
           apiKey={apiKey}
           selectProps={selectProps}

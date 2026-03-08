@@ -32,12 +32,12 @@ Dans ton `.env` (local) et dans Vercel (Settings → Environment Variables) :
 |----------|---------------|---------|
 | `STRIPE_SECRET_KEY` | Stripe → Developers → API keys → Secret key | `sk_test_...` |
 | `STRIPE_WEBHOOK_SECRET` | Stripe → Webhooks → ton endpoint → Signing secret | `whsec_...` |
-| `STRIPE_PRICE_STARTER` | Stripe → Products → Prix Starter 59€/mois | `price_...` |
-| `STRIPE_PRICE_MANAGER` | Stripe → Products → Prix Manager 97€/mois | `price_...` |
-| `STRIPE_PRICE_DOMINATOR` | Stripe → Products → Prix Dominator 157€/mois | `price_...` |
+| `STRIPE_PRICE_ID_VISION` | Stripe → Products → Prix Vision 59€/mois | `price_...` |
+| `STRIPE_PRICE_ID_PULSE` | Stripe → Products → Prix Pulse 97€/mois | `price_...` |
+| `STRIPE_PRICE_ID_ZENITH` | Stripe → Products → Prix Zenith 157€/mois | `price_...` |
 | `NEXT_PUBLIC_APP_URL` | URL de ton site en prod | `https://reputexa.vercel.app` |
 
-**Important :** Crée 3 produits/prix dans Stripe (Starter 59€, Manager 97€, Dominator 157€) avec essai 14 jours.
+**Important :** Crée 3 prix (Price IDs) dans Stripe pour Vision, Pulse et Zenith avec essai 14 jours.
 
 ---
 
@@ -58,7 +58,7 @@ La commande affiche un **webhook signing secret** temporaire (whsec_...) → uti
 1. User clique sur un plan (Starter/Manager/Dominator) sur la landing → `/checkout?plan=manager`
 2. Si non connecté → redirection sign-in puis retour checkout avec le plan
 3. User clique "Ajouter ma carte" → API `/api/stripe/checkout?planType=manager` crée une session Stripe
-4. Session Stripe : prix correspondant (STRIPE_PRICE_STARTER/MANAGER/DOMINATOR), essai 14 jours, 0€ aujourd'hui
+4. Session Stripe : Price ID correspondant (STRIPE_PRICE_ID_VISION/PULSE/ZENITH), essai 14 jours, 0€ aujourd'hui
 5. User entre sa carte sur Stripe
 6. Stripe envoie `checkout.session.completed` à ton webhook
 7. Le webhook met à jour `User` (stripeSubscriptionId, trialEndsAt)

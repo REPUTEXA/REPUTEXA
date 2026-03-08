@@ -6,9 +6,9 @@ import { getSiteUrl } from '@/lib/site-url';
 const TRIAL_DAYS = 14;
 
 const PLAN_ENV_KEYS = {
-  starter: 'STRIPE_PRICE_STARTER',
-  manager: 'STRIPE_PRICE_MANAGER',
-  dominator: 'STRIPE_PRICE_DOMINATOR',
+  starter: 'STRIPE_PRICE_ID_VISION',
+  manager: 'STRIPE_PRICE_ID_PULSE',
+  dominator: 'STRIPE_PRICE_ID_ZENITH',
 } as const;
 
 type PlanType = keyof typeof PLAN_ENV_KEYS;

@@ -17,8 +17,9 @@ Cocher chaque point pour vérifier que tout est correctement configuré.
 | `CLERK_SECRET_KEY` | `sk_test_...` ou `sk_live_...` | ☐ |
 | `STRIPE_SECRET_KEY` | `sk_test_...` ou `sk_live_...` | ☐ |
 | `STRIPE_WEBHOOK_SECRET` | `whsec_...` | ☐ |
-| `STRIPE_PRODUCT_ID` | `prod_...` | ☐ |
-| `STRIPE_PRICE_AMOUNT_CENTS` | `7900` (nombre) | ☐ |
+| `STRIPE_PRICE_ID_VISION` | `price_...` | ☐ |
+| `STRIPE_PRICE_ID_PULSE` | `price_...` | ☐ |
+| `STRIPE_PRICE_ID_ZENITH` | `price_...` | ☐ |
 | `NEXT_PUBLIC_APP_URL` | `https://ton-site.vercel.app` (sans slash final) | ☐ |
 
 ### 1.2 DATABASE_URL - pièges courants

@@ -5,19 +5,13 @@ import { getSiteUrl } from '@/lib/site-url';
 
 const TRIAL_DAYS = 14;
 
-const PLAN_PRICES: Record<string, number> = {
-  vision: 5900,
-  pulse: 9700,
-  zenith: 17900,
-};
-
 const PLAN_TO_PRICE_ENV: Record<string, string> = {
-  vision: 'STRIPE_PRICE_STARTER',
-  pulse: 'STRIPE_PRICE_MANAGER',
-  zenith: 'STRIPE_PRICE_DOMINATOR',
-  starter: 'STRIPE_PRICE_STARTER',
-  manager: 'STRIPE_PRICE_MANAGER',
-  dominator: 'STRIPE_PRICE_DOMINATOR',
+  vision: 'STRIPE_PRICE_ID_VISION',
+  pulse: 'STRIPE_PRICE_ID_PULSE',
+  zenith: 'STRIPE_PRICE_ID_ZENITH',
+  starter: 'STRIPE_PRICE_ID_VISION',
+  manager: 'STRIPE_PRICE_ID_PULSE',
+  dominator: 'STRIPE_PRICE_ID_ZENITH',
 };
 
 export async function POST(request: Request) {
@@ -39,11 +33,10 @@ export async function POST(request: Request) {
     const baseUrl = getSiteUrl();
 
     const priceId = process.env[PLAN_TO_PRICE_ENV[planSlug] ?? PLAN_TO_PRICE_ENV.pulse];
-    const productId = process.env.STRIPE_PRODUCT_ID;
 
-    if (!priceId && !productId) {
+    if (!priceId) {
       return NextResponse.json(
-        { error: 'STRIPE_PRICE_* ou STRIPE_PRODUCT_ID requis' },
+        { error: 'STRIPE_PRICE_ID_VISION, STRIPE_PRICE_ID_PULSE ou STRIPE_PRICE_ID_ZENITH requis' },
         { status: 500 }
       );
     }
@@ -72,17 +65,9 @@ export async function POST(request: Request) {
     const successUrl = `${baseUrl}/${locale}/dashboard?welcome=1&session_id={CHECKOUT_SESSION_ID}`;
     const cancelUrl = `${baseUrl}/${locale}/choose-plan`;
 
-    const lineItems: Stripe.Checkout.SessionCreateParams['line_items'] = priceId
-      ? [{ price: priceId, quantity: 1 }]
-      : [{
-          price_data: {
-            product: productId!,
-            currency: 'eur',
-            unit_amount: (PLAN_PRICES[planSlug] ?? Number(process.env.STRIPE_PRICE_AMOUNT_CENTS)) || 9700,
-            recurring: { interval: 'month' },
-          },
-          quantity: 1,
-        }];
+    const lineItems: Stripe.Checkout.SessionCreateParams['line_items'] = [
+      { price: priceId, quantity: 1 },
+    ];
 
     const sessionParams: Stripe.Checkout.SessionCreateParams = {
       mode: 'subscription',

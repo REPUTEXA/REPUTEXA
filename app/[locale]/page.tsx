@@ -6,6 +6,7 @@ import { useTranslations, useLocale } from 'next-intl';
 import { Bell, TrendingUp, MessageCircle, MessageSquare, ShieldCheck, ChevronRight, Check, BarChart2 } from 'lucide-react';
 import { Chatbot } from '@/components/chatbot';
 import { LanguageSelector } from '@/components/language-selector';
+import { UserProfileMenu } from '@/components/auth/user-profile-menu';
 import { DemoDashboard } from '@/components/demo-dashboard';
 import { Logo } from '@/components/logo';
 import { formatPrice } from '@/lib/format-price';
@@ -75,12 +76,7 @@ export default function HomePage() {
           </div>
           <div className="flex items-center gap-3">
             <LanguageSelector variant="dark" />
-            <Link
-              href="/login"
-              className="text-sm text-white/70 hover:text-white font-medium transition-colors"
-            >
-              {t('nav.login')}
-            </Link>
+            <UserProfileMenu variant="dark" />
             <Link
               href="/signup?mode=trial"
               className="gradient-primary text-white text-sm font-semibold px-4 py-2 rounded-xl hover:opacity-90 transition-opacity"

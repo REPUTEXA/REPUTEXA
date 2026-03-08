@@ -93,8 +93,9 @@ Avant de déployer, ajoute les variables. Clique **Environment Variables** et aj
 | `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` | `pk_test_...` | Ton `.env` local |
 | `CLERK_SECRET_KEY` | `sk_test_...` | Ton `.env` local |
 | `STRIPE_SECRET_KEY` | `sk_test_...` | Stripe → Developers → API keys |
-| `STRIPE_PRODUCT_ID` | `prod_U3Wr41eJCMCSyF` | Ton produit Stripe |
-| `STRIPE_PRICE_AMOUNT_CENTS` | `7900` | Fixe |
+| `STRIPE_PRICE_ID_VISION` | `price_...` | Stripe → Vision |
+| `STRIPE_PRICE_ID_PULSE` | `price_...` | Stripe → Pulse |
+| `STRIPE_PRICE_ID_ZENITH` | `price_...` | Stripe → Zenith |
 | `NEXT_PUBLIC_APP_URL` | *(à remplir après)* | On le mettra à l’étape 3.5 |
 | `STRIPE_WEBHOOK_SECRET` | *(à remplir après)* | Stripe webhook (étape 4) |
 

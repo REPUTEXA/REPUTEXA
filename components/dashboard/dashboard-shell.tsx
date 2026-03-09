@@ -7,6 +7,7 @@ import { Link } from '@/i18n/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { getSiteUrl } from '@/lib/site-url';
 import { LogOut, LayoutDashboard, MessageSquare, BarChart2, Bell, Settings, Menu, X, Search, Building2, Shield, Lock } from 'lucide-react';
+import { ThemeToggle } from '@/components/theme-toggle';
 import { LanguageSelector } from '@/components/language-selector';
 import { hasFeature, FEATURES, type FeatureKey } from '@/lib/feature-gate';
 import { UpgradeModal } from '@/components/dashboard/upgrade-modal';
@@ -23,7 +24,7 @@ function SignOutButton() {
     <button
       type="button"
       onClick={handleSignOut}
-      className="p-2 rounded-xl text-slate-600 hover:bg-slate-100 transition-colors"
+      className="p-2 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
       aria-label="Déconnexion"
       title="Déconnexion"
     >
@@ -112,7 +113,7 @@ export function DashboardShell({
   };
 
   return (
-    <div className="flex min-h-screen bg-slate-50">
+    <div className="flex min-h-screen bg-slate-50 dark:bg-slate-950 transition-colors duration-200">
       {/* Overlay mobile */}
       {sidebarOpen && (
         <button
@@ -247,11 +248,11 @@ export function DashboardShell({
       {/* Main content */}
       <div className="flex flex-1 flex-col min-w-0 lg:ml-60">
         {/* Header */}
-        <header className="sticky top-0 z-20 h-16 border-b border-slate-200 bg-white/90 backdrop-blur-sm flex items-center justify-between px-4 sm:px-6">
+        <header className="sticky top-0 z-20 h-16 border-b border-slate-200 dark:border-slate-800 bg-white/90 dark:bg-slate-950/90 backdrop-blur-sm flex items-center justify-between px-4 sm:px-6 transition-colors duration-200">
           <button
             type="button"
             onClick={() => setSidebarOpen(true)}
-            className="lg:hidden p-2 rounded-lg text-slate-600 hover:bg-slate-100 -ml-2"
+            className="lg:hidden p-2 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 -ml-2"
             aria-label="Ouvrir le menu"
           >
             <Menu className="h-5 w-5" />
@@ -259,22 +260,23 @@ export function DashboardShell({
 
           <form onSubmit={handleSearchSubmit} className="flex-1 max-w-md mx-4 hidden sm:block">
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 dark:text-slate-500" />
               <input
                 type="search"
                 value={searchInput}
                 onChange={(e) => setSearchInput(e.target.value)}
                 placeholder="Rechercher des avis..."
-                className="w-full pl-9 pr-4 py-2 text-sm bg-slate-100 border border-slate-200 rounded-xl text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500/40"
+                className="w-full pl-9 pr-4 py-2 text-sm bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500/40 transition-colors duration-200"
               />
             </div>
           </form>
 
           <div className="flex items-center gap-2 sm:gap-3">
+            <ThemeToggle />
             <LanguageSelector variant="light" />
             <button
               type="button"
-              className="relative p-2 rounded-xl text-slate-500 hover:bg-slate-100 transition-colors"
+              className="relative p-2 rounded-xl text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
               aria-label="Notifications"
             >
               <Bell className="h-5 w-5" />
@@ -284,17 +286,17 @@ export function DashboardShell({
           </div>
         </header>
 
-        <main className="flex-1 bg-slate-50">
+        <main className="flex-1 bg-slate-50 dark:bg-slate-950 transition-colors duration-200">
           {showTrialBanner && !showPaywall && (
             <div
-              className={`border-b px-4 sm:px-6 py-4 ${
+              className={`border-b px-4 sm:px-6 py-4 transition-colors duration-200 ${
                 isCriticalPhase
-                  ? 'bg-red-50 border-red-200 animate-pulse-slow'
-                  : 'bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200'
+                  ? 'bg-red-50 dark:bg-red-950/40 border-red-200 dark:border-red-900 animate-pulse-slow'
+                  : 'bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/40 dark:to-indigo-950/40 border-blue-200 dark:border-blue-900'
               }`}
             >
               <div className="max-w-4xl mx-auto flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                <p className={`text-sm sm:text-base ${isCriticalPhase ? 'text-red-900' : 'text-slate-800'}`}>
+                <p className={`text-sm sm:text-base ${isCriticalPhase ? 'text-red-900 dark:text-red-100' : 'text-slate-800 dark:text-slate-200'}`}>
                   <span className="font-semibold">
                     Essai ZENITH : {trialDaysLeft ?? 0} jour{trialDaysLeft !== 1 ? 's' : ''} restant{trialDaysLeft !== 1 ? 's' : ''}
                   </span>

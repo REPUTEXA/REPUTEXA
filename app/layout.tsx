@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { headers } from 'next/headers';
 import localFont from 'next/font/local';
 import { Toaster } from 'sonner';
+import { ThemeProvider } from '@/components/theme-provider';
 import './globals.css';
 
 const geistSans = localFont({
@@ -34,12 +35,14 @@ export default async function RootLayout({
   const dir = ['ar', 'he'].includes(locale) ? 'rtl' : 'ltr';
 
   return (
-    <html lang={locale} dir={dir}>
+    <html lang={locale} dir={dir} suppressHydrationWarning>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased transition-colors duration-200`}
       >
-        {children}
-        <Toaster richColors position="top-center" />
+        <ThemeProvider>
+          {children}
+          <Toaster richColors position="top-center" />
+        </ThemeProvider>
       </body>
     </html>
   );

@@ -54,6 +54,8 @@ export async function sendWhatsAppAlert(
   const contentSid =
     process.env.TWILIO_WHATSAPP_ALERT_CONTENT_SID ?? 'HX064e5d92f7e039ecb2b39d775ab28b33';
 
+  console.log('DEBUG CONTENT SID:', process.env.TWILIO_WHATSAPP_ALERT_CONTENT_SID ?? '(fallback)');
+
   if (!accountSid || !authToken || !whatsappNumber) {
     return {
       success: false,
@@ -76,9 +78,9 @@ export async function sendWhatsAppAlert(
         to: toWhatsApp,
         contentSid,
         contentVariables: JSON.stringify({
-          '1': authorName,
-          '2': reviewText,
-          '3': suggestedReplyForTemplate,
+          '1': authorName || 'Inconnu',
+          '2': reviewText || 'Pas de texte',
+          '3': suggestedReplyForTemplate || 'Pas de suggestion',
         }),
       });
       return { success: true, messageId: message.sid };

@@ -30,15 +30,27 @@ export async function sendWhatsAppAlert(
     establishmentName,
   } = payload;
 
-  const commentTrunc = comment.length > 300 ? `${comment.slice(0, 300)}...` : comment;
-  const replyTrunc = suggestedReply.length > 500 ? `${suggestedReply.slice(0, 500)}...` : suggestedReply;
+  const authorName = String(reviewerName ?? '').trim() || 'Client';
+  const reviewText = comment?.trim()
+    ? comment.length > 300
+      ? `${comment.slice(0, 300).trim()}...`
+      : comment.trim()
+    : '(Aucun commentaire)';
+  const replyForTemplate = String(suggestedReply ?? '').trim() || '(Aucune suggestion)';
+  const replyTrunc =
+    replyForTemplate.length > 500 ? `${replyForTemplate.slice(0, 500)}...` : replyForTemplate;
 
-  // Variables pour Content API : {{1}} Auteur, {{2}} Contenu avis, {{3}} Suggestion IA
-  const contentVariables: Record<string, string> = {
-    '1': reviewerName,
-    '2': commentTrunc,
+  const contentVariables = {
+    '1': authorName,
+    '2': reviewText,
     '3': replyTrunc,
   };
+
+  console.log('Variables envoyées à Twilio:', {
+    authorName,
+    reviewText: reviewText.slice(0, 80) + (reviewText.length > 80 ? '...' : ''),
+    suggestedReply: replyTrunc.slice(0, 80) + (replyTrunc.length > 80 ? '...' : ''),
+  });
 
   const accountSid = process.env.TWILIO_ACCOUNT_SID;
   const authToken = process.env.TWILIO_AUTH_TOKEN;
@@ -67,7 +79,7 @@ export async function sendWhatsAppAlert(
     if (contentSid) {
       const message = await client.messages.create({
         contentSid,
-        contentVariables: JSON.stringify(contentVariables),
+        contentVariables: JSON.stringify({ '1': authorName, '2': reviewText, '3': replyTrunc }),
         from: fromFormatted,
         to: toWhatsApp,
       });
@@ -78,10 +90,10 @@ export async function sendWhatsAppAlert(
       `🚨 *ALERTE NOUVEL AVIS NÉGATIF*`,
       ``,
       establishmentName ? `📌 ${establishmentName}` : null,
-      `👤 ${reviewerName} — ${rating}/5 ⭐`,
+      `👤 ${authorName} — ${rating}/5 ⭐`,
       ``,
       `📝 *Avis client :*`,
-      `"${commentTrunc}"`,
+      `"${reviewText}"`,
       ``,
       `🤖 *Suggestion de réponse IA :*`,
       `"${replyTrunc}"`,

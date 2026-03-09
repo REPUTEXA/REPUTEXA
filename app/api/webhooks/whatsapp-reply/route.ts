@@ -205,11 +205,15 @@ export async function POST(request: Request) {
       .eq('user_id', review.user_id);
   }
 
-  console.log('[Flux] Renvoi de la carte après modification');
+  console.log('[Flux] Renvoi de la carte après modification', {
+    reviewerName: review.reviewer_name,
+    commentLen: review.comment?.length ?? 0,
+    v2Len: v2?.length ?? 0,
+  });
   const sendResult = await sendWhatsAppInteractiveCard({
     to: fromPhone,
-    reviewerName: review.reviewer_name,
-    comment: review.comment,
+    reviewerName: review.reviewer_name ?? 'Client',
+    comment: review.comment ?? '(Aucun commentaire)',
     suggestedReply: v2,
   });
 

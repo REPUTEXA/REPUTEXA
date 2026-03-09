@@ -28,6 +28,7 @@ export async function transcribeAudioFromUrl(
     headers['Authorization'] = `Basic ${encoded}`;
   }
 
+  console.log('[Transcription] Envoi à Whisper...');
   const res = await fetch(mediaUrl, { headers });
   if (!res.ok) {
     throw new Error(`Failed to fetch audio: ${res.status} ${res.statusText}`);

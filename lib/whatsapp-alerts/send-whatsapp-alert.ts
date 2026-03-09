@@ -43,7 +43,8 @@ export async function sendWhatsAppAlert(
   const accountSid = process.env.TWILIO_ACCOUNT_SID;
   const authToken = process.env.TWILIO_AUTH_TOKEN;
   const whatsappFrom = process.env.TWILIO_WHATSAPP_FROM;
-  const contentSid = process.env.TWILIO_WHATSAPP_ALERT_CONTENT_SID;
+  const contentSid =
+    process.env.TWILIO_WHATSAPP_ALERT_CONTENT_SID ?? 'HXe5963abb10fdbc94f6727dc9eb2900b0';
 
   if (!accountSid || !authToken || !whatsappFrom) {
     return {

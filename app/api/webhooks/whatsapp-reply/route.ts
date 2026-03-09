@@ -1,9 +1,11 @@
 import { createAdminClient } from '@/lib/supabase/admin';
 import { transcribeAudioFromUrl } from '@/lib/whisper';
 import { generateModifiedResponse } from '@/lib/whatsapp-alerts/generate-modified-response';
+import { sendWhatsAppInteractiveCard } from '@/lib/whatsapp-alerts/send-whatsapp-alert';
 import { sendWhatsAppMessage } from '@/lib/whatsapp-alerts/send-whatsapp-message';
 
 export const runtime = 'nodejs';
+export const maxDuration = 60;
 
 function normalizePhone(phone: string): string {
   let digits = phone.replace(/\D/g, '');
@@ -71,15 +73,18 @@ export async function POST(request: Request) {
   // Détection clics sur boutons (ButtonText ou Body)
   const clickText = buttonText ?? body;
   if (clickText.includes('Valider') && clickText.includes('Envoyer')) {
-    console.log('ACTION: PUBLICATION');
+    console.log('[Flux] Bouton Valider reçu');
+    console.log('PUBLICATION SUR GOOGLE...');
+    await sendWhatsAppMessage(fromPhone, "🚀 C'est publié avec succès !");
     return twimlResponse();
   }
   if (clickText.includes('Modifier') && (clickText.includes('Vocal') || clickText.includes('🎙️'))) {
-    await sendWhatsAppMessage(fromPhone, 'Je vous écoute pour les modifications');
+    console.log('[Flux] Bouton Modifier (Vocal) reçu');
+    await sendWhatsAppMessage(fromPhone, 'Je vous écoute, que voulez-vous changer ?');
     return twimlResponse();
   }
   if (clickText.includes('Refuser') || clickText.includes('❌')) {
-    console.log('ACTION: REFUS');
+    console.log('[Flux] Bouton Refuser reçu - ACTION: REFUS');
     return twimlResponse();
   }
 
@@ -136,12 +141,18 @@ export async function POST(request: Request) {
     : { data: null };
 
   const reviewId = mapping?.review_id;
-  let review: { id: string; user_id: string; comment: string; ai_response: string | null } | null = null;
+  let review: {
+    id: string;
+    user_id: string;
+    reviewer_name: string;
+    comment: string;
+    ai_response: string | null;
+  } | null = null;
 
   if (reviewId && supabase) {
     const { data, error } = await supabase
       .from('reviews')
-      .select('id, user_id, comment, ai_response')
+      .select('id, user_id, reviewer_name, comment, ai_response')
       .eq('id', reviewId)
       .single();
     if (!error && data) review = data;
@@ -194,11 +205,16 @@ export async function POST(request: Request) {
       .eq('user_id', review.user_id);
   }
 
-  const replyBody = `Entendu Chef ! Voici la version modifiée :\n\n${v2}`;
-  const sendResult = await sendWhatsAppMessage(fromPhone, replyBody);
+  console.log('[Flux] Renvoi de la carte après modification');
+  const sendResult = await sendWhatsAppInteractiveCard({
+    to: fromPhone,
+    reviewerName: review.reviewer_name,
+    comment: review.comment,
+    suggestedReply: v2,
+  });
 
   if (!sendResult.success) {
-    console.error('[whatsapp-reply] Envoi erreur:', sendResult.error);
+    console.error('[whatsapp-reply] Envoi carte interactive erreur:', sendResult.error);
   }
 
   return twimlResponse();

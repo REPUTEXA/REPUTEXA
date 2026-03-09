@@ -44,7 +44,7 @@ export async function sendWhatsAppAlert(
   const authToken = process.env.TWILIO_AUTH_TOKEN;
   const whatsappFrom = process.env.TWILIO_WHATSAPP_FROM;
   const contentSid =
-    process.env.TWILIO_WHATSAPP_ALERT_CONTENT_SID ?? 'HXe5963abb10fdbc94f6727dc9eb2900b0';
+    process.env.TWILIO_WHATSAPP_ALERT_CONTENT_SID ?? 'HX064e5d92f7e039ecb2b39d775ab28b33';
 
   if (!accountSid || !authToken || !whatsappFrom) {
     return {
@@ -105,6 +105,26 @@ export async function sendWhatsAppAlert(
     console.error('[sendWhatsAppAlert] Twilio error:', err.message);
     return { success: false, error: err.message };
   }
+}
+
+/**
+ * Renvoie la carte interactive (Content API) avec une nouvelle suggestion.
+ * Utilisé après une modification vocale pour permettre de modifier à nouveau ou valider.
+ */
+export async function sendWhatsAppInteractiveCard(params: {
+  to: string;
+  reviewerName: string;
+  comment: string;
+  suggestedReply: string;
+}): Promise<{ success: boolean; messageId?: string; error?: string }> {
+  return sendWhatsAppAlert({
+    to: params.to,
+    reviewId: 'resend', // non utilisé pour l'envoi
+    reviewerName: params.reviewerName,
+    rating: 1,
+    comment: params.comment,
+    suggestedReply: params.suggestedReply,
+  });
 }
 
 export { CALLBACK_ACTIONS };

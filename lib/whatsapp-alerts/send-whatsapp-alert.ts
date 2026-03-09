@@ -30,15 +30,14 @@ export async function sendWhatsAppAlert(
     establishmentName,
   } = payload;
 
-  const commentTrunc = comment.length > 150 ? `${comment.slice(0, 150)}...` : comment;
-  const replyTrunc = suggestedReply.length > 200 ? `${suggestedReply.slice(0, 200)}...` : suggestedReply;
+  const commentTrunc = comment.length > 300 ? `${comment.slice(0, 300)}...` : comment;
+  const replyTrunc = suggestedReply.length > 500 ? `${suggestedReply.slice(0, 500)}...` : suggestedReply;
 
+  // Variables pour Content API : {{1}} Auteur, {{2}} Contenu avis, {{3}} Suggestion IA
   const contentVariables: Record<string, string> = {
-    '1': establishmentName ?? 'Établissement',
-    '2': reviewerName,
-    '3': String(rating),
-    '4': commentTrunc,
-    '5': replyTrunc,
+    '1': reviewerName,
+    '2': commentTrunc,
+    '3': replyTrunc,
   };
 
   const accountSid = process.env.TWILIO_ACCOUNT_SID;
@@ -63,6 +62,7 @@ export async function sendWhatsAppAlert(
   try {
     const client = twilio(accountSid, authToken);
 
+    // Priorité : Content API (boutons) si TWILIO_WHATSAPP_ALERT_CONTENT_SID est défini
     if (contentSid) {
       const message = await client.messages.create({
         contentSid,

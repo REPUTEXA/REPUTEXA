@@ -31,6 +31,7 @@ export async function POST(request: Request) {
   console.log('--- VERSION SYNCHRONE ACTIVE ---');
 
   let body = '';
+  let buttonText = '';
   let fromRaw = '';
   let numMedia = 0;
   let mediaUrl: string | undefined;
@@ -39,6 +40,7 @@ export async function POST(request: Request) {
   try {
     const form = await request.formData();
     body = form.get('Body')?.toString()?.trim() ?? '';
+    buttonText = form.get('ButtonText')?.toString()?.trim() ?? '';
     fromRaw = form.get('From')?.toString() ?? '';
     numMedia = parseInt(form.get('NumMedia')?.toString() ?? '0', 10);
     mediaUrl = form.get('MediaUrl0')?.toString();
@@ -46,6 +48,7 @@ export async function POST(request: Request) {
 
     console.log('[whatsapp-reply] Données Twilio reçues:', {
       Body: body,
+      ButtonText: buttonText,
       MediaUrl0: mediaUrl,
       From: fromRaw,
       NumMedia: numMedia,
@@ -62,6 +65,21 @@ export async function POST(request: Request) {
 
   if (!fromPhone) {
     console.error('[whatsapp-reply] From manquant');
+    return twimlResponse();
+  }
+
+  // Détection clics sur boutons (ButtonText ou Body)
+  const clickText = buttonText ?? body;
+  if (clickText.includes('Valider') && clickText.includes('Envoyer')) {
+    console.log('ACTION: PUBLICATION');
+    return twimlResponse();
+  }
+  if (clickText.includes('Modifier') && (clickText.includes('Vocal') || clickText.includes('🎙️'))) {
+    await sendWhatsAppMessage(fromPhone, 'Je vous écoute pour les modifications');
+    return twimlResponse();
+  }
+  if (clickText.includes('Refuser') || clickText.includes('❌')) {
+    console.log('ACTION: REFUS');
     return twimlResponse();
   }
 

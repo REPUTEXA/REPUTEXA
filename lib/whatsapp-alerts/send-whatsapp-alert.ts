@@ -23,7 +23,6 @@ export async function sendWhatsAppAlert(
 ): Promise<{ success: boolean; messageId?: string; error?: string }> {
   const {
     to,
-    reviewId,
     reviewerName,
     rating,
     comment,

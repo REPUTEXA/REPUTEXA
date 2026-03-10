@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { useMemo, useState, useEffect } from 'react';
 import {
   ResponsiveContainer,
@@ -24,7 +25,7 @@ import {
   eachDayOfInterval,
   eachMonthOfInterval,
 } from 'date-fns';
-import { fr, enUS } from 'date-fns/locale';
+import { fr, enUS, es, de, it } from 'date-fns/locale';
 import { motion } from 'framer-motion';
 import { Calendar } from 'lucide-react';
 import { useTheme } from 'next-themes';
@@ -50,21 +51,15 @@ type ChartPoint = {
   showTick?: boolean;
 };
 
-const RANGE_LABELS: { key: RangeKey; label: string }[] = [
-  { key: '7d', label: '7j' },
-  { key: '30d', label: '30j' },
-  { key: '6m', label: '6m' },
-  { key: 'all', label: 'Tout' },
-  { key: 'custom', label: 'Perso' },
-];
-
 function CustomTooltip({
   active,
   payload,
+  avgRatingLabel,
 }: {
   active?: boolean;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   payload?: any[];
+  avgRatingLabel: string;
 }) {
   if (!active || !payload || !payload.length) return null;
   const point = payload[0].payload as ChartPoint;
@@ -74,13 +69,14 @@ function CustomTooltip({
     <div className="rounded-xl border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 px-3 py-2 text-xs shadow-lg">
       <div className="font-semibold text-slate-900 dark:text-zinc-100">{point.tooltipLabel}</div>
       <div className="mt-1 text-slate-600 dark:text-zinc-400">
-        Note moyenne : <span className="font-semibold">{point.avgRating.toFixed(2)}/5</span>
+        {avgRatingLabel} : <span className="font-semibold">{point.avgRating.toFixed(2)}/5</span>
       </div>
     </div>
   );
 }
 
 export function OverviewChart({ reviews, locale }: OverviewChartProps) {
+  const t = useTranslations('Chart');
   const [isMounted, setIsMounted] = useState(false);
   const [range, setRange] = useState<RangeKey>('6m');
   const [customFrom, setCustomFrom] = useState<string>('');
@@ -116,7 +112,8 @@ export function OverviewChart({ reviews, locale }: OverviewChartProps) {
   };
 
   const data: ChartPoint[] = useMemo(() => {
-    const localeObj = locale === 'en' ? enUS : fr;
+    const localeMap = { fr, en: enUS, es, de, it } as const;
+    const localeObj = localeMap[locale as keyof typeof localeMap] ?? fr;
     const today = startOfDay(new Date());
     const now = endOfDay(today);
 
@@ -257,36 +254,34 @@ export function OverviewChart({ reviews, locale }: OverviewChartProps) {
     <div className="space-y-4">
       <div className="flex items-center justify-between gap-2 flex-wrap">
         <div>
-          <h3 className="font-display font-semibold text-slate-900 dark:text-zinc-100">Évolution de la note</h3>
+          <h3 className="font-display font-semibold text-slate-900 dark:text-zinc-100">{t('title')}</h3>
           <p className="text-xs text-slate-500 dark:text-zinc-400 mt-0.5">
             {range === 'all'
-              ? 'Toutes les périodes'
+              ? t('periodAll')
               : range === 'custom'
-                ? 'Plage personnalisée'
-                : `Période : ${
-                    RANGE_LABELS.find((r) => r.key === range)?.label ?? '6m'
-                  }`}
+                ? t('periodCustom')
+                : `${t('periodLabel')} : ${t(`range${range}` as 'range7d' | 'range30d' | 'range6m' | 'rangeAll')}`}
           </p>
         </div>
         <div className="flex items-center gap-1.5">
-          {RANGE_LABELS.map((r) => (
+          {(['7d', '30d', '6m', 'all', 'custom'] as const).map((r) => (
             <button
-              key={r.key}
+              key={r}
               type="button"
-              onClick={() => setRange(r.key)}
+              onClick={() => setRange(r)}
               className={`px-2.5 py-1 rounded-full text-xs font-medium border transition-all ${
-                range === r.key
+                range === r
                   ? 'bg-sky-600 text-white border-sky-600 shadow-inner ring-1 ring-sky-500/50'
                   : 'bg-white dark:bg-zinc-800/50 text-slate-600 dark:text-zinc-400 border-slate-200 dark:border-zinc-700 hover:bg-slate-50 dark:hover:bg-zinc-700/50'
               }`}
             >
-              {r.key === 'custom' ? (
+              {r === 'custom' ? (
                 <span className="inline-flex items-center gap-1">
                   <Calendar className="w-3 h-3" />
-                  {r.label}
+                  {t('rangeCustom')}
                 </span>
               ) : (
-                r.label
+                t(`range${r}` as 'range7d' | 'range30d' | 'range6m' | 'rangeAll')
               )}
             </button>
           ))}
@@ -295,13 +290,13 @@ export function OverviewChart({ reviews, locale }: OverviewChartProps) {
 
       {range === 'custom' && (
         <div className="relative inline-block text-xs text-slate-600">
-          <button
-            type="button"
-            onClick={() => setShowCustomPanel((v) => !v)}
-            className="mt-1 inline-flex items-center gap-1 rounded-full border border-slate-200 bg-white px-3 py-1 font-medium shadow-sm hover:bg-slate-50 transition-colors"
-          >
-            📅 Calendrier
-          </button>
+            <button
+              type="button"
+              onClick={() => setShowCustomPanel((v) => !v)}
+              className="mt-1 inline-flex items-center gap-1 rounded-full border border-slate-200 bg-white px-3 py-1 font-medium shadow-sm hover:bg-slate-50 transition-colors"
+            >
+              📅 {t('calendar')}
+            </button>
           {showCustomPanel && (
             <motion.div
               initial={{ opacity: 0, y: 6, scale: 0.98 }}
@@ -310,11 +305,11 @@ export function OverviewChart({ reviews, locale }: OverviewChartProps) {
               className="absolute z-20 mt-2 w-64 rounded-xl border border-slate-200 bg-white p-3 shadow-lg"
             >
               <p className="mb-2 text-[11px] font-semibold text-slate-700">
-                Plage personnalisée
+                {t('customPanel')}
               </p>
               <div className="space-y-2">
                 <div className="flex items-center justify-between gap-2">
-                  <span className="text-[11px] text-slate-500">Du</span>
+                  <span className="text-[11px] text-slate-500">{t('from')}</span>
                   <input
                     type="date"
                     value={customFrom}
@@ -323,7 +318,7 @@ export function OverviewChart({ reviews, locale }: OverviewChartProps) {
                   />
                 </div>
                 <div className="flex items-center justify-between gap-2">
-                  <span className="text-[11px] text-slate-500">Au</span>
+                  <span className="text-[11px] text-slate-500">{t('to')}</span>
                   <input
                     type="date"
                     value={customTo}
@@ -340,14 +335,14 @@ export function OverviewChart({ reviews, locale }: OverviewChartProps) {
                     }}
                     className="rounded-full px-2 py-0.5 text-[11px] text-slate-500 hover:bg-slate-50"
                   >
-                    Réinitialiser
+                    {t('reset')}
                   </button>
                   <button
                     type="button"
                     onClick={() => setShowCustomPanel(false)}
                     className="rounded-full bg-sky-600 px-3 py-0.5 text-[11px] font-semibold text-white hover:bg-sky-700"
                   >
-                    Fermer
+                    {t('close')}
                   </button>
                 </div>
               </div>
@@ -385,7 +380,7 @@ export function OverviewChart({ reviews, locale }: OverviewChartProps) {
                 allowDecimals={false}
                 padding={{ top: 16, bottom: 8 }}
               />
-              <Tooltip content={<CustomTooltip />} wrapperStyle={{ maxWidth: 200 }} />
+              <Tooltip content={<CustomTooltip avgRatingLabel={t('avgRating')} />} wrapperStyle={{ maxWidth: 200 }} />
               <Line
                 type="monotone"
                 dataKey="avgRating"
@@ -400,9 +395,7 @@ export function OverviewChart({ reviews, locale }: OverviewChartProps) {
         </div>
         {!data.length && !isLoading && (
           <div className="absolute inset-0 flex items-center justify-center text-xs text-slate-400">
-            {locale === 'en'
-              ? 'No data yet for this period.'
-              : 'Pas encore de données pour cette période.'}
+            {t('noData')}
           </div>
         )}
       </div>

@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { useMemo, useState, useEffect } from 'react';
 import {
   ResponsiveContainer,
@@ -39,10 +40,12 @@ function mapSourceToPlatform(sourceRaw: string | null | undefined): PlatformKey 
 function CustomTooltip({
   active,
   payload,
+  percentLabel,
 }: {
   active?: boolean;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   payload?: any[];
+  percentLabel: string;
 }) {
   if (!active || !payload || !payload.length) return null;
   const datum = payload[0].payload as PieDatum;
@@ -57,13 +60,14 @@ function CustomTooltip({
       </div>
       <div className="mt-1 text-slate-600">
         {datum.percentage.toFixed(0)}
-        % des avis
+        {percentLabel}
       </div>
     </div>
   );
 }
 
 export function PlatformDistributionChart({ reviews }: PlatformDistributionChartProps) {
+  const t = useTranslations('PlatformChart');
   const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
@@ -108,7 +112,7 @@ export function PlatformDistributionChart({ reviews }: PlatformDistributionChart
       <div className="w-32 h-32">
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>
-            <RechartsTooltip content={<CustomTooltip />} />
+            <RechartsTooltip content={<CustomTooltip percentLabel={t('percentOfReviews')} />} />
             <Pie
               data={data}
               dataKey="value"
@@ -150,7 +154,7 @@ export function PlatformDistributionChart({ reviews }: PlatformDistributionChart
           ))
         ) : (
           <p className="text-[11px] text-slate-400">
-            Répartition par plateforme affichée dès les premiers avis.
+            {t('emptyHint')}
           </p>
         )}
       </div>

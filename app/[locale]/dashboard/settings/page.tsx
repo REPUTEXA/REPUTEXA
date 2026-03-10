@@ -441,18 +441,18 @@ export default function SettingsPage() {
   return (
     <div className="px-4 sm:px-6 py-6 space-y-8">
       <header>
-        <h1 className="font-display font-bold text-2xl text-slate-900 tracking-tight">
+        <h1 className="font-display font-bold text-2xl text-slate-900 dark:text-zinc-100 tracking-tight">
           {t('title')}
         </h1>
-        <p className="mt-1 text-sm text-slate-500">{t('description')}</p>
+        <p className="mt-1 text-sm text-slate-500 dark:text-zinc-400">{t('description')}</p>
       </header>
 
       {/* Profil établissement */}
-      <section className="rounded-2xl border border-slate-200 bg-white shadow-sm p-6">
-        <h2 className="font-display font-semibold text-lg text-slate-900 mb-4">Profil établissement</h2>
+      <section className="rounded-2xl border border-slate-200 dark:border-zinc-800/50 bg-white dark:bg-zinc-900/95 shadow-sm dark:shadow-none p-6">
+        <h2 className="font-display font-semibold text-lg text-slate-900 dark:text-zinc-100 mb-4">Profil établissement</h2>
         <form onSubmit={handleSaveProfile} className="space-y-4 max-w-xl">
           <div>
-            <label htmlFor="settings-fullname" className="block text-sm font-medium text-slate-700 mb-1.5">
+            <label htmlFor="settings-fullname" className="block text-sm font-medium text-slate-700 dark:text-zinc-300 mb-1.5">
               Prénom / Nom
             </label>
             <input
@@ -461,12 +461,12 @@ export default function SettingsPage() {
               value={fullName}
               onChange={(e) => setFullName(e.target.value)}
               autoComplete="name"
-              className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-all duration-200"
+              className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-800/50 text-slate-900 dark:text-zinc-100 placeholder:text-slate-400 dark:placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-blue-500/30 dark:focus:ring-indigo-500/30 focus:border-blue-500 dark:focus:border-indigo-500 transition-all duration-200"
               placeholder="Jean Dupont"
             />
           </div>
           <div>
-            <label htmlFor="settings-name" className="block text-sm font-medium text-slate-700 mb-1.5">
+            <label htmlFor="settings-name" className="block text-sm font-medium text-slate-700 dark:text-zinc-300 mb-1.5">
               Nom de l&apos;établissement
             </label>
             <input
@@ -475,12 +475,12 @@ export default function SettingsPage() {
               value={establishmentName}
               onChange={(e) => setEstablishmentName(e.target.value)}
               autoComplete="organization"
-              className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-all duration-200"
+              className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-800/50 text-slate-900 dark:text-zinc-100 placeholder:text-slate-400 dark:placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-blue-500/30 dark:focus:ring-indigo-500/30 focus:border-blue-500 dark:focus:border-indigo-500 transition-all duration-200"
               placeholder="Mon Restaurant"
             />
           </div>
           <div>
-            <label htmlFor="settings-address" className="block text-sm font-medium text-slate-700 mb-1.5">
+            <label htmlFor="settings-address" className="block text-sm font-medium text-slate-700 dark:text-zinc-300 mb-1.5">
               Adresse
             </label>
             <input
@@ -489,12 +489,12 @@ export default function SettingsPage() {
               value={address}
               onChange={(e) => setAddress(e.target.value)}
               autoComplete="street-address"
-              className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-all duration-200"
+              className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-800/50 text-slate-900 dark:text-zinc-100 placeholder:text-slate-400 dark:placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-blue-500/30 dark:focus:ring-indigo-500/30 focus:border-blue-500 dark:focus:border-indigo-500 transition-all duration-200"
               placeholder="12 rue de la Paix, 75001 Paris"
             />
           </div>
           <div>
-            <label htmlFor="settings-phone" className="block text-sm font-medium text-slate-700 mb-1.5">
+            <label htmlFor="settings-phone" className="block text-sm font-medium text-slate-700 dark:text-zinc-300 mb-1.5">
               Téléphone
             </label>
             <PhoneInput
@@ -522,13 +522,13 @@ export default function SettingsPage() {
       </section>
 
       {/* Connexion aux Plateformes */}
-      <section className="rounded-2xl border border-slate-200 bg-white shadow-sm p-6">
-        <h2 className="font-display font-semibold text-lg text-slate-900 mb-4">
+      <section className="rounded-2xl border border-slate-200 dark:border-zinc-800/50 bg-white dark:bg-zinc-900/95 shadow-sm dark:shadow-none p-6">
+        <h2 className="font-display font-semibold text-lg text-slate-900 dark:text-zinc-100 mb-4">
           Connexion aux Plateformes
         </h2>
         <div className="flex flex-col sm:flex-row gap-4">
-          <div className="flex-1 rounded-xl border border-slate-200 bg-slate-50/50 p-4 flex flex-col sm:flex-row items-start sm:items-center gap-4">
-            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-white border border-slate-200 shadow-sm">
+          <div className="flex-1 rounded-xl border border-slate-200 dark:border-zinc-800/50 bg-slate-50/50 dark:bg-zinc-800/30 p-4 flex flex-col sm:flex-row items-start sm:items-center gap-4">
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-white dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 shadow-sm dark:shadow-none">
               <svg className="h-6 w-6" viewBox="0 0 24 24" aria-hidden>
                 <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
                 <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
@@ -537,7 +537,7 @@ export default function SettingsPage() {
               </svg>
             </div>
             <div className="min-w-0 flex-1">
-              <p className="font-semibold text-slate-900">Google Business Profile</p>
+              <p className="font-semibold text-slate-900 dark:text-zinc-100">Google Business Profile</p>
               {isGoogleConnected ? (
                 <>
                   <p className="text-sm text-emerald-600 font-medium flex items-center gap-1.5 mt-0.5">
@@ -545,11 +545,11 @@ export default function SettingsPage() {
                     Connecté · {googleLocationName ?? establishmentName}
                   </p>
                   {googleLocationAddress && (
-                    <p className="text-xs text-slate-500 mt-1">{googleLocationAddress}</p>
+                    <p className="text-xs text-slate-500 dark:text-zinc-400 mt-1">{googleLocationAddress}</p>
                   )}
                 </>
               ) : (
-                <p className="text-sm text-slate-500 mt-0.5">Non connecté</p>
+                <p className="text-sm text-slate-500 dark:text-zinc-400 mt-0.5">Non connecté</p>
               )}
             </div>
             <div className="flex shrink-0">
@@ -558,7 +558,7 @@ export default function SettingsPage() {
                   type="button"
                   onClick={handleGoogleDisconnect}
                   disabled={googleDisconnecting}
-                  className="px-4 py-2 rounded-xl text-sm font-medium text-slate-600 hover:bg-slate-200/80 hover:text-slate-800 transition-colors disabled:opacity-50 active:scale-[0.98]"
+                  className="px-4 py-2 rounded-xl text-sm font-medium text-slate-600 dark:text-zinc-400 dark:hover:bg-zinc-700 dark:hover:text-zinc-200 hover:bg-slate-200/80 hover:text-slate-800 transition-colors disabled:opacity-50 active:scale-[0.98]"
                 >
                   {googleDisconnecting ? '...' : 'Déconnecter'}
                 </button>
@@ -578,13 +578,13 @@ export default function SettingsPage() {
             </div>
           </div>
         </div>
-        <p className="text-xs text-slate-500 mt-4">
+        <p className="text-xs text-slate-500 dark:text-zinc-400 mt-4">
           Vos données sont sécurisées. Nous ne publions rien sans votre accord.
         </p>
       </section>
 
       {/* Personnalisation IA de réponse aux avis */}
-      <section className="rounded-2xl border border-slate-200 bg-white shadow-sm p-6">
+      <section className="rounded-2xl border border-slate-200 dark:border-zinc-800/50 bg-white dark:bg-zinc-900/95 shadow-sm dark:shadow-none p-6">
         <div className="flex flex-col lg:flex-row gap-6">
           <form
             onSubmit={async (e) => {
@@ -614,22 +614,22 @@ export default function SettingsPage() {
             }}
             className="flex-1 space-y-4"
           >
-            <h2 className="font-display font-semibold text-lg text-slate-900 mb-1">
+            <h2 className="font-display font-semibold text-lg text-slate-900 dark:text-zinc-100 mb-1">
               ADN de vos réponses IA
             </h2>
-            <p className="text-sm text-slate-500 mb-3">
+            <p className="text-sm text-slate-500 dark:text-zinc-400 mb-3">
               Définissez le style de vos réponses pour que l&apos;IA parle comme votre établissement.
             </p>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1.5">
+                <label className="block text-sm font-medium text-slate-700 dark:text-zinc-300 mb-1.5">
                   Ton
                 </label>
                 <select
                   value={aiTone}
                   onChange={(e) => setAiTone(e.target.value as typeof aiTone)}
-                  className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500"
+                  className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-800/50 text-slate-900 dark:text-zinc-100 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/30 dark:focus:ring-indigo-500/30 focus:border-blue-500 dark:focus:border-indigo-500"
                 >
                   <option value="professional">Professionnel</option>
                   <option value="warm">Chaleureux</option>
@@ -640,13 +640,13 @@ export default function SettingsPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1.5">
+                <label className="block text-sm font-medium text-slate-700 dark:text-zinc-300 mb-1.5">
                   Longueur des réponses
                 </label>
                 <select
                   value={aiLength}
                   onChange={(e) => setAiLength(e.target.value as typeof aiLength)}
-                  className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500"
+                  className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-800/50 text-slate-900 dark:text-zinc-100 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/30 dark:focus:ring-indigo-500/30 focus:border-blue-500 dark:focus:border-indigo-500"
                 >
                   <option value="concise">Concis</option>
                   <option value="balanced">Équilibré</option>
@@ -657,7 +657,7 @@ export default function SettingsPage() {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1.5">
+                <label className="block text-sm font-medium text-slate-700 dark:text-zinc-300 mb-1.5">
                   Signature automatique
                 </label>
                 <input
@@ -665,11 +665,11 @@ export default function SettingsPage() {
                   value={aiSignature}
                   onChange={(e) => setAiSignature(e.target.value)}
                   placeholder="À bientôt, l'équipe de REPUTEXA"
-                  className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500"
+                  className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-800/50 text-slate-900 dark:text-zinc-100 text-sm placeholder:text-slate-400 dark:placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-blue-500/30 dark:focus:ring-indigo-500/30 focus:border-blue-500 dark:focus:border-indigo-500"
                 />
               </div>
               <div className="space-y-2">
-                <label className="block text-sm font-medium text-slate-700 mb-1.5">
+                <label className="block text-sm font-medium text-slate-700 dark:text-zinc-300 mb-1.5">
                   Tutoiement / Vouvoiement
                 </label>
                 <button
@@ -677,8 +677,8 @@ export default function SettingsPage() {
                   onClick={() => setAiUseTutoiement((v) => !v)}
                   className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium border transition-all duration-200 active:scale-[0.98] ${
                     aiUseTutoiement
-                      ? 'bg-emerald-50 border-emerald-200 text-emerald-700'
-                      : 'bg-slate-50 border-slate-200 text-slate-600'
+                      ? 'bg-emerald-50 dark:bg-emerald-950/50 border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-400'
+                      : 'bg-slate-50 dark:bg-zinc-800/50 border-slate-200 dark:border-zinc-700 text-slate-600 dark:text-zinc-400'
                   }`}
                 >
                   <span
@@ -694,14 +694,14 @@ export default function SettingsPage() {
                   </span>
                   {aiUseTutoiement ? 'Tutoiement (tu)' : 'Vouvoiement (vous)'}
                 </button>
-                <p className="text-xs text-slate-500">
+                <p className="text-xs text-slate-500 dark:text-zinc-400">
                   L&apos;IA adaptera les réponses en conséquence.
                 </p>
               </div>
             </div>
 
             <div className="space-y-2">
-              <label className="block text-sm font-medium text-slate-700 mb-1.5">
+              <label className="block text-sm font-medium text-slate-700 dark:text-zinc-300 mb-1.5">
                 Instructions spécifiques
               </label>
               <div className="flex flex-col sm:flex-row gap-3 items-stretch">
@@ -713,9 +713,9 @@ export default function SettingsPage() {
                     placeholder={
                       "Ex : Ne jamais s'excuser pour les délais le samedi soir.\nToujours inviter à revenir goûter le nouveau dessert."
                     }
-                    className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500"
+                    className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-800/50 text-slate-900 dark:text-zinc-100 text-sm placeholder:text-slate-400 dark:placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-blue-500/30 dark:focus:ring-indigo-500/30 focus:border-blue-500 dark:focus:border-indigo-500"
                   />
-                  <p className="mt-1 text-xs text-slate-500">
+                  <p className="mt-1 text-xs text-slate-500 dark:text-zinc-400">
                     Ces instructions seront ajoutées au prompt système envoyé à l&apos;IA.
                   </p>
                 </div>
@@ -725,8 +725,8 @@ export default function SettingsPage() {
                   disabled={aiVoiceLoading}
                   className={`shrink-0 inline-flex items-center justify-center px-4 py-2.5 rounded-xl border text-sm font-medium transition-colors active:scale-[0.98] ${
                     aiVoiceRecording
-                      ? 'border-red-300 bg-red-50 text-red-700'
-                      : 'border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100'
+                      ? 'border-red-300 dark:border-red-900 bg-red-50 dark:bg-red-950/50 text-red-700 dark:text-red-400'
+                      : 'border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-800/50 text-slate-700 dark:text-zinc-300 hover:bg-slate-100 dark:hover:bg-zinc-700/50'
                   }`}
                 >
                   {aiVoiceLoading ? (
@@ -753,17 +753,17 @@ export default function SettingsPage() {
           </form>
 
           {/* Aperçu en direct - Ghostwriter */}
-          <div className="flex-1 rounded-2xl border border-slate-200 bg-slate-50 dark:bg-slate-900/40 p-5 space-y-3 shadow-[4px_6px_0_rgba(0,0,0,0.04)] dark:shadow-[4px_6px_0_rgba(0,0,0,0.5)]">
+          <div className="flex-1 rounded-2xl border border-slate-200 dark:border-zinc-800/50 bg-slate-50 dark:bg-zinc-900/50 p-5 space-y-3 shadow-[4px_6px_0_rgba(0,0,0,0.04)] dark:shadow-[4px_6px_0_rgba(0,0,0,0.5)]">
             <div className="flex items-center justify-between gap-2">
-              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">
+              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500 dark:text-zinc-400">
                 Aperçu en direct
               </p>
-              <span className="inline-flex items-center gap-1 rounded-full border border-indigo-500/30 bg-indigo-500/10 px-2 py-0.5 text-[10px] font-semibold text-indigo-500">
+              <span className="inline-flex items-center gap-1 rounded-full border border-indigo-500/30 dark:border-indigo-400/30 bg-indigo-500/10 dark:bg-indigo-500/20 px-2 py-0.5 text-[10px] font-semibold text-indigo-500 dark:text-indigo-400">
                 <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-pulse" />
                 Simulation
               </span>
             </div>
-            <div className="rounded-xl border border-slate-200 bg-white/90 dark:bg-slate-900 px-4 py-3 text-xs text-slate-600 dark:text-slate-300">
+            <div className="rounded-xl border border-slate-200 dark:border-zinc-800 bg-white/90 dark:bg-zinc-800/50 px-4 py-3 text-xs text-slate-600 dark:text-zinc-300">
               <p className="font-semibold text-slate-800 dark:text-slate-100 mb-1">
                 Exemple d&apos;avis négatif
               </p>
@@ -772,7 +772,7 @@ export default function SettingsPage() {
                 soir.&quot;
               </p>
             </div>
-            <div className="rounded-xl border border-slate-200 bg-white/95 dark:bg-slate-950 px-4 py-3 text-sm text-slate-700 dark:text-slate-100 shadow-sm relative overflow-hidden">
+            <div className="rounded-xl border border-slate-200 dark:border-zinc-800 bg-white/95 dark:bg-zinc-800/50 px-4 py-3 text-sm text-slate-700 dark:text-zinc-100 shadow-sm dark:shadow-none relative overflow-hidden">
               <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">
                 Réponse IA (aperçu dynamique)
               </p>
@@ -796,11 +796,11 @@ export default function SettingsPage() {
 
       {/* SEO & Visibilité (Zenith) */}
       {hasSeoBoost && (
-        <section className="rounded-2xl border border-slate-200 bg-white shadow-sm p-6">
-          <h2 className="font-display font-semibold text-lg text-slate-900 mb-4">SEO &amp; Visibilité</h2>
+        <section className="rounded-2xl border border-slate-200 dark:border-zinc-800/50 bg-white dark:bg-zinc-900/95 shadow-sm dark:shadow-none p-6">
+          <h2 className="font-display font-semibold text-lg text-slate-900 dark:text-zinc-100 mb-4">SEO &amp; Visibilité</h2>
           <form onSubmit={handleSaveSeo} className="space-y-4 max-w-xl">
             <div>
-              <label htmlFor="settings-seo-keywords" className="block text-sm font-medium text-slate-700 mb-1.5">
+              <label htmlFor="settings-seo-keywords" className="block text-sm font-medium text-slate-700 dark:text-zinc-300 mb-1.5">
                 Mots-clés SEO
               </label>
               <textarea
@@ -815,7 +815,7 @@ export default function SettingsPage() {
                   )
                 }
                 rows={5}
-                className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500"
+                className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-800/50 text-slate-900 dark:text-zinc-100 placeholder:text-slate-400 dark:placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-blue-500/30 dark:focus:ring-indigo-500/30 focus:border-blue-500 dark:focus:border-indigo-500"
                 placeholder={'Meilleure pizza de Nice\nTerrasse ensoleillée\nCuisine faite maison'}
               />
               <p className="text-xs text-slate-500 mt-1">
@@ -841,11 +841,11 @@ export default function SettingsPage() {
       )}
 
       {/* Notifications */}
-      <section className="rounded-2xl border border-slate-200 bg-white shadow-sm p-6">
-        <h2 className="font-display font-semibold text-lg text-slate-900 mb-4">Notifications</h2>
+      <section className="rounded-2xl border border-slate-200 dark:border-zinc-800/50 bg-white dark:bg-zinc-900/95 shadow-sm dark:shadow-none p-6">
+        <h2 className="font-display font-semibold text-lg text-slate-900 dark:text-zinc-100 mb-4">Notifications</h2>
         <form onSubmit={handleSaveNotifications} className="space-y-4 max-w-xl">
           <div>
-            <label htmlFor="settings-whatsapp" className="block text-sm font-medium text-slate-700 mb-1.5">
+            <label htmlFor="settings-whatsapp" className="block text-sm font-medium text-slate-700 dark:text-zinc-300 mb-1.5">
               Numéro WhatsApp
             </label>
             <PhoneInput
@@ -857,14 +857,14 @@ export default function SettingsPage() {
             <p className="text-xs text-slate-500 mt-1">Pour recevoir les alertes d&apos;avis négatifs (Twilio/Meta à brancher).</p>
           </div>
           <div>
-            <label htmlFor="settings-alert-threshold" className="block text-sm font-medium text-slate-700 mb-1.5">
+            <label htmlFor="settings-alert-threshold" className="block text-sm font-medium text-slate-700 dark:text-zinc-300 mb-1.5">
               Seuil d&apos;alerte
             </label>
             <select
               id="settings-alert-threshold"
               value={alertThresholdStars}
               onChange={(e) => setAlertThresholdStars(Number(e.target.value))}
-              className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500"
+              className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-800/50 text-slate-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-blue-500/30 dark:focus:ring-indigo-500/30 focus:border-blue-500 dark:focus:border-indigo-500"
             >
               <option value={2}>Alerter si &lt; 2 étoiles (1 étoile)</option>
               <option value={3}>Alerter si &lt; 3 étoiles</option>
@@ -891,11 +891,11 @@ export default function SettingsPage() {
       </section>
 
       {/* Compte */}
-      <section className="rounded-2xl border border-slate-200 bg-white shadow-sm p-6">
-        <h2 className="font-display font-semibold text-lg text-slate-900 mb-4">Compte</h2>
+      <section className="rounded-2xl border border-slate-200 dark:border-zinc-800/50 bg-white dark:bg-zinc-900/95 shadow-sm dark:shadow-none p-6">
+        <h2 className="font-display font-semibold text-lg text-slate-900 dark:text-zinc-100 mb-4">Compte</h2>
         <form onSubmit={handleSaveAccount} className="space-y-4 max-w-xl">
           <div>
-            <label htmlFor="settings-email" className="block text-sm font-medium text-slate-700 mb-1.5">
+            <label htmlFor="settings-email" className="block text-sm font-medium text-slate-700 dark:text-zinc-300 mb-1.5">
               Email
             </label>
             <input
@@ -903,12 +903,12 @@ export default function SettingsPage() {
               type="email"
               value={email}
               readOnly
-              className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-slate-600 bg-slate-50"
+              className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-zinc-700 text-slate-600 dark:text-zinc-400 bg-slate-50 dark:bg-zinc-800/50"
             />
             <p className="text-xs text-slate-500 mt-1">L&apos;email ne peut pas être modifié ici.</p>
           </div>
           <div>
-            <label htmlFor="settings-password" className="block text-sm font-medium text-slate-700 mb-1.5">
+            <label htmlFor="settings-password" className="block text-sm font-medium text-slate-700 dark:text-zinc-300 mb-1.5">
               Nouveau mot de passe
             </label>
             <PasswordField

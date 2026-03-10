@@ -360,5 +360,108 @@
       }
     }
   },
+  "Chart": {
+    "title": "Rating evolution",
+    "periodAll": "All periods",
+    "periodCustom": "Custom range",
+    "periodLabel": "Period",
+    "range7d": "7d",
+    "range30d": "30d",
+    "range6m": "6m",
+    "rangeAll": "All",
+    "rangeCustom": "Custom",
+    "calendar": "Calendar",
+    "customPanel": "Custom range",
+    "from": "From",
+    "to": "To",
+    "reset": "Reset",
+    "close": "Close",
+    "avgRating": "Average rating",
+    "today": "Today",
+    "noData": "No data yet for this period."
+  },
+  "PlatformChart": {
+    "percentOfReviews": "% of reviews",
+    "emptyHint": "Platform distribution shown once you have reviews."
+  },
+  "DashboardReviews": {
+    "title": "Latest reviews",
+    "searchPlaceholder": "Search by name",
+    "filterAll": "All",
+    "filterUnanswered": "Unanswered",
+    "filterNegative": "Negative",
+    "platformsAll": "All platforms",
+    "requestSent": "Request sent.",
+    "errorReport": "Error reporting.",
+    "agoShort": "recently",
+    "responseSent": "Response sent",
+    "generateAI": "Generate AI response",
+    "shieldReport": "Report via Shield AI",
+    "noMatch": "No reviews match the filters."
+  },
+  "CommandCenter": {
+    "myRestaurant": "My Restaurant",
+    "dashboard": "Dashboard",
+    "avgRating": "Average rating",
+    "reviewsThisMonth": "Reviews this month",
+    "responseTime": "Response time",
+    "priorityActions": "Priority actions",
+    "insightsTitle": "AI insights this week",
+    "waitTimeMentioned": "Wait time mentioned 8x",
+    "impactEstimate": "Estimated impact: -12 customers/month",
+    "qualityPraised": "Service quality praised",
+    "positiveMentions": "+23 positive mentions",
+    "evolutionWeek": "Weekly evolution",
+    "savedThisWeek": "saved this week"
+  },
+  "LandingMockup": {
+    "overview": "Overview",
+    "aiDetected": "AI detected {count} new negative reviews",
+    "responsesReady": "Personalized responses have been prepared and are ready to send.",
+    "seeResponses": "View responses →",
+    "avgRating": "Average rating",
+    "reviewsThisMonth": "Reviews this month",
+    "positiveReviews": "Positive reviews (4★ & 5★)",
+    "negativeReviews": "Negative reviews (1★ to 3★)",
+    "totalPeriod": "Total for the displayed period",
+    "objective": "Goal: maintain > 4.5",
+    "noteEvolution": "Rating evolution",
+    "period": "Period",
+    "custom": "Custom",
+    "reviewsByPlatform": "Reviews by platform",
+    "distribution": "Total distribution",
+    "lastReviews": "Latest reviews",
+    "platformsAll": "All platforms",
+    "searchPlaceholder": "Search by name"
+  },
+  "Report": {
+    "title": "REPUTEXA — Monthly report",
+    "period": "Period",
+    "overview": "Overview",
+    "avgRating": "Average rating",
+    "totalReviews": "Total reviews",
+    "positiveReviews": "Positive reviews (4★–5★)",
+    "negativeReviews": "Negative reviews (1★–3★)",
+    "performance": "Performance",
+    "platformVolume": "Review volume by platform",
+    "noData": "Insufficient data for this month. No reviews recorded.",
+    "reviewsCount": "{count} reviews",
+    "roadmapTitle": "AI strategic roadmap",
+    "roadmapSubtitle": "Analysis of recurring trends and actionable recommendations",
+    "insufficientData": "Insufficient data to generate detailed recommendations this month.",
+    "problemDetected": "Problem detected",
+    "solutionReputexa": "Reputexa solution",
+    "expectedImpact": "Expected impact",
+    "myEstablishment": "My establishment"
+  },
+  "Statistics": {
+    "title": "Statistics",
+    "description": "Analyze your e-reputation performance",
+    "downloadPdf": "Download PDF report"
+  },
+  "Share": {
+    "whatsappMessage": "Check out my Reputexa score! My average rating: {rating}/5 — Managed by AI 🚀",
+    "shareOnWhatsApp": "Share on WhatsApp"
+  },
   "common": { "loading": "Loading...", "error": "An error occurred" }
 }

@@ -1,4 +1,4 @@
-import { setRequestLocale } from 'next-intl/server';
+import { setRequestLocale, getTranslations } from 'next-intl/server';
 import { prisma } from '@/lib/prisma';
 import { createClient } from '@/lib/supabase/server';
 import { StatisticsOverview } from '@/components/dashboard/statistics-overview';
@@ -23,6 +23,7 @@ export const dynamic = 'force-dynamic';
 export default async function StatisticsPage({ params }: Props) {
   const { locale } = await params;
   setRequestLocale(locale);
+  const t = await getTranslations('Statistics');
 
   const supabase = await createClient();
   const {
@@ -83,18 +84,18 @@ export default async function StatisticsPage({ params }: Props) {
       <div className="flex items-center justify-between gap-3 flex-wrap">
         <div>
           <h1 className="font-display font-bold text-2xl text-slate-900 dark:text-slate-50">
-            Statistiques
+            {t('title')}
           </h1>
           <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">
-            Analysez vos performances e-réputation
+            {t('description')}
           </p>
         </div>
         <a
-          href="/api/reports/monthly"
+          href={`/api/reports/monthly?locale=${locale}`}
           className="inline-flex items-center gap-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 dark:border-white/[0.07] px-3.5 py-2 text-xs font-semibold text-slate-700 dark:text-slate-50 hover:shadow-[-8px_12px_24px_-10px_rgba(0,0,0,0.1),_0px_10px_15px_-3px_rgba(0,0,0,0.1)] dark:hover:shadow-[4px_6px_0_rgba(0,0,0,0.5)] dark:hover:border-slate-700 transition-all duration-300 ease-in-out"
         >
           <FileText className="w-4 h-4" />
-          Télécharger le rapport PDF
+          {t('downloadPdf')}
         </a>
       </div>
 

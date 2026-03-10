@@ -52,10 +52,10 @@ export function PhoneInput({
   return (
     <div className="space-y-1">
       <div
-        className={`rpn-phone-wrapper flex items-center rounded-xl border bg-white overflow-hidden transition-all duration-200 ${
+        className={`rpn-phone-wrapper flex items-center rounded-xl border overflow-hidden transition-all duration-200 ${
           showError
-            ? 'border-red-300 focus-within:ring-2 focus-within:ring-red-500/30 focus-within:border-red-500'
-            : 'border-slate-200 focus-within:ring-2 focus-within:ring-blue-500/30 focus-within:border-blue-500'
+            ? 'border-red-300 dark:border-red-900 focus-within:ring-2 focus-within:ring-red-500/30 focus-within:border-red-500 dark:focus-within:border-red-600 bg-white dark:bg-zinc-800/50'
+            : 'border-slate-200 dark:border-zinc-700 focus-within:ring-2 focus-within:ring-blue-500/30 dark:focus-within:ring-indigo-500/30 focus-within:border-blue-500 dark:focus-within:border-indigo-500 bg-white dark:bg-zinc-800/50'
         } [&_.PhoneInput]:!border-0 [&_.PhoneInput]:!p-0 [&_.PhoneInputInput]:!border-0 [&_.PhoneInputInput]:focus:!ring-0 [&_.PhoneInputInput]:!rounded-none`}
       >
         <PhoneInputLib
@@ -66,7 +66,7 @@ export function PhoneInput({
           placeholder={placeholder}
           id={id}
           numberInputProps={{
-            className: 'flex-1 min-w-0 px-4 py-2.5 text-slate-900 placeholder:text-slate-400 bg-transparent border-none focus:outline-none focus:ring-0',
+            className: 'flex-1 min-w-0 px-4 py-2.5 text-slate-900 dark:text-zinc-100 placeholder:text-slate-400 dark:placeholder:text-zinc-500 bg-transparent border-none focus:outline-none focus:ring-0',
           }}
         />
       </div>

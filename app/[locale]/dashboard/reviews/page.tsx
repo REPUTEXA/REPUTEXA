@@ -195,8 +195,8 @@ export default function ReviewsPage() {
   return (
     <div className="px-4 sm:px-6 py-6 space-y-6">
       <div>
-        <h1 className="font-display font-bold text-2xl text-slate-900">Avis</h1>
-        <p className="text-sm text-slate-500 mt-0.5">
+        <h1 className="font-display font-bold text-2xl text-slate-900 dark:text-zinc-100">Avis</h1>
+        <p className="text-sm text-slate-500 dark:text-zinc-400 mt-0.5">
           Gérez vos avis et la file de publication automatique.
         </p>
       </div>
@@ -210,7 +210,7 @@ export default function ReviewsPage() {
             className={`inline-flex items-center justify-center gap-2 min-h-[44px] px-4 py-2 rounded-2xl text-sm font-medium transition-all duration-300 ease-in-out ${
               sourceFilter === tab.value
                 ? 'bg-sky-500 text-white shadow-sm'
-                : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50'
+                : 'bg-white dark:bg-zinc-800/50 border border-slate-200 dark:border-zinc-700 text-slate-600 dark:text-zinc-400 hover:bg-slate-50 dark:hover:bg-zinc-700/50'
             }`}
           >
             {tab.value !== 'all' && (
@@ -223,7 +223,7 @@ export default function ReviewsPage() {
 
       {/* Form add review */}
       <section className="rounded-2xl sm:rounded-3xl border border-slate-200 bg-white p-6 shadow-sm dark:bg-[#09090b] dark:border-zinc-800/50 transition-all duration-300">
-        <h2 className="font-display font-semibold text-lg text-slate-900 mb-4">Ajouter un avis (simulation)</h2>
+        <h2 className="font-display font-semibold text-lg text-slate-900 dark:text-zinc-100 mb-4">Ajouter un avis (simulation)</h2>
         <form onSubmit={handleAddReview} className="flex flex-wrap gap-4">
           <input
             type="text"
@@ -231,7 +231,7 @@ export default function ReviewsPage() {
             value={addForm.reviewerName}
             onChange={(e) => setAddForm({ ...addForm, reviewerName: e.target.value })}
             required
-            className="flex-1 min-w-[140px] px-4 py-2.5 rounded-xl border border-slate-200"
+            className="flex-1 min-w-[140px] px-4 py-2.5 rounded-xl border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-800/50 text-slate-900 dark:text-zinc-100 placeholder:text-slate-400 dark:placeholder:text-zinc-500"
           />
           <select
             value={addForm.rating}
@@ -245,7 +245,7 @@ export default function ReviewsPage() {
           <select
             value={addForm.source}
             onChange={(e) => setAddForm({ ...addForm, source: e.target.value })}
-            className="w-36 px-4 py-2.5 rounded-xl border border-slate-200"
+            className="w-36 px-4 py-2.5 rounded-xl border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-800/50 text-slate-900 dark:text-zinc-100"
           >
             <option value="google">Google</option>
             <option value="tripadvisor">TripAdvisor</option>
@@ -257,7 +257,7 @@ export default function ReviewsPage() {
             value={addForm.comment}
             onChange={(e) => setAddForm({ ...addForm, comment: e.target.value })}
             required
-            className="flex-1 min-w-[200px] px-4 py-2.5 rounded-xl border border-slate-200"
+            className="flex-1 min-w-[200px] px-4 py-2.5 rounded-xl border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-800/50 text-slate-900 dark:text-zinc-100 placeholder:text-slate-400 dark:placeholder:text-zinc-500"
           />
           <button
             type="submit"
@@ -272,14 +272,14 @@ export default function ReviewsPage() {
 
       {/* Actions Requises */}
       <section>
-        <h2 className="font-display font-bold text-lg text-slate-900 mb-3 flex items-center gap-2">
+        <h2 className="font-display font-bold text-lg text-slate-900 dark:text-zinc-100 mb-3 flex items-center gap-2">
           🔥 Actions Requises
         </h2>
-        <p className="text-sm text-slate-500 mb-4">
+        <p className="text-sm text-slate-500 dark:text-zinc-400 mb-4">
           Avis négatifs ou en attente de validation.
         </p>
         {actionRequired.length === 0 ? (
-          <div className="rounded-2xl border border-slate-200 bg-white p-8 text-center text-slate-500">
+          <div className="rounded-2xl border border-slate-200 dark:border-zinc-800/50 bg-white dark:bg-zinc-800/30 p-8 text-center text-slate-500 dark:text-zinc-400">
             Aucun avis nécessitant une action.
           </div>
         ) : (
@@ -306,14 +306,14 @@ export default function ReviewsPage() {
 
       {/* Automatisé */}
       <section>
-        <h2 className="font-display font-bold text-lg text-slate-900 mb-3 flex items-center gap-2">
+        <h2 className="font-display font-bold text-lg text-slate-900 dark:text-zinc-100 mb-3 flex items-center gap-2">
           ⚙️ Automatisé
         </h2>
-        <p className="text-sm text-slate-500 mb-4">
+        <p className="text-sm text-slate-500 dark:text-zinc-400 mb-4">
           Avis en file d&apos;attente avec heure de publication prévue.
         </p>
         {automated.length === 0 ? (
-          <div className="rounded-2xl border border-slate-200 bg-white p-8 text-center text-slate-500">
+          <div className="rounded-2xl border border-slate-200 dark:border-zinc-800/50 bg-white dark:bg-zinc-800/30 p-8 text-center text-slate-500 dark:text-zinc-400">
             Aucun avis en file automatique.
           </div>
         ) : (
@@ -373,10 +373,10 @@ function ReviewCard({
 
   return (
     <div
-      className={`rounded-2xl border p-5 shadow-sm transition-all ${
+      className={`rounded-2xl border p-5 shadow-sm dark:shadow-none transition-all ${
         review.rating < 4
-          ? 'border-amber-200 bg-amber-50/50'
-          : 'border-slate-200 bg-white'
+          ? 'border-amber-200 dark:border-amber-900/50 bg-amber-50/50 dark:bg-amber-950/30'
+          : 'border-slate-200 dark:border-zinc-800/50 bg-white dark:bg-zinc-800/50'
       }`}
     >
       <div className="flex items-start justify-between mb-3">
@@ -391,7 +391,7 @@ function ReviewCard({
             {review.reviewer_name?.charAt(0)?.toUpperCase() ?? '?'}
           </div>
           <div>
-            <p className="text-sm font-semibold text-slate-900">{review.reviewer_name}</p>
+            <p className="text-sm font-semibold text-slate-900 dark:text-zinc-100">{review.reviewer_name}</p>
             <div className="flex items-center gap-2 mt-0.5">
               <StarRating rating={review.rating} />
             </div>
@@ -399,11 +399,11 @@ function ReviewCard({
         </div>
         <div className="flex items-center gap-2">
           <SourceLogo source={(review.source ?? 'google').toLowerCase()} className="w-5 h-5" />
-          <span className="text-xs font-medium text-slate-500 capitalize">{review.source ?? 'google'}</span>
+          <span className="text-xs font-medium text-slate-500 dark:text-zinc-400 capitalize">{review.source ?? 'google'}</span>
         </div>
       </div>
 
-      <p className="text-sm text-slate-700 leading-relaxed mb-3">{review.comment}</p>
+      <p className="text-sm text-slate-700 dark:text-zinc-300 leading-relaxed mb-3">{review.comment}</p>
 
       {review.scheduled_at && (
         <p className="text-xs font-medium text-sky-600 mb-3">
@@ -413,7 +413,7 @@ function ReviewCard({
 
       {(review.ai_response || review.response_text) && !isEditing && (
         <div className="mb-3">
-          <p className="text-xs text-slate-600 bg-slate-50 rounded-lg p-2">
+          <p className="text-xs text-slate-600 dark:text-zinc-400 bg-slate-50 dark:bg-zinc-800/80 rounded-lg p-2">
             {review.response_text || review.ai_response}
           </p>
           {isSeoBoosted && (
@@ -430,7 +430,7 @@ function ReviewCard({
             value={editText}
             onChange={(e) => setEditText(e.target.value)}
             rows={3}
-            className="w-full px-3 py-2 rounded-xl border border-slate-200 text-sm"
+            className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-800/50 text-slate-900 dark:text-zinc-100 text-sm placeholder:text-slate-400 dark:placeholder:text-zinc-500"
             placeholder="Réponse..."
           />
           <div className="flex gap-2">
@@ -445,7 +445,7 @@ function ReviewCard({
             <button
               type="button"
               onClick={() => setEditId(null)}
-              className="px-3 py-1.5 rounded-lg border border-slate-200 text-slate-600 text-sm hover:bg-slate-50"
+              className="px-3 py-1.5 rounded-lg border border-slate-200 dark:border-zinc-700 text-slate-600 dark:text-zinc-400 text-sm hover:bg-slate-50 dark:hover:bg-zinc-700/50"
             >
               Annuler
             </button>
@@ -460,7 +460,7 @@ function ReviewCard({
               setEditText(review.ai_response || review.response_text || '');
             }}
             disabled={isActing}
-            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-medium bg-white border border-slate-200 text-slate-700 hover:bg-slate-50"
+            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-medium bg-white dark:bg-zinc-700/50 border border-slate-200 dark:border-zinc-600 text-slate-700 dark:text-zinc-300 hover:bg-slate-50 dark:hover:bg-zinc-600/50"
           >
             <Pencil className="w-4 h-4" />
             Modifier la réponse
@@ -480,7 +480,7 @@ function ReviewCard({
                 type="button"
                 onClick={() => runAction(review.id, 'cancel')}
                 disabled={isActing}
-                className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-medium border border-red-200 text-red-600 hover:bg-red-50"
+                className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-medium border border-red-200 dark:border-red-900/50 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30"
               >
                 <XCircle className="w-4 h-4" />
                 Annuler

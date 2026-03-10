@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 
+export const dynamic = 'force-dynamic';
+
 /**
  * POST /api/app-suggestions/[id]/upvote
  * Upvote ou retire un upvote (toggle).

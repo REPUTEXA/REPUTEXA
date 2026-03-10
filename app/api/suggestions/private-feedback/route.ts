@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+
+export const dynamic = 'force-dynamic';
 import { hasFeature, toPlanSlug } from '@/lib/feature-gate';
 import { analyzePrivateFeedback } from '@/lib/suggestions/analyze-private-feedback';
 

@@ -1,10 +1,13 @@
 import React from 'react';
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
+
+export const dynamic = 'force-dynamic';
 import { createClient } from '@/lib/supabase/server';
 import { MonthlyReportTemplate } from '@/components/reports/monthly-report-template';
 import { pdf } from '@react-pdf/renderer';
+import { getReportTranslations } from '@/lib/i18n-server';
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
     const supabase = await createClient();
     const {
@@ -18,12 +21,24 @@ export async function GET() {
       .eq('id', user.id)
       .single();
 
+    const locale =
+      request.nextUrl.searchParams.get('locale') ??
+      request.cookies.get('NEXT_LOCALE')?.value ??
+      'en';
+    const reportT = await getReportTranslations(locale);
     const now = new Date();
     const month = now.getMonth();
     const year = now.getFullYear();
     const from = new Date(year, month - 1, 1);
     const to = new Date(year, month, 1);
-    const monthLabel = from.toLocaleDateString('fr-FR', {
+    const localeMap: Record<string, string> = {
+      fr: 'fr-FR',
+      en: 'en-US',
+      es: 'es-ES',
+      de: 'de-DE',
+      it: 'it-IT',
+    };
+    const monthLabel = from.toLocaleDateString(localeMap[locale] ?? 'en-US', {
       month: 'long',
       year: 'numeric',
     });
@@ -55,7 +70,8 @@ export async function GET() {
 
     const doc = (
       <MonthlyReportTemplate
-        establishmentName={profile?.establishment_name ?? 'Mon établissement'}
+        translations={reportT}
+        establishmentName={profile?.establishment_name ?? reportT.myEstablishment}
         monthLabel={monthLabel}
         averageRating={averageRating}
         totalReviews={totalReviews}

@@ -14,8 +14,8 @@ export function ThemeProviderRouteAware({ children, ...props }: ThemeProviderPro
   return (
     <NextThemesProvider
       attribute="class"
-      defaultTheme="system"
-      enableSystem
+      defaultTheme="light"
+      enableSystem={false}
       forcedTheme={forcedTheme}
       {...props}
     >

@@ -8,6 +8,7 @@ import { DashboardReviewsSection } from '@/components/dashboard/dashboard-review
 import { StatsCard } from '@/components/dashboard/stats-card';
 import { OverviewChart } from '@/components/dashboard/overview-chart';
 import { PlatformDistributionChart } from '@/components/dashboard/platform-distribution-chart';
+import { WhatsAppShareButton } from '@/components/share/whatsapp-share-button';
 
 type Props = {
   params: Promise<{ locale: string }>;
@@ -180,6 +181,12 @@ export default async function DashboardPage({ params, searchParams }: Props) {
               )}
             </div>
             <p className="text-[11px] text-white/70">Objectif : maintenir &gt; 4.5</p>
+            {avgRating > 0 && (
+              <WhatsAppShareButton
+                rating={avgRating.toFixed(1)}
+                className="mt-2 inline-flex items-center gap-1.5 text-[10px] text-white/80 hover:text-white"
+              />
+            )}
           </div>
         </StatsCard>
 

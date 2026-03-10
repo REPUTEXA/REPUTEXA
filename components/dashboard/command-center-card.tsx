@@ -1,5 +1,8 @@
 'use client';
 
+import { useTranslations, useLocale } from 'next-intl';
+import { format, addDays } from 'date-fns';
+import { fr, enUS, es, de, it } from 'date-fns/locale';
 import {
   Star,
   MessageSquare,
@@ -23,6 +26,13 @@ export function CommandCenterCard({
   timeSaved,
   priorityActions,
 }: Props) {
+  const t = useTranslations('CommandCenter');
+  const locale = useLocale();
+  const localeMap = { fr, en: enUS, es, de, it } as const;
+  const localeObj = localeMap[locale as keyof typeof localeMap] ?? fr;
+  const weekdays = Array.from({ length: 7 }, (_, i) =>
+    format(addDays(new Date(2024, 0, 1), i), 'EEE', { locale: localeObj })
+  );
   return (
     <div className="rounded-2xl sm:rounded-[32px] border border-white/10 bg-white/5 shadow-[0_24px_64px_rgba(15,23,42,0.85)] p-1 sm:p-1.5 dashboard-glow min-w-0">
       <div className="rounded-xl sm:rounded-2xl md:rounded-3xl border border-slate-200/80 shadow-2xl overflow-hidden bg-white backdrop-blur-sm">
@@ -49,9 +59,9 @@ export function CommandCenterCard({
               </div>
               <div className="min-w-0">
                 <h3 className="font-semibold text-slate-900 text-xs sm:text-sm truncate">
-                  Mon Restaurant
+                  {t('myRestaurant')}
                 </h3>
-                <p className="text-[10px] sm:text-xs text-slate-500">Tableau de bord</p>
+                <p className="text-[10px] sm:text-xs text-slate-500">{t('dashboard')}</p>
               </div>
             </div>
           </div>
@@ -64,7 +74,7 @@ export function CommandCenterCard({
               <p className="text-lg sm:text-xl md:text-2xl font-display font-bold text-slate-900">
                 {avgRating}
               </p>
-              <p className="text-[10px] sm:text-xs text-slate-500">Note moyenne</p>
+              <p className="text-[10px] sm:text-xs text-slate-500">{t('avgRating')}</p>
             </div>
 
             <div className="bg-white p-2.5 sm:p-3 md:p-4 rounded-lg sm:rounded-xl border border-slate-200 shadow-soft min-w-0">
@@ -84,7 +94,7 @@ export function CommandCenterCard({
               <p className="text-lg sm:text-xl md:text-2xl font-display font-bold text-slate-900">
                 {timeSaved}
               </p>
-              <p className="text-[10px] sm:text-xs text-slate-500">Temps de réponse</p>
+              <p className="text-[10px] sm:text-xs text-slate-500">{t('responseTime')}</p>
             </div>
 
             <div className="bg-white p-2.5 sm:p-3 md:p-4 rounded-lg sm:rounded-xl border border-slate-200 shadow-soft min-w-0">
@@ -94,7 +104,7 @@ export function CommandCenterCard({
               <p className="text-lg sm:text-xl md:text-2xl font-display font-bold text-slate-900">
                 {priorityActions}
               </p>
-              <p className="text-[10px] sm:text-xs text-slate-500">Actions prioritaires</p>
+              <p className="text-[10px] sm:text-xs text-slate-500">{t('priorityActions')}</p>
             </div>
           </div>
 
@@ -102,7 +112,7 @@ export function CommandCenterCard({
             <div className="bg-white p-3 sm:p-4 rounded-lg sm:rounded-xl border border-slate-200 shadow-soft min-w-0">
               <h4 className="font-semibold text-slate-900 text-xs sm:text-sm mb-2 sm:mb-3 flex items-center gap-2">
                 <Brain className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-blue-600 shrink-0" />
-                Insights IA de la semaine
+                {t('insightsTitle')}
               </h4>
               <div className="space-y-2">
                 <div className="flex items-start gap-2 p-2 rounded-lg bg-rose-50 border border-rose-100">
@@ -118,9 +128,9 @@ export function CommandCenterCard({
                   <TrendingUp className="w-4 h-4 text-emerald-600 mt-0.5 flex-shrink-0" />
                   <div>
                     <p className="text-xs font-medium text-emerald-700">
-                      Qualité du service saluée
+                      {t('qualityPraised')}
                     </p>
-                    <p className="text-xs text-emerald-600">+23 mentions positives</p>
+                    <p className="text-xs text-emerald-600">{t('positiveMentions')}</p>
                   </div>
                 </div>
               </div>
@@ -132,7 +142,7 @@ export function CommandCenterCard({
                 Évolution cette semaine
               </h4>
               <div className="flex items-end gap-1 sm:gap-2 h-14 sm:h-20">
-                {['L', 'M', 'M', 'J', 'V', 'S', 'D'].map((day, idx) => {
+                {weekdays.map((day, idx) => {
                   const heights = ['35%', '42%', '28%', '45%', '38%', '52%', '48%'];
                   const isToday = idx === 6;
                   return (

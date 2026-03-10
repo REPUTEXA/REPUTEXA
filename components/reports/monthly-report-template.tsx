@@ -1,7 +1,9 @@
 import React from 'react';
 import { Document, Page, Text, View, StyleSheet } from '@react-pdf/renderer';
+import type { ReportTranslations } from '@/lib/i18n-server';
 
 type MonthlyReportProps = {
+  translations: ReportTranslations;
   establishmentName: string;
   monthLabel: string;
   averageRating: number;
@@ -86,6 +88,7 @@ const styles = StyleSheet.create({
 
 export function MonthlyReportTemplate(props: MonthlyReportProps) {
   const {
+    translations: T,
     establishmentName,
     monthLabel,
     averageRating,
@@ -100,17 +103,17 @@ export function MonthlyReportTemplate(props: MonthlyReportProps) {
     <Document>
       <Page size="A4" style={styles.page}>
         <View style={styles.header}>
-          <Text style={styles.title}>REPUTEXA — Rapport mensuel</Text>
+          <Text style={styles.title}>{T.title}</Text>
           <Text style={styles.subtitle}>
-            {establishmentName} · Période : {monthLabel}
+            {establishmentName} · {T.period} : {monthLabel}
           </Text>
         </View>
 
         <View>
-          <Text style={styles.sectionTitle}>Vue d&apos;ensemble</Text>
+          <Text style={styles.sectionTitle}>{T.overview}</Text>
           <View style={styles.row}>
             <View style={[styles.card, { marginRight: 8 }]}>
-              <Text style={styles.cardLabel}>Note moyenne</Text>
+              <Text style={styles.cardLabel}>{T.avgRating}</Text>
               <Text style={styles.cardValue}>
                 {Number.isFinite(averageRating) && averageRating > 0
                   ? `${averageRating.toFixed(1)}/5`
@@ -118,7 +121,7 @@ export function MonthlyReportTemplate(props: MonthlyReportProps) {
               </Text>
             </View>
             <View style={[styles.card, { marginLeft: 8 }]}>
-              <Text style={styles.cardLabel}>Total avis</Text>
+              <Text style={styles.cardLabel}>{T.totalReviews}</Text>
               <Text style={styles.cardValue}>{totalReviews}</Text>
             </View>
           </View>
@@ -128,7 +131,7 @@ export function MonthlyReportTemplate(props: MonthlyReportProps) {
               <Text style={styles.cardValue}>{positiveCount}</Text>
             </View>
             <View style={[styles.card, { marginLeft: 8 }]}>
-              <Text style={styles.cardLabel}>Avis négatifs (1★–3★)</Text>
+              <Text style={styles.cardLabel}>{T.negativeReviews}</Text>
               <Text style={styles.cardValue}>{negativeCount}</Text>
             </View>
           </View>
@@ -144,13 +147,13 @@ export function MonthlyReportTemplate(props: MonthlyReportProps) {
           <Text style={styles.sectionTitle}>Volume d&apos;avis par plateforme</Text>
           {platforms.length === 0 ? (
             <Text style={styles.smallText}>
-              Données insuffisantes pour ce mois. Aucun avis n&apos;a été enregistré.
+              {T.noData}
             </Text>
           ) : (
             <View>
               {platforms.map((p) => (
                 <Text key={p.name} style={styles.listItem}>
-                  • {p.name} : {p.count} avis
+                  • {p.name} : {T.reviewsCount.replace('{count}', String(p.count))}
                 </Text>
               ))}
             </View>
@@ -159,16 +162,15 @@ export function MonthlyReportTemplate(props: MonthlyReportProps) {
       </Page>
       <Page size="A4" style={styles.page}>
         <View style={styles.header}>
-          <Text style={styles.title}>Feuille de route stratégique IA</Text>
+          <Text style={styles.title}>{T.roadmapTitle}</Text>
           <Text style={styles.subtitle}>
-            Analyse des tendances récurrentes et recommandations actionnables
+            {T.roadmapSubtitle}
           </Text>
         </View>
         {insights.length === 0 ? (
           <View>
             <Text style={styles.smallText}>
-              Données insuffisantes pour générer des recommandations détaillées ce mois-ci, ou
-              option non activée pour ce compte.
+              {T.insufficientData}
             </Text>
           </View>
         ) : (
@@ -182,15 +184,15 @@ export function MonthlyReportTemplate(props: MonthlyReportProps) {
                 ]}
               >
                 <Text style={{ fontSize: 11, fontWeight: 700, marginBottom: 4 }}>
-                  Problème détecté
+                  {T.problemDetected}
                 </Text>
                 <Text style={{ fontSize: 10, marginBottom: 6 }}>{i.problem}</Text>
                 <Text style={{ fontSize: 11, fontWeight: 700, marginBottom: 4 }}>
-                  Solution Reputexa
+                  {T.solutionReputexa}
                 </Text>
                 <Text style={{ fontSize: 10, marginBottom: 6 }}>{i.solution}</Text>
                 <Text style={{ fontSize: 11, fontWeight: 700, marginBottom: 4 }}>
-                  Impact attendu
+                  {T.expectedImpact}
                 </Text>
                 <Text style={{ fontSize: 10 }}>{i.impact}</Text>
               </View>

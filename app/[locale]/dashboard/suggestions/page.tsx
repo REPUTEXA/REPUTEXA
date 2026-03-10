@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
+import Image from 'next/image';
 import { Loader2, Mic, Camera, Send, ThumbsUp } from 'lucide-react';
 import { toast } from 'sonner';
 import { useTranslations } from 'next-intl';
@@ -264,6 +265,7 @@ export default function SuggestionsPage() {
             </div>
             {imagePreview && (
               <div className="relative mt-2 inline-block">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={imagePreview}
                   alt="Photo jointe"
@@ -377,10 +379,13 @@ export default function SuggestionsPage() {
                     </button>
                     <div className="min-w-0 flex-1">
                       {s.image_url && (
-                        <img
+                        <Image
                           src={s.image_url}
                           alt=""
+                          width={400}
+                          height={128}
                           className="mb-2 w-full max-h-32 rounded-lg object-cover border border-slate-200 dark:border-slate-700"
+                          unoptimized
                         />
                       )}
                       <p className="font-medium text-slate-900 dark:text-zinc-100">{s.title}</p>

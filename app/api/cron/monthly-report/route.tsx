@@ -1,10 +1,13 @@
 import React from 'react';
 import { NextResponse } from 'next/server';
+
+export const dynamic = 'force-dynamic';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { toPlanSlug, hasFeature, FEATURES } from '@/lib/feature-gate';
 import { resend } from '@/lib/resend';
 import { MonthlyReportTemplate } from '@/components/reports/monthly-report-template';
 import { pdf } from '@react-pdf/renderer';
+import { getReportTranslations } from '@/lib/i18n-server';
 import { Buffer } from 'buffer';
 
 const CRON_SECRET = process.env.CRON_SECRET;
@@ -29,14 +32,10 @@ export async function GET(request: Request) {
     const year = now.getFullYear();
     const from = new Date(year, month - 1, 1);
     const to = new Date(year, month, 1);
-    const monthLabel = from.toLocaleDateString('fr-FR', {
-      month: 'long',
-      year: 'numeric',
-    });
 
     const { data: profiles } = await admin
       .from('profiles')
-      .select('id, email, establishment_name, subscription_plan, selected_plan')
+      .select('id, email, establishment_name, subscription_plan, selected_plan, preferred_language')
       .neq('email', null);
 
     if (!profiles || profiles.length === 0) {
@@ -79,9 +78,24 @@ export async function GET(request: Request) {
         count,
       }));
 
+      const locale = (profile.preferred_language as string) ?? 'fr';
+      const reportT = await getReportTranslations(locale);
+      const localeMap: Record<string, string> = {
+        fr: 'fr-FR',
+        en: 'en-US',
+        es: 'es-ES',
+        de: 'de-DE',
+        it: 'it-IT',
+      };
+      const monthLabel = from.toLocaleDateString(localeMap[locale] ?? 'fr-FR', {
+        month: 'long',
+        year: 'numeric',
+      });
+
       const doc = (
         <MonthlyReportTemplate
-          establishmentName={profile.establishment_name ?? 'Mon établissement'}
+          translations={reportT}
+          establishmentName={profile.establishment_name ?? reportT.myEstablishment}
           monthLabel={monthLabel}
           averageRating={averageRating}
           totalReviews={totalReviews}

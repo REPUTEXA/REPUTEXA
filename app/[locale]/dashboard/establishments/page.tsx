@@ -18,7 +18,7 @@ export default async function EstablishmentsPage({ params }: Props) {
         </h1>
         <p className="mt-1 text-sm text-zinc-500">{t('description')}</p>
       </header>
-      <div className="rounded-xl border border-gray-200 bg-white p-12 text-center">
+      <div className="rounded-xl border border-gray-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-12 text-center">
         <p className="text-zinc-500">{t('comingSoon')}</p>
       </div>
     </div>

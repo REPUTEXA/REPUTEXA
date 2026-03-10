@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { headers } from 'next/headers';
 import localFont from 'next/font/local';
 import { Toaster } from 'sonner';
-import { ThemeProvider } from '@/components/theme-provider';
+import { ThemeProviderRouteAware } from '@/components/theme-provider-route-aware';
 import './globals.css';
 
 const geistSans = localFont({
@@ -34,15 +34,31 @@ export default async function RootLayout({
   const locale = headersList.get('x-next-intl-locale') ?? 'en';
   const dir = ['ar', 'he'].includes(locale) ? 'rtl' : 'ltr';
 
+  const organizationSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'Organization',
+    name: 'Reputexa',
+    url: 'https://reputexa.fr',
+    logo: 'https://reputexa.fr/logo.png',
+    description: 'Solution IA de gestion de réputation pour commerçants et restaurateurs.',
+    sameAs: ['https://www.instagram.com/reputexaa/'],
+  };
+
   return (
     <html lang={locale} dir={dir} suppressHydrationWarning>
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
+        />
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased transition-colors duration-200`}
       >
-        <ThemeProvider>
+        <ThemeProviderRouteAware>
           {children}
           <Toaster richColors position="top-center" />
-        </ThemeProvider>
+        </ThemeProviderRouteAware>
       </body>
     </html>
   );

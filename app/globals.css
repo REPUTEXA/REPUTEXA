@@ -185,7 +185,7 @@ body {
   transform: translateX(100%);
 }
 
-/* Gradient border for DOMINATOR (elite tier) */
+/* Gradient border for ZENITH (elite tier) */
 .gradient-border-card {
   position: relative;
   background: white;
@@ -338,22 +338,25 @@ body {
   transform: scale(0.98);
 }
 
-/* Dashboard dark mode: texture & depth (grands écrans) */
+/* Dashboard dark mode Ultra-Premium: fond noir pur, texture subtile */
+.dark .dashboard-main-bg {
+  background-color: #030303;
+}
 @media (min-width: 768px) {
   .dark .dashboard-main-bg {
-    background-image: radial-gradient(at top right, rgba(79, 70, 229, 0.08), transparent 60%);
+    background-image: radial-gradient(at top right, rgba(79, 70, 229, 0.04), transparent 60%);
   }
   .dark .dashboard-main-bg::before {
     content: "";
     position: fixed;
     inset: 0;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.02'/%3E%3C/svg%3E");
     pointer-events: none;
     z-index: 0;
   }
 }
 
-/* Input 16px min - évite zoom iOS (dashboard & Product Lab) */
+/* Input 16px min - évite zoom iOS (dashboard) + Ultra-Premium dark inputs */
 [data-dashboard="true"] input[type="text"],
 [data-dashboard="true"] input[type="search"],
 [data-dashboard="true"] input[type="email"],
@@ -371,6 +374,15 @@ body {
   [data-dashboard="true"] textarea {
     font-size: 0.875rem;
   }
+}
+.dark [data-dashboard="true"] input[type="text"],
+.dark [data-dashboard="true"] input[type="search"],
+.dark [data-dashboard="true"] input[type="email"],
+.dark [data-dashboard="true"] input[type="tel"],
+.dark [data-dashboard="true"] textarea {
+  background-color: rgb(24 24 27);
+  color: rgb(244 244 245);
+  border-color: rgb(39 39 42);
 }
 
 /* Bottom sheet animation (mobile) */

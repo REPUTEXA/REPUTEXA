@@ -29,10 +29,10 @@ function getPasswordStrength(password: string): { level: 0 | 1 | 2 | 3; label: s
 }
 
 const VALID_PLANS = ['vision', 'pulse', 'zenith'] as const;
-const PLAN_TO_METADATA: Record<string, 'starter' | 'manager' | 'Dominator'> = {
-  vision: 'starter',
-  pulse: 'manager',
-  zenith: 'Dominator',
+const PLAN_TO_METADATA: Record<string, 'vision' | 'pulse' | 'zenith'> = {
+  vision: 'vision',
+  pulse: 'pulse',
+  zenith: 'zenith',
 };
 const PLAN_DISPLAY: Record<string, string> = {
   vision: 'Vision',
@@ -116,7 +116,7 @@ export default function SignupPage() {
     const data = parsed.data as SignupInput;
     setLoading(true);
     const supabase = createClient();
-    const subscriptionPlan = isTrial ? 'Dominator' : (PLAN_TO_METADATA[plan] ?? 'manager');
+    const subscriptionPlan = isTrial ? 'zenith' : (PLAN_TO_METADATA[plan] ?? 'pulse');
     const selectedPlan = isTrial ? 'zenith' : plan;
 
     const { data: authData, error } = await supabase.auth.signUp({

@@ -45,7 +45,6 @@ export default function UpgradePage() {
               <p className="text-xs text-white/50 mt-0.5">{t('pricing.vision.for')}</p>
               <p className="mt-4 text-2xl font-bold text-white">
                 {formatPrice(locale, t('pricing.vision.price'))}
-                <span className="text-sm font-normal text-white/50">{t('perMonth')}</span>
               </p>
               <ul className="mt-4 space-y-2 flex-1">
                 <li className="flex items-center gap-2 text-sm text-white/80">
@@ -73,7 +72,6 @@ export default function UpgradePage() {
               <p className="text-xs text-white/60 mt-0.5">{t('pricing.pulse.for')}</p>
               <p className="mt-4 text-2xl font-bold text-white">
                 {formatPrice(locale, t('pricing.pulse.price'))}
-                <span className="text-sm font-normal text-white/60">{t('perMonth')}</span>
               </p>
               <ul className="mt-4 space-y-2 flex-1">
                 <li className="flex items-center gap-2 text-sm text-white/90">
@@ -106,7 +104,6 @@ export default function UpgradePage() {
               <p className="text-xs text-white/50 mt-0.5">{t('pricing.zenith.for')}</p>
               <p className="mt-4 text-2xl font-bold text-white">
                 {formatPrice(locale, t('pricing.zenith.price'))}
-                <span className="text-sm font-normal text-white/50">{t('perMonth')}</span>
               </p>
               <ul className="mt-4 space-y-2 flex-1">
                 <li className="flex items-center gap-2 text-sm text-white/80">

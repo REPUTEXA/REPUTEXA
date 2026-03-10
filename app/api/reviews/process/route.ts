@@ -62,7 +62,7 @@ export async function POST(request: Request) {
     }
 
     // Charger l'établissement si fourni (tier + platformLang pour segmentation)
-    let tier: 'STARTER' | 'MANAGER' | 'DOMINATOR' | null = null;
+    let tier: string | null = null;
     let platformLang = 'fr';
 
     if (establishmentId) {
@@ -70,15 +70,15 @@ export async function POST(request: Request) {
         where: { id: establishmentId },
       });
       if (establishment) {
-        tier = establishment.tier as 'STARTER' | 'MANAGER' | 'DOMINATOR';
+        tier = establishment.tier as string;
         platformLang = establishment.platformLang ?? 'fr';
       }
     }
 
-    const isStarter = tier === 'STARTER';
+    const isStarter = tier === 'VISION' || tier === 'STARTER' || tier === 'vision' || tier === 'starter';
     const langRule = isStarter
-      ? `IMPORTANT : Réponds UNIQUEMENT en ${platformLang.toUpperCase()}. L'établissement est en plan STARTER, donc limite tes réponses à la langue de l'enseigne. Ignore la langue de l'avis.`
-      : `Détecte la langue de l'avis et réponds dans la MÊME langue (natif). L'établissement est en plan MANAGER/DOMINATOR avec IA polyglotte. Respecte les nuances locales.`;
+      ? `IMPORTANT : Réponds UNIQUEMENT en ${platformLang.toUpperCase()}. L'établissement est en plan Vision, donc limite tes réponses à la langue de l'enseigne. Ignore la langue de l'avis.`
+      : `Détecte la langue de l'avis et réponds dans la MÊME langue (natif). L'établissement est en plan Pulse/ZENITH avec IA polyglotte. Respecte les nuances locales.`;
 
     const systemPrompt = POLYGLOT_BASE.replace('{LANGUE_RULE}', langRule);
 

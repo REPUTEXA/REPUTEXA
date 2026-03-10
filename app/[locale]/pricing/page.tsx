@@ -2,7 +2,7 @@
 
 import { useTranslations } from 'next-intl';
 import { useLocale } from 'next-intl';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { Link } from '@/i18n/navigation';
 import { Logo } from '@/components/logo';
 import { formatPrice } from '@/lib/format-price';
@@ -56,6 +56,7 @@ export default function PricingPage() {
   const t = useTranslations('HomePage');
   const tc = useTranslations('HomePage.pricing.comparison');
   const locale = useLocale();
+  const router = useRouter();
   const searchParams = useSearchParams();
   const planRequired = searchParams?.get('error') === 'plan_required';
 
@@ -102,14 +103,12 @@ export default function PricingPage() {
                   <div>{t('pricing.vision.name')}</div>
                   <div className="text-base font-bold text-slate-700 mt-0.5">
                     {formatPrice(locale, t('pricing.vision.price'))}
-                    <span className="text-xs font-normal text-slate-500">{t('perMonth')}</span>
                   </div>
                 </th>
                 <th className="py-4 px-4 text-center text-sm font-semibold text-slate-900 w-[22%] bg-blue-50/50">
                   <div>{t('pricing.pulse.name')}</div>
                   <div className="text-base font-bold text-blue-700 mt-0.5">
                     {formatPrice(locale, t('pricing.pulse.price'))}
-                    <span className="text-xs font-normal text-slate-500">{t('perMonth')}</span>
                   </div>
                 </th>
                 <th className="py-4 px-4 text-center text-sm font-semibold text-slate-900 w-[22%]">
@@ -117,7 +116,6 @@ export default function PricingPage() {
                   <span className="inline-block text-[10px] font-bold text-slate-600 mt-1">{t('pricing.zenith.badge')}</span>
                   <div className="text-base font-bold text-slate-700 mt-0.5">
                     {formatPrice(locale, t('pricing.zenith.price'))}
-                    <span className="text-xs font-normal text-slate-500">{t('perMonth')}</span>
                   </div>
                 </th>
               </tr>
@@ -146,25 +144,14 @@ export default function PricingPage() {
           </table>
         </div>
 
-        <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
-          <Link
-            href="/signup?mode=checkout&plan=vision"
-            className="inline-flex items-center justify-center px-6 py-3 rounded-xl border-2 border-slate-200 font-semibold text-slate-700 hover:border-slate-300 hover:bg-slate-50 active:scale-[0.98] transition-colors"
+        <div className="mt-10 flex justify-center">
+          <button
+            type="button"
+            onClick={() => router.back()}
+            className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl border-2 border-slate-200 font-semibold text-slate-700 hover:border-slate-300 hover:bg-slate-50 active:scale-[0.98] transition-colors"
           >
-            Choisir Vision
-          </Link>
-          <Link
-            href="/signup?mode=checkout&plan=pulse"
-            className="inline-flex items-center justify-center px-6 py-3 rounded-xl bg-blue-600 font-semibold text-white hover:bg-blue-700 transition-colors"
-          >
-            Choisir Pulse
-          </Link>
-          <Link
-            href="/signup?mode=checkout&plan=zenith"
-            className="inline-flex items-center justify-center px-6 py-3 rounded-xl border-2 border-blue-500 font-semibold text-blue-600 hover:bg-blue-50 active:scale-[0.98] transition-colors"
-          >
-            Choisir Zenith
-          </Link>
+            ← Retour
+          </button>
         </div>
 
         <p className="text-center text-sm text-slate-500 mt-8">

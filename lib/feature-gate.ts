@@ -51,7 +51,7 @@ const FEATURE_MIN_PLAN: Record<FeatureKey, PlanSlug> = {
 export const PLAN_DISPLAY: Record<PlanSlug, string> = {
   vision: 'Vision',
   pulse: 'Pulse',
-  zenith: 'Zenith',
+  zenith: 'ZENITH',
 };
 
 function planLevel(plan: PlanSlug): number {
@@ -86,7 +86,7 @@ export function getRequiredPlanDisplayName(feature: FeatureKey): string {
   return PLAN_DISPLAY[FEATURE_MIN_PLAN[feature]];
 }
 
-/** Normalise subscription_plan (starter/manager/Dominator) vers PlanSlug */
+/** Normalise subscription_plan (vision/pulse/zenith ou legacy starter/manager/dominator) vers PlanSlug */
 export function toPlanSlug(subscriptionPlan: string | null, selectedPlan?: string | null): PlanSlug {
   const s = (selectedPlan ?? subscriptionPlan ?? '').toLowerCase();
   if (s === 'vision' || s === 'starter') return 'vision';

@@ -11,21 +11,22 @@ const PLAN_ICONS: Record<PlanSlug, typeof Eye> = {
   zenith: Crown,
 };
 
-const PLAN_STYLES: Record<PlanSlug, { bg: string; border: string; icon: string }> = {
+const PLAN_STYLES: Record<PlanSlug, { bg: string; border: string; icon: string; glow?: string }> = {
   vision: {
     bg: 'from-sky-500/20 to-blue-500/10',
-    border: 'border-sky-400/40',
+    border: 'border-sky-400/40 dark:border-zinc-800/50',
     icon: 'text-sky-300',
   },
   pulse: {
     bg: 'from-amber-500/20 to-orange-500/10',
-    border: 'border-amber-400/40',
+    border: 'border-amber-400/40 dark:border-zinc-800/50',
     icon: 'text-amber-300',
   },
   zenith: {
     bg: 'from-violet-500/20 to-purple-500/10',
-    border: 'border-violet-400/40',
+    border: 'border-violet-400/40 dark:border-zinc-800/50',
     icon: 'text-violet-300',
+    glow: 'shadow-[0_0_24px_rgba(139,92,246,0.25)] dark:shadow-[0_0_24px_rgba(139,92,246,0.3)]',
   },
 };
 
@@ -54,23 +55,30 @@ export function PlanBadge({
     ? `Essai ${planDisplayName}${trialDaysLeft != null ? ` — ${trialDaysLeft} jour${trialDaysLeft !== 1 ? 's' : ''} restant${trialDaysLeft !== 1 ? 's' : ''}` : ''}`
     : planDisplayName;
 
+  const isUrgent = isTrialing && trialDaysLeft != null && trialDaysLeft < 3;
+  const labelColorClass = isUrgent
+    ? trialDaysLeft === 0
+      ? 'text-red-300'
+      : 'text-amber-300'
+    : 'text-white';
+
   return (
     <>
       <div
-        className={`m-3 p-4 rounded-xl bg-gradient-to-br ${styles.bg} border ${styles.border} flex flex-col gap-2`}
+        className={`m-3 p-4 rounded-xl bg-gradient-to-br ${styles.bg} border ${styles.border} ${styles.glow ?? ''} flex flex-col gap-2`}
       >
         <div className="flex items-center gap-2">
           <div className={`w-8 h-8 rounded-lg flex items-center justify-center bg-white/10 ${styles.icon}`}>
             <Icon className="h-4 w-4 flex-shrink-0" />
           </div>
-          <span className="text-xs font-semibold text-white">
+          <span className={`text-xs font-semibold ${labelColorClass}`}>
             {label}
           </span>
         </div>
         <button
           type="button"
           onClick={() => setModalOpen(true)}
-          className="w-full py-2 text-xs font-medium rounded-lg bg-white/10 hover:bg-white/15 text-white/90 transition-colors"
+          className="w-full py-2 text-xs font-medium rounded-lg bg-white/10 hover:bg-white/5 dark:hover:bg-white/5 text-white/90 transition-colors"
         >
           {hasActiveSubscription || isTrialing ? 'Changer de plan' : 'Passer au niveau supérieur'}
         </button>

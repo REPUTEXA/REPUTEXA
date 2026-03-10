@@ -214,15 +214,15 @@ export default function SuggestionsPage() {
   return (
     <div className="px-4 sm:px-6 md:px-8 py-6 space-y-8 max-w-[1600px] mx-auto">
       <header>
-        <h1 className="font-display font-bold text-2xl text-slate-900 dark:text-slate-50 tracking-tight">
+        <h1 className="font-display font-bold text-2xl text-slate-900 dark:text-zinc-100 tracking-tight">
           {t('page.title')}
         </h1>
-        <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+        <p className="mt-1 text-sm text-slate-500 dark:text-zinc-400">
           {t('page.intro')}
         </p>
       </header>
 
-      <section className="mx-4 sm:mx-0 rounded-2xl border border-slate-200 dark:border-slate-800 dark:border-white/[0.07] bg-white dark:bg-slate-900 shadow-[4px_6px_0_rgba(0,0,0,0.04)] dark:shadow-[4px_6px_0_rgba(0,0,0,0.5)] p-6 transition-colors duration-200">
+      <section className="mx-4 sm:mx-0 rounded-2xl border border-slate-200 dark:border-zinc-800/50 bg-white dark:bg-[#09090b] shadow-[4px_6px_0_rgba(0,0,0,0.04)] dark:shadow-[4px_6px_0_rgba(0,0,0,0.5)] p-6 transition-colors duration-200">
         <form onSubmit={handleSubmit} className="space-y-4 max-w-xl">
           <div>
             <label
@@ -239,7 +239,7 @@ export default function SuggestionsPage() {
                 onChange={(e) => setTitle(e.target.value)}
                 placeholder={t('form.placeholderTitle')}
                 maxLength={200}
-                className="flex-1 px-4 py-3 min-h-[44px] rounded-2xl border border-slate-200 dark:border-slate-800 dark:border-white/[0.07] bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-50 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/30 dark:focus:ring-indigo-500/50 focus:border-blue-500 dark:focus:border-indigo-500/50 transition-all duration-200"
+                className="flex-1 px-4 py-3 min-h-[44px] rounded-2xl border border-slate-200 dark:border-zinc-800/50 bg-white dark:bg-[#09090b] text-slate-900 dark:text-zinc-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/30 dark:focus:ring-indigo-500/50 focus:border-blue-500 dark:focus:border-indigo-500/50 transition-all duration-200"
               />
               <input
                 ref={fileInputRef}
@@ -253,7 +253,7 @@ export default function SuggestionsPage() {
                 onClick={handleCameraClick}
                 disabled={suggestingTitle}
                 title="Joindre une photo (optionnel)"
-                className="flex items-center justify-center min-w-[44px] min-h-[44px] p-2.5 rounded-2xl border border-slate-200 dark:border-slate-800 dark:border-white/[0.07] bg-slate-50 dark:bg-slate-900 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 active:scale-[0.98] transition-transform disabled:opacity-50 transition-colors"
+                className="flex items-center justify-center min-w-[44px] min-h-[44px] p-2.5 rounded-2xl border border-slate-200 dark:border-zinc-800/50 bg-slate-50 dark:bg-[#09090b] text-slate-600 dark:text-zinc-400 hover:bg-slate-100 dark:hover:bg-white/5 active:scale-[0.98] transition-transform disabled:opacity-50 transition-colors"
               >
                 {suggestingTitle ? (
                   <Loader2 className="w-5 h-5 animate-spin" />
@@ -294,7 +294,7 @@ export default function SuggestionsPage() {
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder={t('form.placeholderDescription')}
                 rows={5}
-                className="w-full px-4 py-3 pr-14 min-h-[120px] rounded-2xl border border-slate-200 dark:border-slate-800 dark:border-white/[0.07] bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-50 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/30 dark:focus:ring-indigo-500/50 focus:border-blue-500 dark:focus:border-indigo-500/50 resize-none transition-all duration-200"
+                className="w-full px-4 py-3 pr-14 min-h-[120px] rounded-2xl border border-slate-200 dark:border-zinc-800/50 bg-white dark:bg-[#09090b] text-slate-900 dark:text-zinc-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/30 dark:focus:ring-indigo-500/50 focus:border-blue-500 dark:focus:border-indigo-500/50 resize-none transition-all duration-200"
               />
               <button
                 type="button"
@@ -304,7 +304,7 @@ export default function SuggestionsPage() {
                 className={`absolute right-2 bottom-2 p-2 rounded-lg transition-colors ${
                   recording
                     ? 'bg-red-100 dark:bg-red-900/40 text-red-600 dark:text-red-400 animate-pulse'
-                    : 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-600'
+                    : 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-zinc-400 hover:bg-slate-200 dark:hover:bg-white/5'
                 } disabled:opacity-50`}
               >
                 {transcribing ? (
@@ -335,8 +335,8 @@ export default function SuggestionsPage() {
         </form>
       </section>
 
-      <section className="mx-4 sm:mx-0 rounded-2xl border border-slate-200 dark:border-slate-800 dark:border-white/[0.07] bg-white dark:bg-slate-900 shadow-[4px_6px_0_rgba(0,0,0,0.04)] dark:shadow-[4px_6px_0_rgba(0,0,0,0.5)] overflow-hidden transition-colors duration-200">
-        <h2 className="px-6 py-4 border-b border-slate-200 dark:border-slate-800 dark:border-white/[0.07] font-semibold text-slate-900 dark:text-slate-50">
+      <section className="mx-4 sm:mx-0 rounded-2xl border border-slate-200 dark:border-zinc-800/50 bg-white dark:bg-[#09090b] shadow-[4px_6px_0_rgba(0,0,0,0.04)] dark:shadow-[4px_6px_0_rgba(0,0,0,0.5)] overflow-hidden transition-colors duration-200">
+        <h2 className="px-6 py-4 border-b border-slate-200 dark:border-zinc-800/50 font-semibold text-slate-900 dark:text-zinc-100">
           {t('list.communityWall')}
         </h2>
         <div className="p-6">
@@ -347,7 +347,7 @@ export default function SuggestionsPage() {
               ))}
             </ul>
           ) : suggestions.length === 0 ? (
-            <p className="text-sm text-slate-500 dark:text-slate-400 py-8">
+            <p className="text-sm text-slate-500 dark:text-zinc-400 py-8">
               {t('list.communityEmpty')}
             </p>
           ) : (
@@ -365,7 +365,7 @@ export default function SuggestionsPage() {
                       className={`shrink-0 flex flex-col items-center gap-0.5 p-2 rounded-lg transition-colors ${
                         s.user_has_upvoted
                           ? 'bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400'
-                          : 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-600'
+                          : 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-zinc-400 hover:bg-slate-200 dark:hover:bg-white/5'
                       }`}
                     >
                       {upvoting === s.id ? (
@@ -383,13 +383,13 @@ export default function SuggestionsPage() {
                           className="mb-2 w-full max-h-32 rounded-lg object-cover border border-slate-200 dark:border-slate-700"
                         />
                       )}
-                      <p className="font-medium text-slate-900 dark:text-slate-50">{s.title}</p>
+                      <p className="font-medium text-slate-900 dark:text-zinc-100">{s.title}</p>
                       {s.description && (
-                        <p className="text-sm text-slate-600 dark:text-slate-400 mt-1 line-clamp-3">
+                        <p className="text-sm text-slate-600 dark:text-zinc-400 mt-1 line-clamp-3">
                           {s.description}
                         </p>
                       )}
-                      <div className="mt-2 flex items-center gap-2 text-xs text-slate-500 dark:text-slate-500">
+                      <div className="mt-2 flex items-center gap-2 text-xs text-slate-500 dark:text-zinc-1000">
                         <span>{formatDate(s.created_at)}</span>
                         {getStatusBadge(s.status)}
                       </div>

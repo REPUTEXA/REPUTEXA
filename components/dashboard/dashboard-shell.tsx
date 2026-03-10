@@ -25,7 +25,7 @@ function SignOutButton() {
     <button
       type="button"
       onClick={handleSignOut}
-      className="flex items-center justify-center min-w-[44px] min-h-[44px] p-2 rounded-2xl text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 active:scale-[0.98] transition-transform"
+      className="flex items-center justify-center min-w-[44px] min-h-[44px] p-2 rounded-2xl text-slate-600 dark:text-zinc-100 hover:bg-slate-100 dark:hover:bg-white/5 active:scale-[0.98] transition-transform"
       aria-label="Déconnexion"
       title="Déconnexion"
     >
@@ -143,7 +143,7 @@ export function DashboardShell({
   };
 
   return (
-    <div className="flex min-h-screen bg-slate-50 dark:bg-slate-950 transition-colors duration-200">
+    <div className="flex min-h-screen bg-slate-50 dark:bg-[#030303] transition-colors duration-200">
       {/* Overlay mobile - drawer backdrop */}
       {sidebarOpen && (
         <button
@@ -156,11 +156,11 @@ export function DashboardShell({
 
       {/* Sidebar - Drawer mobile (<768px), fixed desktop */}
       <aside
-        className={`fixed left-0 top-0 z-40 flex h-full w-60 flex-col bg-[#0B1221] dark:bg-slate-950/95 dark:backdrop-blur-md border-r border-transparent dark:border-slate-800/80 dark:border-white/[0.07] text-white transition-transform duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] lg:translate-x-0 ${
+        className={`fixed left-0 top-0 z-40 flex h-full w-60 flex-col bg-[#0B1221] dark:bg-black/40 dark:backdrop-blur-xl border-r border-transparent dark:border-zinc-800/50 text-white transition-transform duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] lg:translate-x-0 ${
           sidebarOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
-        <div className="flex h-16 items-center justify-between border-b border-white/10 px-4 lg:justify-start">
+        <div className="flex h-16 items-center justify-between border-b border-white/10 dark:border-zinc-800/50 px-4 lg:justify-start">
           <Link href="/" className="flex items-center gap-2.5" aria-label="REPUTEXA">
             <div className="w-8 h-8 rounded-lg gradient-primary flex items-center justify-center flex-shrink-0">
               <span className="font-bold text-white text-sm">R</span>
@@ -178,7 +178,7 @@ export function DashboardShell({
         </div>
 
         {/* Establishment card */}
-        <div className="mx-3 mt-4 mb-2 p-3 rounded-xl bg-white/5 border border-white/10 flex items-center gap-2.5">
+        <div className="mx-3 mt-4 mb-2 p-3 rounded-xl bg-white/5 dark:bg-[#09090b] border border-white/10 dark:border-zinc-800/50 flex items-center gap-2.5">
           {avatarUrl ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img src={avatarUrl} alt="" className="w-7 h-7 rounded-lg object-cover flex-shrink-0" />
@@ -206,7 +206,7 @@ export function DashboardShell({
               const baseClass = `flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-150 ${
                 isActive
                   ? 'bg-blue-500 text-white shadow-glow'
-                  : 'text-white/60 hover:text-white hover:bg-white/8'
+                  : 'text-white/60 hover:text-white hover:bg-white/5 dark:hover:bg-white/5'
               }`;
               return (
                 <Link
@@ -234,11 +234,11 @@ export function DashboardShell({
       {/* Main content */}
       <div className="flex flex-1 flex-col min-w-0 lg:ml-60">
         {/* Header */}
-        <header className="sticky top-0 z-20 h-14 min-h-[52px] sm:h-16 border-b border-slate-200 dark:border-slate-800/80 dark:border-white/[0.07] bg-white/95 dark:bg-slate-950/90 backdrop-blur-md flex items-center justify-between px-4 sm:px-6 safe-area-nav transition-colors duration-200">
+        <header className="sticky top-0 z-20 h-14 min-h-[52px] sm:h-16 border-b border-slate-200 dark:border-zinc-800/50 bg-white/95 dark:bg-[#09090b]/95 dark:backdrop-blur-xl flex items-center justify-between px-4 sm:px-6 safe-area-nav transition-colors duration-200">
           <button
             type="button"
             onClick={() => setSidebarOpen(true)}
-            className="lg:hidden flex items-center justify-center min-w-[44px] min-h-[44px] p-2 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 active:scale-[0.98] transition-transform -ml-2"
+            className="lg:hidden flex items-center justify-center min-w-[44px] min-h-[44px] p-2 rounded-xl text-slate-600 dark:text-zinc-100 hover:bg-slate-100 dark:hover:bg-white/5 active:scale-[0.98] transition-transform -ml-2"
             aria-label="Ouvrir le menu"
           >
             <Menu className="h-6 w-6" />
@@ -246,13 +246,13 @@ export function DashboardShell({
 
           <form onSubmit={handleSearchSubmit} className="flex-1 max-w-md mx-4 hidden sm:block">
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 dark:text-slate-500" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 dark:text-zinc-500" />
               <input
                 type="search"
                 value={searchInput}
                 onChange={(e) => setSearchInput(e.target.value)}
                 placeholder="Rechercher des avis..."
-                className="w-full pl-9 pr-4 py-2.5 min-h-[40px] text-sm bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 dark:border-white/[0.07] rounded-2xl text-slate-900 dark:text-slate-50 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 dark:focus:ring-indigo-500/50 focus:border-blue-500/40 transition-colors duration-200"
+                className="w-full pl-9 pr-4 py-2.5 min-h-[40px] text-sm bg-slate-100 dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800/50 rounded-2xl text-slate-900 dark:text-zinc-100 placeholder:text-slate-400 dark:placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 dark:focus:ring-indigo-500/30 focus:border-blue-500/40 dark:focus:border-zinc-700 transition-colors duration-200"
               />
             </div>
           </form>
@@ -264,23 +264,23 @@ export function DashboardShell({
               <button
                 type="button"
                 onClick={() => setShowNotificationTrends((v) => !v)}
-                className="relative flex items-center justify-center min-w-[44px] min-h-[44px] p-2 rounded-xl text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 active:scale-[0.98] transition-transform"
+                className="relative flex items-center justify-center min-w-[44px] min-h-[44px] p-2 rounded-xl text-slate-500 dark:text-zinc-100 hover:bg-slate-100 dark:hover:bg-white/5 active:scale-[0.98] transition-transform"
                 aria-label="Notifications"
               >
                 <Bell className="h-5 w-5" />
                 <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 bg-blue-500 rounded-full" />
               </button>
               {showNotificationTrends && (
-                <div className="absolute right-0 mt-2 w-64 rounded-2xl border border-slate-200 dark:border-slate-800 dark:border-white/[0.07] bg-white dark:bg-slate-900 shadow-lg dark:shadow-[4px_6px_0_rgba(0,0,0,0.5)] p-3 text-sm">
+                <div className="absolute right-0 mt-2 w-64 rounded-2xl border border-slate-200 dark:border-zinc-800/50 bg-white dark:bg-[#09090b] shadow-lg dark:shadow-xl p-3 text-sm">
                   <div className="flex items-center gap-2 mb-2">
                     <div className="flex h-7 w-7 items-center justify-center rounded-full bg-emerald-50 dark:bg-emerald-500/10">
                       <CheckCircle2 className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
                     </div>
-                    <p className="text-xs font-semibold text-slate-900 dark:text-slate-50">
+                    <p className="text-xs font-semibold text-slate-900 dark:text-zinc-100">
                       Tendances détectées
                     </p>
                   </div>
-                  <p className="text-xs text-slate-600 dark:text-slate-400">
+                  <p className="text-xs text-slate-600 dark:text-zinc-400">
                     Aucune tendance négative marquante sur vos derniers avis.
                   </p>
                 </div>
@@ -290,7 +290,7 @@ export function DashboardShell({
           </div>
         </header>
 
-        <main className="flex-1 bg-slate-50 dark:bg-slate-950 dashboard-main-bg transition-colors duration-200 relative" data-dashboard="true">
+        <main className="flex-1 bg-slate-50 dark:bg-[#030303] dashboard-main-bg transition-colors duration-200 relative" data-dashboard="true">
           {showTrialBanner && !showPaywall && (
             <div
               className={`border-b px-4 sm:px-6 py-4 transition-colors duration-200 ${
@@ -302,7 +302,7 @@ export function DashboardShell({
               <div className="max-w-4xl mx-auto flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                 <p className={`text-sm sm:text-base ${isCriticalPhase ? 'text-red-900 dark:text-red-100' : 'text-slate-800 dark:text-slate-200'}`}>
                   <span className="font-semibold">
-                    Essai ZENITH : {trialDaysLeft ?? 0} jour{trialDaysLeft !== 1 ? 's' : ''} restant{trialDaysLeft !== 1 ? 's' : ''}
+                    🚀 Mode Domination Activé : Plan ZENITH (Essai) — {trialDaysLeft ?? 0} jour{trialDaysLeft !== 1 ? 's' : ''} restant{trialDaysLeft !== 1 ? 's' : ''}
                   </span>
                   {trialEndDate && !isCriticalPhase && (
                     <> — se termine le <strong>{trialEndDate}</strong></>

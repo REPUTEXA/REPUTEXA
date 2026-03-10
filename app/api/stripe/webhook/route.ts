@@ -7,9 +7,9 @@ import { canSendEmail, sendEmail } from '@/lib/resend';
 import { getWelcomePremiumEmailHtml } from '@/lib/emails/templates';
 
 const PLAN_SLUG_TO_SUBSCRIPTION: Record<string, string> = {
-  vision: 'starter',
-  pulse: 'manager',
-  zenith: 'Dominator',
+  vision: 'vision',
+  pulse: 'pulse',
+  zenith: 'zenith',
 };
 
 export async function POST(request: Request) {
@@ -45,7 +45,7 @@ export async function POST(request: Request) {
       const subscriptionId = session.subscription as string;
       const planSlug = (session.metadata?.planSlug ?? 'pulse') as string;
       const validPlan = ['vision', 'pulse', 'zenith'].includes(planSlug) ? planSlug : 'pulse';
-      const subscriptionPlan = PLAN_SLUG_TO_SUBSCRIPTION[validPlan] ?? 'manager';
+      const subscriptionPlan = PLAN_SLUG_TO_SUBSCRIPTION[validPlan] ?? 'pulse';
 
       if (!subscriptionId) return NextResponse.json({ received: true });
 
@@ -95,7 +95,7 @@ export async function POST(request: Request) {
 
             if (canSendEmail()) {
               const establishmentName = (profiles[0].establishment_name as string) ?? '';
-              const PLAN_DISPLAY: Record<string, string> = { vision: 'Vision', pulse: 'Pulse', zenith: 'Zenith' };
+              const PLAN_DISPLAY: Record<string, string> = { vision: 'Vision', pulse: 'Pulse', zenith: 'ZENITH' };
               const planName = PLAN_DISPLAY[validPlan] ?? 'Premium';
               const appUrl = process.env.NEXT_PUBLIC_SITE_URL ?? process.env.NEXT_PUBLIC_APP_URL ?? 'https://reputexa.com';
               const loginUrl = `${appUrl}/fr/dashboard`;

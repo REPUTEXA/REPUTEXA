@@ -77,7 +77,7 @@ async function main() {
         user_metadata: {
           establishment_name: 'Restaurant Test',
           signup_mode: 'trial',
-          subscription_plan: 'Dominator',
+          subscription_plan: 'zenith',
           selected_plan: 'zenith',
         },
       });

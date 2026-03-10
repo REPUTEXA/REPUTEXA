@@ -3,9 +3,9 @@ import Stripe from 'stripe';
 import { createAdminClient } from '@/lib/supabase/admin';
 
 const PLAN_SLUG_TO_SUBSCRIPTION: Record<string, string> = {
-  vision: 'starter',
-  pulse: 'manager',
-  zenith: 'Dominator',
+  vision: 'vision',
+  pulse: 'pulse',
+  zenith: 'zenith',
 };
 
 /**
@@ -39,7 +39,7 @@ export async function POST(request: Request) {
     }
 
     const validPlan = ['vision', 'pulse', 'zenith'].includes(planSlug) ? planSlug : 'pulse';
-    const subscriptionPlan = PLAN_SLUG_TO_SUBSCRIPTION[validPlan] ?? 'manager';
+    const subscriptionPlan = PLAN_SLUG_TO_SUBSCRIPTION[validPlan] ?? 'pulse';
 
     const admin = createAdminClient();
     if (!admin) {

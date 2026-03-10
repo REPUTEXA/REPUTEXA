@@ -1,28 +1,26 @@
 {
   "Pricing": {
-    "starter_title": "STARTER",
-    "starter_price": "59€",
-    "starter_desc": "L'essentiel pour votre enseigne",
-    "manager_title": "MANAGER",
-    "manager_price": "97€",
-    "manager_desc": "Idéal pour les zones touristiques",
-    "dominator_title": "DOMINATOR",
-    "dominator_price": "157€",
-    "dominator_desc": "La protection absolue de votre CA"
+    "vision_title": "VISION",
+    "vision_price": "59€",
+    "vision_desc": "L'essentiel pour votre enseigne",
+    "pulse_title": "PULSE",
+    "pulse_price": "97€",
+    "pulse_desc": "Idéal pour les zones touristiques",
+    "zenith_title": "ZENITH",
+    "zenith_price": "157€",
+    "zenith_desc": "La protection absolue de votre CA"
   },
   "Features": {
-    "starter_replies": "Réponses illimitées (Langue locale uniquement)",
-    "starter_pdf": "Reporting PDF mensuel",
-    "manager_replies": "Réponses illimitées (Toutes langues / Natif)",
-    "manager_whatsapp": "Alertes mauvais avis sur WhatsApp",
-    "manager_reporting": "Reporting PDF + Recap Hebdo WhatsApp",
-    "dominator_capture": "IA de Capture (Avis WhatsApp 30 min après encaissement)",
-    "dominator_pos": "Connecteur Caisse OAuth (Square, SumUp)",
-    "dominator_shield": "LE BOUCLIER (Filtre anti-avis négatifs, redirection vers patron)",
-    "vision_replies": "Réponses IA illimitées (Langue locale)",
+    "vision_replies": "Réponses illimitées (Langue locale uniquement)",
+    "vision_pdf": "Reporting PDF mensuel",
+    "pulse_replies": "Réponses illimitées (Toutes langues / Natif)",
+    "pulse_whatsapp": "Alertes mauvais avis sur WhatsApp",
+    "pulse_reporting": "Reporting PDF + Recap Hebdo WhatsApp",
+    "zenith_capture": "IA de Capture (Avis WhatsApp 30 min après encaissement)",
+    "zenith_pos": "Connecteur Caisse OAuth (Square, SumUp)",
+    "zenith_shield": "LE BOUCLIER (Filtre anti-avis négatifs, redirection vers patron)",
     "pulse_whatsapp": "Alertes WhatsApp temps réel",
     "pulse_languages": "Toutes langues",
-    "zenith_shield": "Bouclier Anti-Abus IA",
     "zenith_google": "Signalement automatique Google",
     "zenith_recap": "Recap WhatsApp Hebdo",
     "cta_choose": "Choisir ce plan",
@@ -49,6 +47,14 @@
       "ctaSecondary": "Voir la démo",
       "trialInfo": "Aucune CB requise · 14 jours d'essai · Annulation à tout moment"
     },
+    "scan": {
+      "title": "Découvrez ce que vous perdez",
+      "placeholder": "Nom de votre commerce (ex: Restaurant Le Bistro)",
+      "ctaScan": "Analyser ma réputation",
+      "loading": "Analyse IA en cours",
+      "alert": "ALERTE : Vous perdez environ {count} clients/mois",
+      "ctaSignup": "Arrêter l'hémorragie — Essai gratuit 14j"
+    },
     "demo": {
       "title": "Démo : L'IA en action",
       "subtitle": "Voyez comment REPUTEXA répond automatiquement à un avis négatif pour {business}",
@@ -56,7 +62,7 @@
       "readyToPublish": "Prête à publier",
       "verified": "Double vérification IA passée",
       "publishNow": "Publier maintenant",
-      "whatsappAlert": "Alerte Dominator : Nouvel avis critique intercepté !",
+      "whatsappAlert": "Alerte ZENITH : Nouvel avis critique intercepté !",
       "statsScore": "Score de réputation",
       "statsReviews": "Avis traités",
       "statsTime": "Temps gagné",
@@ -133,7 +139,7 @@
       "controlScore": "Score 3.2 → 4.8",
       "controlShield": "Bouclier Anti-Avis Actif",
       "controlTime": "gagnées cette semaine",
-      "cta": "Activer mon plan Dominator — 157€/mois"
+      "cta": "Activer mon plan ZENITH — 157€/mois"
     },
     "preuve": {
       "trustLine": "Déjà +200 entreprises font confiance à REPUTEXA pour automatiser leur e-réputation.",
@@ -148,37 +154,13 @@
     "howItWorks": {
       "headline": "Tout pour votre réputation",
       "subtitle": "Des outils puissants, une interface simple.",
-      "aiReplies": {
-        "title": "Réponses aux Avis Automatisées",
-        "desc": "Autopilote IA : Réponses illimitées, ultra-rapides à tous vos avis en ligne, personnalisées pour chaque interaction."
-      },
-      "badReviewAlerts": {
-        "title": "Alertes Avis Négatifs Temps Réel",
-        "desc": "Contrôle de crise instantané : Alertes WhatsApp directes pour tout retour potentiellement négatif, permettant une intervention immédiate."
-      },
-      "reporting": {
-        "title": "Rapports de Performance",
-        "desc": "Insights à la demande : Rapports PDF mensuels et récap WhatsApp hebdomadaires, sans vous submerger."
-      },
-      "reviewCapture": {
-        "title": "Capture d'Avis IA",
-        "desc": "Génération proactive : Notre IA incite en douceur vos clients satisfaits via WhatsApp 30 min après la visite à laisser un avis positif."
-      },
-      "posIntegration": {
-        "title": "Intégration Caisse",
-        "desc": "Connectivité fluide : Intégration Square, SumUp et plus via OAuth pour une approche client intelligente."
-      },
-      "negativeFilter": {
-        "title": "Filtre Avis Négatifs",
-        "desc": "Le protecteur ultime : Redirige les clients mécontents vers une résolution privée avant qu'ils n'atteignent Google—évitant les notes 1 étoile publiques."
-      },
-      "weeklyAnalysis": {
-        "title": "Analyse hebdo & mensuelle",
-        "desc": "Tendances, problèmes récurrents, succès — tout est synthétisé pour vous."
-      },
-      "aiChat": {
-        "title": "Chat IA intégré",
-        "desc": "Posez vos questions, obtenez des conseils personnalisés instantanément."
+      "cards": {
+        "multilingue": { "title": "Réponse Locale, Rayonnement Global", "desc": "L'IA détecte et répond dans la langue de vos clients (Anglais, Espagnol, Italien, etc.) avec un ton natif. Le plan Vision se concentre sur votre langue locale.", "badge": "Inclus PULSE • ZENITH" },
+        "bouclier": { "title": "Protection de Marque 24h/7j", "desc": "Détection automatique des insultes et faux avis. L'IA génère et envoie instantanément une requête de suppression officielle auprès de Google pour protéger votre e-réputation.", "badge": "Inclus PULSE • ZENITH" },
+        "whatsapp": { "title": "Réactivité Commando", "desc": "Ne ratez plus aucune urgence. Recevez une notification WhatsApp immédiate uniquement pour les mauvais avis, vous permettant d'éteindre l'incendie avant qu'il ne se propage.", "badge": "Inclus PULSE • ZENITH" },
+        "capture": { "title": "Générateur de 5 Étoiles", "desc": "Notre IA sollicite vos clients via WhatsApp 30 min après leur visite pour collecter leur avis. Ne laissez plus la chance décider de votre note : provoquez votre succès.", "badge": "Exclusif ZENITH" },
+        "boostSeo": { "title": "Domination SEO Locale", "desc": "L'IA injecte intelligemment vos mots-clés stratégiques dans chaque réponse pour forcer Google à vous remonter en 1ère page des recherches. Soyez le premier choix dans votre ville.", "badge": "Exclusif ZENITH" },
+        "reporting": { "title": "Pilotage Stratégique", "desc": "Recevez des rapports mensuels détaillés avec graphiques de progression et analyses de sentiments. Prenez des décisions basées sur des données réelles pour faire croître votre commerce.", "badge": "Inclus VISION • PULSE • ZENITH" }
       }
     },
     "perMonth": "/mois",
@@ -204,7 +186,7 @@
         "cta": "S'abonner maintenant"
       },
       "zenith": {
-        "name": "Zenith",
+        "name": "ZENITH",
         "badge": "ULTIME",
         "for": "La forteresse de votre réputation",
         "price": "179",
@@ -257,17 +239,17 @@
       "subtitle": "+2 400 établissements gèrent leur réputation avec REPUTEXA.",
       "items": {
         "1": {
-          "quote": "Le Filtre Avis Négatifs à lui seul nous a sauvés. On avait 2-3 avis 1 étoile par mois de clients frustrés qui ne nous laissaient jamais corriger. Maintenant ? Zéro catastrophe publique. Ça vaut chaque euro.",
+          "quote": "Le filtre intelligent à lui seul nous a sauvés. On avait 2-3 avis injustes par mois qui nous plombaient. Maintenant ? Zéro catastrophe publique. Ça vaut chaque euro pour la tranquillité d'esprit.",
           "name": "Sophie M.",
           "role": "Propriétaire, Le Bistro Parisien"
         },
         "2": {
-          "quote": "C'est comme avoir un directeur de réputation qui ne dort jamais. Je reçois des alertes WhatsApp quand il faut intervenir, et l'IA gère le reste. Notre note Google est passée de 3,9 à 4,6 en 4 mois.",
+          "quote": "C'est comme avoir un directeur de réputation 24h/24. Je reçois les alertes WhatsApp pour les urgences, et l'IA gère le reste. Notre note est passée de 3,9 à 4,8 en 4 mois. Incontournable.",
           "name": "Marco D.",
           "role": "Chef-Propriétaire, Trattoria Milano"
         },
         "3": {
-          "quote": "La sérénité. C'est ce que je paie. Savoir que les clients mécontents ont un canal privé avant d'aller sur Google ? Révolutionnaire. Le plan DOMINATOR est le meilleur investissement qu'on ait fait.",
+          "quote": "La sérénité, c'est ce que je paie. Le plan ZENITH est le meilleur investissement qu'on ait fait : nos clients sont relancés automatiquement et notre visibilité Google a explosé.",
           "name": "Isabelle R.",
           "role": "Directrice, Hôtel Les Pins"
         }
@@ -276,21 +258,21 @@
     "faq": {
       "headline": "Questions fréquentes",
       "items": {
-        "autoRepondre": {
-          "q": "Ce n'est pas juste un auto-répondeur ?",
-          "a": "Absolument pas. La plupart des outils se contentent de répondre aux avis. REPUTEXA va beaucoup plus loin : notre IA détecte les tendances, identifie les risques, priorise les actions et vous aide à améliorer concrètement votre business."
+        "googleMaps": {
+          "q": "Est-ce que l'IA peut vraiment me faire monter sur Google Maps ?",
+          "a": "Oui. Google favorise les établissements qui répondent vite et qui utilisent des mots-clés pertinents. Notre plan ZENITH injecte stratégiquement ces mots-clés dans vos réponses pour signaler à l'algorithme que vous êtes le meilleur choix local."
         },
-        "natural": {
-          "q": "Les réponses sont-elles vraiment naturelles ?",
-          "a": "Oui. Notre IA suit des règles strictes : jamais de phrases génériques, référence systématique au contenu spécifique de l'avis, ton adapté à votre établissement. Le résultat est indistinguable d'une réponse humaine."
+        "iaDetectable": {
+          "q": "Est-ce que mes clients vont capter que c'est une IA ?",
+          "a": "Absolument pas. Nos modèles sont entraînés sur des milliers de réponses réelles de restaurateurs et commerçants. Le ton est chaleureux, professionnel et indiscernable d'une réponse humaine. On appelle ça le test de Turing réussi."
         },
-        "publishing": {
-          "q": "Comment fonctionne la publication automatique ?",
-          "a": "Les avis positifs (3-5 étoiles) sont automatiquement publiés sur Google. Les avis négatifs (1-2 étoiles) passent par une double vérification IA avant publication. Vous gardez le contrôle total."
+        "installTime": {
+          "q": "Combien de temps ça prend à installer ?",
+          "a": "Moins de 2 minutes. Vous connectez votre compte Google Business, et l'IA commence à analyser vos avis immédiatement. Il n'y a aucun logiciel à installer, tout se passe sur votre dashboard Reputexa."
         },
-        "cancel": {
-          "q": "Puis-je annuler à tout moment ?",
-          "a": "Oui, sans engagement. Vous pouvez annuler votre abonnement à tout moment depuis votre tableau de bord."
+        "gratuit14j": {
+          "q": "C'est vraiment gratuit pendant 14 jours ? Sans carte bleue ?",
+          "a": "Oui. On est tellement sûrs de l'impact sur votre chiffre d'affaires qu'on vous offre l'accès complet sans vous demander vos coordonnées bancaires. Si vous n'êtes pas bluffé par les résultats, vous n'avez rien à faire."
         }
       }
     },

@@ -24,7 +24,7 @@ export async function POST(request: Request) {
     }
 
     const loginUrl = `${getSiteUrl()}/${locale}/dashboard`;
-    const PLAN_DISPLAY: Record<string, string> = { vision: 'Vision', pulse: 'Pulse', zenith: 'Zenith' };
+    const PLAN_DISPLAY: Record<string, string> = { vision: 'Vision', pulse: 'Pulse', zenith: 'ZENITH' };
     const planName = PLAN_DISPLAY[body.planSlug as string] ?? 'Premium';
 
     const html = type === 'premium'

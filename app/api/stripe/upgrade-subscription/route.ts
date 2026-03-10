@@ -11,9 +11,9 @@ const PLAN_TO_PRICE_ENV: Record<string, string> = {
 };
 
 const PLAN_SLUG_TO_SUBSCRIPTION: Record<string, string> = {
-  vision: 'starter',
-  pulse: 'manager',
-  zenith: 'Dominator',
+  vision: 'vision',
+  pulse: 'pulse',
+  zenith: 'zenith',
 };
 
 export async function POST(request: Request) {
@@ -94,7 +94,7 @@ export async function POST(request: Request) {
       metadata: { planSlug },
     });
 
-    const subscriptionPlan = PLAN_SLUG_TO_SUBSCRIPTION[planSlug] ?? 'manager';
+    const subscriptionPlan = PLAN_SLUG_TO_SUBSCRIPTION[planSlug] ?? 'pulse';
     const admin = createAdminClient();
     if (admin) {
       const { data: profiles } = await admin

@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { Link } from '@/i18n/navigation';
 import { useTranslations, useLocale } from 'next-intl';
-import { Bell, TrendingUp, MessageCircle, MessageSquare, ShieldCheck, ChevronRight, Check, BarChart2 } from 'lucide-react';
+import { Globe, ShieldCheck, MessageSquareWarning, Star, Zap, BarChart2, ChevronRight, Check } from 'lucide-react';
 import { Chatbot } from '@/components/chatbot';
 import { LanguageSelector } from '@/components/language-selector';
 import { DemoDashboard } from '@/components/demo-dashboard';
@@ -30,13 +30,16 @@ function StarIcon() {
   );
 }
 
-const FAQ_KEYS = ['autoRepondre', 'natural', 'publishing', 'cancel'] as const;
+const FAQ_KEYS = ['googleMaps', 'iaDetectable', 'installTime', 'gratuit14j'] as const;
 
 export default function HomePage() {
   const t = useTranslations('HomePage');
   const locale = useLocale();
   const [openFaq, setOpenFaq] = useState<string | null>(null);
   const [openDemo, setOpenDemo] = useState(false);
+  const [scanName, setScanName] = useState('');
+  const [scanning, setScanning] = useState(false);
+  const [scanResult, setScanResult] = useState<number | null>(null);
 
   return (
     <div className="min-h-screen bg-background overflow-x-hidden">
@@ -136,6 +139,63 @@ export default function HomePage() {
               </button>
             </div>
             <p className="text-xs text-white/30 mt-4 tracking-prose">{t('hero.trialInfo')}</p>
+
+            {/* SCAN DE RÉPUTATION INTERACTIF */}
+            <div className="mt-10 sm:mt-12 max-w-xl mx-auto animate-fade-up" style={{ animationDelay: '0.4s', opacity: 0 }}>
+              <div className="rounded-2xl border border-white/15 bg-white/5 p-4 sm:p-6 backdrop-blur-sm">
+                <p className="text-sm text-white/70 font-medium mb-3">{t('scan.title')}</p>
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <input
+                    type="text"
+                    value={scanName}
+                    onChange={(e) => { setScanName(e.target.value); setScanResult(null); }}
+                    placeholder={t('scan.placeholder')}
+                    disabled={scanning}
+                    className="flex-1 px-4 py-3 rounded-xl bg-white/10 border border-white/20 text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-blue-500/50 disabled:opacity-60"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (!scanName.trim() || scanning) return;
+                      setScanning(true);
+                      setScanResult(null);
+                      setTimeout(() => {
+                        const base = 8 + (scanName.length % 15) + Math.floor(Math.random() * 6);
+                        setScanResult(base);
+                        setScanning(false);
+                      }, 2200);
+                    }}
+                    disabled={scanning || !scanName.trim()}
+                    className="gradient-primary text-white font-semibold px-5 py-3 rounded-xl hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed transition-opacity"
+                  >
+                    {t('scan.ctaScan')}
+                  </button>
+                </div>
+                {scanning && (
+                  <div className="mt-4 flex items-center gap-2 text-white/80">
+                    <span className="inline-flex gap-1">
+                      <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-bounce" style={{ animationDelay: '0ms' }} />
+                      <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-bounce" style={{ animationDelay: '150ms' }} />
+                      <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-bounce" style={{ animationDelay: '300ms' }} />
+                    </span>
+                    {t('scan.loading')}...
+                  </div>
+                )}
+                {scanResult !== null && !scanning && (
+                  <div className="mt-4 p-4 rounded-xl bg-rose-500/20 border border-rose-400/30">
+                    <p className="text-rose-100 font-bold text-lg">
+                      {t('scan.alert', { count: scanResult })}
+                    </p>
+                    <Link
+                      href="/signup?mode=trial"
+                      className="mt-4 block w-full gradient-primary text-white font-bold py-4 px-6 rounded-xl text-center hover:opacity-95 transition-opacity text-base sm:text-lg"
+                    >
+                      {t('scan.ctaSignup')}
+                    </Link>
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
           </div>
         </section>
@@ -477,128 +537,30 @@ export default function HomePage() {
             </h2>
             <p className="text-muted-foreground text-lg">{t('howItWorks.subtitle')}</p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            <div className="bg-card rounded-2xl border border-border p-6 hover:shadow-md transition-all duration-200 group">
-              <div className="w-10 h-10 rounded-xl flex items-center justify-center mb-4 bg-blue-50 text-blue-600">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className="lucide lucide-bot w-5 h-5"
-                >
-                  <path d="M12 8V4H8" />
-                  <rect width="16" height="12" x="4" y="8" rx="2" />
-                  <path d="M2 14h2" />
-                  <path d="M20 14h2" />
-                  <path d="M15 13v2" />
-                  <path d="M9 13v2" />
-                </svg>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {[
+              { icon: Globe, key: 'multilingue', iconBg: 'bg-blue-50', iconColor: 'text-blue-600', badgeClass: 'border-indigo-400/60 bg-indigo-500/15 text-indigo-700' },
+              { icon: ShieldCheck, key: 'bouclier', iconBg: 'bg-red-50', iconColor: 'text-red-500', badgeClass: 'border-indigo-400/60 bg-indigo-500/15 text-indigo-700' },
+              { icon: MessageSquareWarning, key: 'whatsapp', iconBg: 'bg-amber-50', iconColor: 'text-amber-600', badgeClass: 'border-indigo-400/60 bg-indigo-500/15 text-indigo-700' },
+              { icon: Zap, key: 'capture', iconBg: 'bg-purple-50', iconColor: 'text-purple-600', badgeClass: 'border-emerald-400/60 bg-emerald-500/15 text-emerald-700' },
+              { icon: Star, key: 'boostSeo', iconBg: 'bg-amber-50', iconColor: 'text-amber-600', badgeClass: 'border-emerald-400/60 bg-emerald-500/15 text-emerald-700' },
+              { icon: BarChart2, key: 'reporting', iconBg: 'bg-green-50', iconColor: 'text-green-600', badgeClass: 'border-slate-300 bg-slate-100 text-slate-700' },
+            ].map(({ icon: Icon, key, iconBg, iconColor, badgeClass }) => (
+              <div key={key} className="relative bg-card rounded-2xl border border-border p-6 hover:shadow-md transition-all duration-200 group">
+                <div className={`w-10 h-10 rounded-xl flex items-center justify-center mb-4 ${iconBg} ${iconColor}`}>
+                  <Icon className="w-5 h-5" aria-hidden="true" />
+                </div>
+                <span className={`inline-flex items-center rounded-full border px-2 py-0.5 text-[10px] font-semibold tracking-wide mb-3 ${badgeClass}`}>
+                  {t(`howItWorks.cards.${key}.badge`)}
+                </span>
+                <h3 className="font-display font-bold text-base text-foreground mb-2">
+                  {t(`howItWorks.cards.${key}.title`)}
+                </h3>
+                <p className="text-sm text-muted-foreground leading-relaxed">
+                  {t(`howItWorks.cards.${key}.desc`)}
+                </p>
               </div>
-              <h3 className="font-display font-bold text-base text-foreground mb-2">
-                {t('howItWorks.aiReplies.title')}
-              </h3>
-              <p className="text-sm text-muted-foreground leading-relaxed">
-                {t('howItWorks.aiReplies.desc')}
-              </p>
-            </div>
-
-            <div className="bg-card rounded-2xl border border-border p-6 hover:shadow-md transition-all duration-200 group">
-              <div className="w-10 h-10 rounded-xl flex items-center justify-center mb-4 bg-indigo-50 text-indigo-600">
-                <BarChart2 className="w-5 h-5" aria-hidden="true" />
-              </div>
-              <h3 className="font-display font-bold text-base text-foreground mb-2">
-                {t('howItWorks.weeklyAnalysis.title')}
-              </h3>
-              <p className="text-sm text-muted-foreground leading-relaxed">
-                {t('howItWorks.weeklyAnalysis.desc')}
-              </p>
-            </div>
-
-            <div className="bg-card rounded-2xl border border-border p-6 hover:shadow-md transition-all duration-200 group">
-              <div className="w-10 h-10 rounded-xl flex items-center justify-center mb-4 bg-amber-50 text-amber-600">
-                <Bell className="w-5 h-5" aria-hidden="true" />
-              </div>
-              <h3 className="font-display font-bold text-base text-foreground mb-2">
-                {t('howItWorks.badReviewAlerts.title')}
-              </h3>
-              <p className="text-sm text-muted-foreground leading-relaxed">
-                {t('howItWorks.badReviewAlerts.desc')}
-              </p>
-            </div>
-
-            <div className="bg-card rounded-2xl border border-border p-6 hover:shadow-md transition-all duration-200 group">
-              <div className="w-10 h-10 rounded-xl flex items-center justify-center mb-4 bg-green-50 text-green-600">
-                <TrendingUp className="w-5 h-5" aria-hidden="true" />
-              </div>
-              <h3 className="font-display font-bold text-base text-foreground mb-2">
-                {t('howItWorks.reporting.title')}
-              </h3>
-              <p className="text-sm text-muted-foreground leading-relaxed">
-                {t('howItWorks.reporting.desc')}
-              </p>
-            </div>
-
-            <div className="bg-card rounded-2xl border border-border p-6 hover:shadow-md transition-all duration-200 group">
-              <div className="w-10 h-10 rounded-xl flex items-center justify-center mb-4 bg-purple-50 text-purple-600">
-                <BarChart2 className="w-5 h-5" aria-hidden="true" />
-              </div>
-              <h3 className="font-display font-bold text-base text-foreground mb-2">
-                {t('howItWorks.reviewCapture.title')}
-              </h3>
-              <p className="text-sm text-muted-foreground leading-relaxed">
-                {t('howItWorks.reviewCapture.desc')}
-              </p>
-            </div>
-
-            <div className="bg-card rounded-2xl border border-border p-6 hover:shadow-md transition-all duration-200 group">
-              <div className="w-10 h-10 rounded-xl flex items-center justify-center mb-4 bg-blue-100 text-indigo-600">
-                <MessageSquare className="w-5 h-5" aria-hidden="true" />
-              </div>
-              <h3 className="font-display font-bold text-base text-foreground mb-2">
-                {t('howItWorks.aiChat.title')}
-              </h3>
-              <p className="text-sm text-muted-foreground leading-relaxed">
-                {t('howItWorks.aiChat.desc')}
-              </p>
-            </div>
-
-            <div className="bg-card rounded-2xl border border-border p-6 hover:shadow-md transition-all duration-200 group">
-              <div className="w-10 h-10 rounded-xl flex items-center justify-center mb-4 bg-teal-50 text-teal-600">
-                <MessageCircle className="w-5 h-5" aria-hidden="true" />
-              </div>
-              <h3 className="font-display font-bold text-base text-foreground mb-2">
-                {t('howItWorks.posIntegration.title')}
-              </h3>
-              <p className="text-sm text-muted-foreground leading-relaxed">
-                {t('howItWorks.posIntegration.desc')}
-              </p>
-            </div>
-
-            <div className="relative bg-card rounded-2xl border border-border p-6 hover:shadow-md transition-all duration-200 group">
-              <div className="w-10 h-10 rounded-xl flex items-center justify-center mb-4 bg-red-50 text-red-500">
-                <ShieldCheck className="w-5 h-5" aria-hidden="true" />
-              </div>
-              <h3 className="font-display font-bold text-base text-foreground mb-2">
-                Bouclier Anti-Abus IA
-              </h3>
-              <p className="text-sm text-muted-foreground leading-relaxed">
-                <span className="font-semibold">Nettoyage Automatique :</span> Détection des insultes, spams et faux avis.
-                L&apos;IA génère et envoie directement une requête de suppression officielle à Google selon leurs règles
-                communautaires.
-              </p>
-              <p className="mt-2 text-xs font-semibold text-emerald-600">
-                Exclusif au plan DOMINATOR.
-              </p>
-              <span className="absolute top-4 right-4 inline-flex items-center rounded-full border border-emerald-400/60 bg-emerald-500/15 px-2 py-0.5 text-[10px] font-semibold tracking-wide text-emerald-300">
-                PROTECTION ACTIVE
-              </span>
-            </div>
+            ))}
           </div>
         </div>
       </section>
@@ -703,7 +665,6 @@ export default function HomePage() {
                 <span className="text-4xl font-display font-bold text-foreground">
                   {formatPrice(locale, t('pricing.vision.price'))}
                 </span>
-                <span className="text-sm text-muted-foreground">{t('perMonth')}</span>
               </div>
               <ul className="space-y-2.5 mb-6 flex-1">
                 <li className="flex items-center gap-2.5 text-sm">
@@ -755,7 +716,6 @@ export default function HomePage() {
                 <span className="text-4xl font-display font-bold text-white">
                   {formatPrice(locale, t('pricing.pulse.price'))}
                 </span>
-                <span className="text-sm text-white/70">{t('perMonth')}</span>
                 </div>
               <ul className="space-y-2.5 mb-6 flex-1">
                 <li className="flex items-center gap-2.5 text-sm">
@@ -812,7 +772,6 @@ export default function HomePage() {
                 <span className="text-4xl font-display font-bold text-foreground">
                   {formatPrice(locale, t('pricing.zenith.price'))}
                 </span>
-                <span className="text-sm text-muted-foreground">{t('perMonth')}</span>
               </div>
               <ul className="space-y-2.5 mb-6 flex-1">
                 <li className="flex items-center gap-2.5 text-sm">

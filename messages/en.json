@@ -1,21 +1,21 @@
 {
   "Pricing": {
-    "starter_title": "STARTER",
-    "starter_price": "$59",
-    "manager_title": "MANAGER",
-    "manager_price": "$97",
-    "dominator_title": "DOMINATOR",
-    "dominator_price": "$157"
+    "vision_title": "VISION",
+    "vision_price": "$59",
+    "pulse_title": "PULSE",
+    "pulse_price": "$97",
+    "zenith_title": "ZENITH",
+    "zenith_price": "$157"
   },
   "Features": {
-    "starter_replies": "Unlimited replies (Local language only)",
-    "starter_pdf": "Monthly PDF reporting",
-    "manager_replies": "Unlimited replies (All languages / Native)",
-    "manager_whatsapp": "BAD review alerts on WhatsApp",
-    "manager_reporting": "PDF reporting + Weekly WhatsApp Recap",
-    "dominator_capture": "AI Capture (WhatsApp review 30 min after payment)",
-    "dominator_pos": "OAuth POS Connector (Square, SumUp)",
-    "dominator_shield": "THE SHIELD (Negative review filter, redirect to owner)",
+    "vision_replies": "Unlimited replies (Local language only)",
+    "vision_pdf": "Monthly PDF reporting",
+    "pulse_replies": "Unlimited replies (All languages / Native)",
+    "pulse_whatsapp": "BAD review alerts on WhatsApp",
+    "pulse_reporting": "PDF reporting + Weekly WhatsApp Recap",
+    "zenith_capture": "AI Capture (WhatsApp review 30 min after payment)",
+    "zenith_pos": "OAuth POS Connector (Square, SumUp)",
+    "zenith_shield": "THE SHIELD (Negative review filter, redirect to owner)",
     "vision_replies": "Unlimited AI replies (Local language)",
     "pulse_whatsapp": "Real-time WhatsApp alerts",
     "pulse_languages": "All languages",
@@ -45,6 +45,14 @@
       "ctaSecondary": "See How It Works",
       "trialInfo": "No credit card required · 14-day free trial · Cancel anytime"
     },
+    "scan": {
+      "title": "See what you're losing",
+      "placeholder": "Your business name (e.g. Restaurant Le Bistro)",
+      "ctaScan": "Analyze my reputation",
+      "loading": "AI analysis in progress",
+      "alert": "ALERT: You are losing approximately {count} customers/month",
+      "ctaSignup": "Stop the bleeding — 14-day free trial"
+    },
     "demo": {
       "title": "Demo: AI in Action",
       "subtitle": "See how REPUTEXA automatically responds to a negative review for {business}",
@@ -52,7 +60,7 @@
       "readyToPublish": "Ready to publish",
       "verified": "Double AI verification passed",
       "publishNow": "Publish now",
-      "whatsappAlert": "Dominator Alert: New critical review intercepted!",
+      "whatsappAlert": "ZENITH Alert: New critical review intercepted!",
       "statsScore": "Reputation score",
       "statsReviews": "Reviews processed",
       "statsTime": "Time saved",
@@ -136,7 +144,7 @@
       "controlScore": "Score 3.2 → 4.8",
       "controlShield": "Anti-Review Shield Active",
       "controlTime": "saved this week",
-      "cta": "Activate my Dominator plan — $157/month"
+      "cta": "Activate my ZENITH plan — $157/month"
     },
     "preuve": {
       "trustLine": "Already +200 companies trust REPUTEXA to automate their e-reputation.",
@@ -152,14 +160,14 @@
     "howItWorks": {
       "headline": "All you need for your reputation",
       "subtitle": "Powerful tools, simple interface.",
-      "aiReplies": { "title": "Automated Review Responses", "desc": "Intelligent AI Autopilot: Unlimited, lightning-fast responses to all your online reviews, tailored to each interaction." },
-      "badReviewAlerts": { "title": "Real-time Bad Review Alerts", "desc": "Instant Crisis Control: Direct WhatsApp alerts for potential negative feedback, allowing immediate intervention." },
-      "reporting": { "title": "Performance Reporting", "desc": "Insights on Demand: Monthly PDF reports and weekly WhatsApp recaps, keeping you informed without overwhelming you." },
-      "reviewCapture": { "title": "AI Review Capture", "desc": "Proactive Feedback Generation: Our AI gently nudges satisfied customers via WhatsApp 30 mins post-visit to leave positive reviews." },
-      "posIntegration": { "title": "POS Integration", "desc": "Seamless Connectivity: Integrates with Square, SumUp, and more via OAuth for intelligent customer outreach." },
-      "negativeFilter": { "title": "Negative Review Filter", "desc": "The Ultimate Protector: Redirects unhappy customers to private resolution before they ever hit Google—preventing public 1-star ratings." },
-      "weeklyAnalysis": { "title": "Weekly & Monthly Analysis", "desc": "Trends, recurring issues, successes — everything synthesized for you." },
-      "aiChat": { "title": "Integrated AI Chat", "desc": "Ask your questions, get personalized advice instantly." }
+      "cards": {
+        "multilingue": { "title": "Local Response, Global Reach", "desc": "AI detects and responds in your customers' language (English, Spanish, Italian, etc.) with a native tone. Vision focuses on your local language.", "badge": "Included PULSE • ZENITH" },
+        "bouclier": { "title": "24/7 Brand Protection", "desc": "Automatic detection of insults and fake reviews. AI generates and sends an official removal request to Google instantly to protect your e-reputation.", "badge": "Included PULSE • ZENITH" },
+        "whatsapp": { "title": "Commando Reactivity", "desc": "Never miss an emergency. Get an instant WhatsApp notification only for bad reviews, so you can put out the fire before it spreads.", "badge": "Included PULSE • ZENITH" },
+        "capture": { "title": "5-Star Generator", "desc": "Our AI contacts your customers via WhatsApp 30 min after their visit to collect their review. Don't leave your rating to chance: drive your success.", "badge": "Exclusive ZENITH" },
+        "boostSeo": { "title": "Local SEO Domination", "desc": "AI intelligently injects your strategic keywords into every response to push Google to rank you on page 1. Be the first choice in your city.", "badge": "Exclusive ZENITH" },
+        "reporting": { "title": "Strategic Oversight", "desc": "Receive detailed monthly reports with progress charts and sentiment analysis. Make data-driven decisions to grow your business.", "badge": "Included VISION • PULSE • ZENITH" }
+      }
     },
     "pricingTrial": "14-day free trial - No credit card required",
     "pricing": {
@@ -183,7 +191,7 @@
         "cta": "Try for Free"
       },
       "zenith": {
-        "name": "Zenith",
+        "name": "ZENITH",
         "badge": "ULTIMATE",
         "for": "The fortress of your reputation",
         "price": "179",
@@ -235,18 +243,18 @@
       "headline": "What Restaurant Owners Say About Their New Director.",
       "subtitle": "Join hundreds of restaurant owners who sleep better at night.",
       "items": {
-        "1": { "quote": "The Negative Review Filter alone has saved us. We used to get 2-3 one-star reviews a month. Now? Zero public disasters. Worth every euro.", "name": "Sophie M.", "role": "Owner, Le Bistro Parisien" },
-        "2": { "quote": "It's like having a reputation manager who never sleeps. Our Google rating went from 3.9 to 4.6 in 4 months.", "name": "Marco D.", "role": "Chef-Owner, Trattoria Milano" },
-        "3": { "quote": "Peace of mind. Knowing that unhappy customers get a private channel before they hit Google? Game-changer.", "name": "Isabelle R.", "role": "Director, Hôtel Les Pins" }
+        "1": { "quote": "The smart filter alone has saved us. We used to get 2-3 unfair reviews a month that dragged us down. Now? Zero public disasters. Worth every euro for peace of mind.", "name": "Sophie M.", "role": "Owner, Le Bistro Parisien" },
+        "2": { "quote": "It's like having a 24/7 reputation director. I get WhatsApp alerts for emergencies, and the AI handles the rest. Our rating went from 3.9 to 4.8 in 4 months. Essential.", "name": "Marco D.", "role": "Chef-Owner, Trattoria Milano" },
+        "3": { "quote": "Peace of mind, that's what I pay for. The ZENITH plan is the best investment we've made: our customers are automatically followed up and our Google visibility has exploded.", "name": "Isabelle R.", "role": "Director, Hôtel Les Pins" }
       }
     },
     "faq": {
       "headline": "Frequently asked questions",
       "items": {
-        "autoRepondre": { "q": "Isn't it just an auto-responder?", "a": "Absolutely not. Most tools simply reply to reviews. REPUTEXA goes much further: our AI detects trends, identifies risks, prioritizes actions, and helps you improve your business concretely." },
-        "natural": { "q": "Are the responses really natural?", "a": "Yes. Our AI follows strict rules: never generic phrases, systematic reference to the specific content of the review, tone adapted to your establishment. The result is indistinguishable from a human response." },
-        "publishing": { "q": "How does automatic publishing work?", "a": "Positive reviews (3-5 stars) are automatically published on Google. Negative reviews (1-2 stars) go through double AI verification before publication. You keep full control." },
-        "cancel": { "q": "Can I cancel anytime?", "a": "Yes, with no commitment. You can cancel your subscription at any time from your dashboard." }
+        "googleMaps": { "q": "Can the AI really help me rank higher on Google Maps?", "a": "Yes. Google favors businesses that respond quickly and use relevant keywords. Our ZENITH plan strategically injects these keywords into your responses to signal to the algorithm that you're the best local choice." },
+        "iaDetectable": { "q": "Will my customers notice it's AI?", "a": "Absolutely not. Our models are trained on thousands of real responses from restaurant and business owners. The tone is warm, professional and indistinguishable from a human response. That's what we call passing the Turing test." },
+        "installTime": { "q": "How long does it take to set up?", "a": "Less than 2 minutes. You connect your Google Business account, and the AI starts analyzing your reviews immediately. No software to install, everything runs on your Reputexa dashboard." },
+        "gratuit14j": { "q": "Is it really free for 14 days? No credit card?", "a": "Yes. We're so confident in the impact on your revenue that we offer full access without asking for your bank details. If you're not impressed by the results, you don't have to do anything." }
       }
     },
     "contact": {

@@ -10,7 +10,7 @@ const TRIAL_DAYS = 14;
 const PLAN_DISPLAY: Record<string, string> = {
   vision: 'Vision',
   pulse: 'Pulse',
-  zenith: 'Zenith',
+  zenith: 'ZENITH',
 };
 
 /**

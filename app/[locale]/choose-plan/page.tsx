@@ -48,7 +48,6 @@ export default function ChoosePlanPage() {
               <p className="text-xs text-slate-500 mt-0.5">{t('pricing.vision.for')}</p>
               <p className="mt-4 text-2xl font-bold text-slate-900">
                 {formatPrice(locale, t('pricing.vision.price'))}
-                <span className="text-sm font-normal text-slate-500">{t('perMonth')}</span>
               </p>
               <ul className="mt-4 space-y-2 flex-1">
                 <li className="flex items-center gap-2 text-sm text-slate-600">
@@ -84,7 +83,6 @@ export default function ChoosePlanPage() {
               <p className="text-xs text-slate-500 mt-0.5">{t('pricing.pulse.for')}</p>
               <p className="mt-4 text-2xl font-bold text-slate-900">
                 {formatPrice(locale, t('pricing.pulse.price'))}
-                <span className="text-sm font-normal text-slate-500">{t('perMonth')}</span>
               </p>
               <ul className="mt-4 space-y-2 flex-1">
                 <li className="flex items-center gap-2 text-sm text-slate-600">
@@ -128,7 +126,6 @@ export default function ChoosePlanPage() {
               <p className="text-xs text-slate-500 mt-0.5">{t('pricing.zenith.for')}</p>
               <p className="mt-4 text-2xl font-bold text-slate-900">
                 {formatPrice(locale, t('pricing.zenith.price'))}
-                <span className="text-sm font-normal text-slate-500">{t('perMonth')}</span>
               </p>
               <ul className="mt-4 space-y-2 flex-1">
                 <li className="flex items-center gap-2 text-sm text-slate-600">

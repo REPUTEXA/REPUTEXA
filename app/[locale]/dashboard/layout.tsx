@@ -4,6 +4,7 @@ import { redirect } from 'next/navigation';
 import { setRequestLocale } from 'next-intl/server';
 import { createClient } from '@/lib/supabase/server';
 import { toPlanSlug } from '@/lib/feature-gate';
+import { getRemainingTrialDays, formatTrialEndDate } from '@/lib/trial-utils';
 import { DashboardShell } from '@/components/dashboard/dashboard-shell';
 import { StripeSyncOnReturn } from '@/components/dashboard/stripe-sync-on-return';
 
@@ -24,7 +25,10 @@ export default async function DashboardLayout({ children, params }: Props) {
   const PLAN_DISPLAY: Record<string, string> = {
     starter: 'Vision',
     manager: 'Pulse',
-    Dominator: 'Zenith',
+    Dominator: 'ZENITH',
+    vision: 'Vision',
+    pulse: 'Pulse',
+    zenith: 'ZENITH',
   };
 
   const supabase = await createClient();
@@ -75,9 +79,9 @@ export default async function DashboardLayout({ children, params }: Props) {
       } else if (trialEnd && !hasActiveSubscription && now >= trialEnd) {
         showPaywall = true;
       } else if (trialInFuture) {
-        trialDaysLeft = Math.max(0, Math.ceil((trialEnd!.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)));
-        trialEndDate = trialEnd!.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
-        showTrialBanner = true;
+        trialDaysLeft = getRemainingTrialDays(trialEnd);
+        trialEndDate = formatTrialEndDate(trialEnd, locale);
+        showTrialBanner = !hasActiveSubscription;
       }
     }
   }

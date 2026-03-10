@@ -39,6 +39,12 @@ export default function SettingsPage() {
   const [alertThresholdStars, setAlertThresholdStars] = useState(3);
   const [seoKeywords, setSeoKeywords] = useState<string[]>([]);
   const [selectedPlan, setSelectedPlan] = useState<'vision' | 'pulse' | 'zenith'>('vision');
+  const [aiTone, setAiTone] = useState<'professional' | 'warm' | 'casual' | 'luxury' | 'humorous'>('professional');
+  const [aiLength, setAiLength] = useState<'concise' | 'balanced' | 'detailed'>('balanced');
+  const [aiSignature, setAiSignature] = useState('');
+  const [aiUseTutoiement, setAiUseTutoiement] = useState(false);
+  const [aiSafeMode, setAiSafeMode] = useState(true);
+  const [aiInstructions, setAiInstructions] = useState('');
   const [loadingProfile, setLoadingProfile] = useState(true);
   const [savingProfile, setSavingProfile] = useState(false);
   const [savingAccount, setSavingAccount] = useState(false);
@@ -69,6 +75,12 @@ export default function SettingsPage() {
         if (data.alertThresholdStars !== undefined) setAlertThresholdStars(data.alertThresholdStars ?? 3);
         if (Array.isArray(data.seoKeywords)) setSeoKeywords(data.seoKeywords);
         if (data.selectedPlan) setSelectedPlan(data.selectedPlan);
+        if (data.aiTone) setAiTone(data.aiTone);
+        if (data.aiLength) setAiLength(data.aiLength);
+        if (typeof data.aiSignature === 'string') setAiSignature(data.aiSignature);
+        if (typeof data.aiUseTutoiement === 'boolean') setAiUseTutoiement(data.aiUseTutoiement);
+        if (typeof data.aiSafeMode === 'boolean') setAiSafeMode(data.aiSafeMode);
+        if (typeof data.aiInstructions === 'string') setAiInstructions(data.aiInstructions);
       })
       .catch((err) => toast.error(err instanceof Error ? err.message : 'Impossible de charger le profil'))
       .finally(() => setLoadingProfile(false));
@@ -258,6 +270,27 @@ export default function SettingsPage() {
 
   if (loadingProfile) return <SettingsSkeleton />;
 
+  const previewExample =
+    aiTone === 'warm'
+      ? `Merci beaucoup pour votre avis et d'avoir pris le temps de partager votre ressenti. Même si tout n'a pas été parfait cette fois-ci, votre retour nous aide vraiment à nous améliorer.${
+          aiSignature ? `\n\n${aiSignature}` : ''
+        }`
+      : aiTone === 'casual'
+        ? `Merci pour ton message, on est vraiment désolés que l'expérience n'ait pas été au niveau. On va regarder ça de près pour que ta prochaine visite soit au top.${
+            aiSignature ? `\n\n${aiSignature}` : ''
+          }`
+        : aiTone === 'luxury'
+          ? `Nous vous remercions sincèrement pour votre retour et sommes navrés que votre expérience n’ait pas été à la hauteur de nos standards. Votre commentaire a été partagé avec l’équipe afin de corriger ces points sans délai.${
+              aiSignature ? `\n\n${aiSignature}` : ''
+            }`
+          : aiTone === 'humorous'
+            ? `Ouch, ce service n’était clairement pas digne de notre meilleure soirée ! Merci de nous l’avoir signalé, on va corriger le tir pour que votre prochaine visite soit une vraie réussite.${
+                aiSignature ? `\n\n${aiSignature}` : ''
+              }`
+            : `Merci d’avoir pris le temps de partager votre avis. Nous sommes désolés que votre expérience n’ait pas été pleinement satisfaisante et nous allons analyser votre retour pour nous améliorer.${
+                aiSignature ? `\n\n${aiSignature}` : ''
+              }`;
+
   return (
     <div className="px-4 sm:px-6 py-6 space-y-8">
       <header>
@@ -401,6 +434,213 @@ export default function SettingsPage() {
         <p className="text-xs text-slate-500 mt-4">
           Vos données sont sécurisées. Nous ne publions rien sans votre accord.
         </p>
+      </section>
+
+      {/* Personnalisation IA de réponse aux avis */}
+      <section className="rounded-2xl border border-slate-200 bg-white shadow-sm p-6">
+        <div className="flex flex-col lg:flex-row gap-6">
+          <form
+            onSubmit={async (e) => {
+              e.preventDefault();
+              try {
+                const res = await fetch('/api/profile', {
+                  method: 'PATCH',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({
+                    aiTone,
+                    aiLength,
+                    aiSignature: aiSignature.trim(),
+                    aiUseTutoiement,
+                    aiSafeMode,
+                    aiInstructions: aiInstructions.trim(),
+                  }),
+                });
+                const data = await res.json().catch(() => ({}));
+                if (!res.ok) {
+                  toast.error(data?.error ?? 'Erreur lors de la sauvegarde des préférences IA');
+                  return;
+                }
+                toast.success('Préférences IA enregistrées ✅');
+              } catch (err) {
+                toast.error(err instanceof Error ? err.message : 'Erreur réseau');
+              }
+            }}
+            className="flex-1 space-y-4"
+          >
+            <h2 className="font-display font-semibold text-lg text-slate-900 mb-1">
+              ADN de vos réponses IA
+            </h2>
+            <p className="text-sm text-slate-500 mb-3">
+              Définissez le style de vos réponses pour que l&apos;IA parle comme votre établissement.
+            </p>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1.5">
+                  Ton
+                </label>
+                <select
+                  value={aiTone}
+                  onChange={(e) => setAiTone(e.target.value as typeof aiTone)}
+                  className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500"
+                >
+                  <option value="professional">Professionnel</option>
+                  <option value="warm">Chaleureux</option>
+                  <option value="casual">Décontracté</option>
+                  <option value="luxury">Luxueux</option>
+                  <option value="humorous">Humoristique</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1.5">
+                  Longueur des réponses
+                </label>
+                <select
+                  value={aiLength}
+                  onChange={(e) => setAiLength(e.target.value as typeof aiLength)}
+                  className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500"
+                >
+                  <option value="concise">Concis</option>
+                  <option value="balanced">Équilibré</option>
+                  <option value="detailed">Détaillé</option>
+                </select>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1.5">
+                  Signature automatique
+                </label>
+                <input
+                  type="text"
+                  value={aiSignature}
+                  onChange={(e) => setAiSignature(e.target.value)}
+                  placeholder="À bientôt, l'équipe de REPUTEXA"
+                  className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500"
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="block text-sm font-medium text-slate-700 mb-1.5">
+                  Tutoiement / Vouvoiement
+                </label>
+                <button
+                  type="button"
+                  onClick={() => setAiUseTutoiement((v) => !v)}
+                  className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium border transition-all duration-200 ${
+                    aiUseTutoiement
+                      ? 'bg-emerald-50 border-emerald-200 text-emerald-700'
+                      : 'bg-slate-50 border-slate-200 text-slate-600'
+                  }`}
+                >
+                  <span
+                    className={`h-4 w-8 flex items-center rounded-full transition-colors ${
+                      aiUseTutoiement ? 'bg-emerald-500/80' : 'bg-slate-300'
+                    }`}
+                  >
+                    <span
+                      className={`h-3 w-3 rounded-full bg-white shadow-sm transform transition-transform ${
+                        aiUseTutoiement ? 'translate-x-4' : 'translate-x-1'
+                      }`}
+                    />
+                  </span>
+                  {aiUseTutoiement ? 'Tutoiement (tu)' : 'Vouvoiement (vous)'}
+                </button>
+                <p className="text-xs text-slate-500">
+                  L&apos;IA adaptera les réponses en conséquence.
+                </p>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-slate-700 mb-1.5">
+                Instructions spécifiques
+              </label>
+              <textarea
+                rows={4}
+                value={aiInstructions}
+                onChange={(e) => setAiInstructions(e.target.value)}
+                placeholder={
+                  "Ex : Ne jamais s'excuser pour les délais le samedi soir.\nToujours inviter à revenir goûter le nouveau dessert."
+                }
+                className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500"
+              />
+              <p className="text-xs text-slate-500">
+                Ces instructions seront ajoutées au prompt système envoyé à l&apos;IA.
+              </p>
+            </div>
+
+            <div className="flex items-center justify-between gap-3 rounded-xl border border-amber-100 bg-amber-50 px-4 py-3 mt-2">
+              <div className="flex-1">
+                <p className="text-sm font-medium text-amber-900">
+                  Mode sécurité pour les avis négatifs
+                </p>
+                <p className="text-xs text-amber-700 mt-0.5">
+                  Si activé, les réponses suggérées pour les avis &lt; 3★ resteront en brouillon
+                  pour validation manuelle.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setAiSafeMode((v) => !v)}
+                className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium border transition-all duration-200 ${
+                  aiSafeMode
+                    ? 'bg-emerald-50 border-emerald-200 text-emerald-700'
+                    : 'bg-slate-50 border-slate-200 text-slate-600'
+                }`}
+              >
+                <span
+                  className={`h-4 w-8 flex items-center rounded-full transition-colors ${
+                    aiSafeMode ? 'bg-emerald-500/80' : 'bg-slate-300'
+                  }`}
+                >
+                  <span
+                    className={`h-3 w-3 rounded-full bg-white shadow-sm transform transition-transform ${
+                      aiSafeMode ? 'translate-x-4' : 'translate-x-1'
+                    }`}
+                  />
+                </span>
+                {aiSafeMode ? 'Safe-mode ON' : 'Safe-mode OFF'}
+              </button>
+            </div>
+
+            <button
+              type="submit"
+              className="mt-4 inline-flex items-center justify-center gap-2 py-3 px-6 rounded-xl font-semibold text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-300"
+            >
+              Enregistrer les préférences IA
+            </button>
+          </form>
+
+          {/* Aperçu en direct */}
+          <div className="flex-1 rounded-2xl border border-slate-200 bg-slate-50 p-5 space-y-3">
+            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">
+              Aperçu en direct
+            </p>
+            <div className="rounded-xl border border-slate-200 bg-white px-4 py-3 text-xs text-slate-600">
+              <p className="font-semibold text-slate-800 mb-1">
+                Exemple d&apos;avis négatif
+              </p>
+              <p>
+                &quot;Service très lent et plat arrivé tiède. Je suis déçu de mon dîner hier
+                soir.&quot;
+              </p>
+            </div>
+            <div className="rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 shadow-sm">
+              <p className="text-xs font-semibold text-slate-500 mb-1">
+                Réponse IA (aperçu)
+              </p>
+              <p className="whitespace-pre-line">
+                {previewExample}
+              </p>
+            </div>
+            <p className="text-xs text-slate-500">
+              L&apos;IA utilisera ce ton, cette longueur et ces instructions comme base pour toutes
+              les réponses générées.
+            </p>
+          </div>
+        </div>
       </section>
 
       {/* SEO & Visibilité (Zenith) */}

@@ -8,7 +8,7 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-const SYSTEM_PROMPT_BASE = `Tu es un expert en e-réputation. Génère exactement 3 variantes de réponses professionnelles et chaleureuses pour l'avis client.
+const SYSTEM_PROMPT_BASE = `Tu es un expert en e-réputation. Génère exactement 3 variantes de réponses pour l'avis client, en respectant strictement les préférences de style et de ton fournies.
 Réponds UNIQUEMENT en JSON valide : {"options": ["Réponse A", "Réponse B", "Réponse C"], "detectedLanguage": "fr"}
 Détecte la langue de l'avis et réponds dans la MÊME langue.`;
 
@@ -42,7 +42,13 @@ export async function POST(
 
     const [reviewRes, profileRes] = await Promise.all([
       supabase.from('reviews').select('id, comment, rating, response_text').eq('id', id).eq('user_id', user.id).single(),
-      supabase.from('profiles').select('seo_keywords, subscription_plan, selected_plan, establishment_name').eq('id', user.id).single(),
+      supabase
+        .from('profiles')
+        .select(
+          'seo_keywords, subscription_plan, selected_plan, establishment_name, ai_tone, ai_length, ai_signature, ai_use_tutoiement, ai_safe_mode, ai_instructions'
+        )
+        .eq('id', user.id)
+        .single(),
     ]);
 
     const { data: review } = reviewRes;
@@ -63,7 +69,50 @@ export async function POST(
       ? profile.seo_keywords.filter((k): k is string => typeof k === 'string').slice(0, 10)
       : [];
     const useSeo = hasFeature(planSlug, FEATURES.SEO_BOOST) && seoKeywords.length > 0;
-    const systemPrompt = SYSTEM_PROMPT_BASE + (useSeo ? buildSeoInstruction(seoKeywords) : '');
+
+    const toneLabel = (() => {
+      switch (profile?.ai_tone) {
+        case 'warm':
+          return 'chaleureux';
+        case 'casual':
+          return 'décontracté';
+        case 'luxury':
+          return 'haut de gamme / luxueux';
+        case 'humorous':
+          return 'avec une touche légère et souriante, sans être déplacé';
+        default:
+          return 'professionnel et bienveillant';
+      }
+    })();
+
+    const lengthLabel = (() => {
+      switch (profile?.ai_length) {
+        case 'concise':
+          return 'très concises (2 à 3 phrases maximum)';
+        case 'detailed':
+          return 'plus détaillées (3 à 5 phrases)';
+        default:
+          return 'équilibrées (2 à 4 phrases)';
+      }
+    })();
+
+    const signature = (profile?.ai_signature ?? '').trim();
+    const extraInstructions = (profile?.ai_instructions ?? '').trim();
+    const useTutoiement = profile?.ai_use_tutoiement ?? false;
+
+    const styleInstruction = `
+PRÉFÉRENCES DE STYLE À RESPECTER :
+- Ton: ${toneLabel}.
+- Longueur des réponses: ${lengthLabel}.
+- Registre: ${useTutoiement ? 'utilise le tutoiement (tu) partout' : 'utilise le vouvoiement (vous) partout'}.
+${signature ? `- Ajoute systématiquement cette signature à la fin : "${signature}".` : ''}
+${extraInstructions ? `- Consigne(s) spécifique(s) du restaurateur : ${extraInstructions}` : ''}`.trim();
+
+    const systemPrompt =
+      SYSTEM_PROMPT_BASE +
+      '\n\n' +
+      styleInstruction +
+      (useSeo ? buildSeoInstruction(seoKeywords) : '');
 
     const completion = await openai.chat.completions.create({
       model: 'gpt-4o-mini',

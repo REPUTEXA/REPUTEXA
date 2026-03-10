@@ -21,10 +21,12 @@ type Props = {
 };
 
 type FilterType = 'all' | 'unanswered' | 'negative';
+type PlatformFilter = 'all' | 'google' | 'tripadvisor' | 'yelp' | 'other';
 
 export function DashboardReviewsSection({ reviews, useSupabaseAuth, initialSearch = '' }: Props) {
   const [filter, setFilter] = useState<FilterType>('all');
   const [search, setSearch] = useState(initialSearch);
+  const [platform, setPlatform] = useState<PlatformFilter>('all');
   useEffect(() => { setSearch(initialSearch); }, [initialSearch]);
   const [modalReviewId, setModalReviewId] = useState<string | null>(null);
   const [respondedIds, setRespondedIds] = useState<Set<string>>(new Set());
@@ -38,6 +40,16 @@ export function DashboardReviewsSection({ reviews, useSupabaseAuth, initialSearc
     } else if (filter === 'negative') {
       list = list.filter((r) => r.rating < 3);
     }
+    if (platform !== 'all') {
+      const p = platform;
+      list = list.filter((r) => {
+        const src = r.source.toLowerCase();
+        if (p === 'google') return src.includes('google');
+        if (p === 'tripadvisor') return src.includes('trip') || src.includes('advisor');
+        if (p === 'yelp') return src.includes('yelp');
+        return !src || src === 'autre' || src === 'other';
+      });
+    }
     if (search.trim()) {
       const q = search.trim().toLowerCase();
       list = list.filter(
@@ -47,7 +59,7 @@ export function DashboardReviewsSection({ reviews, useSupabaseAuth, initialSearc
       );
     }
     return list;
-  }, [reviews, filter, search, respondedIds]);
+  }, [reviews, filter, search, platform, respondedIds]);
 
   const handleResponded = (id: string) => {
     setRespondedIds((prev) => new Set(prev).add(id));
@@ -79,28 +91,41 @@ export function DashboardReviewsSection({ reviews, useSupabaseAuth, initialSearc
     <section className="space-y-4">
       <div className="flex items-center justify-between gap-2 flex-wrap">
         <h2 className="font-display font-bold text-lg text-slate-900">Derniers avis</h2>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap justify-end">
           <input
             type="search"
-            placeholder="Rechercher par nom ou mot-clé..."
+            placeholder="Rechercher par nom"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="text-xs px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-slate-900 placeholder:text-slate-400 max-w-[180px]"
           />
-          {(['all', 'unanswered', 'negative'] as const).map((f) => (
-            <button
-              key={f}
-              type="button"
-              onClick={() => setFilter(f)}
-              className={`text-xs font-medium px-3 py-1.5 rounded-lg border transition-colors ${
-                filter === f
-                  ? 'border-sky-500 bg-sky-500 text-white'
-                  : 'border-slate-200 text-slate-600 hover:bg-slate-50'
-              }`}
-            >
-              {f === 'all' ? 'Tous' : f === 'unanswered' ? 'Non répondus' : 'Négatifs'}
-            </button>
-          ))}
+          <div className="flex items-center gap-1">
+            {(['all', 'unanswered', 'negative'] as const).map((f) => (
+              <button
+                key={f}
+                type="button"
+                onClick={() => setFilter(f)}
+                className={`text-xs font-medium px-3 py-1.5 rounded-lg border transition-colors ${
+                  filter === f
+                    ? 'border-sky-500 bg-sky-500 text-white'
+                    : 'border-slate-200 text-slate-600 hover:bg-slate-50'
+                }`}
+              >
+                {f === 'all' ? 'Tous' : f === 'unanswered' ? 'Non répondus' : 'Négatifs'}
+              </button>
+            ))}
+          </div>
+          <select
+            value={platform}
+            onChange={(e) => setPlatform(e.target.value as PlatformFilter)}
+            className="text-xs px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-slate-700"
+          >
+            <option value="all">Toutes plateformes</option>
+            <option value="google">Google</option>
+            <option value="tripadvisor">Tripadvisor</option>
+            <option value="yelp">Yelp</option>
+            <option value="other">Autres</option>
+          </select>
         </div>
       </div>
 

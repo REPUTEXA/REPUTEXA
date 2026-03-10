@@ -9,7 +9,7 @@ export async function GET() {
 
   const { data: profile, error } = await supabase
     .from('profiles')
-    .select('establishment_name, full_name, address, phone, website, whatsapp_phone, alert_threshold_stars, seo_keywords, subscription_plan, selected_plan, google_location_id, google_location_name, google_location_address')
+    .select('establishment_name, full_name, address, phone, website, whatsapp_phone, alert_threshold_stars, seo_keywords, subscription_plan, selected_plan, google_location_id, google_location_name, google_location_address, ai_tone, ai_length, ai_signature, ai_use_tutoiement, ai_safe_mode, ai_instructions')
     .eq('id', user.id)
     .single();
 
@@ -31,6 +31,12 @@ export async function GET() {
     googleLocationId: profile?.google_location_id ?? null,
     googleLocationName: profile?.google_location_name ?? null,
     googleLocationAddress: profile?.google_location_address ?? null,
+    aiTone: profile?.ai_tone ?? 'professional',
+    aiLength: profile?.ai_length ?? 'balanced',
+    aiSignature: profile?.ai_signature ?? '',
+    aiUseTutoiement: profile?.ai_use_tutoiement ?? false,
+    aiSafeMode: profile?.ai_safe_mode ?? true,
+    aiInstructions: profile?.ai_instructions ?? '',
   });
 }
 
@@ -40,9 +46,24 @@ export async function PATCH(request: Request) {
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   const body = await request.json().catch(() => ({}));
-  const { establishmentName, fullName, address, phone, website, whatsappPhone, alertThresholdStars, seoKeywords } = body;
+  const {
+    establishmentName,
+    fullName,
+    address,
+    phone,
+    website,
+    whatsappPhone,
+    alertThresholdStars,
+    seoKeywords,
+    aiTone,
+    aiLength,
+    aiSignature,
+    aiUseTutoiement,
+    aiSafeMode,
+    aiInstructions,
+  } = body;
 
-  const updates: Record<string, string | number | string[]> = {};
+  const updates: Record<string, string | number | string[] | boolean> = {};
   if (typeof establishmentName === 'string') updates.establishment_name = establishmentName.trim();
   if (typeof fullName === 'string') updates.full_name = fullName.trim();
   if (typeof address === 'string') updates.address = address.trim();
@@ -54,6 +75,24 @@ export async function PATCH(request: Request) {
   }
   if (Array.isArray(seoKeywords)) {
     updates.seo_keywords = seoKeywords.filter((k): k is string => typeof k === 'string' && k.trim().length > 0).map((k) => k.trim());
+  }
+  if (typeof aiTone === 'string') {
+    updates.ai_tone = aiTone;
+  }
+  if (typeof aiLength === 'string') {
+    updates.ai_length = aiLength;
+  }
+  if (typeof aiSignature === 'string') {
+    updates.ai_signature = aiSignature;
+  }
+  if (typeof aiUseTutoiement === 'boolean') {
+    updates.ai_use_tutoiement = aiUseTutoiement;
+  }
+  if (typeof aiSafeMode === 'boolean') {
+    updates.ai_safe_mode = aiSafeMode;
+  }
+  if (typeof aiInstructions === 'string') {
+    updates.ai_instructions = aiInstructions;
   }
 
   if (Object.keys(updates).length === 0) {

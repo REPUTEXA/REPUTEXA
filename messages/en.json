@@ -228,12 +228,70 @@
     "footer": { "rights": "© 2026 REPUTEXA. All rights reserved.", "privacy": "Privacy Policy", "terms": "Terms of Service" }
   },
   "Dashboard": {
-    "sidebar": { "overview": "Overview", "aiResponses": "AI Responses", "statistics": "Statistics", "establishments": "My Establishments", "prospects": "Prospects (Sniper)", "settings": "Settings", "upgrade": "Upgrade", "unlockCta": "Unlock unlimited responses" },
+    "sidebar": {
+      "overview": "Overview",
+      "aiResponses": "AI Responses",
+      "statistics": "Statistics",
+      "establishments": "My Establishments",
+      "prospects": "Prospects (Sniper)",
+      "alerts": "Alerts",
+      "suggestions": "Suggestions",
+      "settings": "Settings",
+      "upgrade": "Upgrade",
+      "unlockCta": "Unlock unlimited responses"
+    },
     "overview": { "title": "Overview", "stats": { "avgRating": "Average Rating", "reviewsProcessed": "Reviews Processed", "securityAlerts": "Security Alerts", "timeSaved": "Time Saved" }, "reviewsTitle": "Real-Time Review Feed", "reviewsEmpty": "No reviews yet. Simulate one below.", "simulateTitle": "Simulate Review", "chartTitle": "Rating Trend" },
     "prospects": { "title": "Prospects (Sniper)", "subtitle": "{{count}} prospect to contact", "subtitle_plural": "{{count}} prospects to contact", "empty": "No prospects. Run the Sniper script to find some.", "generatePitch": "Generate Pitch", "contact": "Contact", "copyPitch": "Copy pitch", "copied": "Copied!", "pitchTitle": "Custom pitch", "noPitch": "No pitch generated yet." },
     "establishments": { "title": "My Establishments", "description": "Connect your establishments to manage their reviews", "comingSoon": "Coming soon." },
     "settings": { "title": "Settings", "description": "Manage your account and preferences", "comingSoon": "Coming soon." },
     "form": { "review": "Review", "rating": "Rating", "establishment": "Establishment", "city": "City", "simulate": "Simulate", "placeholder": { "review": "Great restaurant!", "establishment": "Le Bistro", "city": "Paris" }, "error": "Error sending" }
+  },
+  "Suggestions": {
+    "page": {
+      "title": "Suggestions",
+      "intro": "Got an idea or improvement? Tell us what you’d like to see in the platform."
+    },
+    "form": {
+      "titleLabel": "Title",
+      "descriptionLabel": "Description",
+      "placeholderTitle": "E.g. Export reviews to CSV",
+      "placeholderDescription": "Describe your idea in detail...",
+      "submitLabel": "Send my suggestion",
+      "submitting": "Sending...",
+      "titleRequired": "Please enter a title.",
+      "submitSuccess": "Thank you! Your suggestion has been sent.",
+      "genericError": "Something went wrong. Please try again."
+    },
+    "list": {
+      "title": "My suggestions",
+      "loading": "Loading...",
+      "loadError": "Unable to load your suggestions.",
+      "status": {
+        "PENDING": "Received",
+        "IN_PROGRESS": "In progress",
+        "DONE": "Completed"
+      }
+    }
+  },
+  "Alerts": {
+    "whatsapp": {
+      "negativeReview": {
+        "title": "🚨 *NEW NEGATIVE REVIEW ALERT*",
+        "anonymousAuthor": "Customer",
+        "noComment": "(No comment)",
+        "noSuggestion": "(No suggestion available)",
+        "reviewLabel": "📝 *Customer review:*",
+        "aiSuggestionLabel": "🤖 *AI-suggested reply :*",
+        "cta": "Reply 'OK' to approve this reply or send a voice message to edit it.",
+        "poweredBy": "_Powered by Reputexa AI_"
+      },
+      "weeklyRecap": {
+        "title": "📊 Your Weekly Recap",
+        "line": "⭐ Average rating: {rating}/5 ({count} reviews)",
+        "noData": "Not enough reviews to generate a recap yet. Keep collecting customer feedback.",
+        "notConfigured": "Weekly recap generated but WhatsApp recipient is not configured."
+      }
+    }
   },
   "common": { "loading": "Loading...", "error": "An error occurred" }
 }

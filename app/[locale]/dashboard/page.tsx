@@ -3,9 +3,12 @@ import { getTranslations } from 'next-intl/server';
 import { prisma } from '@/lib/prisma';
 import { createClient } from '@/lib/supabase/server';
 import { Link } from '@/i18n/navigation';
-import { Info, Star as StarIconSmall, Building2 } from 'lucide-react';
+import { Info, Star as StarIconSmall, ThumbsUp, AlertTriangle } from 'lucide-react';
 import { SimulateReviewForm } from '@/components/dashboard/simulate-review-form';
 import { DashboardReviewsSection } from '@/components/dashboard/dashboard-reviews-section';
+import { StatsCard } from '@/components/dashboard/stats-card';
+import { OverviewChart } from '@/components/dashboard/overview-chart';
+import { PlatformDistributionChart } from '@/components/dashboard/platform-distribution-chart';
 
 type Props = {
   params: Promise<{ locale: string }>;
@@ -21,6 +24,7 @@ type ReviewDisplay = {
   comment: string;
   source: string;
   responseText?: string | null;
+  createdAt: string;
 };
 
 export default async function DashboardPage({ params, searchParams }: Props) {
@@ -49,17 +53,25 @@ export default async function DashboardPage({ params, searchParams }: Props) {
 
     const { data: supabaseReviews } = await supabase
       .from('reviews')
-      .select('id, reviewer_name, rating, comment, source, response_text')
+      .select('id, reviewer_name, rating, comment, source, response_text, created_at')
       .order('created_at', { ascending: false })
       .limit(30);
-    reviews = (supabaseReviews ?? []).map((r) => ({
-      id: r.id,
-      reviewerName: r.reviewer_name,
-      rating: r.rating,
-      comment: r.comment,
-      source: r.source,
-      responseText: r.response_text ?? null,
-    }));
+    reviews = (supabaseReviews ?? []).map((r) => {
+      const safeRating = typeof r.rating === 'number' && Number.isFinite(r.rating) ? r.rating : 0;
+      const created =
+        typeof r.created_at === 'string' && r.created_at
+          ? r.created_at
+          : new Date().toISOString();
+      return {
+        id: String(r.id),
+        reviewerName: String(r.reviewer_name ?? 'Client'),
+        rating: safeRating,
+        comment: String(r.comment ?? ''),
+        source: String(r.source ?? 'Unknown'),
+        responseText: r.response_text ?? null,
+        createdAt: created,
+      };
+    });
     responseCount = reviews.filter((r) => r.responseText).length;
     totalReviews = reviews.length;
     avgRating = reviews.length ? reviews.reduce((s, r) => s + r.rating, 0) / reviews.length : 0;
@@ -73,14 +85,22 @@ export default async function DashboardPage({ params, searchParams }: Props) {
       }),
       prisma.review.count({ where: { rating: { lt: 3 } } }),
     ]);
-    reviews = prismaReviews.map((r) => ({
-      id: r.id,
-      reviewerName: r.establishmentName,
-      rating: r.rating,
-      comment: r.reviewText,
-      source: 'Google',
-      responseText: r.responseText,
-    }));
+    reviews = prismaReviews.map((r) => {
+      const safeRating = typeof r.rating === 'number' && Number.isFinite(r.rating) ? r.rating : 0;
+      const created =
+        r.createdAt instanceof Date && !Number.isNaN(r.createdAt.getTime())
+          ? r.createdAt.toISOString()
+          : new Date().toISOString();
+      return {
+        id: String(r.id),
+        reviewerName: String(r.establishmentName ?? 'Client'),
+        rating: safeRating,
+        comment: String(r.reviewText ?? ''),
+        source: 'Google',
+        responseText: r.responseText ?? null,
+        createdAt: created,
+      };
+    });
     totalReviews = statsData._count.id;
     avgRating = statsData._avg.rating ?? 0;
     responseCount = prismaReviews.filter((r) => r.responseText).length;
@@ -88,7 +108,8 @@ export default async function DashboardPage({ params, searchParams }: Props) {
   }
 
   const responseRatePct = totalReviews > 0 ? Math.round((responseCount / totalReviews) * 100) : 0;
-  const showEmptyState = supabaseUser && totalReviews === 0;
+  const positiveCount = reviews.filter((r) => r.rating >= 4).length;
+  const negativeCount = reviews.filter((r) => r.rating <= 3).length;
 
   return (
     <div className="px-4 sm:px-6 py-6 space-y-6">
@@ -111,36 +132,7 @@ export default async function DashboardPage({ params, searchParams }: Props) {
         </p>
       </div>
 
-      {/* Empty State : pas encore d'établissements/avis connectés */}
-      {showEmptyState && (
-        <>
-          <div className="flex flex-col items-center justify-center py-16 px-4 rounded-2xl border-2 border-dashed border-slate-200 bg-slate-50">
-            <div className="w-16 h-16 rounded-2xl bg-blue-100 flex items-center justify-center mb-4">
-              <Building2 className="w-8 h-8 text-blue-600" />
-            </div>
-            <h2 className="font-display font-bold text-xl text-slate-900 mb-2">
-              Aucun avis pour le moment
-            </h2>
-            <p className="text-slate-500 text-center max-w-md mb-6">
-              Connectez votre premier établissement (Google, TripAdvisor) pour commencer à recevoir et gérer vos avis clients.
-            </p>
-            <Link
-              href="/dashboard/settings"
-              className="inline-flex items-center justify-center px-6 py-3 rounded-xl font-semibold text-white bg-blue-600 hover:bg-blue-700 transition-colors"
-            >
-              🚀 Configurer mon premier établissement
-            </Link>
-          </div>
-          <section className="mt-6">
-            <h2 className="font-display font-bold text-lg text-slate-900 mb-3">{t('simulateTitle')}</h2>
-            <SimulateReviewForm />
-          </section>
-        </>
-      )}
-
-      {/* Contenu principal (stats + avis) — masqué si empty state */}
-      {!showEmptyState && (
-        <>
+      {/* Contenu principal (stats + avis) */}
       {/* Bandeau alerte IA — masqué si 0 avis */}
       {totalReviews > 0 && (
       <div className="flex items-center gap-3 rounded-xl border border-sky-100 bg-sky-50 px-4 py-3">
@@ -171,7 +163,7 @@ export default async function DashboardPage({ params, searchParams }: Props) {
       {/* Cartes de statistiques */}
       <section className="grid grid-cols-1 lg:grid-cols-4 gap-4">
         {/* Note moyenne (carte gradient) */}
-        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-sky-500 to-indigo-500 text-white shadow-lg">
+        <StatsCard className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-sky-500 to-indigo-500 text-white shadow-lg dark:shadow-glow border border-transparent dark:border-slate-800 hover:shadow-[-8px_12px_24px_-10px_rgba(0,0,0,0.1),_0px_10px_15px_-3px_rgba(0,0,0,0.1)] dark:hover:shadow-none dark:hover:border-slate-600 transition-all duration-300 ease-in-out">
           <div className="p-4 sm:p-5 h-full flex flex-col justify-between">
             <div className="flex items-start justify-between mb-3">
               <div className="flex items-center gap-2">
@@ -186,247 +178,89 @@ export default async function DashboardPage({ params, searchParams }: Props) {
                   </p>
                 </div>
               </div>
-              <span className="inline-flex items-center rounded-full bg-emerald-400/15 text-emerald-100 border border-emerald-300/60 px-2 py-0.5 text-[10px] font-semibold">
-                +8% vs mois dernier
-              </span>
+              {totalReviews > 0 && (
+                <span className="inline-flex items-center rounded-full bg-emerald-400/15 text-emerald-100 border border-emerald-300/60 px-2 py-0.5 text-[10px] font-semibold">
+                  +8% vs mois dernier
+                </span>
+              )}
             </div>
             <p className="text-[11px] text-white/70">Objectif : maintenir &gt; 4.5</p>
           </div>
-        </div>
+        </StatsCard>
 
         {/* Total avis */}
-        <div className="rounded-2xl bg-white border border-slate-200 shadow-sm p-4 sm:p-5">
+        <StatsCard className="rounded-2xl bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 shadow-sm dark:shadow-soft hover:shadow-[-8px_12px_24px_-10px_rgba(0,0,0,0.1),_0px_10px_15px_-3px_rgba(0,0,0,0.1)] dark:hover:shadow-none dark:hover:border-slate-700 p-4 sm:p-5 transition-all duration-300 ease-in-out">
           <div className="flex items-start justify-between mb-3">
-            <div className="w-8 h-8 rounded-xl bg-sky-50 flex items-center justify-center">
+            <div className="w-8 h-8 rounded-xl bg-sky-50 dark:bg-sky-500/15 flex items-center justify-center">
               <StarIconSmall className="w-4 h-4 text-sky-600" />
             </div>
-            <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-semibold text-emerald-600">
-              +12%
-            </span>
+            {totalReviews > 0 && (
+              <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 dark:bg-emerald-500/10 px-2 py-0.5 text-[10px] font-semibold text-emerald-600">
+                +12%
+              </span>
+            )}
           </div>
           <p className="text-2xl font-display font-bold text-slate-900">
             {totalReviews}
           </p>
           <p className="text-xs font-medium text-slate-500">Avis ce mois</p>
-        </div>
+        </StatsCard>
 
-        {/* Taux de réponse */}
-        <div className="rounded-2xl bg-white border border-slate-200 shadow-sm p-4 sm:p-5">
+        {/* Avis positifs */}
+        <StatsCard className="rounded-2xl bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 shadow-sm dark:shadow-soft hover:shadow-[-8px_12px_24px_-10px_rgba(0,0,0,0.1),_0px_10px_15px_-3px_rgba(0,0,0,0.1)] dark:hover:shadow-none dark:hover:border-slate-700 p-4 sm:p-5 transition-all duration-300 ease-in-out">
           <div className="flex items-start justify-between mb-3">
-            <div className="w-8 h-8 rounded-xl bg-emerald-50 flex items-center justify-center">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                className="w-4 h-4 text-emerald-600"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <path d="M7 10v12" />
-                <path d="M15 5.88 14 10h5.83a2 2 0 0 1 1.92 2.56l-2.33 8A2 2 0 0 1 17.5 22H4a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2h2.76a2 2 0 0 0 1.79-1.11L12 2a3.13 3.13 0 0 1 3 3.88Z" />
-              </svg>
+            <div className="w-8 h-8 rounded-xl bg-emerald-50 dark:bg-emerald-500/15 flex items-center justify-center">
+              <ThumbsUp className="w-4 h-4 text-emerald-600" />
             </div>
-            <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-semibold text-emerald-600">
-              +5%
-            </span>
+            {totalReviews > 0 && (
+              <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 dark:bg-emerald-500/10 px-2 py-0.5 text-[10px] font-semibold text-emerald-600">
+                +5%
+              </span>
+            )}
           </div>
-          <p className="text-2xl font-display font-bold text-slate-900">{responseRatePct}%</p>
-          <p className="text-xs font-medium text-slate-500">Taux de réponse</p>
-          <p className="text-[11px] text-slate-400 mt-1">Objectif : 95%</p>
-        </div>
+          <p className="text-2xl font-display font-bold text-slate-900">
+            {positiveCount}
+          </p>
+          <p className="text-xs font-medium text-slate-500">Avis positifs (4★ et 5★)</p>
+          <p className="text-[11px] text-slate-400 mt-1">Total sur la période affichée</p>
+        </StatsCard>
 
-        {/* Score sentiment */}
-        <div className="rounded-2xl bg-white border border-slate-200 shadow-sm p-4 sm:p-5">
+        {/* Avis négatifs */}
+        <StatsCard className="rounded-2xl bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 shadow-sm dark:shadow-soft hover:shadow-[-8px_12px_24px_-10px_rgba(0,0,0,0.1),_0px_10px_15px_-3px_rgba(0,0,0,0.1)] dark:hover:shadow-none dark:hover:border-slate-700 p-4 sm:p-5 transition-all duration-300 ease-in-out">
           <div className="flex items-start justify-between mb-3">
-            <div className="w-8 h-8 rounded-xl bg-indigo-50 flex items-center justify-center">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                className="w-4 h-4 text-indigo-600"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <path d="M12 18V5" />
-                <path d="M9 9H7a2 2 0 0 0-2 2v1" />
-                <path d="M15 9h2a2 2 0 0 1 2 2v1" />
-                <path d="M8 21h8" />
-              </svg>
+            <div className="w-8 h-8 rounded-xl bg-red-50 flex items-center justify-center">
+              <AlertTriangle className="w-4 h-4 text-red-600" />
             </div>
-            <span className="inline-flex items-center gap-1 rounded-full bg-red-50 px-2 py-0.5 text-[10px] font-semibold text-red-500">
-              -2%
-            </span>
+            {totalReviews > 0 && (
+              <span className="inline-flex items-center gap-1 rounded-full bg-red-50 dark:bg-red-500/10 px-2 py-0.5 text-[10px] font-semibold text-red-500">
+                -2%
+              </span>
+            )}
           </div>
-          <p className="text-2xl font-display font-bold text-slate-900">87/100</p>
-          <p className="text-xs font-medium text-slate-500">Score sentiment</p>
-          <p className="text-[11px] text-slate-400 mt-1">Légère baisse</p>
-        </div>
+          <p className="text-2xl font-display font-bold text-slate-900">
+            {negativeCount}
+          </p>
+          <p className="text-xs font-medium text-slate-500">Avis négatifs (1★ à 3★)</p>
+          <p className="text-[11px] text-slate-400 mt-1">Total sur la période affichée</p>
+        </StatsCard>
       </section>
 
       {/* Graphiques */}
       <section className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         {/* Évolution de la note */}
-        <div className="lg:col-span-2 rounded-2xl bg-white border border-slate-200 shadow-sm p-5">
-          <div className="flex items-center justify-between mb-4">
-            <div>
-              <h3 className="font-display font-semibold text-slate-900">
-                Évolution de la note
-              </h3>
-              <p className="text-xs text-slate-500 mt-0.5">7 derniers mois</p>
-            </div>
-            <div className="flex items-center gap-1.5 text-xs font-semibold text-emerald-600 bg-emerald-50 px-2.5 py-1.5 rounded-full">
-              <span>+0.8</span>
-              <span className="text-emerald-400">pts</span>
-            </div>
-          </div>
-          <div className="h-52">
-            <svg viewBox="0 0 640 200" className="w-full h-full">
-              <defs>
-                <linearGradient id="ratingArea" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="hsl(215 90% 52%)" stopOpacity="0.18" />
-                  <stop offset="100%" stopColor="hsl(215 90% 52%)" stopOpacity="0" />
-                </linearGradient>
-              </defs>
-              <rect
-                x="60"
-                y="10"
-                width="560"
-                height="160"
-                fill="none"
-                stroke="hsl(220 13% 90%)"
-                strokeWidth="0"
-              />
-              {/* Grid lines */}
-              {[0, 1, 2, 3].map((i) => (
-                <line
-                  // eslint-disable-next-line react/no-array-index-key
-                  key={i}
-                  x1="60"
-                  x2="620"
-                  y1={170 - i * 40}
-                  y2={170 - i * 40}
-                  stroke="hsl(220 13% 91%)"
-                  strokeDasharray="3 3"
-                />
-              ))}
-              {/* Area */}
-              <path
-                d="M60 150 C 120 146, 180 142, 240 138 C 300 134, 360 130, 420 122 C 480 114, 540 104, 600 96 L 600 170 L 60 170 Z"
-                fill="url(#ratingArea)"
-              />
-              {/* Line */}
-              <path
-                d="M60 150 C 120 146, 180 142, 240 138 C 300 134, 360 130, 420 122 C 480 114, 540 104, 600 96"
-                fill="none"
-                stroke="hsl(215 90% 52%)"
-                strokeWidth="3"
-                strokeLinecap="round"
-              />
-              {/* X axis labels */}
-              {['Août', 'Sep', 'Oct', 'Nov', 'Déc', 'Jan', 'Fév'].map((m, idx) => {
-                const x = 60 + idx * (560 / 6);
-                return (
-                  <text
-                    key={m}
-                    x={x}
-                    y={190}
-                    textAnchor="middle"
-                    fontSize="11"
-                    fill="hsl(220 9% 46%)"
-                  >
-                    {m}
-                  </text>
-                );
-              })}
-            </svg>
-          </div>
+        <div className="lg:col-span-2 rounded-2xl bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 shadow-sm dark:shadow-soft hover:shadow-[-8px_12px_24px_-10px_rgba(0,0,0,0.1),_0px_10px_15px_-3px_rgba(0,0,0,0.1)] dark:hover:shadow-none dark:hover:border-slate-700 p-5 transition-all duration-300 ease-in-out">
+          <OverviewChart reviews={reviews} locale={locale} />
         </div>
 
         {/* Avis par plateforme */}
-        <div className="rounded-2xl bg-white border border-slate-200 shadow-sm p-5">
+        <div className="rounded-2xl bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 shadow-sm dark:shadow-soft hover:shadow-[-8px_12px_24px_-10px_rgba(0,0,0,0.1),_0px_10px_15px_-3px_rgba(0,0,0,0.1)] dark:hover:shadow-none dark:hover:border-slate-700 p-5 transition-all duration-300 ease-in-out">
           <div className="mb-4">
             <h3 className="font-display font-semibold text-slate-900">
               Avis par plateforme
             </h3>
             <p className="text-xs text-slate-500 mt-0.5">Répartition totale</p>
           </div>
-          <div className="flex items-center gap-5">
-            <div className="w-32 h-32 relative">
-              <svg viewBox="0 0 120 120" className="w-full h-full">
-                <circle
-                  cx="60"
-                  cy="60"
-                  r="45"
-                  stroke="#e5e7eb"
-                  strokeWidth="14"
-                  fill="none"
-                />
-                {/* Google */}
-                <circle
-                  cx="60"
-                  cy="60"
-                  r="45"
-                  stroke="hsl(215 90% 52%)"
-                  strokeWidth="14"
-                  fill="none"
-                  strokeDasharray="282.6"
-                  strokeDashoffset="118"
-                  strokeLinecap="round"
-                />
-                {/* TripAdvisor */}
-                <circle
-                  cx="60"
-                  cy="60"
-                  r="45"
-                  stroke="hsl(175 80% 42%)"
-                  strokeWidth="14"
-                  fill="none"
-                  strokeDasharray="282.6"
-                  strokeDashoffset="206"
-                  strokeLinecap="round"
-                />
-                {/* Yelp */}
-                <circle
-                  cx="60"
-                  cy="60"
-                  r="45"
-                  stroke="hsl(0 72% 51%)"
-                  strokeWidth="14"
-                  fill="none"
-                  strokeDasharray="282.6"
-                  strokeDashoffset="244"
-                  strokeLinecap="round"
-                />
-              </svg>
-            </div>
-            <div className="flex-1 space-y-2.5">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <span className="w-2.5 h-2.5 rounded-full bg-[hsl(215_90%_52%)]" />
-                  <span className="text-xs font-medium text-slate-700">Google</span>
-                </div>
-                <span className="text-xs font-bold text-slate-900">58%</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <span className="w-2.5 h-2.5 rounded-full bg-[hsl(175_80%_42%)]" />
-                  <span className="text-xs font-medium text-slate-700">TripAdvisor</span>
-                </div>
-                <span className="text-xs font-bold text-slate-900">27%</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <span className="w-2.5 h-2.5 rounded-full bg-[hsl(0_72%_51%)]" />
-                  <span className="text-xs font-medium text-slate-700">Yelp</span>
-                </div>
-                <span className="text-xs font-bold text-slate-900">15%</span>
-              </div>
-            </div>
-          </div>
+          <PlatformDistributionChart reviews={reviews} />
         </div>
       </section>
 
@@ -436,16 +270,6 @@ export default async function DashboardPage({ params, searchParams }: Props) {
         useSupabaseAuth={!!supabaseUser}
         initialSearch={q ?? ''}
       />
-
-      {/* Simuler un avis */}
-      <section className="mt-2">
-        <h2 className="font-display font-bold text-lg text-slate-900 mb-3">
-          {t('simulateTitle')}
-        </h2>
-        <SimulateReviewForm />
-      </section>
-        </>
-      )}
     </div>
   );
 }

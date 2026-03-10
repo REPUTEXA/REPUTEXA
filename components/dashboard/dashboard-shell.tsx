@@ -1,16 +1,17 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { usePathname, useRouter } from '@/i18n/navigation';
 import { useSearchParams, useParams } from 'next/navigation';
 import { Link } from '@/i18n/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { getSiteUrl } from '@/lib/site-url';
-import { LogOut, LayoutDashboard, MessageSquare, BarChart2, Bell, Settings, Menu, X, Search, Building2, Shield, Lock } from 'lucide-react';
+import { LogOut, LayoutDashboard, MessageSquare, BarChart2, Bell, Lightbulb, Settings, Menu, X, Search, Building2, Shield, Lock, CheckCircle2 } from 'lucide-react';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { LanguageSelector } from '@/components/language-selector';
 import { hasFeature, FEATURES, type FeatureKey } from '@/lib/feature-gate';
 import { UpgradeModal } from '@/components/dashboard/upgrade-modal';
+import { useTranslations } from 'next-intl';
 
 function SignOutButton() {
   const params = useParams();
@@ -44,16 +45,28 @@ function StarNavIcon(props: React.SVGProps<SVGSVGElement>) {
 const navItems: Array<{
   href: string;
   icon: React.ComponentType<{ className?: string }>;
-  label: string;
+  key: keyof typeof NAV_LABEL_KEYS;
   featureKey?: FeatureKey;
 }> = [
-  { href: '/dashboard', icon: LayoutDashboard, label: "Vue d'ensemble" },
-  { href: '/dashboard/reviews', icon: StarNavIcon, label: 'Avis' },
-  { href: '/dashboard/responses', icon: MessageSquare, label: 'Réponses IA' },
-  { href: '/dashboard/statistics', icon: BarChart2, label: 'Analytiques' },
-  { href: '/dashboard/alerts', icon: Bell, label: 'Alertes', featureKey: FEATURES.WHATSAPP_ALERTS },
-  { href: '/dashboard/settings', icon: Settings, label: 'Paramètres' },
+  { href: '/dashboard', icon: LayoutDashboard, key: 'overview' },
+  { href: '/dashboard/reviews', icon: StarNavIcon, key: 'aiResponses' },
+  { href: '/dashboard/statistics', icon: BarChart2, key: 'statistics' },
+  { href: '/dashboard/alerts', icon: Bell, key: 'alerts', featureKey: FEATURES.WHATSAPP_ALERTS },
+  { href: '/dashboard/suggestions', icon: Lightbulb, key: 'suggestions' },
+  { href: '/dashboard/settings', icon: Settings, key: 'settings' },
 ];
+
+const NAV_LABEL_KEYS = {
+  overview: 'overview',
+  aiResponses: 'aiResponses',
+  statistics: 'statistics',
+  establishments: 'establishments',
+  prospects: 'prospects',
+  alerts: 'alerts',
+  suggestions: 'suggestions',
+  settings: 'settings',
+  upgrade: 'upgrade',
+} as const;
 
 type Props = {
   labels: Record<string, string>;
@@ -92,6 +105,7 @@ export function DashboardShell({
   showPaywall = false,
   children,
 }: Props) {
+  const tSidebar = useTranslations('Dashboard.sidebar');
   const planSlug = PLAN_TO_SLUG[planDisplayName] ?? 'pulse';
   const pathname = usePathname();
   const router = useRouter();
@@ -101,7 +115,21 @@ export function DashboardShell({
   const [shakingLock, setShakingLock] = useState<FeatureKey | null>(null);
   const qParam = searchParams?.get('q') ?? '';
   const [searchInput, setSearchInput] = useState(qParam);
+  const [showNotificationTrends, setShowNotificationTrends] = useState(false);
+  const notificationRef = useRef<HTMLDivElement | null>(null);
   useEffect(() => { setSearchInput(qParam); }, [qParam]);
+
+  useEffect(() => {
+    if (!showNotificationTrends) return;
+    const handler = (event: MouseEvent) => {
+      if (!notificationRef.current) return;
+      if (!notificationRef.current.contains(event.target as Node)) {
+        setShowNotificationTrends(false);
+      }
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, [showNotificationTrends]);
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -170,6 +198,7 @@ export function DashboardShell({
                 ? pathname === '/dashboard' || pathname?.endsWith('/dashboard')
                 : pathname?.startsWith(item.href);
             const Icon = item.icon;
+            const label = tSidebar(NAV_LABEL_KEYS[item.key]);
             const locked = item.featureKey && !hasFeature(selectedPlanSlug, item.featureKey);
             const baseClass = `flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-150 ${
               locked ? 'opacity-50 cursor-pointer' : ''
@@ -195,7 +224,7 @@ export function DashboardShell({
                   className={`w-full text-left ${baseClass}`}
                 >
                   <Icon className="w-4 h-4 flex-shrink-0" />
-                  <span>{item.label}</span>
+                  <span>{label}</span>
                   <Lock
                     className={`w-3.5 h-3.5 ml-auto flex-shrink-0 text-amber-400 drop-shadow-[0_0_4px_rgba(251,191,36,0.6)] ${shakingLock === fk ? 'animate-lock-shake' : ''}`}
                     aria-hidden
@@ -211,7 +240,7 @@ export function DashboardShell({
                 className={baseClass}
               >
                 <Icon className="w-4 h-4 flex-shrink-0" />
-                <span>{item.label ?? labels.overview}</span>
+                <span>{label}</span>
               </Link>
             );
           })}
@@ -274,14 +303,32 @@ export function DashboardShell({
           <div className="flex items-center gap-2 sm:gap-3">
             <ThemeToggle />
             <LanguageSelector variant="light" />
-            <button
-              type="button"
-              className="relative p-2 rounded-xl text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
-              aria-label="Notifications"
-            >
-              <Bell className="h-5 w-5" />
-              <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 bg-blue-500 rounded-full" />
-            </button>
+            <div className="relative" ref={notificationRef}>
+              <button
+                type="button"
+                onClick={() => setShowNotificationTrends((v) => !v)}
+                className="relative p-2 rounded-xl text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                aria-label="Notifications"
+              >
+                <Bell className="h-5 w-5" />
+                <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 bg-blue-500 rounded-full" />
+              </button>
+              {showNotificationTrends && (
+                <div className="absolute right-0 mt-2 w-64 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 shadow-lg p-3 text-sm">
+                  <div className="flex items-center gap-2 mb-2">
+                    <div className="flex h-7 w-7 items-center justify-center rounded-full bg-emerald-50 dark:bg-emerald-500/10">
+                      <CheckCircle2 className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+                    </div>
+                    <p className="text-xs font-semibold text-slate-900 dark:text-slate-100">
+                      Tendances détectées
+                    </p>
+                  </div>
+                  <p className="text-xs text-slate-600 dark:text-slate-400">
+                    Aucune tendance négative marquante sur vos derniers avis.
+                  </p>
+                </div>
+              )}
+            </div>
             <SignOutButton />
           </div>
         </header>

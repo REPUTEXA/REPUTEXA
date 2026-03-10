@@ -293,6 +293,8 @@
       "statistics": "Statistiques",
       "establishments": "Mes Établissements",
       "prospects": "Prospects (Sniper)",
+      "alerts": "Alertes",
+      "suggestions": "Suggestions",
       "settings": "Paramètres",
       "upgrade": "Upgrader",
       "unlockCta": "Débloquez les réponses illimitées"
@@ -344,6 +346,53 @@
         "city": "Paris"
       },
       "error": "Erreur lors de l'envoi"
+    }
+  },
+  "Suggestions": {
+    "page": {
+      "title": "Suggestions",
+      "intro": "Une idée ? Une amélioration ? Dites-nous ce que vous aimeriez voir sur la plateforme."
+    },
+    "form": {
+      "titleLabel": "Titre",
+      "descriptionLabel": "Description",
+      "placeholderTitle": "Ex : Exporter les avis en CSV",
+      "placeholderDescription": "Décrivez votre idée en détail...",
+      "submitLabel": "Envoyer ma suggestion",
+      "submitting": "Envoi...",
+      "titleRequired": "Veuillez entrer un titre.",
+      "submitSuccess": "Merci ! Votre suggestion a bien été envoyée.",
+      "genericError": "Une erreur est survenue. Merci de réessayer."
+    },
+    "list": {
+      "title": "Mes suggestions",
+      "loading": "Chargement...",
+      "loadError": "Impossible de charger vos suggestions.",
+      "status": {
+        "PENDING": "Reçu",
+        "IN_PROGRESS": "En cours",
+        "DONE": "Terminé"
+      }
+    }
+  },
+  "Alerts": {
+    "whatsapp": {
+      "negativeReview": {
+        "title": "🚨 *ALERTE NOUVEL AVIS NÉGATIF*",
+        "anonymousAuthor": "Client",
+        "noComment": "(Aucun commentaire)",
+        "noSuggestion": "(Aucune suggestion)",
+        "reviewLabel": "📝 *Avis client :*",
+        "aiSuggestionLabel": "🤖 *Suggestion de réponse IA :*",
+        "cta": "Répondez 'OK' pour valider cette réponse ou envoyez un vocal pour la modifier.",
+        "poweredBy": "_Propulsé par Reputexa AI_"
+      },
+      "weeklyRecap": {
+        "title": "📊 Ton Récap Hebdo",
+        "line": "⭐ Note moyenne : {rating}/5 ({count} avis)",
+        "noData": "Pas d'avis suffisants pour générer un récap. Continuez à collecter des retours clients.",
+        "notConfigured": "Récap hebdomadaire généré mais destinataire WhatsApp non configuré."
+      }
     }
   },
   "common": {

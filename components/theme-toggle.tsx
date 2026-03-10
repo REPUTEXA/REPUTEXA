@@ -3,9 +3,10 @@
 import { useTheme } from 'next-themes';
 import { Sun, Moon } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 export function ThemeToggle() {
-  const { theme, setTheme, resolvedTheme } = useTheme();
+  const { setTheme, resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => setMounted(true), []);
@@ -15,7 +16,7 @@ export function ThemeToggle() {
       <button
         type="button"
         aria-label="Changer le thème"
-        className="p-2 rounded-xl text-slate-500 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800 transition-all duration-200"
+        className="p-2 rounded-xl text-slate-500 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800 transition-colors duration-300"
       >
         <Sun className="h-5 w-5" />
       </button>
@@ -25,17 +26,39 @@ export function ThemeToggle() {
   const isDark = resolvedTheme === 'dark';
 
   return (
-    <button
+    <motion.button
       type="button"
       onClick={() => setTheme(isDark ? 'light' : 'dark')}
       aria-label={isDark ? 'Mode clair' : 'Mode sombre'}
-      className="p-2 rounded-xl text-slate-600 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800 transition-all duration-200"
+      className="relative flex items-center justify-center p-2 rounded-xl text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800 transition-colors duration-300"
+      whileTap={{ scale: 0.9 }}
     >
-      {isDark ? (
-        <Sun className="h-5 w-5 transition-transform duration-200 hover:rotate-12" />
-      ) : (
-        <Moon className="h-5 w-5 transition-transform duration-200 hover:-rotate-12" />
-      )}
-    </button>
+      <AnimatePresence mode="wait" initial={false}>
+        {isDark ? (
+          <motion.span
+            key="sun"
+            initial={{ opacity: 0, y: 4, rotate: -15 }}
+            animate={{ opacity: 1, y: 0, rotate: 0 }}
+            exit={{ opacity: 0, y: -4, rotate: 15 }}
+            transition={{ duration: 0.18 }}
+            className="inline-flex"
+          >
+            <Sun className="h-5 w-5" />
+          </motion.span>
+        ) : (
+          <motion.span
+            key="moon"
+            initial={{ opacity: 0, y: 4, rotate: 15 }}
+            animate={{ opacity: 1, y: 0, rotate: 0 }}
+            exit={{ opacity: 0, y: -4, rotate: -15 }}
+            transition={{ duration: 0.18 }}
+            className="inline-flex"
+          >
+            <Moon className="h-5 w-5" />
+          </motion.span>
+        )}
+      </AnimatePresence>
+    </motion.button>
   );
 }
+

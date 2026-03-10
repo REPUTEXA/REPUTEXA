@@ -1,6 +1,43 @@
 import twilio from 'twilio';
 import type { WhatsAppAlertPayload } from './types';
 import { CALLBACK_ACTIONS } from './types';
+import { createAdminClient } from '../supabase/admin';
+
+type SupportedLocale = 'fr' | 'en';
+
+async function loadMessages(locale: SupportedLocale) {
+  try {
+    const mod = await import(`../../messages/${locale}.json`);
+    // next-intl charge les messages en default
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return (mod as any).default ?? mod;
+  } catch {
+    return null;
+  }
+}
+
+async function getPreferredLocale(phone: string): Promise<SupportedLocale> {
+  const admin = createAdminClient();
+  if (!admin) return 'fr';
+
+  try {
+    const normalized = phone.replace(/\D/g, '');
+    const { data, error } = await admin
+      .from('profiles')
+      .select('preferred_language, whatsapp_phone')
+      .ilike('whatsapp_phone', `%${normalized.slice(-9)}%`)
+      .limit(1)
+      .maybeSingle();
+
+    if (error || !data) return 'fr';
+    const lang = (data.preferred_language as string | null) ?? 'fr';
+    return (['fr', 'en'] as SupportedLocale[]).includes(lang as SupportedLocale)
+      ? (lang as SupportedLocale)
+      : 'fr';
+  } catch {
+    return 'fr';
+  }
+}
 
 function normalizePhone(phone: string): string {
   const digits = phone.replace(/\D/g, '');
@@ -30,13 +67,24 @@ export async function sendWhatsAppAlert(
     establishmentName,
   } = payload;
 
-  const authorName = String(reviewerName ?? '').trim() || 'Client';
+  const locale = await getPreferredLocale(to);
+  const messages = await loadMessages(locale);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const alerts = (messages as any)?.Alerts?.whatsapp?.negativeReview ?? {};
+
+  const authorFallback = locale === 'fr' ? 'Client' : 'Customer';
+  const noCommentFallback = locale === 'fr' ? '(Aucun commentaire)' : '(No comment)';
+  const noSuggestionFallback =
+    locale === 'fr' ? '(Aucune suggestion)' : '(No suggestion available)';
+
+  const authorName = String(reviewerName ?? '').trim() || alerts.anonymousAuthor || authorFallback;
   const reviewText = comment?.trim()
     ? comment.length > 300
       ? `${comment.slice(0, 300).trim()}...`
       : comment.trim()
-    : '(Aucun commentaire)';
-  const suggestedReplyVal = String(suggestedReply ?? '').trim() || '(Aucune suggestion)';
+    : alerts.noComment || noCommentFallback;
+  const suggestedReplyVal =
+    String(suggestedReply ?? '').trim() || alerts.noSuggestion || noSuggestionFallback;
   const suggestedReplyForTemplate =
     suggestedReplyVal.length > 500 ? `${suggestedReplyVal.slice(0, 500)}...` : suggestedReplyVal;
 
@@ -60,7 +108,9 @@ export async function sendWhatsAppAlert(
     return {
       success: false,
       error:
-        'Twilio non configuré. Définissez TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN et TWILIO_WHATSAPP_NUMBER (ou TWILIO_WHATSAPP_FROM).',
+        locale === 'fr'
+          ? 'Twilio non configuré. Définissez TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN et TWILIO_WHATSAPP_NUMBER (ou TWILIO_WHATSAPP_FROM).'
+          : 'Twilio not configured. Please set TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN and TWILIO_WHATSAPP_NUMBER (or TWILIO_WHATSAPP_FROM).',
     };
   }
 
@@ -78,29 +128,51 @@ export async function sendWhatsAppAlert(
         to: toWhatsApp,
         contentSid,
         contentVariables: JSON.stringify({
-          '1': authorName || 'Inconnu',
-          '2': reviewText || 'Pas de texte',
-          '3': suggestedReplyForTemplate || 'Pas de suggestion',
+          '1': authorName || (alerts.anonymousAuthor ?? authorFallback),
+          '2': reviewText || (alerts.noComment ?? noCommentFallback),
+          '3': suggestedReplyForTemplate || (alerts.noSuggestion ?? noSuggestionFallback),
         }),
       });
       return { success: true, messageId: message.sid };
     }
 
+    const title =
+      alerts.title ??
+      (locale === 'fr'
+        ? '🚨 *ALERTE NOUVEL AVIS NÉGATIF*'
+        : '🚨 *NEW NEGATIVE REVIEW ALERT*');
+    const reviewLabel =
+      alerts.reviewLabel ??
+      (locale === 'fr' ? '📝 *Avis client :*' : '📝 *Customer review:*');
+    const aiLabel =
+      alerts.aiSuggestionLabel ??
+      (locale === 'fr' ? '🤖 *Suggestion de réponse IA :*' : '🤖 *AI-suggested reply:*');
+    const cta =
+      alerts.cta ??
+      (locale === 'fr'
+        ? "Répondez 'OK' pour valider cette réponse ou envoyez un vocal pour la modifier."
+        : "Reply 'OK' to approve this reply or send a voice message to edit it.");
+    const poweredBy =
+      alerts.poweredBy ??
+      (locale === 'fr'
+        ? '_Propulsé par Reputexa AI_'
+        : '_Powered by Reputexa AI_');
+
     const body = [
-      `🚨 *ALERTE NOUVEL AVIS NÉGATIF*`,
-      ``,
+      title,
+      '',
       establishmentName ? `📌 ${establishmentName}` : null,
       `👤 ${authorName} — ${rating}/5 ⭐`,
-      ``,
-      `📝 *Avis client :*`,
+      '',
+      reviewLabel,
       `"${reviewText}"`,
-      ``,
-      `🤖 *Suggestion de réponse IA :*`,
+      '',
+      aiLabel,
       `"${suggestedReplyForTemplate}"`,
-      ``,
-      `Répondez 'OK' pour valider cette réponse ou envoyez un vocal pour la modifier.`,
-      ``,
-      `_Propulsé par Reputexa AI_`,
+      '',
+      cta,
+      '',
+      poweredBy,
     ]
       .filter(Boolean)
       .join('\n');

@@ -84,30 +84,30 @@ export default function AlertsPage() {
   if (planSlug !== null && !canAccess) {
     return (
       <div className="px-4 sm:px-6 py-6">
-        <h1 className="font-display font-bold text-2xl text-slate-900 flex items-center gap-2">
+        <h1 className="font-display font-bold text-2xl text-slate-900 dark:text-slate-50 flex items-center gap-2">
           Alertes
           <span className="text-amber-500" title="Réservé Pulse">
             🔒
           </span>
         </h1>
-        <p className="text-sm text-slate-500 mt-0.5">
+        <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">
           Alertes WhatsApp pour avis négatifs — réservé aux membres Pulse et Zenith
         </p>
-        <div className="mt-6 rounded-2xl border-2 border-amber-200 bg-amber-50/50 p-10 text-center">
-          <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-amber-100 text-amber-600 mb-4">
+        <div className="mt-6 rounded-2xl border-2 border-amber-200 dark:border-amber-500/30 dark:border-white/[0.07] bg-amber-50/50 dark:bg-slate-900 p-10 text-center shadow-sm dark:shadow-[4px_6px_0_rgba(0,0,0,0.5)]">
+          <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-amber-100 dark:bg-amber-500/20 text-amber-600 dark:text-amber-400 mb-4">
             <Lock className="w-7 h-7" />
           </div>
           <p className="text-slate-700 font-medium mb-1">
             Cette fonctionnalité est réservée aux membres <strong>Pulse</strong> ou{' '}
             <strong>Zenith</strong>.
           </p>
-          <p className="text-slate-500 text-sm mb-6">
+          <p className="text-slate-500 dark:text-slate-400 text-sm mb-6">
             Recevez des alertes WhatsApp immédiates dès qu&apos;un avis négatif est détecté.
           </p>
           <button
             type="button"
             onClick={() => setShowUpgradeModal(true)}
-            className="inline-flex items-center justify-center px-6 py-3 rounded-xl bg-blue-600 text-white font-semibold hover:bg-blue-700 transition-colors"
+            className="inline-flex items-center justify-center px-6 py-3 rounded-xl bg-blue-600 dark:bg-indigo-600 text-white font-semibold hover:bg-blue-700 dark:hover:bg-indigo-500 transition-colors"
           >
             Passer au plan Pulse
           </button>
@@ -132,7 +132,7 @@ export default function AlertsPage() {
       </div>
 
       {loading ? (
-        <div className="mt-6 rounded-2xl border border-slate-200 bg-white p-10 text-center text-sm text-slate-500">
+        <div className="mt-6 rounded-2xl border border-slate-200 dark:border-slate-800 dark:border-white/[0.07] bg-white dark:bg-slate-900 p-10 text-center text-sm text-slate-500 dark:text-slate-400 shadow-sm dark:shadow-[4px_6px_0_rgba(0,0,0,0.5)]">
           Chargement des alertes en cours...
         </div>
       ) : urgentReviews.length === 0 ? (
@@ -159,7 +159,7 @@ export default function AlertsPage() {
             return (
               <div
                 key={r.id}
-                className={`rounded-2xl bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 shadow-sm dark:shadow-soft hover:shadow-[-8px_12px_24px_-10px_rgba(0,0,0,0.1),_0px_10px_15px_-3px_rgba(0,0,0,0.1)] dark:hover:shadow-none dark:hover:border-slate-700 p-5 transition-all duration-300 ease-in-out border-l-4 ${borderColor}`}
+                className={`rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 dark:border-white/[0.07] shadow-sm dark:shadow-[4px_6px_0_rgba(0,0,0,0.5)] hover:shadow-[-8px_12px_24px_-10px_rgba(0,0,0,0.1),_0px_10px_15px_-3px_rgba(0,0,0,0.1)] dark:hover:shadow-[4px_6px_0_rgba(0,0,0,0.6)] dark:hover:border-slate-700 p-5 transition-all duration-300 ease-in-out border-l-4 ${borderColor}`}
               >
                 <div className="flex items-start justify-between gap-3 mb-3">
                   <div className="flex items-start gap-3">
@@ -167,30 +167,30 @@ export default function AlertsPage() {
                       <AlertTriangle className="w-4 h-4 text-red-600 dark:text-red-400" />
                     </div>
                     <div>
-                      <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">
+                      <p className="text-sm font-semibold text-slate-900 dark:text-slate-50">
                         {r.reviewerName}
                       </p>
                       <div className="flex items-center gap-2 mt-0.5">
                         <StarRating rating={r.rating} />
-                        <span className="text-[11px] text-slate-400">{r.source}</span>
+                        <span className="text-[11px] text-slate-400 dark:text-slate-500">{r.source}</span>
                       </div>
                     </div>
                   </div>
-                  <span className="text-[11px] text-slate-400">
+                  <span className="text-[11px] text-slate-400 dark:text-slate-500">
                     {new Date(r.createdAt).toLocaleDateString('fr-FR')}
                   </span>
                 </div>
-                <p className="text-sm text-slate-700 dark:text-slate-200 mb-4 leading-relaxed">
+                <p className="text-sm text-slate-700 dark:text-slate-400 mb-4 leading-relaxed">
                   {r.comment}
                 </p>
                 <div className="flex items-center justify-between gap-3 flex-wrap">
-                  <p className="text-xs text-slate-500">
+                  <p className="text-xs text-slate-500 dark:text-slate-400">
                     Avis non répondu &lt; 3★ — recommandé : répondre en priorité.
                   </p>
                   <button
                     type="button"
                     onClick={() => setModalReviewId(r.id)}
-                    className="inline-flex items-center gap-1.5 rounded-full bg-sky-600 hover:bg-sky-700 text-xs font-semibold text-white px-4 py-1.5 transition-colors"
+                    className="inline-flex items-center gap-1.5 rounded-full bg-sky-600 dark:bg-indigo-600 hover:bg-sky-700 dark:hover:bg-indigo-500 text-xs font-semibold text-white px-4 py-1.5 transition-colors"
                   >
                     Répondre maintenant
                   </button>

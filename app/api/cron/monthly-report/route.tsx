@@ -5,6 +5,7 @@ import { toPlanSlug, hasFeature, FEATURES } from '@/lib/feature-gate';
 import { resend } from '@/lib/resend';
 import { MonthlyReportTemplate } from '@/components/reports/monthly-report-template';
 import { pdf } from '@react-pdf/renderer';
+import { Buffer } from 'buffer';
 
 const CRON_SECRET = process.env.CRON_SECRET;
 
@@ -46,7 +47,7 @@ export async function GET(request: Request) {
 
     for (const profile of profiles) {
       const planSlug = toPlanSlug(profile.subscription_plan ?? null, profile.selected_plan ?? null);
-      if (!hasFeature(planSlug, FEATURES.REPORTING)) continue;
+      if (!hasFeature(planSlug, FEATURES.REPORTING_PDF)) continue;
 
       const { data: reviews } = await admin
         .from('reviews')
@@ -101,7 +102,7 @@ export async function GET(request: Request) {
           attachments: [
             {
               filename: `reputexa-rapport-${from.getFullYear()}-${from.getMonth() + 1}.pdf`,
-              content: buffer.toString('base64'),
+              content: Buffer.from(buffer as unknown as Uint8Array).toString('base64'),
               contentType: 'application/pdf',
             },
           ],

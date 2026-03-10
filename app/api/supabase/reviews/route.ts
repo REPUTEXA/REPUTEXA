@@ -4,19 +4,19 @@ import { createClient } from '@/lib/supabase/server';
 import { getSiteUrl } from '@/lib/site-url';
 import { calculateScheduledAt, isPositiveReview, generateQuickReplyToken } from '@/lib/reviews/queue';
 import { hasFeature, toPlanSlug, FEATURES } from '@/lib/feature-gate';
+import {
+  HUMAN_CHARTER_BASE,
+  buildSeoInvisibleInstruction,
+  HUMAN_FALLBACKS,
+} from '@/lib/ai/concierge-prompts';
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-const AI_PROMPT_BASE = `Tu es un expert en e-réputation. Génère une réponse professionnelle et chaleureuse pour l'avis client.
+const AI_PROMPT_BASE = `Tu es un expert en e-réputation. Génère une réponse organique et chaleureuse pour l'avis client.
+${HUMAN_CHARTER_BASE}
 Détecte la langue de l'avis et réponds dans la MÊME langue. Une seule réponse, pas de JSON.`;
-
-function buildSeoInstruction(keywords: string[]): string {
-  if (!keywords.length) return '';
-  const list = keywords.slice(0, 10).map((k) => `"${k}"`).join(', ');
-  return `\n\nUtilise intelligemment et de manière naturelle un ou deux des mots-clés suivants dans la réponse pour améliorer le référencement local : [${list}]. La phrase doit rester humaine et pas robotique.`;
-}
 
 /**
  * Liste les avis de l'utilisateur connecté.
@@ -101,7 +101,7 @@ export async function POST(request: Request) {
       ? profileData.seo_keywords.filter((k): k is string => typeof k === 'string').slice(0, 10)
       : [];
     const useSeo = hasFeature(planSlug, FEATURES.SEO_BOOST) && seoKeywords.length > 0;
-    const aiPrompt = AI_PROMPT_BASE + (useSeo ? buildSeoInstruction(seoKeywords) : '');
+    const aiPrompt = AI_PROMPT_BASE + (useSeo ? buildSeoInvisibleInstruction(seoKeywords) : '');
     const isPositive = isPositiveReview(ratingNum);
     const token = generateQuickReplyToken();
 
@@ -135,10 +135,10 @@ export async function POST(request: Request) {
             insert.ai_response = content;
           }
         } catch {
-          insert.ai_response = 'Merci pour votre avis ! Nous sommes ravis de votre retour.';
+          insert.ai_response = HUMAN_FALLBACKS.positiveShort;
         }
       } else {
-        insert.ai_response = 'Merci pour votre avis ! Nous sommes ravis de votre retour.';
+        insert.ai_response = HUMAN_FALLBACKS.positiveShort;
       }
       insert.status = 'scheduled';
     } else {

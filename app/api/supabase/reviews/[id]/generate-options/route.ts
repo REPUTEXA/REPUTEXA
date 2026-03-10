@@ -3,20 +3,21 @@ import OpenAI from 'openai';
 import { createClient } from '@/lib/supabase/server';
 import { requireFeature } from '@/lib/api-plan-guard';
 import { FEATURES, hasFeature, toPlanSlug } from '@/lib/feature-gate';
+import {
+  HUMAN_CHARTER_BASE,
+  ZENITH_CONCIERGE_ADDON,
+  buildSeoInvisibleInstruction,
+  HUMAN_FALLBACKS,
+} from '@/lib/ai/concierge-prompts';
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
 const SYSTEM_PROMPT_BASE = `Tu es un expert en e-réputation. Génère exactement 3 variantes de réponses pour l'avis client, en respectant strictement les préférences de style et de ton fournies.
+${HUMAN_CHARTER_BASE}
 Réponds UNIQUEMENT en JSON valide : {"options": ["Réponse A", "Réponse B", "Réponse C"], "detectedLanguage": "fr"}
 Détecte la langue de l'avis et réponds dans la MÊME langue.`;
-
-function buildSeoInstruction(keywords: string[]): string {
-  if (!keywords.length) return '';
-  const list = keywords.slice(0, 10).map((k) => `"${k}"`).join(', ');
-  return `\n\nUtilise intelligemment et de manière naturelle un ou deux des mots-clés suivants dans chaque réponse pour améliorer le référencement local : [${list}]. La phrase doit rester humaine et pas robotique.`;
-}
 
 export async function POST(
   _request: Request,
@@ -108,11 +109,13 @@ PRÉFÉRENCES DE STYLE À RESPECTER :
 ${signature ? `- Ajoute systématiquement cette signature à la fin : "${signature}".` : ''}
 ${extraInstructions ? `- Consigne(s) spécifique(s) du restaurateur : ${extraInstructions}` : ''}`.trim();
 
+    const isZenith = planSlug === 'zenith';
     const systemPrompt =
       SYSTEM_PROMPT_BASE +
       '\n\n' +
       styleInstruction +
-      (useSeo ? buildSeoInstruction(seoKeywords) : '');
+      (isZenith ? '\n\n' + ZENITH_CONCIERGE_ADDON : '') +
+      (useSeo ? buildSeoInvisibleInstruction(seoKeywords) : '');
 
     const completion = await openai.chat.completions.create({
       model: 'gpt-4o-mini',
@@ -134,9 +137,9 @@ ${extraInstructions ? `- Consigne(s) spécifique(s) du restaurateur : ${extraIns
 
     return NextResponse.json({
       options: options.length >= 3 ? options : [
-        options[0] ?? 'Merci pour votre avis !',
-        options[1] ?? 'Nous sommes ravis de votre retour.',
-        options[2] ?? 'À bientôt !',
+        options[0] ?? HUMAN_FALLBACKS.genericThanks,
+        options[1] ?? HUMAN_FALLBACKS.positiveShort,
+        options[2] ?? 'À très vite !',
       ],
       detectedLanguage: parsed.detectedLanguage ?? 'fr',
     });

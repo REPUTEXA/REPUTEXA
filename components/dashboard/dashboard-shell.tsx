@@ -6,7 +6,7 @@ import { useSearchParams, useParams } from 'next/navigation';
 import { Link } from '@/i18n/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { getSiteUrl } from '@/lib/site-url';
-import { LogOut, LayoutDashboard, MessageSquare, BarChart2, Bell, Lightbulb, Settings, Menu, X, Search, Building2, Shield, Lock, CheckCircle2 } from 'lucide-react';
+import { LogOut, LayoutDashboard, BarChart2, Bell, Lightbulb, Settings, Menu, X, Search, Building2, Shield, Lock, CheckCircle2, TrendingUp } from 'lucide-react';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { LanguageSelector } from '@/components/language-selector';
 import { hasFeature, FEATURES, type FeatureKey } from '@/lib/feature-gate';
@@ -25,7 +25,7 @@ function SignOutButton() {
     <button
       type="button"
       onClick={handleSignOut}
-      className="p-2 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+      className="flex items-center justify-center min-w-[44px] min-h-[44px] p-2 rounded-2xl text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 active:scale-[0.98] transition-transform"
       aria-label="Déconnexion"
       title="Déconnexion"
     >
@@ -52,6 +52,7 @@ const navItems: Array<{
   { href: '/dashboard/reviews', icon: StarNavIcon, key: 'aiResponses' },
   { href: '/dashboard/statistics', icon: BarChart2, key: 'statistics' },
   { href: '/dashboard/alerts', icon: Bell, key: 'alerts', featureKey: FEATURES.WHATSAPP_ALERTS },
+  { href: '/dashboard/growth', icon: TrendingUp, key: 'growth', featureKey: FEATURES.AI_CAPTURE },
   { href: '/dashboard/suggestions', icon: Lightbulb, key: 'suggestions' },
   { href: '/dashboard/settings', icon: Settings, key: 'settings' },
 ];
@@ -63,13 +64,13 @@ const NAV_LABEL_KEYS = {
   establishments: 'establishments',
   prospects: 'prospects',
   alerts: 'alerts',
+  growth: 'growth',
   suggestions: 'suggestions',
   settings: 'settings',
   upgrade: 'upgrade',
 } as const;
 
 type Props = {
-  labels: Record<string, string>;
   establishmentName?: string;
   fullName?: string;
   avatarUrl?: string | null;
@@ -91,7 +92,6 @@ const PLAN_TO_SLUG: Record<string, string> = {
 };
 
 export function DashboardShell({
-  labels,
   establishmentName = 'Mon établissement',
   fullName = '',
   avatarUrl = null,
@@ -142,19 +142,19 @@ export function DashboardShell({
 
   return (
     <div className="flex min-h-screen bg-slate-50 dark:bg-slate-950 transition-colors duration-200">
-      {/* Overlay mobile */}
+      {/* Overlay mobile - drawer backdrop */}
       {sidebarOpen && (
         <button
           type="button"
           onClick={() => setSidebarOpen(false)}
-          className="fixed inset-0 z-30 bg-black/40 lg:hidden"
+          className="fixed inset-0 z-30 bg-black/50 backdrop-blur-[2px] lg:hidden transition-opacity duration-300"
           aria-hidden
         />
       )}
 
-      {/* Sidebar */}
+      {/* Sidebar - Drawer mobile (<768px), fixed desktop */}
       <aside
-        className={`fixed left-0 top-0 z-40 flex h-full w-60 flex-col bg-[#0B1221] text-white transition-transform duration-300 lg:translate-x-0 ${
+        className={`fixed left-0 top-0 z-40 flex h-full w-60 flex-col bg-[#0B1221] dark:bg-slate-950/95 dark:backdrop-blur-md border-r border-transparent dark:border-slate-800/80 dark:border-white/[0.07] text-white transition-transform duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] lg:translate-x-0 ${
           sidebarOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
@@ -277,14 +277,14 @@ export function DashboardShell({
       {/* Main content */}
       <div className="flex flex-1 flex-col min-w-0 lg:ml-60">
         {/* Header */}
-        <header className="sticky top-0 z-20 h-16 border-b border-slate-200 dark:border-slate-800 bg-white/90 dark:bg-slate-950/90 backdrop-blur-sm flex items-center justify-between px-4 sm:px-6 transition-colors duration-200">
+        <header className="sticky top-0 z-20 h-14 min-h-[52px] sm:h-16 border-b border-slate-200 dark:border-slate-800/80 dark:border-white/[0.07] bg-white/95 dark:bg-slate-950/90 backdrop-blur-md flex items-center justify-between px-4 sm:px-6 safe-area-nav transition-colors duration-200">
           <button
             type="button"
             onClick={() => setSidebarOpen(true)}
-            className="lg:hidden p-2 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 -ml-2"
+            className="lg:hidden flex items-center justify-center min-w-[44px] min-h-[44px] p-2 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 active:scale-[0.98] transition-transform -ml-2"
             aria-label="Ouvrir le menu"
           >
-            <Menu className="h-5 w-5" />
+            <Menu className="h-6 w-6" />
           </button>
 
           <form onSubmit={handleSearchSubmit} className="flex-1 max-w-md mx-4 hidden sm:block">
@@ -295,7 +295,7 @@ export function DashboardShell({
                 value={searchInput}
                 onChange={(e) => setSearchInput(e.target.value)}
                 placeholder="Rechercher des avis..."
-                className="w-full pl-9 pr-4 py-2 text-sm bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500/40 transition-colors duration-200"
+                className="w-full pl-9 pr-4 py-2.5 min-h-[40px] text-sm bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 dark:border-white/[0.07] rounded-2xl text-slate-900 dark:text-slate-50 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 dark:focus:ring-indigo-500/50 focus:border-blue-500/40 transition-colors duration-200"
               />
             </div>
           </form>
@@ -307,19 +307,19 @@ export function DashboardShell({
               <button
                 type="button"
                 onClick={() => setShowNotificationTrends((v) => !v)}
-                className="relative p-2 rounded-xl text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                className="relative flex items-center justify-center min-w-[44px] min-h-[44px] p-2 rounded-xl text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 active:scale-[0.98] transition-transform"
                 aria-label="Notifications"
               >
                 <Bell className="h-5 w-5" />
                 <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 bg-blue-500 rounded-full" />
               </button>
               {showNotificationTrends && (
-                <div className="absolute right-0 mt-2 w-64 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 shadow-lg p-3 text-sm">
+                <div className="absolute right-0 mt-2 w-64 rounded-2xl border border-slate-200 dark:border-slate-800 dark:border-white/[0.07] bg-white dark:bg-slate-900 shadow-lg dark:shadow-[4px_6px_0_rgba(0,0,0,0.5)] p-3 text-sm">
                   <div className="flex items-center gap-2 mb-2">
                     <div className="flex h-7 w-7 items-center justify-center rounded-full bg-emerald-50 dark:bg-emerald-500/10">
                       <CheckCircle2 className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
                     </div>
-                    <p className="text-xs font-semibold text-slate-900 dark:text-slate-100">
+                    <p className="text-xs font-semibold text-slate-900 dark:text-slate-50">
                       Tendances détectées
                     </p>
                   </div>
@@ -333,7 +333,7 @@ export function DashboardShell({
           </div>
         </header>
 
-        <main className="flex-1 bg-slate-50 dark:bg-slate-950 transition-colors duration-200">
+        <main className="flex-1 bg-slate-50 dark:bg-slate-950 dashboard-main-bg transition-colors duration-200 relative" data-dashboard="true">
           {showTrialBanner && !showPaywall && (
             <div
               className={`border-b px-4 sm:px-6 py-4 transition-colors duration-200 ${

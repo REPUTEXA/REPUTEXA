@@ -294,7 +294,8 @@
       "establishments": "Mes Établissements",
       "prospects": "Prospects (Sniper)",
       "alerts": "Alertes",
-      "suggestions": "Suggestions",
+      "growth": "Croissance Zenith",
+      "suggestions": "Product Lab",
       "settings": "Paramètres",
       "upgrade": "Upgrader",
       "unlockCta": "Débloquez les réponses illimitées"
@@ -348,10 +349,34 @@
       "error": "Erreur lors de l'envoi"
     }
   },
+  "Growth": {
+    "title": "Agent de Croissance Zenith",
+    "intro": "Statistiques du flux de capture d'avis WhatsApp (Zenith Intelligence) et suggestions d'amélioration.",
+    "stats": {
+      "sollicitations": "Sollicitations envoyées",
+      "optIn": "Opt-in (Oui)",
+      "optInRate": "Taux d'opt-in"
+    },
+    "suggestions": {
+      "title": "Lab d'amélioration",
+      "empty": "Aucune suggestion privée pour le moment."
+    },
+    "error": "Impossible de charger les statistiques."
+  },
   "Suggestions": {
     "page": {
-      "title": "Suggestions",
-      "intro": "Une idée ? Une amélioration ? Dites-nous ce que vous aimeriez voir sur la plateforme."
+      "title": "Reputexa Product Lab",
+      "intro": "Ton lien direct avec l'équipe Reputexa. Partage tes idées pour faire évoluer la plateforme.",
+      "strategicAdvice": "Conseil stratégique de l'IA",
+      "actionPriority": "Action prioritaire",
+      "topTitle": "Top des Suggestions Clients",
+      "empty": "Aucun retour client pour le moment. Les retours du flux Zenith Capture apparaîtront ici.",
+      "emptyZenith": "Activez le plan Zenith pour capturer les retours clients via WhatsApp.",
+      "demandedBy": "Demandé par {count} client ce mois-ci",
+      "demandedBy_plural": "Demandé par {count} clients ce mois-ci",
+      "sentiment": { "Positif": "Positif", "Neutre": "Neutre", "Constructif": "Constructif" },
+      "markResolved": "Marquer comme traité",
+      "markedResolved": "Marqué comme traité"
     },
     "form": {
       "titleLabel": "Titre",
@@ -366,10 +391,12 @@
     },
     "list": {
       "title": "Mes suggestions",
+      "communityWall": "Mur communautaire — Les idées des patrons",
+      "communityEmpty": "Aucune idée pour le moment. Soyez le premier à construire l'avenir de Reputexa !",
       "loading": "Chargement...",
       "loadError": "Impossible de charger vos suggestions.",
       "status": {
-        "PENDING": "Reçu",
+        "PENDING": "À l'étude",
         "IN_PROGRESS": "En cours",
         "DONE": "Terminé"
       }

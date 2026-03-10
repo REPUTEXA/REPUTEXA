@@ -235,7 +235,8 @@
       "establishments": "My Establishments",
       "prospects": "Prospects (Sniper)",
       "alerts": "Alerts",
-      "suggestions": "Suggestions",
+      "growth": "Zenith Growth",
+      "suggestions": "Product Lab",
       "settings": "Settings",
       "upgrade": "Upgrade",
       "unlockCta": "Unlock unlimited responses"
@@ -246,10 +247,35 @@
     "settings": { "title": "Settings", "description": "Manage your account and preferences", "comingSoon": "Coming soon." },
     "form": { "review": "Review", "rating": "Rating", "establishment": "Establishment", "city": "City", "simulate": "Simulate", "placeholder": { "review": "Great restaurant!", "establishment": "Le Bistro", "city": "Paris" }, "error": "Error sending" }
   },
+  "Growth": {
+    "title": "Zenith Growth Agent",
+    "intro": "WhatsApp review capture stats (Zenith Intelligence) and improvement suggestions.",
+    "stats": {
+      "sollicitations": "Sollicitations sent",
+      "optIn": "Opt-in (Yes)",
+      "optInRate": "Opt-in rate"
+    },
+    "suggestions": {
+      "title": "Improvement lab",
+      "empty": "No private suggestions yet."
+    },
+    "error": "Unable to load stats."
+  },
   "Suggestions": {
     "page": {
-      "title": "Suggestions",
-      "intro": "Got an idea or improvement? Tell us what you’d like to see in the platform."
+      "title": "Reputexa Product Lab",
+      "intro": "Your direct link with the Reputexa team. Share your ideas to evolve the platform.",
+      "strategicAdvice": "IA Strategic Advice",
+      "actionPriority": "Priority action",
+      "topTitle": "Top Client Suggestions",
+      "empty": "No client feedback yet. Zenith Capture feedback will appear here.",
+      "emptyZenith": "Enable Zenith plan to capture client feedback via WhatsApp.",
+      "demandedBy": "Requested by {count} client this month",
+      "demandedBy_plural": "Requested by {count} clients this month",
+      "sentiment": { "Positif": "Positive", "Neutre": "Neutral", "Constructif": "Constructive" },
+      "markResolved": "Mark as resolved",
+      "markedResolved": "Marked as resolved",
+      "introLegacy": "Got an idea or improvement? Tell us what you’d like to see in the platform."
     },
     "form": {
       "titleLabel": "Title",
@@ -264,12 +290,14 @@
     },
     "list": {
       "title": "My suggestions",
+      "communityWall": "Community Wall — Patrons' Ideas",
+      "communityEmpty": "No ideas yet. Be the first to build the future of Reputexa!",
       "loading": "Loading...",
       "loadError": "Unable to load your suggestions.",
       "status": {
-        "PENDING": "Received",
+        "PENDING": "Under review",
         "IN_PROGRESS": "In progress",
-        "DONE": "Completed"
+        "DONE": "Done"
       }
     }
   },

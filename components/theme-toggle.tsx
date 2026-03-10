@@ -30,7 +30,7 @@ export function ThemeToggle() {
       type="button"
       onClick={() => setTheme(isDark ? 'light' : 'dark')}
       aria-label={isDark ? 'Mode clair' : 'Mode sombre'}
-      className="relative flex items-center justify-center p-2 rounded-xl text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800 transition-colors duration-300"
+      className="relative flex items-center justify-center min-w-[44px] min-h-[44px] p-2 rounded-2xl text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800 transition-colors duration-300"
       whileTap={{ scale: 0.9 }}
     >
       <AnimatePresence mode="wait" initial={false}>

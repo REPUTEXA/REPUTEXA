@@ -67,7 +67,7 @@ export async function GET() {
     );
     const buffer = await pdf(doc).toBuffer();
 
-    return new NextResponse(buffer, {
+    return new NextResponse(buffer as unknown as BodyInit, {
       status: 200,
       headers: {
         'Content-Type': 'application/pdf',

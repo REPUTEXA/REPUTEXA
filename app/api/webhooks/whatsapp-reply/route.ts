@@ -3,6 +3,7 @@ import { transcribeAudioFromUrl } from '@/lib/whisper';
 import { generateModifiedResponse } from '@/lib/whatsapp-alerts/generate-modified-response';
 import { sendWhatsAppInteractiveCard } from '@/lib/whatsapp-alerts/send-whatsapp-alert';
 import { sendWhatsAppMessage } from '@/lib/whatsapp-alerts/send-whatsapp-message';
+import { handleCaptureReply } from '@/lib/zenith-capture/handle-capture-reply';
 
 export const runtime = 'nodejs';
 export const maxDuration = 60;
@@ -25,9 +26,9 @@ const twimlResponse = () =>
   });
 
 /**
- * Webhook pour les réponses texte/vocal de l'utilisateur après une alerte avis négatif.
+ * Webhook pour les réponses texte/vocal WhatsApp.
+ * Gère : (1) Flux Zenith Capture, (2) Flux alerte avis négatif.
  * Twilio envoie application/x-www-form-urlencoded.
- * Traitement 100% synchrone : on attend Whisper + IA avant de répondre.
  */
 export async function POST(request: Request) {
   console.log('--- VERSION SYNCHRONE ACTIVE ---');
@@ -90,6 +91,7 @@ export async function POST(request: Request) {
 
   let instruction: string;
 
+  // 2. Flux alerte avis négatif
   if (numMedia > 0 && mediaUrl) {
     console.log('[Transcription] Détection vocal: NumMedia=' + numMedia + ', MediaUrl0=' + mediaUrl);
     const accountSid = process.env.TWILIO_ACCOUNT_SID;
@@ -121,7 +123,7 @@ export async function POST(request: Request) {
     instruction = body;
   }
 
-  if (!instruction?.trim()) {
+  if (!instruction?.trim() && numMedia === 0) {
     await sendWhatsAppMessage(
       fromPhone,
       "Je n'ai pas pu comprendre votre message. Envoyez du texte ou un vocal pour modifier la réponse, ou tapez OK pour valider."
@@ -130,6 +132,19 @@ export async function POST(request: Request) {
   }
 
   const supabase = createAdminClient();
+
+  // 1. Flux Zenith Capture (prioritaire si session active)
+  const accountSid = process.env.TWILIO_ACCOUNT_SID;
+  const authToken = process.env.TWILIO_AUTH_TOKEN;
+  const twilioAuth = accountSid && authToken ? { accountSid, authToken } : undefined;
+  const handled = await handleCaptureReply({
+    fromPhone,
+    normalizedPhone: normalized,
+    text: instruction?.trim() || body || '',
+    mediaUrl: numMedia > 0 && !instruction?.trim() ? mediaUrl : undefined,
+    twilioAuth,
+  });
+  if (handled) return twimlResponse();
   const { data: mapping } = supabase
     ? await supabase
         .from('whatsapp_outbound_mapping')

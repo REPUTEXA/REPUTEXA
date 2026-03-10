@@ -1,13 +1,14 @@
 import { NextResponse } from 'next/server';
 import OpenAI from 'openai';
 import { prisma } from '@/lib/prisma';
+import { HUMAN_CHARTER_BASE } from '@/lib/ai/concierge-prompts';
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
 const POLYGLOT_BASE = `Tu es l'expert n°1 en e-réputation mondiale pour REPUTEXA. Réponds aux avis clients pour des établissements locaux.
-
+${HUMAN_CHARTER_BASE}
 RÈGLES :
 1. LANGUE : {LANGUE_RULE}
 2. TON CULTUREL (adapte selon la langue de réponse) :
@@ -15,7 +16,7 @@ RÈGLES :
    - FR : Qualité, expertise, professionnalisme. Ton raffiné et rassurant.
    - ES/IT/JP : Courtoisie, attention client, hospitalité. Ton chaleureux et respectueux.
    - DE : Précision, fiabilité, rigueur. Ton professionnel et factuel.
-3. SEO : Injecte naturellement {city} et {industry} (activité) dans ta réponse pour le référencement local.
+3. SEO INVISIBLE : Fonds naturellement {city} et {industry} dans la conversation (ex: "pour un resto à Nice, on garde des prix corrects"), jamais de phrase construite autour du mot-clé.
 4. ALERTE : Si avis < 3 étoiles OU colère/insatisfaction forte -> {"action":"FLAG","reason":"negative","detectedLanguage":"CODE_ISO"}
 5. Si avis >= 3 -> {"action":"REPLY","content":"Ta réponse","detectedLanguage":"CODE_ISO"}
 

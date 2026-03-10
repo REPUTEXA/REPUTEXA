@@ -20,40 +20,40 @@ export function UpgradeModal({ featureKey, onClose }: Props) {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50"
+      className="fixed inset-0 z-50 flex items-end md:items-center justify-center p-0 md:p-4 bg-black/50 dark:bg-black/70 backdrop-blur-sm"
       onClick={onClose}
       role="dialog"
       aria-modal="true"
       aria-labelledby="upgrade-modal-title"
     >
       <div
-        className="bg-white rounded-2xl shadow-xl max-w-md w-full p-6 border border-slate-200"
+        className="bg-white dark:bg-slate-900 dark:backdrop-blur-md rounded-t-2xl md:rounded-2xl shadow-xl dark:shadow-[4px_6px_0_rgba(0,0,0,0.5)] max-w-md w-full p-6 pb-[max(1.5rem,env(safe-area-inset-bottom))] border border-slate-200 dark:border-slate-800 dark:border-white/[0.07] animate-bottom-sheet-in"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center gap-3 mb-4">
-          <div className="w-10 h-10 rounded-xl bg-amber-100 flex items-center justify-center">
-            <Lock className="w-5 h-5 text-amber-400 drop-shadow-[0_0_4px_rgba(251,191,36,0.6)]" />
+          <div className="w-10 h-10 rounded-xl bg-amber-100 dark:bg-amber-500/20 flex items-center justify-center">
+            <Lock className="w-5 h-5 text-amber-500 dark:text-amber-400 drop-shadow-[0_0_4px_rgba(251,191,36,0.6)]" />
           </div>
-          <h2 id="upgrade-modal-title" className="font-display text-lg font-bold text-slate-900">
+          <h2 id="upgrade-modal-title" className="font-display text-lg font-bold text-slate-900 dark:text-slate-50">
             Fonctionnalité réservée
           </h2>
         </div>
-        <p className="text-slate-600 text-sm leading-relaxed mb-6">
-          Cette fonctionnalité est réservée aux membres <strong className="text-slate-900">{planName}</strong>.
+        <p className="text-slate-600 dark:text-slate-400 text-sm leading-relaxed mb-6">
+          Cette fonctionnalité est réservée aux membres <strong className="text-slate-900 dark:text-slate-50">{planName}</strong>.
           Voulez-vous booster votre visibilité ?
         </p>
         <div className="flex gap-3">
           <button
             type="button"
             onClick={onClose}
-            className="flex-1 py-2.5 rounded-xl border border-slate-200 text-slate-600 font-medium hover:bg-slate-50 transition-colors"
+            className="flex-1 min-h-[44px] py-2.5 rounded-2xl border border-slate-200 dark:border-slate-700 dark:border-white/[0.07] text-slate-600 dark:text-slate-400 font-medium hover:bg-slate-50 dark:hover:bg-slate-800/50 active:scale-[0.98] transition-transform"
           >
             Plus tard
           </button>
           <button
             type="button"
             onClick={handleUpgrade}
-            className="flex-1 py-2.5 rounded-xl bg-blue-600 text-white font-semibold hover:bg-blue-700 transition-colors"
+            className="flex-1 min-h-[44px] py-2.5 rounded-2xl bg-blue-600 dark:bg-indigo-600 text-white font-semibold hover:bg-blue-700 dark:hover:bg-indigo-500 active:scale-[0.98] transition-transform"
           >
             Passer au plan {planName}
           </button>

@@ -174,7 +174,7 @@ export function StatisticsOverview({ reviews, locale }: StatisticsOverviewProps)
     <div className="space-y-4">
       <section className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         {/* Répartition du rating */}
-        <div className="rounded-2xl bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 shadow-sm dark:shadow-soft hover:shadow-[-8px_12px_24px_-10px_rgba(0,0,0,0.1),_0px_10px_15px_-3px_rgba(0,0,0,0.1)] dark:hover:shadow-none dark:hover:border-slate-700 p-5 transition-all duration-300 ease-in-out">
+        <div className="rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 dark:border-white/[0.07] shadow-sm dark:shadow-[4px_6px_0_rgba(0,0,0,0.5)] hover:shadow-[-8px_12px_24px_-10px_rgba(0,0,0,0.1),_0px_10px_15px_-3px_rgba(0,0,0,0.1)] dark:hover:shadow-[4px_6px_0_rgba(0,0,0,0.6)] dark:hover:border-slate-700 p-5 transition-all duration-300 ease-in-out">
           <div className="mb-3">
             <h2 className="font-display font-semibold text-slate-900 dark:text-slate-100 text-sm">
               Répartition des notes
@@ -208,7 +208,7 @@ export function StatisticsOverview({ reviews, locale }: StatisticsOverviewProps)
         </div>
 
         {/* Rapidité de réponse */}
-        <div className="rounded-2xl bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 shadow-sm dark:shadow-soft hover:shadow-[-8px_12px_24px_-10px_rgba(0,0,0,0.1),_0px_10px_15px_-3px_rgba(0,0,0,0.1)] dark:hover:shadow-none dark:hover:border-slate-700 p-5 transition-all duration-300 ease-in-out flex flex-col justify-between">
+        <div className="rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 dark:border-white/[0.07] shadow-sm dark:shadow-[4px_6px_0_rgba(0,0,0,0.5)] hover:shadow-[-8px_12px_24px_-10px_rgba(0,0,0,0.1),_0px_10px_15px_-3px_rgba(0,0,0,0.1)] dark:hover:shadow-[4px_6px_0_rgba(0,0,0,0.6)] dark:hover:border-slate-700 p-5 transition-all duration-300 ease-in-out flex flex-col justify-between">
           <div>
             <h2 className="font-display font-semibold text-slate-900 dark:text-slate-100 text-sm">
               Rapidité de réponse
@@ -229,7 +229,7 @@ export function StatisticsOverview({ reviews, locale }: StatisticsOverviewProps)
         </div>
 
         {/* Top mots-clés */}
-        <div className="rounded-2xl bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 shadow-sm dark:shadow-soft hover:shadow-[-8px_12px_24px_-10px_rgba(0,0,0,0.1),_0px_10px_15px_-3px_rgba(0,0,0,0.1)] dark:hover:shadow-none dark:hover:border-slate-700 p-5 transition-all duration-300 ease-in-out">
+        <div className="rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 dark:border-white/[0.07] shadow-sm dark:shadow-[4px_6px_0_rgba(0,0,0,0.5)] hover:shadow-[-8px_12px_24px_-10px_rgba(0,0,0,0.1),_0px_10px_15px_-3px_rgba(0,0,0,0.1)] dark:hover:shadow-[4px_6px_0_rgba(0,0,0,0.6)] dark:hover:border-slate-700 p-5 transition-all duration-300 ease-in-out">
           <div className="mb-3">
             <h2 className="font-display font-semibold text-slate-900 dark:text-slate-100 text-sm">
               Top mots-clés
@@ -245,7 +245,7 @@ export function StatisticsOverview({ reviews, locale }: StatisticsOverviewProps)
               {topKeywords.map((k) => (
                 <span
                   key={k.word}
-                  className="inline-flex items-center gap-1 rounded-full border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/60 px-2.5 py-1 text-[11px] text-slate-700 dark:text-slate-200"
+                  className="inline-flex items-center gap-1 rounded-full border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 px-2.5 py-1 text-[11px] text-slate-700 dark:text-slate-200"
                 >
                   <span className="font-medium">#{k.word}</span>
                   <span className="text-[10px] text-slate-400">×{k.count}</span>
@@ -257,7 +257,7 @@ export function StatisticsOverview({ reviews, locale }: StatisticsOverviewProps)
       </section>
 
       {/* Comparaison périodique */}
-      <section className="rounded-2xl bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 shadow-sm dark:shadow-soft hover:shadow-[-8px_12px_24px_-10px_rgba(0,0,0,0.1),_0px_10px_15px_-3px_rgba(0,0,0,0.1)] dark:hover:shadow-none dark:hover:border-slate-700 p-5 transition-all duration-300 ease-in-out">
+      <section className="rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 dark:border-white/[0.07] shadow-sm dark:shadow-[4px_6px_0_rgba(0,0,0,0.5)] hover:shadow-[-8px_12px_24px_-10px_rgba(0,0,0,0.1),_0px_10px_15px_-3px_rgba(0,0,0,0.1)] dark:hover:shadow-[4px_6px_0_rgba(0,0,0,0.6)] dark:hover:border-slate-700 p-5 transition-all duration-300 ease-in-out">
         <div className="mb-3 flex items-center justify-between gap-2">
           <div>
             <h2 className="font-display font-semibold text-slate-900 dark:text-slate-100 text-sm">
@@ -320,7 +320,7 @@ export function StatisticsOverview({ reviews, locale }: StatisticsOverviewProps)
       </section>
 
       {/* Insights stratégiques IA (Premium Pulse) */}
-      <section className="rounded-2xl bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 shadow-sm dark:shadow-soft hover:shadow-[-8px_12px_24px_-10px_rgba(0,0,0,0.1),_0px_10px_15px_-3px_rgba(0,0,0,0.1)] dark:hover:shadow-none dark:hover:border-slate-700 p-5 transition-all duration-300 ease-in-out">
+      <section className="rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 dark:border-white/[0.07] shadow-sm dark:shadow-[4px_6px_0_rgba(0,0,0,0.5)] hover:shadow-[-8px_12px_24px_-10px_rgba(0,0,0,0.1),_0px_10px_15px_-3px_rgba(0,0,0,0.1)] dark:hover:shadow-[4px_6px_0_rgba(0,0,0,0.6)] dark:hover:border-slate-700 p-5 transition-all duration-300 ease-in-out">
         <div className="flex items-center justify-between gap-2 mb-3">
           <div>
             <h2 className="font-display font-semibold text-slate-900 dark:text-slate-100 text-sm flex items-center gap-1.5">
@@ -350,7 +350,7 @@ export function StatisticsOverview({ reviews, locale }: StatisticsOverviewProps)
             {insights.map((i, idx) => (
               <div
                 key={`${i.problem}-${idx}`}
-                className="rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/60 px-3.5 py-3 text-xs text-slate-700 dark:text-slate-200"
+                className="rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 px-3.5 py-3 text-xs text-slate-700 dark:text-slate-200"
               >
                 <p className="font-semibold text-slate-900 dark:text-slate-50 mb-0.5">
                   {i.problem}

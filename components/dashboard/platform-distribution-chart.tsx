@@ -8,7 +8,6 @@ import {
   Cell,
   Tooltip as RechartsTooltip,
 } from 'recharts';
-import { useTheme } from 'next-themes';
 
 type PlatformDistributionChartProps = {
   reviews: { source: string }[];
@@ -66,7 +65,6 @@ function CustomTooltip({
 
 export function PlatformDistributionChart({ reviews }: PlatformDistributionChartProps) {
   const [isMounted, setIsMounted] = useState(false);
-  const { resolvedTheme } = useTheme();
 
   useEffect(() => {
     setIsMounted(true);
@@ -103,8 +101,6 @@ export function PlatformDistributionChart({ reviews }: PlatformDistributionChart
   }, [reviews]);
 
   if (!isMounted) return null;
-
-  const isDark = resolvedTheme === 'dark';
   const hasData = reviews.length > 0;
 
   return (

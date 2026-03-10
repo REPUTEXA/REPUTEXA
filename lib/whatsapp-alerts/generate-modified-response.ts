@@ -1,4 +1,5 @@
 import OpenAI from 'openai';
+import { HUMAN_CHARTER_BASE } from '@/lib/ai/concierge-prompts';
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -8,11 +9,11 @@ const SYSTEM_PROMPT = `Tu es un expert en e-réputation. Un patron a reçu une p
 Il t'envoie une instruction de modification (texte ou vocal retranscrit).
 
 Tâche : Fusionne l'avis original + la première réponse + l'instruction du patron pour générer une V2 améliorée.
-
+${HUMAN_CHARTER_BASE}
 Règles :
 - Respecte EXACTEMENT l'instruction du patron (ton, contenu, longueur, etc.).
 - Garde la même langue que l'avis et la première réponse.
-- Reste professionnel et adapté à une réponse publique.
+- Reste humain, organique, jamais robotique. Bannis les formules IA.
 Réponds UNIQUEMENT avec le texte de la nouvelle réponse, rien d'autre.`;
 
 export interface GenerateModifiedResponseInput {

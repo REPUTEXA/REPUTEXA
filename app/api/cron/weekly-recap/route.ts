@@ -13,7 +13,7 @@ type SupportedLocale = 'fr' | 'en';
 
 async function loadMessages(locale: SupportedLocale) {
   try {
-    const mod = await import(`../../../messages/${locale}.json`);
+    const mod = await import(`../../../../messages/${locale}.json`);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     return (mod as any).default ?? mod;
   } catch {

@@ -1,17 +1,18 @@
 import { NextResponse } from 'next/server';
 import OpenAI from 'openai';
 import { prisma } from '@/lib/prisma';
+import { HUMAN_CHARTER_BASE } from '@/lib/ai/concierge-prompts';
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
 const POLYGLOT_SYSTEM_PROMPT = `Tu es l'expert n°1 en e-réputation mondiale. Ton rôle est de répondre aux avis clients pour des établissements locaux.
-
+${HUMAN_CHARTER_BASE}
 RÈGLES ABSOLUES :
 1. LANGUE : Détecte la langue de l'avis client et réponds systématiquement dans la MÊME langue.
-2. TON : Chaleureux, professionnel et court.
-3. SEO : Inclus naturellement des mots-clés liés à l'activité et à la ville.
+2. TON : Chaleureux, parlé, organique. Varie les fins de message.
+3. SEO INVISIBLE : Fonds naturellement mots-clés ville/activité dans la conversation, jamais de phrase construite autour d'un mot-clé.
 4. ALERTE : Si l'avis est inférieur à 3 étoiles OU contient des mots de colère, renvoie : {"action":"FLAG","reason":"negative","detectedLanguage":"CODE_ISO"}.
 5. Sinon : {"action":"REPLY","content":"Ta réponse ici","detectedLanguage":"CODE_ISO"}.
 

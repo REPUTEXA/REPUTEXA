@@ -14,12 +14,12 @@
     --navy: 217 45% 12%;
   }
   .dark {
-    --background: #0f172a;
-    --foreground: #f1f5f9;
+    --background: #020617;
+    --foreground: #f8fafc;
     --muted: 215 20% 35%;
     --muted-foreground: #94a3b8;
-    --card: #1e293b;
-    --border: #334155;
+    --card: #0f172a;
+    --border: #1e293b;
   }
 }
 
@@ -328,6 +328,73 @@ body {
 }
 .animate-lock-shake {
   animation: lock-shake 0.4s ease-in-out;
+}
+
+/* World-Class: Button tactile feedback */
+.btn-tactile {
+  transition: transform 0.15s ease, box-shadow 0.2s ease;
+}
+.btn-tactile:active {
+  transform: scale(0.98);
+}
+
+/* Dashboard dark mode: texture & depth (grands écrans) */
+@media (min-width: 768px) {
+  .dark .dashboard-main-bg {
+    background-image: radial-gradient(at top right, rgba(79, 70, 229, 0.08), transparent 60%);
+  }
+  .dark .dashboard-main-bg::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+  }
+}
+
+/* Input 16px min - évite zoom iOS (dashboard & Product Lab) */
+[data-dashboard="true"] input[type="text"],
+[data-dashboard="true"] input[type="search"],
+[data-dashboard="true"] input[type="email"],
+[data-dashboard="true"] input[type="tel"],
+[data-dashboard="true"] textarea {
+  font-size: 16px;
+}
+@media (min-width: 640px) {
+  [data-dashboard="true"] input[type="text"],
+  [data-dashboard="true"] input[type="search"],
+  [data-dashboard="true"] input[type="email"],
+  [data-dashboard="true"] input[type="tel"] {
+    font-size: 0.875rem;
+  }
+  [data-dashboard="true"] textarea {
+    font-size: 0.875rem;
+  }
+}
+
+/* Bottom sheet animation (mobile) */
+@keyframes bottom-sheet-in {
+  from {
+    transform: translateY(100%);
+    opacity: 0.8;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+.animate-bottom-sheet-in {
+  animation: bottom-sheet-in 0.3s cubic-bezier(0.32, 0.72, 0, 1) forwards;
+}
+
+/* Skeleton pulse */
+@keyframes skeleton-pulse {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 0.7; }
+}
+.animate-skeleton {
+  animation: skeleton-pulse 1.5s ease-in-out infinite;
 }
 
 @layer utilities {

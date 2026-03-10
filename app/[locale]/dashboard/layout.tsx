@@ -2,7 +2,6 @@ import type { Metadata } from 'next';
 import { Suspense } from 'react';
 import { redirect } from 'next/navigation';
 import { setRequestLocale } from 'next-intl/server';
-import { getTranslations } from 'next-intl/server';
 import { createClient } from '@/lib/supabase/server';
 import { toPlanSlug } from '@/lib/feature-gate';
 import { DashboardShell } from '@/components/dashboard/dashboard-shell';
@@ -20,17 +19,6 @@ type Props = {
 export default async function DashboardLayout({ children, params }: Props) {
   const { locale } = await params;
   setRequestLocale(locale);
-
-  const t = await getTranslations('Dashboard.sidebar');
-
-  const labels = {
-    overview: t('overview'),
-    aiResponses: t('aiResponses'),
-    statistics: t('statistics'),
-    settings: t('settings'),
-    upgrade: t('upgrade'),
-    unlockCta: t('unlockCta'),
-  };
 
   const TRIAL_DAYS = 14;
   const PLAN_DISPLAY: Record<string, string> = {
@@ -103,7 +91,6 @@ export default async function DashboardLayout({ children, params }: Props) {
 
   return (
     <DashboardShell
-      labels={labels}
       establishmentName={establishmentName}
       fullName={fullName}
       avatarUrl={avatarUrl}

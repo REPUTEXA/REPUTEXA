@@ -54,12 +54,10 @@ const RANGE_LABELS: { key: RangeKey; label: string }[] = [
 function CustomTooltip({
   active,
   payload,
-  label,
 }: {
   active?: boolean;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   payload?: any[];
-  label?: string;
 }) {
   if (!active || !payload || !payload.length) return null;
   const point = payload[0].payload as ChartPoint;

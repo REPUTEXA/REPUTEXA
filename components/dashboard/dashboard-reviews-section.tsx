@@ -90,14 +90,14 @@ export function DashboardReviewsSection({ reviews, useSupabaseAuth, initialSearc
   return (
     <section className="space-y-4">
       <div className="flex items-center justify-between gap-2 flex-wrap">
-        <h2 className="font-display font-bold text-lg text-slate-900">Derniers avis</h2>
+        <h2 className="font-display font-bold text-lg text-slate-900 dark:text-slate-50">Derniers avis</h2>
         <div className="flex items-center gap-2 flex-wrap justify-end">
           <input
             type="search"
             placeholder="Rechercher par nom"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="text-xs px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-slate-900 placeholder:text-slate-400 max-w-[180px]"
+            className="text-sm sm:text-xs px-3 py-2.5 sm:py-1.5 min-h-[44px] sm:min-h-0 rounded-2xl sm:rounded-lg border border-slate-200 dark:border-slate-800 dark:border-white/[0.07] bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-50 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/30 dark:focus:ring-indigo-500/50 max-w-[180px]"
           />
           <div className="flex items-center gap-1">
             {(['all', 'unanswered', 'negative'] as const).map((f) => (
@@ -107,8 +107,8 @@ export function DashboardReviewsSection({ reviews, useSupabaseAuth, initialSearc
                 onClick={() => setFilter(f)}
                 className={`text-xs font-medium px-3 py-1.5 rounded-lg border transition-colors ${
                   filter === f
-                    ? 'border-sky-500 bg-sky-500 text-white'
-                    : 'border-slate-200 text-slate-600 hover:bg-slate-50'
+                    ? 'border-sky-500 dark:border-indigo-500 bg-sky-500 dark:bg-indigo-500 text-white'
+                    : 'border-slate-200 dark:border-slate-800 dark:border-white/[0.07] text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50'
                 }`}
               >
                 {f === 'all' ? 'Tous' : f === 'unanswered' ? 'Non répondus' : 'Négatifs'}
@@ -118,7 +118,7 @@ export function DashboardReviewsSection({ reviews, useSupabaseAuth, initialSearc
           <select
             value={platform}
             onChange={(e) => setPlatform(e.target.value as PlatformFilter)}
-            className="text-xs px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-slate-700"
+            className="text-xs px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-800 dark:border-white/[0.07] bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 dark:focus:ring-indigo-500/50"
           >
             <option value="all">Toutes plateformes</option>
             <option value="google">Google</option>
@@ -130,15 +130,15 @@ export function DashboardReviewsSection({ reviews, useSupabaseAuth, initialSearc
       </div>
 
       {shieldMessage && (
-        <div className="rounded-lg bg-emerald-50 border border-emerald-200 px-3 py-2 text-sm text-emerald-700">
+        <div className="rounded-lg bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 px-3 py-2 text-sm text-emerald-700 dark:text-emerald-400">
           {shieldMessage}
         </div>
       )}
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {displayReviews.length === 0 ? (
-          <div className="col-span-2 rounded-2xl border border-slate-200 bg-white p-10 text-center">
-            <p className="text-slate-500">
+          <div className="col-span-2 rounded-2xl border border-slate-200 dark:border-slate-800 dark:border-white/[0.07] bg-white dark:bg-slate-900 p-10 text-center shadow-sm dark:shadow-[4px_6px_0_rgba(0,0,0,0.5)]">
+            <p className="text-slate-500 dark:text-slate-400">
               Aucun avis ne correspond aux filtres.
             </p>
           </div>
@@ -148,7 +148,7 @@ export function DashboardReviewsSection({ reviews, useSupabaseAuth, initialSearc
             return (
               <div
                 key={review.id}
-                className="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm hover:shadow-md transition-all"
+                className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 dark:border-white/[0.07] p-5 shadow-sm dark:shadow-[4px_6px_0_rgba(0,0,0,0.5)] hover:shadow-md dark:hover:shadow-[4px_6px_0_rgba(0,0,0,0.6)] transition-all"
               >
                 <div className="flex items-start justify-between mb-3">
                   <div className="flex items-center gap-3">
@@ -156,13 +156,13 @@ export function DashboardReviewsSection({ reviews, useSupabaseAuth, initialSearc
                       {review.reviewerName.charAt(0).toUpperCase()}
                     </div>
                     <div>
-                      <p className="text-sm font-semibold text-slate-900">{review.reviewerName}</p>
+                      <p className="text-sm font-semibold text-slate-900 dark:text-slate-50">{review.reviewerName}</p>
                       <div className="flex items-center gap-2 mt-0.5">
                         <StarRating rating={review.rating} />
                       </div>
                     </div>
                   </div>
-                  <span className="text-xs text-slate-400">il y a peu</span>
+                  <span className="text-xs text-slate-400 dark:text-slate-500">il y a peu</span>
                 </div>
                 <div className="flex items-center gap-2 mb-3">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
@@ -170,10 +170,10 @@ export function DashboardReviewsSection({ reviews, useSupabaseAuth, initialSearc
                     {review.source}
                   </span>
                 </div>
-                <p className="text-sm text-slate-700 leading-relaxed mb-4">{review.comment}</p>
+                <p className="text-sm text-slate-700 dark:text-slate-400 leading-relaxed mb-4">{review.comment}</p>
                 <div className="flex items-center gap-3 flex-wrap">
                   {hasResponse ? (
-                    <span className="flex items-center gap-1.5 text-xs text-emerald-600 font-medium">
+                    <span className="flex items-center gap-1.5 text-xs text-emerald-600 dark:text-emerald-400 font-medium">
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
                         viewBox="0 0 24 24"
@@ -193,7 +193,7 @@ export function DashboardReviewsSection({ reviews, useSupabaseAuth, initialSearc
                     <button
                       type="button"
                       onClick={() => setModalReviewId(review.id)}
-                      className="inline-flex items-center gap-1.5 text-xs font-semibold text-sky-600 hover:text-sky-700"
+                      className="inline-flex items-center gap-1.5 text-xs font-semibold text-sky-600 dark:text-indigo-400 hover:text-sky-700 dark:hover:text-indigo-300"
                     >
                       <Zap className="w-3.5 h-3.5" />
                       Générer une réponse IA
@@ -204,7 +204,7 @@ export function DashboardReviewsSection({ reviews, useSupabaseAuth, initialSearc
                       type="button"
                       onClick={() => handleShieldReport(review.id)}
                       disabled={!!shieldLoading}
-                      className="inline-flex items-center gap-1.5 text-xs font-medium text-slate-600 hover:text-slate-800 disabled:opacity-60"
+                      className="inline-flex items-center gap-1.5 text-xs font-medium text-slate-600 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-300 disabled:opacity-60"
                     >
                       {shieldLoading === review.id ? (
                         <Loader2 className="w-3.5 h-3.5 animate-spin" />

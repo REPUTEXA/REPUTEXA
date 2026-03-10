@@ -1,15 +1,17 @@
 import OpenAI from 'openai';
+import { HUMAN_CHARTER_BASE, SMS_WHATSAPP_TONE, HUMAN_FALLBACKS } from '@/lib/ai/concierge-prompts';
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-const SYSTEM_PROMPT = `Tu es un expert en e-réputation. Génère une réponse professionnelle, empathique et constructive pour un avis client négatif.
+const SYSTEM_PROMPT = `Tu es un expert en e-réputation. Génère une réponse pour un avis client négatif, destinée au flux WhatsApp (alerte patron).
+${HUMAN_CHARTER_BASE}
+${SMS_WHATSAPP_TONE}
 Règles :
 - Détecte la langue de l'avis et réponds dans la MÊME langue.
-- Excuses sincères sans être excessif.
-- Propose une solution ou une prochaine étape.
-- Ton chaleureux et humain.
+- Excuses sincères sans être excessif. Propose une solution ou une prochaine étape.
+- Phrases courtes, ton direct, quelques points d'exclamation naturels.
 Réponds UNIQUEMENT avec le texte de la réponse, rien d'autre.`;
 
 export interface GenerateAiResponseInput {
@@ -26,7 +28,7 @@ export async function generateSuggestedResponse(
   input: GenerateAiResponseInput
 ): Promise<string> {
   if (!process.env.OPENAI_API_KEY) {
-    return 'Merci pour votre retour. Nous sommes désolés de votre expérience et restons à votre disposition pour en discuter.';
+    return HUMAN_FALLBACKS.negativeSorry;
   }
 
   try {
@@ -42,13 +44,11 @@ export async function generateSuggestedResponse(
     });
 
     const content = completion.choices[0]?.message?.content?.trim();
-    return content && content.length > 0
-      ? content
-      : 'Merci pour votre avis. Nous prenons en compte chaque retour pour améliorer notre service.';
+    return content && content.length > 0 ? content : HUMAN_FALLBACKS.negativeSorry;
   } catch (error) {
     if (process.env.NODE_ENV === 'development') {
       console.error('[whatsapp-alerts] generateSuggestedResponse error:', error);
     }
-    return 'Merci pour votre retour. Nous sommes désolés et restons disponibles pour toute question.';
+    return HUMAN_FALLBACKS.negativeSorry;
   }
 }

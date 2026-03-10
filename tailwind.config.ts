@@ -35,6 +35,8 @@ const config: Config = {
         "fade-up": "fade-up 0.6s ease-out forwards",
         "logo-pulse": "logo-pulse 2s ease-in-out infinite",
         "chart-rise": "chart-rise 1.5s ease-out forwards",
+        "bottom-sheet-in": "bottom-sheet-in 0.3s cubic-bezier(0.32, 0.72, 0, 1) forwards",
+        "skeleton": "skeleton-pulse 1.5s ease-in-out infinite",
       },
       keyframes: {
         "glow-pulse": {
@@ -56,6 +58,14 @@ const config: Config = {
         "chart-rise": {
           "0%": { transform: "scaleY(0)", transformOrigin: "bottom" },
           "100%": { transform: "scaleY(1)", transformOrigin: "bottom" },
+        },
+        "skeleton-pulse": {
+          "0%, 100%": { opacity: "0.4" },
+          "50%": { opacity: "0.7" },
+        },
+        "bottom-sheet-in": {
+          "0%": { transform: "translateY(100%)" },
+          "100%": { transform: "translateY(0)" },
         },
       },
       boxShadow: {

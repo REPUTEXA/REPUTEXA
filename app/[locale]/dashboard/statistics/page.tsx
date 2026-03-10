@@ -91,7 +91,7 @@ export default async function StatisticsPage({ params }: Props) {
         </div>
         <a
           href="/api/reports/monthly"
-          className="inline-flex items-center gap-2 rounded-xl bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700 px-3.5 py-2 text-xs font-semibold text-slate-700 dark:text-slate-100 hover:shadow-[-8px_12px_24px_-10px_rgba(0,0,0,0.1),_0px_10px_15px_-3px_rgba(0,0,0,0.1)] dark:hover:shadow-none dark:hover:border-slate-500 transition-all duration-300 ease-in-out"
+          className="inline-flex items-center gap-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 dark:border-white/[0.07] px-3.5 py-2 text-xs font-semibold text-slate-700 dark:text-slate-50 hover:shadow-[-8px_12px_24px_-10px_rgba(0,0,0,0.1),_0px_10px_15px_-3px_rgba(0,0,0,0.1)] dark:hover:shadow-[4px_6px_0_rgba(0,0,0,0.5)] dark:hover:border-slate-700 transition-all duration-300 ease-in-out"
         >
           <FileText className="w-4 h-4" />
           Télécharger le rapport PDF

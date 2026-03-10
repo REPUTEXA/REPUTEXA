@@ -11,12 +11,6 @@ const TRIAL_DAYS = 14;
 const PLAN_DISPLAY: Record<string, string> = {
   vision: 'Vision',
   pulse: 'Pulse',
-  zenith: 'Zenith',
-  starter: 'Vision',
-  manager: 'Pulse',
-  Dominator: 'ZENITH',
-  vision: 'Vision',
-  pulse: 'Pulse',
   zenith: 'ZENITH',
 };
 
@@ -74,7 +68,7 @@ export async function GET(request: Request) {
     if (!trialEnd || trialEnd !== targetDateStr) continue;
 
     const planSlug = (p.selected_plan || p.subscription_plan || 'zenith') as string;
-    const planName = PLAN_DISPLAY[planSlug] ?? 'Zenith';
+    const planName = PLAN_DISPLAY[planSlug] ?? 'ZENITH';
     const checkoutUrl = `${APP_URL}/fr/checkout?plan=${planSlug}&trial=0`;
     const fullName = (p.full_name || p.establishment_name || '') as string;
     const firstName = fullName.split(/\s+/)[0] || '';

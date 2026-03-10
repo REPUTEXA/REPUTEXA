@@ -708,11 +708,19 @@ export default function HomePage() {
               <ul className="space-y-2.5 mb-6 flex-1">
                 <li className="flex items-center gap-2.5 text-sm">
                   <Check className="w-4 h-4 flex-shrink-0 text-primary" aria-hidden="true" />
-                  <span className="text-foreground/80">{t('pricing.comparison.ai_local')}</span>
+                  <span className="text-foreground/80">{t('pricing.comparison.card_reponses')}</span>
                 </li>
                 <li className="flex items-center gap-2.5 text-sm">
                   <Check className="w-4 h-4 flex-shrink-0 text-primary" aria-hidden="true" />
-                  <span className="text-foreground/80">{t('pricing.comparison.reporting_pdf')}</span>
+                  <span className="text-foreground/80">{t('pricing.comparison.card_reporting_vision')}</span>
+                </li>
+                <li className="flex items-center gap-2.5 text-sm">
+                  <Check className="w-4 h-4 flex-shrink-0 text-primary" aria-hidden="true" />
+                  <span className="text-foreground/80">{t('pricing.comparison.card_ia_tests')}</span>
+                </li>
+                <li className="flex items-center gap-2.5 text-sm">
+                  <Check className="w-4 h-4 flex-shrink-0 text-primary" aria-hidden="true" />
+                  <span className="text-foreground/80">{t('pricing.comparison.card_langues_vision')}</span>
                 </li>
               </ul>
               <p className="text-xs text-emerald-600 font-medium mb-4">{t('pricing.trialMention')}</p>
@@ -752,31 +760,27 @@ export default function HomePage() {
               <ul className="space-y-2.5 mb-6 flex-1">
                 <li className="flex items-center gap-2.5 text-sm">
                   <Check className="w-4 h-4 flex-shrink-0 text-white" aria-hidden="true" />
-                  <span className="text-white/80">{t('pricing.comparison.ai_local')}</span>
+                  <span className="text-white/80">{t('pricing.comparison.card_reponses')}</span>
                 </li>
                 <li className="flex items-center gap-2.5 text-sm">
                   <Check className="w-4 h-4 flex-shrink-0 text-white" aria-hidden="true" />
-                  <span className="text-white/80">{t('pricing.comparison.ai_all_languages')}</span>
+                  <span className="text-white/80">{t('pricing.comparison.card_alertes')}</span>
                 </li>
                 <li className="flex items-center gap-2.5 text-sm">
                   <Check className="w-4 h-4 flex-shrink-0 text-white" aria-hidden="true" />
-                  <span className="text-white/80">{t('pricing.comparison.reporting_pdf')}</span>
+                  <span className="text-white/80">{t('pricing.comparison.card_reporting_pulse')}</span>
                 </li>
                 <li className="flex items-center gap-2.5 text-sm">
                   <Check className="w-4 h-4 flex-shrink-0 text-white" aria-hidden="true" />
-                  <span className="text-white/80">{t('pricing.comparison.triple_verification')}</span>
+                  <span className="text-white/80">{t('pricing.comparison.card_suppression')}</span>
                 </li>
                 <li className="flex items-center gap-2.5 text-sm">
                   <Check className="w-4 h-4 flex-shrink-0 text-white" aria-hidden="true" />
-                  <span className="text-white/80">{t('pricing.comparison.whatsapp_alerts')}</span>
+                  <span className="text-white/80">{t('pricing.comparison.card_ia_tests')}</span>
                 </li>
                 <li className="flex items-center gap-2.5 text-sm">
                   <Check className="w-4 h-4 flex-shrink-0 text-white" aria-hidden="true" />
-                  <span className="text-white/80">{t('pricing.comparison.reporting_whatsapp_recap')}</span>
-                </li>
-                <li className="flex items-center gap-2.5 text-sm">
-                  <Check className="w-4 h-4 flex-shrink-0 text-white" aria-hidden="true" />
-                  <span className="text-white/80">{t('pricing.comparison.shield_alert')}</span>
+                  <span className="text-white/80">{t('pricing.comparison.card_langues_autres')}</span>
                 </li>
               </ul>
               <p className="text-xs text-emerald-200 font-medium mb-4">{t('pricing.trialMention')}</p>
@@ -813,39 +817,35 @@ export default function HomePage() {
               <ul className="space-y-2.5 mb-6 flex-1">
                 <li className="flex items-center gap-2.5 text-sm">
                   <Check className="w-4 h-4 flex-shrink-0 text-primary" aria-hidden="true" />
-                  <span className="text-foreground/80">{t('pricing.comparison.ai_local')}</span>
+                  <span className="text-foreground/80">{t('pricing.comparison.card_reponses')}</span>
                 </li>
                 <li className="flex items-center gap-2.5 text-sm">
                   <Check className="w-4 h-4 flex-shrink-0 text-primary" aria-hidden="true" />
-                  <span className="text-foreground/80">{t('pricing.comparison.ai_all_languages')}</span>
+                  <span className="text-foreground/80">{t('pricing.comparison.card_triple')}</span>
                 </li>
                 <li className="flex items-center gap-2.5 text-sm">
                   <Check className="w-4 h-4 flex-shrink-0 text-primary" aria-hidden="true" />
-                  <span className="text-foreground/80">{t('pricing.comparison.reporting_pdf')}</span>
+                  <span className="text-foreground/80">{t('pricing.comparison.card_alertes')}</span>
                 </li>
                 <li className="flex items-center gap-2.5 text-sm">
                   <Check className="w-4 h-4 flex-shrink-0 text-primary" aria-hidden="true" />
-                  <span className="text-foreground/80">{t('pricing.comparison.triple_verification')}</span>
+                  <span className="text-foreground/80">{t('pricing.comparison.card_reporting_pulse')}</span>
                 </li>
                 <li className="flex items-center gap-2.5 text-sm">
                   <Check className="w-4 h-4 flex-shrink-0 text-primary" aria-hidden="true" />
-                  <span className="text-foreground/80">{t('pricing.comparison.whatsapp_alerts')}</span>
+                  <span className="text-foreground/80 font-semibold">{t('pricing.comparison.card_boost_seo')}</span>
                 </li>
                 <li className="flex items-center gap-2.5 text-sm">
                   <Check className="w-4 h-4 flex-shrink-0 text-primary" aria-hidden="true" />
-                  <span className="text-foreground/80">{t('pricing.comparison.reporting_whatsapp_recap')}</span>
+                  <span className="text-foreground/80">{t('pricing.comparison.card_suppression')}</span>
                 </li>
                 <li className="flex items-center gap-2.5 text-sm">
                   <Check className="w-4 h-4 flex-shrink-0 text-primary" aria-hidden="true" />
-                  <span className="text-foreground/80">{t('pricing.comparison.shield_alert')}</span>
+                  <span className="text-foreground/80">{t('pricing.comparison.card_ai_capture')}</span>
                 </li>
                 <li className="flex items-center gap-2.5 text-sm">
                   <Check className="w-4 h-4 flex-shrink-0 text-primary" aria-hidden="true" />
-                  <span className="text-foreground/80">{t('pricing.comparison.ai_capture')}</span>
-                </li>
-                <li className="flex items-center gap-2.5 text-sm">
-                  <Check className="w-4 h-4 flex-shrink-0 text-primary" aria-hidden="true" />
-                  <span className="text-foreground/80">{t('pricing.comparison.pos_connector')}</span>
+                  <span className="text-foreground/80">{t('pricing.comparison.card_langues_autres')}</span>
                 </li>
               </ul>
               <p className="text-xs text-emerald-600 font-medium mb-4">{t('pricing.trialMention')}</p>
@@ -888,16 +888,20 @@ export default function HomePage() {
               {t('faq.headline')}
             </h2>
           </div>
-          <div className="space-y-4">
+          <div className="space-y-3">
             {FAQ_KEYS.map((key) => (
               <div
                 key={key}
-                className="bg-white rounded-2xl border border-slate-200 overflow-hidden transition-all duration-300 hover:shadow-soft"
+                className={`bg-white rounded-xl overflow-hidden transition-all duration-200 ${
+                  openFaq === key
+                    ? 'border border-slate-300/80 shadow-sm'
+                    : 'border border-slate-200/90 hover:border-slate-200'
+                }`}
               >
                 <button
                   type="button"
                   onClick={() => setOpenFaq(openFaq === key ? null : key)}
-                  className="w-full p-5 text-left flex items-center justify-between focus:outline-none focus:ring-2 focus:ring-primary focus:ring-inset"
+                  className="w-full p-5 text-left flex items-center justify-between focus:outline-none focus-visible:ring-1 focus-visible:ring-slate-300 focus-visible:ring-inset"
                 >
                   <span className="font-display font-semibold text-slate-900 pr-4">
                     {t(`faq.items.${key}.q`)}

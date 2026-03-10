@@ -13,7 +13,7 @@ export const FEATURES = {
   AI_REPLIES_LOCAL: 'ai_replies_local',
   /** Réponses IA toutes langues / natif (Pulse+) */
   AI_REPLIES_ALL_LANGUAGES: 'ai_replies_all_languages',
-  /** Triple Vérification IA (3 options, choisit la meilleure) — Pulse+ */
+  /** Triple Vérification IA (3 options, choisit la meilleure) — Zenith uniquement */
   TRIPLE_VERIFICATION: 'triple_verification',
   /** Reporting PDF mensuel simple — Vision+ */
   REPORTING_PDF: 'reporting_pdf',
@@ -57,6 +57,16 @@ export const PLAN_DISPLAY: Record<PlanSlug, string> = {
 function planLevel(plan: PlanSlug): number {
   const i = PLAN_ORDER.indexOf(plan);
   return i === -1 ? 0 : i + 1;
+}
+
+/**
+ * Vérifie si le plan de l'utilisateur atteint le plan requis.
+ * @param userPlan - Plan actuel (vision | pulse | zenith)
+ * @param requiredPlan - Plan minimum requis
+ */
+export function checkPlan(userPlan: PlanSlug | null, requiredPlan: PlanSlug): boolean {
+  if (!userPlan || !PLAN_ORDER.includes(userPlan)) return false;
+  return planLevel(userPlan) >= planLevel(requiredPlan);
 }
 
 /** Vérifie si le plan a accès à la fonctionnalité */

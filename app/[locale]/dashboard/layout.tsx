@@ -32,13 +32,14 @@ export default async function DashboardLayout({ children, params }: Props) {
   let establishmentName = 'Mon établissement';
   let fullName = '';
   let avatarUrl: string | null = null;
-  let hasDominatorPlan = false;
   let trialDaysLeft: number | null = null;
   let trialEndDate: string | null = null;
   let showPaywall = false;
   let showTrialBanner = false;
   let planDisplayName = 'Pulse';
   let selectedPlanSlug: 'vision' | 'pulse' | 'zenith' = 'pulse';
+  let isTrialing = false;
+  let hasActiveSubscription = false;
 
   if (user) {
     const { data: profile, error: profileError } = await supabase
@@ -65,10 +66,8 @@ export default async function DashboardLayout({ children, params }: Props) {
           : null;
       const now = new Date();
       const trialInFuture = trialEnd && now < trialEnd;
-      const hasActiveSubscription = profile.subscription_status === 'active';
-
-      // Accès Zenith si trial_ends_at dans le futur OU abonnement actif
-      hasDominatorPlan = !!(hasActiveSubscription || (trialInFuture && (profile.subscription_plan === 'Dominator' || profile.selected_plan === 'zenith')));
+      hasActiveSubscription = profile.subscription_status === 'active';
+      isTrialing = !!trialInFuture && !hasActiveSubscription;
 
       // Redirection /upgrade : trial expiré ET pas d'abonnement actif (pas de stripe)
       if (profile.subscription_status === 'expired') {
@@ -94,13 +93,16 @@ export default async function DashboardLayout({ children, params }: Props) {
       establishmentName={establishmentName}
       fullName={fullName}
       avatarUrl={avatarUrl}
-      hasDominatorPlan={hasDominatorPlan}
       trialDaysLeft={trialDaysLeft}
       trialEndDate={trialEndDate}
       showTrialBanner={showTrialBanner}
       planDisplayName={planDisplayName}
       selectedPlanSlug={selectedPlanSlug}
       isCriticalPhase={isCriticalPhase}
+      showPaywall={showPaywall}
+      isTrialing={isTrialing}
+      hasActiveSubscription={hasActiveSubscription}
+      locale={locale}
     >
       <Suspense fallback={null}>
         <StripeSyncOnReturn />

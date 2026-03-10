@@ -13,6 +13,7 @@ type AppSuggestion = {
   upvotes_count: number;
   created_at: string;
   user_has_upvoted: boolean;
+  image_url?: string | null;
 };
 
 const STATUS_STYLES: Record<string, string> = {
@@ -40,6 +41,8 @@ export default function SuggestionsPage() {
   const [transcribing, setTranscribing] = useState(false);
   const [suggestingTitle, setSuggestingTitle] = useState(false);
   const [upvoting, setUpvoting] = useState<string | null>(null);
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
@@ -69,16 +72,31 @@ export default function SuggestionsPage() {
     }
     setSubmitting(true);
     try {
-      const res = await fetch('/api/app-suggestions', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ title: title.trim(), description: description.trim() }),
-      });
+      let res: Response;
+      if (imageFile) {
+        const form = new FormData();
+        form.append('title', title.trim());
+        form.append('description', description.trim());
+        form.append('image', imageFile);
+        res = await fetch('/api/app-suggestions', {
+          method: 'POST',
+          body: form,
+          credentials: 'include',
+        });
+      } else {
+        res = await fetch('/api/app-suggestions', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ title: title.trim(), description: description.trim() }),
+        });
+      }
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? t('form.genericError'));
       toast.success(t('form.submitSuccess'));
       setTitle('');
       setDescription('');
+      setImageFile(null);
+      setImagePreview(null);
       setSuggestions((prev) => [data.suggestion, ...prev]);
     } catch (err) {
       toast.error(err instanceof Error ? err.message : t('form.genericError'));
@@ -135,7 +153,9 @@ export default function SuggestionsPage() {
 
   const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (!file) return;
+    if (!file || !file.type.startsWith('image/')) return;
+    setImageFile(file);
+    setImagePreview(URL.createObjectURL(file));
     setSuggestingTitle(true);
     try {
       const form = new FormData();
@@ -147,12 +167,18 @@ export default function SuggestionsPage() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? 'Erreur analyse');
       if (data.title) setTitle(data.title);
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'Erreur analyse');
+    } catch {
+      // Silently ignore AI suggestion failure; photo is still attached
     } finally {
       setSuggestingTitle(false);
       e.target.value = '';
     }
+  };
+
+  const removeImage = () => {
+    if (imagePreview) URL.revokeObjectURL(imagePreview);
+    setImageFile(null);
+    setImagePreview(null);
   };
 
   const handleUpvote = async (id: string) => {
@@ -226,7 +252,7 @@ export default function SuggestionsPage() {
                 type="button"
                 onClick={handleCameraClick}
                 disabled={suggestingTitle}
-                title="Envoyer une capture pour suggérer un titre"
+                title="Joindre une photo (optionnel)"
                 className="flex items-center justify-center min-w-[44px] min-h-[44px] p-2.5 rounded-2xl border border-slate-200 dark:border-slate-800 dark:border-white/[0.07] bg-slate-50 dark:bg-slate-900 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 active:scale-[0.98] transition-transform disabled:opacity-50 transition-colors"
               >
                 {suggestingTitle ? (
@@ -236,6 +262,23 @@ export default function SuggestionsPage() {
                 )}
               </button>
             </div>
+            {imagePreview && (
+              <div className="relative mt-2 inline-block">
+                <img
+                  src={imagePreview}
+                  alt="Photo jointe"
+                  className="h-20 w-auto rounded-xl border border-slate-200 dark:border-slate-700 object-cover"
+                />
+                <button
+                  type="button"
+                  onClick={removeImage}
+                  aria-label="Retirer la photo"
+                  className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-red-500 text-white text-xs font-bold hover:bg-red-600"
+                >
+                  ×
+                </button>
+              </div>
+            )}
           </div>
           <div>
             <label
@@ -333,6 +376,13 @@ export default function SuggestionsPage() {
                       <span className="text-xs font-semibold">{s.upvotes_count}</span>
                     </button>
                     <div className="min-w-0 flex-1">
+                      {s.image_url && (
+                        <img
+                          src={s.image_url}
+                          alt=""
+                          className="mb-2 w-full max-h-32 rounded-lg object-cover border border-slate-200 dark:border-slate-700"
+                        />
+                      )}
                       <p className="font-medium text-slate-900 dark:text-slate-50">{s.title}</p>
                       {s.description && (
                         <p className="text-sm text-slate-600 dark:text-slate-400 mt-1 line-clamp-3">

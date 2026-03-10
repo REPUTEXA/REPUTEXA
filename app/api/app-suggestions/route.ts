@@ -14,7 +14,7 @@ export async function GET() {
 
   const { data, error } = await supabase
     .from('app_suggestions')
-    .select('id, title, description, status, upvotes_count, created_at, user_id')
+    .select('id, title, description, status, upvotes_count, created_at, user_id, image_url')
     .order('upvotes_count', { ascending: false })
     .order('created_at', { ascending: false })
     .limit(100);
@@ -40,7 +40,7 @@ export async function GET() {
 
 /**
  * POST /api/app-suggestions
- * Crée une suggestion produit (Product Lab).
+ * Crée une suggestion produit. Accepte JSON ou FormData (avec image).
  */
 export async function POST(request: Request) {
   const supabase = await createClient();
@@ -49,12 +49,48 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const body = await request.json().catch(() => ({}));
-  const title = String(body.title ?? '').trim();
-  const description = String(body.description ?? '').trim();
+  let title = '';
+  let description = '';
+  let imageFile: File | null = null;
+
+  const contentType = request.headers.get('content-type') ?? '';
+  if (contentType.includes('multipart/form-data')) {
+    const form = await request.formData().catch(() => null);
+    if (form) {
+      title = String(form.get('title') ?? '').trim();
+      description = String(form.get('description') ?? '').trim();
+      const img = form.get('image');
+      if (img instanceof File && img.size > 0) {
+        imageFile = img;
+      }
+    }
+  } else {
+    const body = await request.json().catch(() => ({}));
+    title = String(body.title ?? '').trim();
+    description = String(body.description ?? '').trim();
+  }
 
   if (!title) {
     return NextResponse.json({ error: 'Le titre est requis' }, { status: 400 });
+  }
+
+  let imageUrl: string | null = null;
+  if (imageFile) {
+    const ext = imageFile.name.split('.').pop()?.toLowerCase() || 'jpg';
+    const safeExt = ['jpeg', 'jpg', 'png', 'webp', 'gif'].includes(ext) ? ext : 'jpg';
+    const path = `${user.id}/${crypto.randomUUID()}.${safeExt}`;
+    const { data: uploadData, error: uploadError } = await supabase.storage
+      .from('suggestion-images')
+      .upload(path, imageFile, {
+        contentType: imageFile.type || 'image/jpeg',
+        upsert: false,
+      });
+    if (uploadError) {
+      console.error('[app-suggestions] upload error:', uploadError);
+      return NextResponse.json({ error: 'Erreur lors de l\'upload de la photo' }, { status: 500 });
+    }
+    const { data: urlData } = supabase.storage.from('suggestion-images').getPublicUrl(uploadData.path);
+    imageUrl = urlData.publicUrl;
   }
 
   const { data, error } = await supabase
@@ -64,8 +100,9 @@ export async function POST(request: Request) {
       title,
       description: description || '',
       status: 'PENDING',
+      ...(imageUrl && { image_url: imageUrl }),
     })
-    .select('id, title, description, status, upvotes_count, created_at')
+    .select('id, title, description, status, upvotes_count, created_at, image_url')
     .single();
 
   if (error) {

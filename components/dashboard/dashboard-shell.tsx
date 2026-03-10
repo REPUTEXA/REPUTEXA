@@ -6,11 +6,11 @@ import { useSearchParams, useParams } from 'next/navigation';
 import { Link } from '@/i18n/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { getSiteUrl } from '@/lib/site-url';
-import { LogOut, LayoutDashboard, BarChart2, Bell, Lightbulb, Settings, Menu, X, Search, Building2, Shield, Lock, CheckCircle2, TrendingUp } from 'lucide-react';
+import { LogOut, LayoutDashboard, BarChart2, Bell, Lightbulb, Settings, Menu, X, Search, Building2, CheckCircle2, TrendingUp } from 'lucide-react';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { LanguageSelector } from '@/components/language-selector';
-import { hasFeature, FEATURES, type FeatureKey } from '@/lib/feature-gate';
-import { UpgradeModal } from '@/components/dashboard/upgrade-modal';
+import { checkPlan, type PlanSlug } from '@/lib/feature-gate';
+import { PlanBadge } from './plan-badge';
 import { useTranslations } from 'next-intl';
 
 function SignOutButton() {
@@ -46,15 +46,15 @@ const navItems: Array<{
   href: string;
   icon: React.ComponentType<{ className?: string }>;
   key: keyof typeof NAV_LABEL_KEYS;
-  featureKey?: FeatureKey;
+  minPlan: PlanSlug;
 }> = [
-  { href: '/dashboard', icon: LayoutDashboard, key: 'overview' },
-  { href: '/dashboard/reviews', icon: StarNavIcon, key: 'aiResponses' },
-  { href: '/dashboard/statistics', icon: BarChart2, key: 'statistics' },
-  { href: '/dashboard/alerts', icon: Bell, key: 'alerts', featureKey: FEATURES.WHATSAPP_ALERTS },
-  { href: '/dashboard/growth', icon: TrendingUp, key: 'growth', featureKey: FEATURES.AI_CAPTURE },
-  { href: '/dashboard/suggestions', icon: Lightbulb, key: 'suggestions' },
-  { href: '/dashboard/settings', icon: Settings, key: 'settings' },
+  { href: '/dashboard', icon: LayoutDashboard, key: 'overview', minPlan: 'vision' },
+  { href: '/dashboard/reviews', icon: StarNavIcon, key: 'aiResponses', minPlan: 'vision' },
+  { href: '/dashboard/statistics', icon: BarChart2, key: 'statistics', minPlan: 'vision' },
+  { href: '/dashboard/alerts', icon: Bell, key: 'alerts', minPlan: 'pulse' },
+  { href: '/dashboard/growth', icon: TrendingUp, key: 'growth', minPlan: 'zenith' },
+  { href: '/dashboard/suggestions', icon: Lightbulb, key: 'suggestions', minPlan: 'pulse' },
+  { href: '/dashboard/settings', icon: Settings, key: 'settings', minPlan: 'vision' },
 ];
 
 const NAV_LABEL_KEYS = {
@@ -74,14 +74,16 @@ type Props = {
   establishmentName?: string;
   fullName?: string;
   avatarUrl?: string | null;
-  hasDominatorPlan?: boolean;
   trialDaysLeft?: number | null;
   trialEndDate?: string | null;
   showTrialBanner?: boolean;
   planDisplayName?: string;
-  selectedPlanSlug?: 'vision' | 'pulse' | 'zenith';
+  selectedPlanSlug?: PlanSlug;
   isCriticalPhase?: boolean;
   showPaywall?: boolean;
+  isTrialing?: boolean;
+  hasActiveSubscription?: boolean;
+  locale?: string;
   children: React.ReactNode;
 };
 
@@ -95,7 +97,6 @@ export function DashboardShell({
   establishmentName = 'Mon établissement',
   fullName = '',
   avatarUrl = null,
-  hasDominatorPlan = false,
   trialDaysLeft = null,
   trialEndDate = null,
   showTrialBanner = false,
@@ -103,6 +104,9 @@ export function DashboardShell({
   selectedPlanSlug = 'pulse',
   isCriticalPhase = false,
   showPaywall = false,
+  isTrialing = false,
+  hasActiveSubscription = false,
+  locale = 'fr',
   children,
 }: Props) {
   const tSidebar = useTranslations('Dashboard.sidebar');
@@ -111,8 +115,6 @@ export function DashboardShell({
   const router = useRouter();
   const searchParams = useSearchParams();
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [upgradeModalFeature, setUpgradeModalFeature] = useState<FeatureKey | null>(null);
-  const [shakingLock, setShakingLock] = useState<FeatureKey | null>(null);
   const qParam = searchParams?.get('q') ?? '';
   const [searchInput, setSearchInput] = useState(qParam);
   const [showNotificationTrends, setShowNotificationTrends] = useState(false);
@@ -192,86 +194,41 @@ export function DashboardShell({
         </div>
 
         <nav className="flex-1 px-2 py-3 space-y-0.5">
-          {navItems.map((item) => {
-            const isActive =
-              item.href === '/dashboard'
-                ? pathname === '/dashboard' || pathname?.endsWith('/dashboard')
-                : pathname?.startsWith(item.href);
-            const Icon = item.icon;
-            const label = tSidebar(NAV_LABEL_KEYS[item.key]);
-            const locked = item.featureKey && !hasFeature(selectedPlanSlug, item.featureKey);
-            const baseClass = `flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-150 ${
-              locked ? 'opacity-50 cursor-pointer' : ''
-            } ${
-              isActive && !locked
-                ? 'bg-blue-500 text-white shadow-glow'
-                : locked
-                  ? 'text-white/60 hover:opacity-70'
+          {navItems
+            .filter((item) => checkPlan(selectedPlanSlug, item.minPlan))
+            .map((item) => {
+              const isActive =
+                item.href === '/dashboard'
+                  ? pathname === '/dashboard' || pathname?.endsWith('/dashboard')
+                  : pathname?.startsWith(item.href);
+              const Icon = item.icon;
+              const label = tSidebar(NAV_LABEL_KEYS[item.key]);
+              const baseClass = `flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-150 ${
+                isActive
+                  ? 'bg-blue-500 text-white shadow-glow'
                   : 'text-white/60 hover:text-white hover:bg-white/8'
-            }`;
-            if (locked) {
-              const fk = item.featureKey!;
+              }`;
               return (
-                <button
+                <Link
                   key={item.href}
-                  type="button"
-                  onClick={() => {
-                    setShakingLock(fk);
-                    setSidebarOpen(false);
-                    setUpgradeModalFeature(fk);
-                    setTimeout(() => setShakingLock(null), 400);
-                  }}
-                  className={`w-full text-left ${baseClass}`}
+                  href={item.href}
+                  onClick={() => setSidebarOpen(false)}
+                  className={baseClass}
                 >
                   <Icon className="w-4 h-4 flex-shrink-0" />
                   <span>{label}</span>
-                  <Lock
-                    className={`w-3.5 h-3.5 ml-auto flex-shrink-0 text-amber-400 drop-shadow-[0_0_4px_rgba(251,191,36,0.6)] ${shakingLock === fk ? 'animate-lock-shake' : ''}`}
-                    aria-hidden
-                  />
-                </button>
+                </Link>
               );
-            }
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                onClick={() => setSidebarOpen(false)}
-                className={baseClass}
-              >
-                <Icon className="w-4 h-4 flex-shrink-0" />
-                <span>{label}</span>
-              </Link>
-            );
-          })}
+            })}
         </nav>
-        {upgradeModalFeature && (
-          <UpgradeModal
-            featureKey={upgradeModalFeature}
-            onClose={() => setUpgradeModalFeature(null)}
-          />
-        )}
-
-        {/* Dominator badge / upgrade */}
-        {hasDominatorPlan ? (
-          <div className="m-3 p-4 rounded-xl bg-gradient-to-br from-emerald-500/20 to-teal-500/10 border border-emerald-400/40 flex items-center gap-2">
-            <Shield className="h-4 w-4 text-emerald-300 flex-shrink-0" />
-            <span className="text-xs font-semibold text-emerald-100">
-              Protection Dominator Active
-            </span>
-          </div>
-        ) : (
-          <div className="m-3 p-4 rounded-xl bg-gradient-to-br from-blue-500/20 to-indigo-500/10 border border-blue-400/20">
-            <p className="text-xs font-semibold text-white mb-1">Plan Pro</p>
-            <p className="text-xs text-white/60 mb-3">Débloquez les réponses illimitées</p>
-            <Link
-              href="/choose-plan"
-              className="block w-full py-1.5 text-xs font-semibold gradient-primary rounded-lg text-white text-center hover:opacity-90 transition-opacity"
-            >
-              Upgrader
-            </Link>
-          </div>
-        )}
+        <PlanBadge
+          planSlug={selectedPlanSlug}
+          planDisplayName={planDisplayName}
+          isTrialing={isTrialing}
+          trialDaysLeft={trialDaysLeft}
+          hasActiveSubscription={hasActiveSubscription}
+          locale={locale}
+        />
       </aside>
 
       {/* Main content */}

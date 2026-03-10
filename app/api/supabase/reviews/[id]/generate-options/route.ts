@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
 import OpenAI from 'openai';
 import { createClient } from '@/lib/supabase/server';
-import { requireFeature } from '@/lib/api-plan-guard';
 import { FEATURES, hasFeature, toPlanSlug } from '@/lib/feature-gate';
 import {
   HUMAN_CHARTER_BASE,
@@ -14,7 +13,12 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-const SYSTEM_PROMPT_BASE = `Tu es un expert en e-réputation. Génère exactement 3 variantes de réponses pour l'avis client, en respectant strictement les préférences de style et de ton fournies.
+const SYSTEM_PROMPT_SINGLE = `Tu es un expert en e-réputation. Génère une seule réponse pour l'avis client, en respectant les préférences de style et de ton fournies.
+${HUMAN_CHARTER_BASE}
+Réponds UNIQUEMENT en JSON valide : {"content": "Ta réponse ici", "detectedLanguage": "fr"}
+Détecte la langue de l'avis et réponds dans la MÊME langue.`;
+
+const SYSTEM_PROMPT_TRIPLE = `Tu es un expert en e-réputation. Génère exactement 3 variantes de réponses pour l'avis client, en respectant strictement les préférences de style et de ton fournies.
 ${HUMAN_CHARTER_BASE}
 Réponds UNIQUEMENT en JSON valide : {"options": ["Réponse A", "Réponse B", "Réponse C"], "detectedLanguage": "fr"}
 Détecte la langue de l'avis et réponds dans la MÊME langue.`;
@@ -31,9 +35,6 @@ export async function POST(
         { status: 500 }
       );
     }
-
-    const planCheck = await requireFeature(FEATURES.TRIPLE_VERIFICATION);
-    if (planCheck instanceof NextResponse) return planCheck;
 
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
@@ -110,38 +111,71 @@ ${signature ? `- Ajoute systématiquement cette signature à la fin : "${signatu
 ${extraInstructions ? `- Consigne(s) spécifique(s) du restaurateur : ${extraInstructions}` : ''}`.trim();
 
     const isZenith = planSlug === 'zenith';
-    const systemPrompt =
-      SYSTEM_PROMPT_BASE +
+
+    if (isZenith) {
+      const systemPrompt =
+        SYSTEM_PROMPT_TRIPLE +
+        '\n\n' +
+        styleInstruction +
+        '\n\n' +
+        ZENITH_CONCIERGE_ADDON +
+        (useSeo ? buildSeoInvisibleInstruction(seoKeywords) : '');
+
+      const completion = await openai.chat.completions.create({
+        model: 'gpt-4o-mini',
+        messages: [
+          { role: 'system', content: systemPrompt },
+          {
+            role: 'user',
+            content: `Avis: "${review.comment}" | Note: ${review.rating}/5 | Établissement: ${profile?.establishment_name || 'client'}. Génère 3 options de réponse en JSON.`,
+          },
+        ],
+        response_format: { type: 'json_object' },
+      });
+
+      const content = completion.choices[0]?.message?.content;
+      if (!content) throw new Error('No response from OpenAI');
+
+      const parsed = JSON.parse(content) as { options?: string[]; detectedLanguage?: string };
+      const options = Array.isArray(parsed.options) ? parsed.options.slice(0, 3) : [];
+
+      return NextResponse.json({
+        options: options.length >= 3 ? options : [
+          options[0] ?? HUMAN_FALLBACKS.genericThanks,
+          options[1] ?? HUMAN_FALLBACKS.positiveShort,
+          options[2] ?? 'À très vite !',
+        ],
+        detectedLanguage: parsed.detectedLanguage ?? 'fr',
+      });
+    }
+
+    const systemPromptSingle =
+      SYSTEM_PROMPT_SINGLE +
       '\n\n' +
       styleInstruction +
-      (isZenith ? '\n\n' + ZENITH_CONCIERGE_ADDON : '') +
       (useSeo ? buildSeoInvisibleInstruction(seoKeywords) : '');
 
-    const completion = await openai.chat.completions.create({
+    const completionSingle = await openai.chat.completions.create({
       model: 'gpt-4o-mini',
       messages: [
-        { role: 'system', content: systemPrompt },
+        { role: 'system', content: systemPromptSingle },
         {
           role: 'user',
-          content: `Avis: "${review.comment}" | Note: ${review.rating}/5 | Établissement: ${profile?.establishment_name || 'client'}. Génère 3 options de réponse en JSON.`,
+          content: `Avis: "${review.comment}" | Note: ${review.rating}/5 | Établissement: ${profile?.establishment_name || 'client'}. Génère une réponse en JSON.`,
         },
       ],
       response_format: { type: 'json_object' },
     });
 
-    const content = completion.choices[0]?.message?.content;
-    if (!content) throw new Error('No response from OpenAI');
+    const contentSingle = completionSingle.choices[0]?.message?.content;
+    if (!contentSingle) throw new Error('No response from OpenAI');
 
-    const parsed = JSON.parse(content) as { options?: string[]; detectedLanguage?: string };
-    const options = Array.isArray(parsed.options) ? parsed.options.slice(0, 3) : [];
+    const parsedSingle = JSON.parse(contentSingle) as { content?: string; detectedLanguage?: string };
+    const singleResponse = parsedSingle.content ?? HUMAN_FALLBACKS.genericThanks;
 
     return NextResponse.json({
-      options: options.length >= 3 ? options : [
-        options[0] ?? HUMAN_FALLBACKS.genericThanks,
-        options[1] ?? HUMAN_FALLBACKS.positiveShort,
-        options[2] ?? 'À très vite !',
-      ],
-      detectedLanguage: parsed.detectedLanguage ?? 'fr',
+      options: [singleResponse],
+      detectedLanguage: parsedSingle.detectedLanguage ?? 'fr',
     });
   } catch (error) {
     console.error('[supabase/reviews/generate-options]', error);

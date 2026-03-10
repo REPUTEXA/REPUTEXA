@@ -43,7 +43,6 @@ export function buildSeoInvisibleInstruction(keywords: string[]): string {
   const list = keywords.slice(0, 10).map((k) => `"${k}"`).join(', ');
   return `\nMots-clés SEO à fondre naturellement (un ou deux max par réponse) : [${list}]. Exemple de style : "on garde des prix corrects pour un resto à Nice" — pas "meilleur restaurant à Nice".`;
 }
-}
 
 /** Fallbacks humains (remplacent les anciens fallbacks IA) */
 export const HUMAN_FALLBACKS = {

@@ -59,7 +59,7 @@ export default function UpgradePage() {
               </ul>
               <Link
                 href={`/checkout?plan=vision`}
-                className="mt-6 block w-full py-2.5 rounded-xl bg-blue-600 text-white text-center font-semibold text-sm hover:bg-blue-700 transition-colors"
+                className="mt-6 block w-full py-2.5 rounded-xl bg-blue-600 text-white text-center font-semibold text-sm hover:bg-blue-700 active:scale-[0.98] transition-colors"
               >
                 S&apos;abonner
               </Link>
@@ -95,7 +95,7 @@ export default function UpgradePage() {
               </ul>
               <Link
                 href={`/checkout?plan=pulse`}
-                className="mt-6 block w-full py-2.5 rounded-xl bg-white text-blue-600 text-center font-semibold text-sm hover:bg-white/90 transition-colors"
+                className="mt-6 block w-full py-2.5 rounded-xl bg-white text-blue-600 text-center font-semibold text-sm hover:bg-white/90 active:scale-[0.98] transition-colors"
               >
                 S&apos;abonner
               </Link>
@@ -124,7 +124,7 @@ export default function UpgradePage() {
               </ul>
               <Link
                 href={`/checkout?plan=zenith`}
-                className="mt-6 block w-full py-2.5 rounded-xl bg-blue-600 text-white text-center font-semibold text-sm hover:bg-blue-700 transition-colors"
+                className="mt-6 block w-full py-2.5 rounded-xl bg-blue-600 text-white text-center font-semibold text-sm hover:bg-blue-700 active:scale-[0.98] transition-colors"
               >
                 S&apos;abonner
               </Link>

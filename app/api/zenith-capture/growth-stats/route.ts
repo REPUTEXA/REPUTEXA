@@ -74,13 +74,13 @@ export async function GET() {
     }> = [];
     let priorityAdvice: string | null = null;
 
-    function inferCategory(theme: string, title: string): string {
+    const inferCategory = (theme: string, title: string): string => {
       const t = (theme + title).toLowerCase();
       if (/service|rapidité|attente|équipe|personnel|accueil/i.test(t)) return 'service';
       if (/dessert|plat|cuisine|nourriture|menu|qualité|prix|hygiène|végétarien/i.test(t)) return 'cuisine';
       if (/ambiance|sonore|musique|lieu|espace|terrasse|décor/i.test(t)) return 'lieu';
       return 'autre';
-    }
+    };
 
     if (unresolved.length > 0 && process.env.OPENAI_API_KEY) {
       const analyzed = await analyzePrivateFeedback(

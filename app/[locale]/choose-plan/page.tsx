@@ -60,7 +60,7 @@ export default function ChoosePlanPage() {
                   {t('pricing.comparison.reporting_pdf')}
                 </li>
               </ul>
-              <span className="mt-6 block w-full py-2.5 rounded-xl bg-blue-600 text-white text-center font-semibold text-sm hover:bg-blue-700 transition-colors">
+              <span className="mt-6 block w-full py-2.5 rounded-xl bg-blue-600 text-white text-center font-semibold text-sm hover:bg-blue-700 active:scale-[0.98] transition-colors">
                 {t('pricing.vision.cta')}
               </span>
             </Link>
@@ -108,7 +108,7 @@ export default function ChoosePlanPage() {
                   {t('pricing.comparison.shield_alert')}
                 </li>
               </ul>
-              <span className="mt-6 block w-full py-2.5 rounded-xl bg-blue-600 text-white text-center font-semibold text-sm hover:bg-blue-700 transition-colors">
+              <span className="mt-6 block w-full py-2.5 rounded-xl bg-blue-600 text-white text-center font-semibold text-sm hover:bg-blue-700 active:scale-[0.98] transition-colors">
                 {t('pricing.pulse.cta')}
               </span>
             </Link>
@@ -161,7 +161,7 @@ export default function ChoosePlanPage() {
                   {t('pricing.comparison.pos_connector')}
                 </li>
               </ul>
-              <span className="mt-6 block w-full py-2.5 rounded-xl bg-blue-600 text-white text-center font-semibold text-sm hover:bg-blue-700 transition-colors">
+              <span className="mt-6 block w-full py-2.5 rounded-xl bg-blue-600 text-white text-center font-semibold text-sm hover:bg-blue-700 active:scale-[0.98] transition-colors">
                 {t('pricing.zenith.cta')}
               </span>
             </Link>

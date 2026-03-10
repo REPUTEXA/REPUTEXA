@@ -356,7 +356,7 @@ export function DashboardShell({
                 </p>
                 <Link
                   href={`/checkout?plan=${planSlug}`}
-                  className={`shrink-0 inline-flex items-center justify-center px-4 py-2.5 rounded-xl font-semibold text-white text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors ${
+                  className={`shrink-0 inline-flex items-center justify-center px-4 py-2.5 rounded-xl font-semibold text-white text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 active:scale-[0.98] transition-colors ${
                     isCriticalPhase
                       ? 'bg-red-600 hover:bg-red-700 focus:ring-red-500'
                       : 'bg-blue-600 hover:bg-blue-700 focus:ring-blue-500'

@@ -107,7 +107,7 @@ export default function AlertsPage() {
           <button
             type="button"
             onClick={() => setShowUpgradeModal(true)}
-            className="inline-flex items-center justify-center px-6 py-3 rounded-xl bg-blue-600 dark:bg-indigo-600 text-white font-semibold hover:bg-blue-700 dark:hover:bg-indigo-500 transition-colors"
+            className="inline-flex items-center justify-center px-6 py-3 rounded-xl bg-blue-600 dark:bg-indigo-600 text-white font-semibold hover:bg-blue-700 dark:hover:bg-indigo-500 active:scale-[0.98] transition-colors"
           >
             Passer au plan Pulse
           </button>

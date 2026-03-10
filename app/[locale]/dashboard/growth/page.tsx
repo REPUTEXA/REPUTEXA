@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { Loader2, TrendingUp, Users, MessageCircle, Lightbulb, Flame, Sparkles, Check } from 'lucide-react';
+import { useState, useEffect, useCallback } from 'react';
+import { Loader2, TrendingUp, Users, MessageCircle, Flame, Sparkles, Check } from 'lucide-react';
 import { toast } from 'sonner';
 import { useTranslations } from 'next-intl';
 
@@ -69,7 +69,7 @@ export default function GrowthPage() {
   const [loading, setLoading] = useState(true);
   const [resolving, setResolving] = useState<string | null>(null);
 
-  const fetchData = () => {
+  const fetchData = useCallback(() => {
     setLoading(true);
     fetch('/api/zenith-capture/growth-stats')
       .then(async (r) => {
@@ -80,11 +80,11 @@ export default function GrowthPage() {
       .then(setStats)
       .catch(() => setStats(null))
       .finally(() => setLoading(false));
-  };
+  }, [t]);
 
   useEffect(() => {
     fetchData();
-  }, [t]);
+  }, [fetchData]);
 
   const handleMarkResolved = async (feedbackIds: string[]) => {
     if (feedbackIds.length === 0) return;

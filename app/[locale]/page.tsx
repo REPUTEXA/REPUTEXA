@@ -123,14 +123,14 @@ export default function HomePage() {
             >
               <Link
                 href="/signup?mode=trial"
-                className="gradient-primary text-white font-semibold px-5 py-2.5 sm:px-6 sm:py-3 rounded-xl flex items-center gap-2 hover:opacity-90 transition-opacity shadow-glow cta-pulse-soft text-sm sm:text-base"
+                className="gradient-primary text-white font-semibold px-5 py-2.5 sm:px-6 sm:py-3 rounded-xl flex items-center gap-2 hover:opacity-90 active:scale-[0.98] transition-all shadow-glow cta-pulse-soft text-sm sm:text-base"
               >
                 {t('hero.ctaPrimary')} <ChevronRight className="w-4 h-4" aria-hidden="true" />
               </Link>
               <button
                 type="button"
                 onClick={() => setOpenDemo(true)}
-                className="text-white/70 font-semibold px-5 py-2.5 sm:px-6 sm:py-3 rounded-xl flex items-center gap-2 border border-white/15 hover:bg-white/5 transition-colors text-sm sm:text-base"
+                className="text-white/70 font-semibold px-5 py-2.5 sm:px-6 sm:py-3 rounded-xl flex items-center gap-2 border border-white/15 hover:bg-white/5 active:scale-[0.98] transition-all text-sm sm:text-base"
               >
                 {t('hero.ctaSecondary')}
               </button>
@@ -935,7 +935,7 @@ export default function HomePage() {
           <p className="text-white/60 mb-8">{t('cta.subtitle')}</p>
               <Link
                 href="/signup?mode=trial"
-                className="inline-flex items-center gap-2 gradient-primary text-white font-semibold px-8 py-3 rounded-xl hover:opacity-90 transition-opacity shadow-glow"
+                className="inline-flex items-center gap-2 gradient-primary text-white font-semibold px-8 py-3 rounded-xl hover:opacity-90 active:scale-[0.98] transition-all shadow-glow"
               >
             {t('cta.button')} <ChevronRight className="w-4 h-4" aria-hidden="true" />
           </Link>

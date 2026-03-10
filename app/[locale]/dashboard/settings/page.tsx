@@ -1,13 +1,13 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useTranslations } from 'next-intl';
 import { useRouter, usePathname } from '@/i18n/navigation';
 import { useSearchParams } from 'next/navigation';
 import { useLocale } from 'next-intl';
 import { createClient } from '@/lib/supabase/client';
 import { getSiteUrl } from '@/lib/site-url';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Mic } from 'lucide-react';
 import { PhoneInput, isValidPhoneNumber } from '@/components/phone-input';
 import { PasswordField } from '@/components/auth/password-field';
 import { SettingsSkeleton } from '@/components/auth/settings-skeleton';
@@ -51,6 +51,17 @@ export default function SettingsPage() {
   const [savingNotifications, setSavingNotifications] = useState(false);
   const [savingSeo, setSavingSeo] = useState(false);
 
+  // Vocal-to-style (ADN IA) state
+  const [aiVoiceRecording, setAiVoiceRecording] = useState(false);
+  const [aiVoiceLoading, setAiVoiceLoading] = useState(false);
+  const aiMediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const aiStreamRef = useRef<MediaStream | null>(null);
+  const aiChunksRef = useRef<Blob[]>([]);
+
+  // Aperçu "Ghostwriter" en direct
+  const [previewText, setPreviewText] = useState('');
+  const [animatedPreview, setAnimatedPreview] = useState('');
+
   const hasSeoBoost = hasFeature(selectedPlan, FEATURES.SEO_BOOST);
 
   useEffect(() => {
@@ -85,6 +96,89 @@ export default function SettingsPage() {
       .catch((err) => toast.error(err instanceof Error ? err.message : 'Impossible de charger le profil'))
       .finally(() => setLoadingProfile(false));
   }, []);
+
+  const handleAiVoiceToggle = () => {
+    if (aiMediaRecorderRef.current?.state === 'recording') {
+      aiMediaRecorderRef.current.stop();
+      aiMediaRecorderRef.current = null;
+      aiStreamRef.current?.getTracks().forEach((t) => t.stop());
+      aiStreamRef.current = null;
+      setAiVoiceRecording(false);
+      return;
+    }
+
+    navigator.mediaDevices
+      .getUserMedia({ audio: true })
+      .then((stream) => {
+        aiStreamRef.current = stream;
+        const recorder = new MediaRecorder(stream);
+        aiChunksRef.current = [];
+        recorder.ondataavailable = (e) => {
+          if (e.data.size > 0) aiChunksRef.current.push(e.data);
+        };
+        recorder.onstop = async () => {
+          if (aiChunksRef.current.length === 0) return;
+          setAiVoiceLoading(true);
+          try {
+            const blob = new Blob(aiChunksRef.current, { type: 'audio/webm' });
+            const form = new FormData();
+            form.append('audio', blob);
+            const res = await fetch('/api/suggestions/transcribe', {
+              method: 'POST',
+              body: form,
+            });
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.error ?? 'Erreur transcription');
+            const transcript = String(data.transcript ?? '').trim();
+            if (!transcript) {
+              toast.error('Aucune transcription détectée.');
+              return;
+            }
+
+            const prefRes = await fetch('/api/ai/preferences/from-voice', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                transcript,
+                aiTone,
+                aiLength,
+                aiInstructions,
+                aiSignature,
+              }),
+            });
+            const prefJson = await prefRes.json();
+            if (!prefRes.ok) {
+              throw new Error(prefJson.error ?? 'Erreur IA');
+            }
+            if (prefJson.aiTone) setAiTone(prefJson.aiTone);
+            if (prefJson.aiLength) setAiLength(prefJson.aiLength);
+            if (typeof prefJson.aiInstructions === 'string') {
+              setAiInstructions(prefJson.aiInstructions);
+            }
+            if (typeof prefJson.aiSignature === 'string' && prefJson.aiSignature.trim()) {
+              setAiSignature(prefJson.aiSignature.trim());
+            }
+            toast.success('Préférences IA mises à jour depuis votre voix ✅');
+          } catch (err) {
+            toast.error(
+              err instanceof Error
+                ? err.message
+                : "Impossible d'analyser le vocal. Réessayez dans un endroit calme.",
+            );
+          } finally {
+            setAiVoiceLoading(false);
+          }
+        };
+        recorder.start();
+        aiMediaRecorderRef.current = recorder;
+        setAiVoiceRecording(true);
+      })
+      .catch(() =>
+        toast.error(
+          'Micro non accessible. Vérifiez les autorisations du navigateur pour ce site.',
+        ),
+      );
+  };
 
   const handleSaveProfile = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -238,6 +332,80 @@ export default function SettingsPage() {
     run();
   }, [searchParams, router, pathname]);
 
+  // Aperçu Ghostwriter: construit le texte et anime la frappe
+  const previewExample =
+    aiTone === 'warm'
+      ? `Merci beaucoup pour votre avis et d'avoir pris le temps de partager votre ressenti. Même si tout n'a pas été parfait cette fois-ci, votre retour nous aide vraiment à nous améliorer.${
+          aiSignature ? `\n\n${aiSignature}` : ''
+        }`
+      : aiTone === 'casual'
+        ? `Merci pour ton message, on est vraiment désolés que l'expérience n'ait pas été au niveau. On va regarder ça de près pour que ta prochaine visite soit au top.${
+            aiSignature ? `\n\n${aiSignature}` : ''
+          }`
+        : aiTone === 'luxury'
+          ? `Nous vous remercions sincèrement pour votre retour et sommes navrés que votre expérience n’ait pas été à la hauteur de nos standards. Votre commentaire a été partagé avec l’équipe afin de corriger ces points sans délai.${
+              aiSignature ? `\n\n${aiSignature}` : ''
+            }`
+          : aiTone === 'humorous'
+            ? `Ouch, ce service n’était clairement pas digne de notre meilleure soirée ! Merci de nous l’avoir signalé, on va corriger le tir pour que votre prochaine visite soit une vraie réussite.${
+                aiSignature ? `\n\n${aiSignature}` : ''
+              }`
+            : `Merci d’avoir pris le temps de partager votre avis. Nous sommes désolés que votre expérience n’ait pas été pleinement satisfaisante et nous allons analyser votre retour pour nous améliorer.${
+                aiSignature ? `\n\n${aiSignature}` : ''
+              }`;
+
+  // Ajuste le tutoiement/vouvoiement dans l'aperçu selon le toggle
+  const applyTutoiementVouvoiement = (text: string): string => {
+    if (aiUseTutoiement) {
+      return text
+        .replace(/\bvotre avis\b/g, 'ton avis')
+        .replace(/\bvotre ressenti\b/g, 'ton ressenti')
+        .replace(/\bvotre retour\b/g, 'ton retour')
+        .replace(/\bvotre expérience\b/g, 'ton expérience')
+        .replace(/\bVotre commentaire\b/g, 'Ton commentaire')
+        .replace(/\bVotre prochaine visite\b/g, 'Ta prochaine visite')
+        .replace(/\bNous vous remercions\b/g, 'Nous te remercions')
+        .replace(/\b pour votre message\b/g, ' pour ton message')
+        .replace(/\b pour partager votre avis\b/g, ' pour partager ton avis')
+        .replace(/\b votre expérience\b/g, ' ton expérience')
+        .replace(/\b votre retour\b/g, ' ton retour');
+    }
+    if (aiTone === 'casual') {
+      return text
+        .replace(/\bton message\b/g, 'votre message')
+        .replace(/\bta prochaine visite\b/g, 'votre prochaine visite')
+        .replace(/\bon est vraiment désolés\b/g, 'nous sommes vraiment désolés');
+    }
+    return text;
+  };
+
+  const previewWithTutoiement = applyTutoiementVouvoiement(previewExample);
+  const enrichedPreviewExample = aiInstructions.trim()
+    ? `${previewWithTutoiement}\n\n[Note interne IA : ${aiInstructions.trim()}]`
+    : previewWithTutoiement;
+
+  useEffect(() => {
+    setPreviewText(enrichedPreviewExample);
+  }, [enrichedPreviewExample]);
+
+  useEffect(() => {
+    if (!previewText) {
+      setAnimatedPreview('');
+      return;
+    }
+    let index = 0;
+    setAnimatedPreview('');
+    const chars = Array.from(previewText);
+    const interval = window.setInterval(() => {
+      index += 3;
+      setAnimatedPreview(chars.slice(0, index).join(''));
+      if (index >= chars.length) {
+        window.clearInterval(interval);
+      }
+    }, 20);
+    return () => window.clearInterval(interval);
+  }, [previewText]);
+
   const handleSaveNotifications = async (e: React.FormEvent) => {
     e.preventDefault();
     if (whatsappPhone.trim() && !isValidPhoneNumber(whatsappPhone)) {
@@ -269,27 +437,6 @@ export default function SettingsPage() {
   };
 
   if (loadingProfile) return <SettingsSkeleton />;
-
-  const previewExample =
-    aiTone === 'warm'
-      ? `Merci beaucoup pour votre avis et d'avoir pris le temps de partager votre ressenti. Même si tout n'a pas été parfait cette fois-ci, votre retour nous aide vraiment à nous améliorer.${
-          aiSignature ? `\n\n${aiSignature}` : ''
-        }`
-      : aiTone === 'casual'
-        ? `Merci pour ton message, on est vraiment désolés que l'expérience n'ait pas été au niveau. On va regarder ça de près pour que ta prochaine visite soit au top.${
-            aiSignature ? `\n\n${aiSignature}` : ''
-          }`
-        : aiTone === 'luxury'
-          ? `Nous vous remercions sincèrement pour votre retour et sommes navrés que votre expérience n’ait pas été à la hauteur de nos standards. Votre commentaire a été partagé avec l’équipe afin de corriger ces points sans délai.${
-              aiSignature ? `\n\n${aiSignature}` : ''
-            }`
-          : aiTone === 'humorous'
-            ? `Ouch, ce service n’était clairement pas digne de notre meilleure soirée ! Merci de nous l’avoir signalé, on va corriger le tir pour que votre prochaine visite soit une vraie réussite.${
-                aiSignature ? `\n\n${aiSignature}` : ''
-              }`
-            : `Merci d’avoir pris le temps de partager votre avis. Nous sommes désolés que votre expérience n’ait pas été pleinement satisfaisante et nous allons analyser votre retour pour nous améliorer.${
-                aiSignature ? `\n\n${aiSignature}` : ''
-              }`;
 
   return (
     <div className="px-4 sm:px-6 py-6 space-y-8">
@@ -360,7 +507,7 @@ export default function SettingsPage() {
           <button
             type="submit"
             disabled={savingProfile}
-            className="py-3 px-6 rounded-xl font-semibold text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none transition-all duration-300 flex items-center justify-center gap-2"
+            className="py-3 px-6 rounded-xl font-semibold text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none active:scale-[0.98] transition-all duration-300 flex items-center justify-center gap-2"
           >
             {savingProfile ? (
               <>
@@ -411,7 +558,7 @@ export default function SettingsPage() {
                   type="button"
                   onClick={handleGoogleDisconnect}
                   disabled={googleDisconnecting}
-                  className="px-4 py-2 rounded-xl text-sm font-medium text-slate-600 hover:bg-slate-200/80 hover:text-slate-800 transition-colors disabled:opacity-50"
+                  className="px-4 py-2 rounded-xl text-sm font-medium text-slate-600 hover:bg-slate-200/80 hover:text-slate-800 transition-colors disabled:opacity-50 active:scale-[0.98]"
                 >
                   {googleDisconnecting ? '...' : 'Déconnecter'}
                 </button>
@@ -420,7 +567,7 @@ export default function SettingsPage() {
                   type="button"
                   onClick={handleGoogleConnect}
                   disabled={googleConnecting}
-                  className="px-5 py-2.5 rounded-xl text-sm font-semibold text-white bg-gradient-to-r from-[#4285F4] to-[#34A853] hover:opacity-90 shadow-sm transition-opacity disabled:opacity-50 flex items-center gap-2"
+                  className="px-5 py-2.5 rounded-xl text-sm font-semibold text-white bg-gradient-to-r from-[#4285F4] to-[#34A853] hover:opacity-90 shadow-sm transition-opacity disabled:opacity-50 active:scale-[0.98] flex items-center gap-2"
                 >
                   {googleConnecting ? (
                     <Loader2 className="w-4 h-4 animate-spin" />
@@ -528,7 +675,7 @@ export default function SettingsPage() {
                 <button
                   type="button"
                   onClick={() => setAiUseTutoiement((v) => !v)}
-                  className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium border transition-all duration-200 ${
+                  className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium border transition-all duration-200 active:scale-[0.98] ${
                     aiUseTutoiement
                       ? 'bg-emerald-50 border-emerald-200 text-emerald-700'
                       : 'bg-slate-50 border-slate-200 text-slate-600'
@@ -557,69 +704,67 @@ export default function SettingsPage() {
               <label className="block text-sm font-medium text-slate-700 mb-1.5">
                 Instructions spécifiques
               </label>
-              <textarea
-                rows={4}
-                value={aiInstructions}
-                onChange={(e) => setAiInstructions(e.target.value)}
-                placeholder={
-                  "Ex : Ne jamais s'excuser pour les délais le samedi soir.\nToujours inviter à revenir goûter le nouveau dessert."
-                }
-                className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500"
-              />
-              <p className="text-xs text-slate-500">
-                Ces instructions seront ajoutées au prompt système envoyé à l&apos;IA.
-              </p>
-            </div>
-
-            <div className="flex items-center justify-between gap-3 rounded-xl border border-amber-100 bg-amber-50 px-4 py-3 mt-2">
-              <div className="flex-1">
-                <p className="text-sm font-medium text-amber-900">
-                  Mode sécurité pour les avis négatifs
-                </p>
-                <p className="text-xs text-amber-700 mt-0.5">
-                  Si activé, les réponses suggérées pour les avis &lt; 3★ resteront en brouillon
-                  pour validation manuelle.
-                </p>
-              </div>
-              <button
-                type="button"
-                onClick={() => setAiSafeMode((v) => !v)}
-                className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium border transition-all duration-200 ${
-                  aiSafeMode
-                    ? 'bg-emerald-50 border-emerald-200 text-emerald-700'
-                    : 'bg-slate-50 border-slate-200 text-slate-600'
-                }`}
-              >
-                <span
-                  className={`h-4 w-8 flex items-center rounded-full transition-colors ${
-                    aiSafeMode ? 'bg-emerald-500/80' : 'bg-slate-300'
+              <div className="flex flex-col sm:flex-row gap-3 items-stretch">
+                <div className="flex-1">
+                  <textarea
+                    rows={4}
+                    value={aiInstructions}
+                    onChange={(e) => setAiInstructions(e.target.value)}
+                    placeholder={
+                      "Ex : Ne jamais s'excuser pour les délais le samedi soir.\nToujours inviter à revenir goûter le nouveau dessert."
+                    }
+                    className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500"
+                  />
+                  <p className="mt-1 text-xs text-slate-500">
+                    Ces instructions seront ajoutées au prompt système envoyé à l&apos;IA.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={handleAiVoiceToggle}
+                  disabled={aiVoiceLoading}
+                  className={`shrink-0 inline-flex items-center justify-center px-4 py-2.5 rounded-xl border text-sm font-medium transition-colors active:scale-[0.98] ${
+                    aiVoiceRecording
+                      ? 'border-red-300 bg-red-50 text-red-700'
+                      : 'border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100'
                   }`}
                 >
-                  <span
-                    className={`h-3 w-3 rounded-full bg-white shadow-sm transform transition-transform ${
-                      aiSafeMode ? 'translate-x-4' : 'translate-x-1'
-                    }`}
-                  />
-                </span>
-                {aiSafeMode ? 'Safe-mode ON' : 'Safe-mode OFF'}
-              </button>
+                  {aiVoiceLoading ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                      Analyse...
+                    </>
+                  ) : (
+                    <>
+                      <Mic className="w-4 h-4 mr-2" />
+                      {aiVoiceRecording ? 'Terminer le vocal' : 'Parler à votre IA'}
+                    </>
+                  )}
+                </button>
+              </div>
             </div>
 
             <button
               type="submit"
-              className="mt-4 inline-flex items-center justify-center gap-2 py-3 px-6 rounded-xl font-semibold text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-300"
+              className="mt-4 inline-flex items-center justify-center gap-2 py-3 px-6 rounded-xl font-semibold text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 active:scale-[0.98] transition-all duration-300"
             >
               Enregistrer les préférences IA
             </button>
           </form>
 
-          {/* Aperçu en direct */}
-          <div className="flex-1 rounded-2xl border border-slate-200 bg-slate-50 p-5 space-y-3">
-            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">
-              Aperçu en direct
-            </p>
-            <div className="rounded-xl border border-slate-200 bg-white px-4 py-3 text-xs text-slate-600">
-              <p className="font-semibold text-slate-800 mb-1">
+          {/* Aperçu en direct - Ghostwriter */}
+          <div className="flex-1 rounded-2xl border border-slate-200 bg-slate-50 dark:bg-slate-900/40 p-5 space-y-3 shadow-[4px_6px_0_rgba(0,0,0,0.04)] dark:shadow-[4px_6px_0_rgba(0,0,0,0.5)]">
+            <div className="flex items-center justify-between gap-2">
+              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">
+                Aperçu en direct
+              </p>
+              <span className="inline-flex items-center gap-1 rounded-full border border-indigo-500/30 bg-indigo-500/10 px-2 py-0.5 text-[10px] font-semibold text-indigo-500">
+                <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-pulse" />
+                Simulation
+              </span>
+            </div>
+            <div className="rounded-xl border border-slate-200 bg-white/90 dark:bg-slate-900 px-4 py-3 text-xs text-slate-600 dark:text-slate-300">
+              <p className="font-semibold text-slate-800 dark:text-slate-100 mb-1">
                 Exemple d&apos;avis négatif
               </p>
               <p>
@@ -627,17 +772,23 @@ export default function SettingsPage() {
                 soir.&quot;
               </p>
             </div>
-            <div className="rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 shadow-sm">
-              <p className="text-xs font-semibold text-slate-500 mb-1">
-                Réponse IA (aperçu)
+            <div className="rounded-xl border border-slate-200 bg-white/95 dark:bg-slate-950 px-4 py-3 text-sm text-slate-700 dark:text-slate-100 shadow-sm relative overflow-hidden">
+              <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">
+                Réponse IA (aperçu dynamique)
               </p>
-              <p className="whitespace-pre-line">
-                {previewExample}
+              <p className="whitespace-pre-line font-normal">
+                {animatedPreview || enrichedPreviewExample}
               </p>
+              {animatedPreview && animatedPreview.length < enrichedPreviewExample.length && (
+                <span className="absolute bottom-3 right-4 inline-flex items-center gap-1 text-[10px] text-slate-400">
+                  <span className="w-1 h-1 bg-slate-400 rounded-full animate-pulse" />
+                  IA en train d&apos;ajuster le ton...
+                </span>
+              )}
             </div>
-            <p className="text-xs text-slate-500">
-              L&apos;IA utilisera ce ton, cette longueur et ces instructions comme base pour toutes
-              les réponses générées.
+            <p className="text-xs text-slate-500 dark:text-slate-400">
+              Chaque changement de ton, longueur ou instruction met instantanément à jour cette
+              simulation, pour refléter la manière dont l&apos;IA répondra à vos futurs avis.
             </p>
           </div>
         </div>
@@ -674,7 +825,7 @@ export default function SettingsPage() {
             <button
               type="submit"
               disabled={savingSeo}
-              className="py-3 px-6 rounded-xl font-semibold text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none transition-all duration-300 flex items-center justify-center gap-2"
+              className="py-3 px-6 rounded-xl font-semibold text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none active:scale-[0.98] transition-all duration-300 flex items-center justify-center gap-2"
             >
               {savingSeo ? (
                 <>
@@ -725,7 +876,7 @@ export default function SettingsPage() {
           <button
             type="submit"
             disabled={savingNotifications}
-            className="py-3 px-6 rounded-xl font-semibold text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none transition-all duration-300 flex items-center justify-center gap-2"
+            className="py-3 px-6 rounded-xl font-semibold text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none active:scale-[0.98] transition-all duration-300 flex items-center justify-center gap-2"
           >
             {savingNotifications ? (
               <>
@@ -775,7 +926,7 @@ export default function SettingsPage() {
           <button
             type="submit"
             disabled={savingAccount || !newPassword || newPassword.length < 6}
-            className="py-3 px-6 rounded-xl font-semibold text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none transition-all duration-300 flex items-center justify-center gap-2"
+            className="py-3 px-6 rounded-xl font-semibold text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none active:scale-[0.98] transition-all duration-300 flex items-center justify-center gap-2"
           >
             {savingAccount ? (
               <>

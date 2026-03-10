@@ -120,7 +120,7 @@ export default function PricingPage() {
         <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
           <Link
             href="/signup?mode=checkout&plan=vision"
-            className="inline-flex items-center justify-center px-6 py-3 rounded-xl border-2 border-slate-200 font-semibold text-slate-700 hover:border-slate-300 hover:bg-slate-50 transition-colors"
+            className="inline-flex items-center justify-center px-6 py-3 rounded-xl border-2 border-slate-200 font-semibold text-slate-700 hover:border-slate-300 hover:bg-slate-50 active:scale-[0.98] transition-colors"
           >
             Choisir Vision
           </Link>
@@ -132,7 +132,7 @@ export default function PricingPage() {
           </Link>
           <Link
             href="/signup?mode=checkout&plan=zenith"
-            className="inline-flex items-center justify-center px-6 py-3 rounded-xl border-2 border-blue-500 font-semibold text-blue-600 hover:bg-blue-50 transition-colors"
+            className="inline-flex items-center justify-center px-6 py-3 rounded-xl border-2 border-blue-500 font-semibold text-blue-600 hover:bg-blue-50 active:scale-[0.98] transition-colors"
           >
             Choisir Zenith
           </Link>

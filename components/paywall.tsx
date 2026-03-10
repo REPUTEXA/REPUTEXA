@@ -22,7 +22,7 @@ export function Paywall({ locale = 'fr' }: Props) {
         </p>
         <Link
           href={`/${locale}/upgrade`}
-          className="inline-block gradient-primary text-white font-semibold px-6 py-3 rounded-xl hover:opacity-90 transition-opacity"
+          className="inline-block gradient-primary text-white font-semibold px-6 py-3 rounded-xl hover:opacity-90 active:scale-[0.98] transition-all"
         >
           Choisir mon abonnement
         </Link>

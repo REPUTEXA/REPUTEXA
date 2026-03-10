@@ -43,6 +43,12 @@ export async function POST(request: Request) {
     }
 
     const supabase = isCron ? createAdminClient() : await createClient();
+    if (!supabase) {
+      return NextResponse.json(
+        { error: 'Configuration Supabase manquante' },
+        { status: 500 }
+      );
+    }
     const userId = effectiveUserId!;
     if (!userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });

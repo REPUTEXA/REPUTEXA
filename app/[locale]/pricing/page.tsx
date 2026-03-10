@@ -62,7 +62,7 @@ export default function PricingPage() {
 
   return (
     <div className="min-h-screen bg-white">
-      <header className="border-b border-slate-200 bg-white/95 sticky top-0 z-10">
+      <header className="border-b border-slate-200/80 bg-white/70 backdrop-blur-md sticky top-0 z-10">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2 text-slate-800" aria-label="REPUTEXA">
             <Logo />
@@ -77,7 +77,7 @@ export default function PricingPage() {
         </div>
       </header>
 
-      <main className="max-w-6xl mx-auto px-4 sm:px-6 py-12 sm:py-16">
+      <main className="max-w-6xl mx-auto px-4 sm:px-6 py-8 sm:py-16">
         {planRequired && (
           <div className="mb-6 rounded-xl bg-amber-50 border border-amber-200 px-4 py-3 text-sm text-amber-800">
             Un plan supérieur est requis pour accéder à cette fonctionnalité.

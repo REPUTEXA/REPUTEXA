@@ -37,14 +37,11 @@ export default function HomePage() {
   const locale = useLocale();
   const [openFaq, setOpenFaq] = useState<string | null>(null);
   const [openDemo, setOpenDemo] = useState(false);
-  const [scanName, setScanName] = useState('');
-  const [scanning, setScanning] = useState(false);
-  const [scanResult, setScanResult] = useState<number | null>(null);
 
   return (
     <div className="min-h-screen bg-background overflow-x-hidden">
-      {/* NAVBAR */}
-      <nav className="fixed top-0 inset-x-0 z-50 h-14 sm:h-16 border-b border-white/10 bg-navy/60 backdrop-blur-xl backdrop-saturate-150">
+      {/* NAVBAR - Glassmorphism */}
+      <nav className="fixed top-0 inset-x-0 z-50 h-14 sm:h-16 border-b border-white/10 bg-navy/70 dark:bg-navy/80 backdrop-blur-md backdrop-saturate-150">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 h-full flex items-center justify-between gap-2 safe-area-nav">
           <Link href="/" className="flex items-center gap-2 sm:gap-2.5 shrink-0" aria-label="REPUTEXA">
             <Logo />
@@ -86,7 +83,7 @@ export default function HomePage() {
             </Link>
             <Link
               href="/signup?mode=trial"
-              className="gradient-primary text-white text-sm font-semibold px-4 py-2 rounded-xl hover:opacity-90 transition-opacity"
+              className="gradient-primary text-white text-sm font-semibold px-4 py-2.5 min-h-[44px] min-w-[44px] inline-flex items-center justify-center rounded-2xl hover:opacity-90 active:scale-[0.98] transition-all duration-300 ease-in-out"
             >
               {t('nav.trial')}
             </Link>
@@ -139,63 +136,6 @@ export default function HomePage() {
               </button>
             </div>
             <p className="text-xs text-white/30 mt-4 tracking-prose">{t('hero.trialInfo')}</p>
-
-            {/* SCAN DE RÉPUTATION INTERACTIF */}
-            <div className="mt-10 sm:mt-12 max-w-xl mx-auto animate-fade-up" style={{ animationDelay: '0.4s', opacity: 0 }}>
-              <div className="rounded-2xl border border-white/15 bg-white/5 p-4 sm:p-6 backdrop-blur-sm">
-                <p className="text-sm text-white/70 font-medium mb-3">{t('scan.title')}</p>
-                <div className="flex flex-col sm:flex-row gap-3">
-                  <input
-                    type="text"
-                    value={scanName}
-                    onChange={(e) => { setScanName(e.target.value); setScanResult(null); }}
-                    placeholder={t('scan.placeholder')}
-                    disabled={scanning}
-                    className="flex-1 px-4 py-3 rounded-xl bg-white/10 border border-white/20 text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-blue-500/50 disabled:opacity-60"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => {
-                      if (!scanName.trim() || scanning) return;
-                      setScanning(true);
-                      setScanResult(null);
-                      setTimeout(() => {
-                        const base = 8 + (scanName.length % 15) + Math.floor(Math.random() * 6);
-                        setScanResult(base);
-                        setScanning(false);
-                      }, 2200);
-                    }}
-                    disabled={scanning || !scanName.trim()}
-                    className="gradient-primary text-white font-semibold px-5 py-3 rounded-xl hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed transition-opacity"
-                  >
-                    {t('scan.ctaScan')}
-                  </button>
-                </div>
-                {scanning && (
-                  <div className="mt-4 flex items-center gap-2 text-white/80">
-                    <span className="inline-flex gap-1">
-                      <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-bounce" style={{ animationDelay: '0ms' }} />
-                      <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-bounce" style={{ animationDelay: '150ms' }} />
-                      <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-bounce" style={{ animationDelay: '300ms' }} />
-                    </span>
-                    {t('scan.loading')}...
-                  </div>
-                )}
-                {scanResult !== null && !scanning && (
-                  <div className="mt-4 p-4 rounded-xl bg-rose-500/20 border border-rose-400/30">
-                    <p className="text-rose-100 font-bold text-lg">
-                      {t('scan.alert', { count: scanResult })}
-                    </p>
-                    <Link
-                      href="/signup?mode=trial"
-                      className="mt-4 block w-full gradient-primary text-white font-bold py-4 px-6 rounded-xl text-center hover:opacity-95 transition-opacity text-base sm:text-lg"
-                    >
-                      {t('scan.ctaSignup')}
-                    </Link>
-                  </div>
-                )}
-              </div>
-            </div>
           </div>
           </div>
         </section>
@@ -519,7 +459,7 @@ export default function HomePage() {
       <div className="border-t border-white/5" />
 
       <section className="py-10 border-y border-slate-200/30" style={{ backgroundColor: 'hsl(var(--navy) / 0.05)' }}>
-        <div className="max-w-6xl mx-auto px-6 flex flex-wrap justify-center items-center gap-8">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 flex flex-wrap justify-center items-center gap-6 sm:gap-8">
           {(['0', '1', '2', '3', '4', '5'] as const).map((i) => (
             <span key={i} className="text-sm font-semibold text-muted-foreground">
               {t(`socialProof.${i}`)}
@@ -529,8 +469,8 @@ export default function HomePage() {
       </section>
 
       {/* FONCTIONNALITÉS (blanc) */}
-      <section id="fonctionnalités" className="py-20 bg-white">
-        <div className="max-w-7xl mx-auto px-6">
+      <section id="fonctionnalités" className="py-16 sm:py-20 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="text-center mb-12">
             <h2 className="font-display text-4xl font-bold text-foreground mb-3">
               {t('howItWorks.headline')}
@@ -546,17 +486,17 @@ export default function HomePage() {
               { icon: Star, key: 'boostSeo', iconBg: 'bg-amber-50', iconColor: 'text-amber-600', badgeClass: 'border-emerald-400/60 bg-emerald-500/15 text-emerald-700' },
               { icon: BarChart2, key: 'reporting', iconBg: 'bg-green-50', iconColor: 'text-green-600', badgeClass: 'border-slate-300 bg-slate-100 text-slate-700' },
             ].map(({ icon: Icon, key, iconBg, iconColor, badgeClass }) => (
-              <div key={key} className="relative bg-card rounded-2xl border border-border p-6 hover:shadow-md transition-all duration-200 group">
+              <div key={key} className="relative bg-card rounded-2xl sm:rounded-3xl border border-border p-6 shadow-sm hover:shadow-apple transition-all duration-300 ease-in-out group">
                 <div className={`w-10 h-10 rounded-xl flex items-center justify-center mb-4 ${iconBg} ${iconColor}`}>
                   <Icon className="w-5 h-5" aria-hidden="true" />
                 </div>
                 <span className={`inline-flex items-center rounded-full border px-2 py-0.5 text-[10px] font-semibold tracking-wide mb-3 ${badgeClass}`}>
                   {t(`howItWorks.cards.${key}.badge`)}
                 </span>
-                <h3 className="font-display font-bold text-base text-foreground mb-2">
+                <h3 className="font-display font-semibold text-base sm:text-lg text-foreground mb-2">
                   {t(`howItWorks.cards.${key}.title`)}
                 </h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">
+                <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">
                   {t(`howItWorks.cards.${key}.desc`)}
                 </p>
               </div>
@@ -566,8 +506,8 @@ export default function HomePage() {
       </section>
 
       {/* TÉMOIGNAGES (blanc cassé) */}
-      <section id="témoignages" className="py-20 bg-muted/40">
-        <div className="max-w-6xl mx-auto px-6">
+      <section id="témoignages" className="py-16 sm:py-20 bg-muted/40">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div className="text-center mb-12">
             <h2 className="font-display text-4xl font-bold text-foreground mb-3">
               {t('testimonials.headline')}
@@ -642,8 +582,8 @@ export default function HomePage() {
       </section>
 
       {/* TARIFS (blanc) */}
-      <section id="tarifs" className="py-20 bg-white">
-        <div className="max-w-6xl mx-auto px-6">
+      <section id="tarifs" className="py-16 sm:py-20 bg-white">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div className="text-center mb-12">
             <h2 className="font-display text-4xl font-bold text-foreground mb-3">
               {t('pricing.headline')}
@@ -652,7 +592,7 @@ export default function HomePage() {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-5 items-stretch">
             {/* Plan Vision */}
-            <div className="flex flex-col h-full rounded-2xl border p-6 relative bg-card border-border transition-all duration-300 ease-out hover:-translate-y-3 hover:shadow-[0_20px_40px_rgba(75,115,255,0.2)]">
+            <div className="flex flex-col h-full rounded-2xl sm:rounded-3xl border p-6 relative bg-card border-border shadow-sm transition-all duration-300 ease-in-out hover:-translate-y-1 hover:shadow-[0_20px_40px_rgba(75,115,255,0.12)]">
               <div className="mb-5">
                 <p className="font-display font-bold text-lg text-foreground">
                   {t('pricing.vision.name')}
@@ -687,7 +627,7 @@ export default function HomePage() {
               <p className="text-xs text-emerald-600 font-medium mb-4">{t('pricing.trialMention')}</p>
               <Link
                 href="/signup?mode=checkout&plan=vision"
-                className="block text-center py-2.5 text-sm font-semibold rounded-xl transition-all duration-300 gradient-primary text-white hover:opacity-90"
+                className="block text-center py-3 min-h-[44px] text-sm font-semibold rounded-2xl transition-all duration-300 ease-in-out gradient-primary text-white hover:opacity-90 active:scale-[0.98]"
               >
                 {t('pricing.ctaSubscribe')}
               </Link>
@@ -700,7 +640,7 @@ export default function HomePage() {
             </div>
 
             {/* Plan Pulse - LE PLUS POPULAIRE */}
-            <div className="flex flex-col h-full rounded-2xl border p-6 relative gradient-primary text-white border-transparent shadow-glow scale-105 transition-all duration-300 ease-out hover:-translate-y-3 hover:shadow-[0_20px_40px_rgba(75,115,255,0.2)]">
+            <div className="flex flex-col h-full rounded-2xl sm:rounded-3xl border p-6 relative gradient-primary text-white border-transparent shadow-glow scale-[1.02] sm:scale-105 transition-all duration-300 ease-in-out hover:-translate-y-1 hover:shadow-[0_24px_48px_rgba(75,115,255,0.25)]">
               <span className="absolute -top-3 left-1/2 -translate-x-1/2 text-xs font-bold px-3 py-1 bg-white text-primary rounded-full">
                 {t('pricing.pulse.badge')}
               </span>
@@ -746,7 +686,7 @@ export default function HomePage() {
               <p className="text-xs text-emerald-200 font-medium mb-4">{t('pricing.trialMention')}</p>
               <Link
                 href="/signup?mode=checkout&plan=pulse"
-                className="block text-center py-2.5 text-sm font-semibold rounded-xl transition-all duration-300 bg-white text-primary hover:bg-white/90"
+                className="block text-center py-3 min-h-[44px] text-sm font-semibold rounded-2xl transition-all duration-300 ease-in-out bg-white text-primary hover:bg-white/90 active:scale-[0.98]"
               >
                 {t('pricing.ctaSubscribe')}
               </Link>
@@ -759,7 +699,7 @@ export default function HomePage() {
             </div>
 
             {/* Plan Zenith - bordure lumineuse bleue (offre ultime) */}
-            <div className="flex flex-col h-full rounded-2xl border p-6 relative bg-card border-border transition-all duration-300 ease-out hover:-translate-y-3 hover:shadow-[0_20px_40px_rgba(75,115,255,0.2)] hover:border-primary/50 border-2 border-blue-500/50 shadow-[0_0_20px_rgba(59,130,246,0.15)]">
+            <div className="flex flex-col h-full rounded-2xl sm:rounded-3xl border-2 border-blue-500/50 p-6 relative bg-card shadow-[0_0_24px_rgba(59,130,246,0.12)] transition-all duration-300 ease-in-out hover:-translate-y-1 hover:shadow-[0_24px_48px_rgba(59,130,246,0.2)] hover:border-primary/60">
               <div className="mb-5">
                 <p className="font-display font-bold text-lg text-foreground">
                   {t('pricing.zenith.name')}
@@ -810,7 +750,7 @@ export default function HomePage() {
               <p className="text-xs text-emerald-600 font-medium mb-4">{t('pricing.trialMention')}</p>
               <Link
                 href="/signup?mode=checkout&plan=zenith"
-                className="block text-center py-2.5 text-sm font-semibold rounded-xl transition-all duration-300 gradient-primary text-white hover:opacity-90"
+                className="block text-center py-3 min-h-[44px] text-sm font-semibold rounded-2xl transition-all duration-300 ease-in-out gradient-primary text-white hover:opacity-90 active:scale-[0.98]"
               >
                 {t('pricing.ctaSubscribe')}
               </Link>
@@ -860,7 +800,7 @@ export default function HomePage() {
                 <button
                   type="button"
                   onClick={() => setOpenFaq(openFaq === key ? null : key)}
-                  className="w-full p-5 text-left flex items-center justify-between focus:outline-none focus-visible:ring-1 focus-visible:ring-slate-300 focus-visible:ring-inset"
+                  className="w-full min-h-[44px] p-5 text-left flex items-center justify-between focus:outline-none focus-visible:ring-1 focus-visible:ring-slate-300 focus-visible:ring-inset transition-colors duration-300"
                 >
                   <span className="font-display font-semibold text-slate-900 pr-4">
                     {t(`faq.items.${key}.q`)}
@@ -898,7 +838,7 @@ export default function HomePage() {
           <p className="text-white/60 mb-8">{t('cta.subtitle')}</p>
               <Link
                 href="/signup?mode=trial"
-                className="inline-flex items-center gap-2 gradient-primary text-white font-semibold px-8 py-3 rounded-xl hover:opacity-90 active:scale-[0.98] transition-all shadow-glow"
+                className="inline-flex items-center justify-center gap-2 min-h-[44px] gradient-primary text-white font-semibold px-8 py-3 rounded-2xl hover:opacity-90 active:scale-[0.98] transition-all duration-300 ease-in-out shadow-glow"
               >
             {t('cta.button')} <ChevronRight className="w-4 h-4" aria-hidden="true" />
           </Link>
@@ -907,7 +847,7 @@ export default function HomePage() {
 
       {/* FOOTER */}
       <footer className="bg-navy py-8">
-        <div className="max-w-6xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-4">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 flex flex-col md:flex-row items-center justify-between gap-4">
           <Link href="/" className="flex items-center gap-2" aria-label="REPUTEXA">
             <Logo size="sm" />
             <span className="font-display font-bold text-white">REPUTEXA</span>

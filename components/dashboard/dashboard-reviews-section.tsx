@@ -105,7 +105,7 @@ export function DashboardReviewsSection({ reviews, useSupabaseAuth, initialSearc
                 key={f}
                 type="button"
                 onClick={() => setFilter(f)}
-                className={`text-xs font-medium px-3 py-1.5 rounded-lg border transition-colors ${
+                className={`text-xs font-medium min-h-[44px] sm:min-h-0 px-3 py-2 sm:py-1.5 rounded-xl border transition-all duration-300 ease-in-out ${
                   filter === f
                     ? 'border-sky-500 dark:border-indigo-500 bg-sky-500 dark:bg-indigo-500 text-white'
                     : 'border-slate-200 dark:border-zinc-800/50 text-slate-600 dark:text-zinc-400 hover:bg-slate-50 dark:hover:bg-white/5'

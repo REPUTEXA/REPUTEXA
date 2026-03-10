@@ -207,7 +207,7 @@ export default function ReviewsPage() {
             key={tab.value}
             type="button"
             onClick={() => setSourceFilter(tab.value)}
-            className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-colors ${
+            className={`inline-flex items-center justify-center gap-2 min-h-[44px] px-4 py-2 rounded-2xl text-sm font-medium transition-all duration-300 ease-in-out ${
               sourceFilter === tab.value
                 ? 'bg-sky-500 text-white shadow-sm'
                 : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50'
@@ -222,7 +222,7 @@ export default function ReviewsPage() {
       </div>
 
       {/* Form add review */}
-      <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+      <section className="rounded-2xl sm:rounded-3xl border border-slate-200 bg-white p-6 shadow-sm dark:bg-[#09090b] dark:border-zinc-800/50 transition-all duration-300">
         <h2 className="font-display font-semibold text-lg text-slate-900 mb-4">Ajouter un avis (simulation)</h2>
         <form onSubmit={handleAddReview} className="flex flex-wrap gap-4">
           <input

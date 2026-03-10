@@ -23,6 +23,14 @@
   }
 }
 
+/* Apple-style shadow (soft, diffuse) */
+.shadow-apple {
+  box-shadow: 0 8px 30px rgb(0 0 0 / 0.04);
+}
+.dark .shadow-apple {
+  box-shadow: 0 8px 30px rgb(0 0 0 / 0.15);
+}
+
 /* Reset & base */
 html {
   scroll-behavior: smooth;

@@ -107,7 +107,7 @@ export default async function DashboardPage({ params, searchParams }: Props) {
   const negativeCount = reviews.filter((r) => r.rating <= 3).length;
 
   return (
-    <div className="px-4 sm:px-6 md:px-8 py-6 space-y-6 max-w-[1600px] mx-auto">
+    <div className="px-4 sm:px-6 md:px-8 py-6 sm:py-8 space-y-6 max-w-[1600px] mx-auto">
       {welcome === '1' && (
         <div className="rounded-2xl bg-emerald-500/15 dark:bg-emerald-500/10 border border-emerald-500/30 dark:border-emerald-500/20 p-4 text-emerald-800 dark:text-emerald-200">
           <p className="font-medium">Bienvenue ! Votre essai gratuit de 14 jours a bien été activé.</p>

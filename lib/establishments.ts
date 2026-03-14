@@ -7,6 +7,7 @@
 import type { PlanSlug } from '@/lib/feature-gate';
 
 export const PLAN_PRICES: Record<PlanSlug, number> = {
+  free: 0,
   vision: 59,
   pulse: 98,
   zenith: 179,

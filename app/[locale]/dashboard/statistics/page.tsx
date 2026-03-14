@@ -5,7 +5,7 @@ import { createClient } from '@/lib/supabase/server';
 import { StatisticsOverview } from '@/components/dashboard/statistics-overview';
 import { ArchivesInsightsSection } from '@/components/dashboard/archives-insights-section';
 import { WeeklyInsightSection } from '@/components/dashboard/weekly-insight-section';
-import { toPlanSlug } from '@/lib/feature-gate';
+import { toPlanSlug, type PlanSlug } from '@/lib/feature-gate';
 
 type Props = {
   params: Promise<{ locale: string }>;
@@ -34,7 +34,7 @@ export default async function StatisticsPage({ params }: Props) {
   } = await supabase.auth.getUser();
 
   let reviews: ReviewDisplay[] = [];
-  let planSlug: 'vision' | 'pulse' | 'zenith' = 'vision';
+  let planSlug: PlanSlug = 'vision';
 
   if (supabaseUser) {
     const { data: profile } = await supabase

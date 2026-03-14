@@ -1,8 +1,7 @@
 import { setRequestLocale } from 'next-intl/server';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/server';
-import { toPlanSlug } from '@/lib/feature-gate';
-import { hasFeature, FEATURES } from '@/lib/feature-gate';
+import { toPlanSlug, hasFeature, FEATURES, type PlanSlug } from '@/lib/feature-gate';
 import { StrategicConsultantChat } from '@/components/dashboard/strategic-consultant-chat';
 import { Sparkles, ArrowRight, MessageSquare } from 'lucide-react';
 
@@ -26,7 +25,7 @@ export default async function ConsultantPage({ params }: Props) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  let planSlug: 'vision' | 'pulse' | 'zenith' = 'vision';
+  let planSlug: PlanSlug = 'vision';
   if (user) {
     const { data: profile } = await supabase
       .from('profiles')

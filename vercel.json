@@ -2,7 +2,7 @@
   "crons": [
     {
       "path": "/api/cron/publish-scheduled-reviews",
-      "schedule": "*/15 * * * *"
+      "schedule": "0 8 * * *"
     },
     {
       "path": "/api/cron/trial-emails",
@@ -14,7 +14,7 @@
     },
     {
       "path": "/api/cron/weekly-recap",
-      "schedule": "0 9 * * 1"
+      "schedule": "0 8 * * 1"
     },
     {
       "path": "/api/cron/weekly-insight",
@@ -22,7 +22,7 @@
     },
     {
       "path": "/api/cron/monthly-report",
-      "schedule": "0 9 1 * *"
+      "schedule": "0 8 1 * *"
     }
   ]
 }

@@ -1,163 +1,319 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import { useLocale } from 'next-intl';
-import { useSearchParams, useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { Link } from '@/i18n/navigation';
 import { Logo } from '@/components/logo';
-import { formatPrice } from '@/lib/format-price';
-import { CheckCircle2, XCircle, Globe } from 'lucide-react';
+import { createClient } from '@/lib/supabase/client';
+import { Check, Loader2 } from 'lucide-react';
+import { toast } from 'sonner';
 
-type CellType = { type: 'check'; textKey: string } | { type: 'cross'; textKey?: string } | { type: 'globe'; textKey: string };
+const MONTHLY_EUR: Record<string, number> = { vision: 59, pulse: 97, zenith: 157 };
+const MONTHLY_USD: Record<string, number> = { vision: 65, pulse: 107, zenith: 175 };
+const ANNUAL_MULTIPLIER = 0.8;
 
-function renderCell(cell: CellType, tc: (k: string) => string) {
-  if (cell.type === 'check') {
-    return (
-      <span className="flex flex-col items-center gap-1">
-        <CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0" aria-hidden />
-        <span>{tc(cell.textKey)}</span>
-      </span>
-    );
-  }
-  if (cell.type === 'cross') {
-    return (
-      <span className="flex flex-col items-center gap-1">
-        <XCircle className="w-5 h-5 text-red-500 shrink-0" aria-hidden />
-        {cell.textKey && <span>{tc(cell.textKey)}</span>}
-      </span>
-    );
-  }
-  return (
-    <span className="flex flex-col items-center gap-1">
-      <Globe className="w-5 h-5 text-slate-500 shrink-0" aria-hidden />
-      <span>{tc(cell.textKey)}</span>
-    </span>
-  );
-}
-
-const COMPARISON_ROWS: Array<{
-  labelKey: string;
-  vision: CellType;
-  pulse: CellType;
-  zenith: CellType;
-}> = [
-  { labelKey: 'reponses_avis', vision: { type: 'check', textKey: 'reponses_avis_val' }, pulse: { type: 'check', textKey: 'reponses_avis_val' }, zenith: { type: 'check', textKey: 'reponses_avis_val' } },
-  { labelKey: 'triple_verification', vision: { type: 'cross', textKey: 'non' }, pulse: { type: 'cross', textKey: 'non' }, zenith: { type: 'check', textKey: 'triple_verification_val' } },
-  { labelKey: 'alertes_mauvais', vision: { type: 'cross', textKey: 'non' }, pulse: { type: 'check', textKey: 'alertes_mauvais_val' }, zenith: { type: 'check', textKey: 'alertes_mauvais_val' } },
-  { labelKey: 'reporting', vision: { type: 'check', textKey: 'reporting_vision' }, pulse: { type: 'check', textKey: 'reporting_pulse' }, zenith: { type: 'check', textKey: 'reporting_pulse' } },
-  { labelKey: 'ia_tests_humains', vision: { type: 'check', textKey: 'ia_tests_val' }, pulse: { type: 'check', textKey: 'ia_tests_val' }, zenith: { type: 'check', textKey: 'ia_tests_val' } },
-  { labelKey: 'boost_seo', vision: { type: 'cross', textKey: 'non' }, pulse: { type: 'cross', textKey: 'non' }, zenith: { type: 'check', textKey: 'boost_seo_val' } },
-  { labelKey: 'suppression_haineux', vision: { type: 'cross', textKey: 'non' }, pulse: { type: 'check', textKey: 'suppression_val' }, zenith: { type: 'check', textKey: 'suppression_val' } },
-  { labelKey: 'ai_capture', vision: { type: 'cross', textKey: 'non' }, pulse: { type: 'cross', textKey: 'non' }, zenith: { type: 'check', textKey: 'ai_capture_val' } },
-  { labelKey: 'langues', vision: { type: 'globe', textKey: 'langues_vision' }, pulse: { type: 'globe', textKey: 'langues_autres' }, zenith: { type: 'globe', textKey: 'langues_autres' } },
-];
+const PLAN_TO_STRIPE: Record<string, 'starter' | 'manager' | 'dominator'> = {
+  vision: 'starter',
+  pulse: 'manager',
+  zenith: 'dominator',
+};
 
 export default function PricingPage() {
-  const t = useTranslations('HomePage');
-  const tc = useTranslations('HomePage.pricing.comparison');
+  const t = useTranslations('PricingPage');
   const locale = useLocale();
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const planRequired = searchParams?.get('error') === 'plan_required';
+  const [annual, setAnnual] = useState(false);
+  const [session, setSession] = useState<{ user: { id: string } } | null>(null);
+  const [sessionLoading, setSessionLoading] = useState(true);
+  const [checkoutLoading, setCheckoutLoading] = useState<string | null>(null);
+  const useUsd = locale === 'en';
+
+  useEffect(() => {
+    const supabase = createClient();
+    supabase.auth.getSession().then(({ data: { session: s } }) => {
+      setSession(s);
+      setSessionLoading(false);
+    });
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, s) => {
+      setSession(s);
+    });
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const formatPrice = (planKey: string) => {
+    const base = useUsd ? MONTHLY_USD[planKey] ?? 0 : MONTHLY_EUR[planKey] ?? 0;
+    const amount = annual ? Math.round(base * 12 * ANNUAL_MULTIPLIER) : base;
+    return new Intl.NumberFormat(locale === 'en' ? 'en-US' : 'fr-FR', {
+      style: 'currency',
+      currency: useUsd ? 'USD' : 'EUR',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(amount);
+  };
+
+  const suffix = annual ? t('perYear') : t('perMonth');
+
+  const handleSubscribe = (planKey: string) => {
+    if (!session) {
+      router.push(`/${locale}/signup?mode=checkout&plan=${planKey}`);
+      return;
+    }
+    handleCheckout(planKey);
+  };
+
+  const handleCheckout = async (planKey: string) => {
+    if (!session) return;
+    setCheckoutLoading(planKey);
+    try {
+      const params = new URLSearchParams({
+        locale,
+        planType: PLAN_TO_STRIPE[planKey] ?? 'manager',
+        planSlug: planKey,
+      });
+      if (annual) params.set('skipTrial', '1');
+      const res = await fetch(`/api/stripe/create-checkout?${params}`, {
+        method: 'POST',
+        credentials: 'include',
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error ?? 'Erreur');
+      if (data.url) window.location.href = data.url;
+      else throw new Error('URL de paiement non reçue');
+    } catch (err) {
+      console.error('[pricing] checkout:', err);
+      toast.error(err instanceof Error ? err.message : t('checkoutError'));
+      setCheckoutLoading(null);
+    }
+  };
+
+  const logoHref = session ? '/dashboard' : '/';
+  const backLinkVisible = session;
 
   return (
-    <div className="min-h-screen bg-white">
-      <header className="border-b border-slate-200/80 bg-white/70 backdrop-blur-md sticky top-0 z-10">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
+      <header className="border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/80 backdrop-blur-sm sticky top-0 z-10">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2 text-slate-800" aria-label="REPUTEXA">
+          <Link
+            href={logoHref}
+            className="flex items-center gap-2 text-slate-800 dark:text-slate-100"
+            aria-label="REPUTEXA"
+          >
             <Logo />
             <span className="font-display font-bold text-lg">REPUTEXA</span>
           </Link>
-          <Link
-            href="/#tarifs"
-            className="text-sm text-slate-600 hover:text-slate-900 font-medium"
-          >
-            Voir les offres
-          </Link>
+          {backLinkVisible && (
+            <Link
+              href="/dashboard"
+              className="text-sm text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 font-medium"
+            >
+              {t('backToDashboard')}
+            </Link>
+          )}
         </div>
       </header>
 
-      <main className="max-w-6xl mx-auto px-4 sm:px-6 py-8 sm:py-16">
-        {planRequired && (
-          <div className="mb-6 rounded-xl bg-amber-50 border border-amber-200 px-4 py-3 text-sm text-amber-800">
-            Un plan supérieur est requis pour accéder à cette fonctionnalité.
-          </div>
-        )}
-        <div className="text-center mb-12">
-          <h1 className="font-display text-4xl font-bold text-slate-900 mb-2">
-            Tableau comparatif
+      <main className="max-w-6xl mx-auto px-4 sm:px-6 py-12 sm:py-16">
+        <div className="text-center mb-10">
+          <h1 className="font-display text-3xl sm:text-4xl font-bold text-slate-900 dark:text-slate-50">
+            {t('headline')}
           </h1>
-          <p className="text-slate-500">
-            Tout ce qui est inclus dans chaque plan — transparent et sans surprise.
+          <p className="text-slate-500 dark:text-slate-400 mt-2">
+            {t('subtitle')}
           </p>
         </div>
 
-        <div className="overflow-x-auto rounded-2xl border border-slate-200 shadow-lg">
-          <table className="w-full min-w-[640px] border-collapse bg-white">
-            <thead>
-              <tr className="border-b border-slate-200 bg-slate-50/80">
-                <th className="text-left py-4 pl-6 pr-4 text-sm font-semibold text-slate-700">
-                  Fonctionnalité
-                </th>
-                <th className="py-4 px-4 text-center text-sm font-semibold text-slate-900 w-[22%]">
-                  <div>{t('pricing.vision.name')}</div>
-                  <div className="text-base font-bold text-slate-700 mt-0.5">
-                    {formatPrice(locale, t('pricing.vision.price'))}
-                  </div>
-                </th>
-                <th className="py-4 px-4 text-center text-sm font-semibold text-slate-900 w-[22%] bg-blue-50/50">
-                  <div>{t('pricing.pulse.name')}</div>
-                  <div className="text-base font-bold text-blue-700 mt-0.5">
-                    {formatPrice(locale, t('pricing.pulse.price'))}
-                  </div>
-                </th>
-                <th className="py-4 px-4 text-center text-sm font-semibold text-slate-900 w-[22%]">
-                  <div>{t('pricing.zenith.name')}</div>
-                  <span className="inline-block text-[10px] font-bold text-slate-600 mt-1">{t('pricing.zenith.badge')}</span>
-                  <div className="text-base font-bold text-slate-700 mt-0.5">
-                    {formatPrice(locale, t('pricing.zenith.price'))}
-                  </div>
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {COMPARISON_ROWS.map((row, i) => (
-                <tr
-                  key={row.labelKey}
-                  className={`border-b border-slate-100 ${i % 2 === 0 ? 'bg-slate-50/30' : ''}`}
-                >
-                  <td className="py-3.5 pl-6 pr-4 text-sm text-slate-700">
-                    {tc(row.labelKey)}
-                  </td>
-                  <td className="py-3.5 px-4 text-center text-sm text-slate-600">
-                    {renderCell(row.vision, tc)}
-                  </td>
-                  <td className="py-3.5 px-4 text-center text-sm text-slate-600 bg-blue-50/20">
-                    {renderCell(row.pulse, tc)}
-                  </td>
-                  <td className="py-3.5 px-4 text-center text-sm text-slate-600">
-                    {renderCell(row.zenith, tc)}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-
-        <div className="mt-10 flex justify-center">
+        {/* Toggle Monthly / Annual */}
+        <div className="flex justify-center items-center gap-3 mb-12">
+          <span className={`text-sm font-medium transition-colors ${!annual ? 'text-slate-900 dark:text-slate-100' : 'text-slate-500 dark:text-slate-400'}`}>
+            {t('monthly')}
+          </span>
           <button
             type="button"
-            onClick={() => router.back()}
-            className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl border-2 border-slate-200 font-semibold text-slate-700 hover:border-slate-300 hover:bg-slate-50 active:scale-[0.98] transition-colors"
+            role="switch"
+            aria-checked={annual}
+            onClick={() => setAnnual((a) => !a)}
+            className={`relative w-14 h-7 rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-[#2563eb] focus:ring-offset-2 ${annual ? 'bg-[#2563eb]' : 'bg-slate-300 dark:bg-slate-600'}`}
           >
-            ← Retour
+            <span
+              className={`absolute top-1 w-5 h-5 rounded-full bg-white shadow transition-transform duration-200 ${annual ? 'left-8' : 'left-1'}`}
+            />
           </button>
+          <span className={`text-sm font-medium transition-colors ${annual ? 'text-slate-900 dark:text-slate-100' : 'text-slate-500 dark:text-slate-400'}`}>
+            {t('annual')}
+          </span>
+          <span className="ml-2 px-2 py-0.5 rounded-md bg-emerald-100 dark:bg-emerald-900/50 text-emerald-700 dark:text-emerald-300 text-xs font-bold">
+            {t('annualBadge')}
+          </span>
         </div>
 
-        <p className="text-center text-sm text-slate-500 mt-8">
-          {t('pricingTrial')}
+        {/* 3 cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {/* Vision */}
+          <div className="rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm p-6 flex flex-col">
+            <h2 className="font-display font-bold text-xl text-slate-900 dark:text-slate-100">
+              {t('visionTitle')}
+            </h2>
+            <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
+              {t('visionDesc')}
+            </p>
+            <p className="mt-4 text-2xl font-bold text-slate-900 dark:text-slate-100">
+              {formatPrice('vision')}
+              <span className="text-sm font-normal text-slate-500 dark:text-slate-400 ml-1">{suffix}</span>
+            </p>
+            <ul className="mt-6 space-y-3 flex-1">
+              <li className="flex items-start gap-2 text-sm text-slate-700 dark:text-slate-200">
+                <Check className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
+                {t('visionFeature1')}
+              </li>
+              <li className="flex items-start gap-2 text-sm text-slate-700 dark:text-slate-200">
+                <Check className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
+                {t('visionFeature2')}
+              </li>
+            </ul>
+            <PlanButton
+              planKey="vision"
+              loading={checkoutLoading === 'vision'}
+              sessionLoading={sessionLoading}
+              onSubscribe={() => handleSubscribe('vision')}
+              trialHref="/signup?mode=trial"
+              t={t}
+            />
+          </div>
+
+          {/* Pulse */}
+          <div className="rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm p-6 flex flex-col relative">
+            <span className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-slate-600 dark:bg-slate-500 text-white text-xs font-bold">
+              {t('pulseBadge')}
+            </span>
+            <h2 className="font-display font-bold text-xl text-slate-900 dark:text-slate-100 mt-1">
+              {t('pulseTitle')}
+            </h2>
+            <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
+              {t('pulseDesc')}
+            </p>
+            <p className="mt-4 text-2xl font-bold text-slate-900 dark:text-slate-100">
+              {formatPrice('pulse')}
+              <span className="text-sm font-normal text-slate-500 dark:text-slate-400 ml-1">{suffix}</span>
+            </p>
+            <ul className="mt-6 space-y-3 flex-1">
+              <li className="flex items-start gap-2 text-sm text-slate-700 dark:text-slate-200">
+                <Check className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
+                {t('pulseFeature1')}
+              </li>
+              <li className="flex items-start gap-2 text-sm text-slate-700 dark:text-slate-200">
+                <Check className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
+                {t('pulseFeature2')}
+              </li>
+              <li className="flex items-start gap-2 text-sm text-slate-700 dark:text-slate-200">
+                <Check className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
+                {t('pulseFeature3')}
+              </li>
+            </ul>
+            <PlanButton
+              planKey="pulse"
+              loading={checkoutLoading === 'pulse'}
+              sessionLoading={sessionLoading}
+              onSubscribe={() => handleSubscribe('pulse')}
+              trialHref="/signup?mode=trial"
+              t={t}
+              primary
+            />
+          </div>
+
+          {/* Zenith - Mise en avant */}
+          <div className="rounded-2xl bg-white dark:bg-slate-900 border-2 border-[#2563eb] shadow-lg shadow-[#2563eb]/15 p-6 flex flex-col relative ring-2 ring-[#2563eb]/20">
+            <span className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-[#2563eb] text-white text-xs font-bold">
+              {t('zenithBadge')}
+            </span>
+            <h2 className="font-display font-bold text-xl text-slate-900 dark:text-slate-100 mt-1">
+              {t('zenithTitle')}
+            </h2>
+            <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
+              {t('zenithDesc')}
+            </p>
+            <p className="mt-4 text-2xl font-bold text-[#2563eb]">
+              {formatPrice('zenith')}
+              <span className="text-sm font-normal text-slate-500 dark:text-slate-400 ml-1">{suffix}</span>
+            </p>
+            <ul className="mt-6 space-y-3 flex-1">
+              <li className="flex items-start gap-2 text-sm text-slate-700 dark:text-slate-200">
+                <Check className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
+                {t('zenithFeature1')}
+              </li>
+              <li className="flex items-start gap-2 text-sm text-slate-700 dark:text-slate-200">
+                <Check className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
+                {t('zenithFeature2')}
+              </li>
+              <li className="flex items-start gap-2 text-sm text-slate-700 dark:text-slate-200">
+                <Check className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
+                {t('zenithFeature3')}
+              </li>
+            </ul>
+            <PlanButton
+              planKey="zenith"
+              loading={checkoutLoading === 'zenith'}
+              sessionLoading={sessionLoading}
+              onSubscribe={() => handleSubscribe('zenith')}
+              trialHref="/signup?mode=trial"
+              t={t}
+              primary
+            />
+          </div>
+        </div>
+
+        <p className="text-center text-sm text-slate-500 dark:text-slate-400 mt-8">
+          {t('stripeReassurance')}
+        </p>
+        <p className="text-center text-sm text-slate-500 dark:text-slate-400 mt-2">
+          {t('trialMention')}
         </p>
       </main>
+    </div>
+  );
+}
+
+function PlanButton({
+  planKey,
+  loading,
+  sessionLoading,
+  onSubscribe,
+  trialHref,
+  t,
+  primary,
+}: {
+  planKey: string;
+  loading: boolean;
+  sessionLoading: boolean;
+  onSubscribe: () => void;
+  trialHref: string;
+  t: (k: string) => string;
+  primary?: boolean;
+}) {
+  const baseClass = 'mt-6 block w-full py-3 rounded-xl text-center font-semibold transition-colors disabled:opacity-60 flex items-center justify-center gap-2';
+  const primaryClass = 'bg-[#2563eb] text-white hover:bg-[#1d4ed8]';
+  const secondaryClass = 'bg-slate-800 dark:bg-slate-100 text-white dark:text-slate-900 hover:bg-slate-700 dark:hover:bg-slate-200';
+
+  return (
+    <div className="space-y-2" data-plan={planKey}>
+      <button
+        type="button"
+        onClick={onSubscribe}
+        disabled={sessionLoading || loading}
+        className={`${baseClass} ${primary ? primaryClass : secondaryClass}`}
+      >
+        {loading ? (
+          <Loader2 className="w-5 h-5 animate-spin" />
+        ) : null}
+        {t('ctaSubscribe')}
+      </button>
+      <Link
+        href={trialHref}
+        className="block w-full py-2 text-center text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-[#2563eb] dark:hover:text-[#2563eb] underline underline-offset-2 hover:no-underline transition-colors"
+      >
+        {t('ctaTrial')}
+      </Link>
     </div>
   );
 }

@@ -8,6 +8,7 @@ import { formatPrice } from '@/lib/format-price';
 import { type PlanSlug } from '@/lib/feature-gate';
 
 const PLAN_CONFIG: Record<PlanSlug, { icon: typeof Eye; name: string; price: string }> = {
+  free: { icon: Eye, name: 'Gratuit', price: '0' },
   vision: { icon: Eye, name: 'Vision', price: '59' },
   pulse: { icon: Zap, name: 'Pulse', price: '98' },
   zenith: { icon: Crown, name: 'ZENITH', price: '179' },
@@ -38,7 +39,7 @@ export function PlanUpgradeModal({
     return () => setMounted(false);
   }, []);
 
-  const planOrder: PlanSlug[] = ['vision', 'pulse', 'zenith'];
+  const planOrder: PlanSlug[] = ['free', 'vision', 'pulse', 'zenith'];
   const currentLevel = planOrder.indexOf(currentPlanSlug);
   const upgradeablePlans = planOrder.filter((_, i) => i > currentLevel);
 
@@ -138,7 +139,7 @@ export function PlanUpgradeModal({
                   isCurrent
                     ? 'border-slate-200 dark:border-zinc-800/50 bg-slate-50 dark:bg-zinc-900/50 opacity-70 cursor-default'
                     : isUpgrade
-                      ? 'border-blue-500/50 bg-blue-50/30 dark:border-zinc-700 dark:bg-zinc-900/80 hover:border-blue-500 hover:bg-blue-50/50 dark:hover:bg-white/5 cursor-pointer'
+                      ? 'border-[#2563eb]/50 bg-[#2563eb]/5 dark:border-zinc-700 dark:bg-zinc-900/80 hover:border-[#2563eb] hover:bg-[#2563eb]/10 dark:hover:bg-white/5 cursor-pointer'
                       : 'border-slate-200 dark:border-zinc-800/50 opacity-60 cursor-default'
                 }`}
               >
@@ -160,7 +161,7 @@ export function PlanUpgradeModal({
                   </p>
                 </div>
                 {isUpgrade && (
-                  <span className="text-xs font-semibold text-blue-600 dark:text-blue-400 shrink-0">
+                  <span className="text-xs font-semibold text-primary shrink-0">
                     {loading === slug ? (
                       <Loader2 className="w-4 h-4 animate-spin" />
                     ) : (

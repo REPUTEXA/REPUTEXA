@@ -41,7 +41,7 @@ export function GenerateResponseButton({
       type="button"
       onClick={handleGenerate}
       disabled={loading}
-      className={`flex items-center gap-1.5 text-xs font-medium text-blue-500 hover:text-blue-600 disabled:opacity-60 ${className}`}
+      className={`flex items-center gap-1.5 text-xs font-medium text-primary hover:brightness-110 disabled:opacity-60 ${className}`}
     >
       {loading ? (
         <>

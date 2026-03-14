@@ -15,6 +15,8 @@ export function getAuthErrorMessage(error: { message?: string; status?: number }
   if (msg.includes('email not confirmed')) return 'Vérifiez votre boîte mail pour confirmer votre compte.';
   if (msg.includes('user already registered') || msg.includes('already been registered'))
     return 'Un compte existe déjà avec cet email.';
+  if (msg.includes('phone') && (msg.includes('duplicate') || msg.includes('already') || msg.includes('exists')))
+    return 'Ce numéro de téléphone est déjà associé à un compte.';
   if (msg.includes('password') && msg.includes('weak')) return 'Mot de passe trop faible. Utilisez au moins 6 caractères.';
   if (msg.includes('signup_disabled')) return 'Les inscriptions sont temporairement désactivées.';
   if (msg.includes('rate limit') || msg.includes('too many'))

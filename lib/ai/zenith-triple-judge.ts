@@ -1,0 +1,168 @@
+/**
+ * Workflow Triple Rédaction + Juge (exclusif Zenith)
+ * Génère 3 variantes (empathie, storytelling, expertise) puis GPT-4o sélectionne la meilleure.
+ */
+import OpenAI from 'openai';
+import {
+  HUMAN_CHARTER_BASE,
+  ZENITH_CONCIERGE_ADDON,
+  buildZenithSeoInstruction,
+  HUMAN_FALLBACKS,
+} from './concierge-prompts';
+
+const ZENITH_TRIPLE_FOCUS = `
+TRIPLE RÉDACTION — Génère exactement 3 variantes distinctes :
+
+1. VARIANTE EMPATHIE : Focus chaleur humaine, reconnaissance émotionnelle, connexion avec le client. Rebondis sur le ressenti exprimé.
+2. VARIANTE STORYTELLING : Focus sur l'histoire de l'établissement, l'origine des produits, l'ambiance, les petits détails qui font l'âme du lieu.
+3. VARIANTE EXPERTISE : Focus sur le produit/technique (plats, recettes, sélection, savoir-faire). Met en valeur le professionnalisme sans être froid.
+
+Chaque variante doit rester 100 % humaine et respecter la charte anti-IA.
+Réponds UNIQUEMENT en JSON : {"options": ["Var1", "Var2", "Var3"], "detectedLanguage": "fr"}
+`;
+
+function buildJudgeSystem(params: {
+  aiTon?: string;
+  aiLength?: string;
+  aiCustomInstructions?: string;
+}): string {
+  const tonDesc =
+    params.aiTon === 'luxury'
+      ? 'Luxueux : vocabulaire noble, formules raffinées'
+      : params.aiTon === 'warm'
+        ? 'Chaleureux : empathie et connexion'
+        : params.aiTon === 'casual'
+          ? 'Décontracté : ton léger mais toujours en vouvoiement'
+          : params.aiTon === 'humorous'
+            ? 'Humoristique : touche légère et souriante'
+            : 'Professionnel : courtois et sérieux';
+  const lengthRule =
+    params.aiLength === 'concise'
+      ? 'Concis : maximum 2 phrases, aucune phrase en trop'
+      : params.aiLength === 'detailed'
+        ? 'Détaillé : 3 à 5 phrases pour le SEO'
+        : 'Équilibré : 2 à 4 phrases';
+  const hasCustom = (params.aiCustomInstructions ?? '').trim().length > 0;
+
+  return `Tu es un Juge qualité pour réponses e-réputation. On te donne 3 variantes (empathie, storytelling, expertise).
+Tu dois ÉLIMINER toute variante qui viole un critère éliminatoire. Parmi celles qui restent, choisis la meilleure.
+
+CRITÈRES ÉLIMINATOIRES (si une variante échoue, elle est éliminée) :
+1. CONFORMITÉ AU TON : ${tonDesc}. Si le ton demandé est "Luxueux" et le vocabulaire est trop ordinaire → éliminé.
+2. RESPECT DE LA LONGUEUR : ${lengthRule}. Si "Concis" demandé et la variante dépasse 2 phrases → éliminé.
+3. VOUVOIEMENT STRICT : Si un "tu", "ton", "ta", "te" (tutoiement) est détecté → éliminé immédiatement.
+4. INCLUSION DES CONSIGNES : ${
+    hasCustom
+      ? `Les instructions spécifiques du restaurateur doivent être présentes ou reflétées. Si absentes → éliminé.`
+      : 'Pas de consignes spécifiques à respecter.'
+  }
+
+Si plusieurs variantes passent tous les critères : choisis la plus humaine et fluide.
+
+Réponds UNIQUEMENT en JSON : {"winner": 1|2|3, "reason": "raison courte"}
+`;
+}
+
+function cleanOutput(text: string): string {
+  return text
+    .replace(/^["']|["']$/g, '')
+    .replace(/^Voici la réponse\s*:?\s*/i, '')
+    .replace(/\s*\[.*?\]\s*/g, '')  // balises [ ... ]
+    .replace(/<[^>]+>/g, '')         // balises HTML
+    .trim();
+}
+
+export async function runZenithTripleJudge(
+  openai: OpenAI,
+  context: {
+    reviewComment: string;
+    reviewerName: string;
+    rating: number;
+    establishmentName: string;
+    businessContext: string;
+    seoKeywords: string[];
+    styleInstruction: string;
+    aiTon?: string;
+    aiLength?: string;
+    aiCustomInstructions?: string;
+  }
+): Promise<string> {
+  const { reviewComment, reviewerName, rating } = context;
+  const useSeo = context.seoKeywords.length > 0 || context.businessContext;
+  const seoBlock = useSeo
+    ? buildZenithSeoInstruction(
+        context.establishmentName,
+        context.businessContext,
+        context.seoKeywords
+      )
+    : '';
+
+  const systemPrompt =
+    `Tu es un expert en e-réputation pour établissements haut de gamme.\n` +
+    HUMAN_CHARTER_BASE +
+    '\n\n' +
+    context.styleInstruction +
+    '\n\n' +
+    ZENITH_CONCIERGE_ADDON +
+    ZENITH_TRIPLE_FOCUS +
+    seoBlock;
+
+  const userContent = `Avis: "${reviewComment}" | Client: ${reviewerName} | Note: ${rating}/5 | Établissement: ${context.establishmentName}.
+Génère 3 variantes en JSON. Chaque option = texte brut uniquement.`;
+
+  const completion = await openai.chat.completions.create({
+    model: 'gpt-4o-mini',
+    temperature: 0.8,
+    messages: [
+      { role: 'system', content: systemPrompt },
+      { role: 'user', content: userContent },
+    ],
+    response_format: { type: 'json_object' },
+  });
+
+  const raw = completion.choices[0]?.message?.content ?? '{}';
+  let parsed: { options?: string[]; detectedLanguage?: string } = {};
+  try {
+    parsed = JSON.parse(raw);
+  } catch {
+    parsed = {};
+  }
+  const options = (parsed.options ?? []).slice(0, 3).map((o) => cleanOutput(String(o ?? '')));
+
+  if (options.length < 3) {
+    const fallbacks = [HUMAN_FALLBACKS.genericThanks, HUMAN_FALLBACKS.positiveShort, 'À très vite !'];
+    while (options.length < 3) options.push(fallbacks[options.length]);
+  }
+
+  const judgeSystem = buildJudgeSystem({
+    aiTon: context.aiTon,
+    aiLength: context.aiLength,
+    aiCustomInstructions: context.aiCustomInstructions,
+  });
+
+  // Juge (GPT-4o)
+  const judgeCompletion = await openai.chat.completions.create({
+    model: 'gpt-4o',
+    temperature: 0.3,
+    messages: [
+      { role: 'system', content: judgeSystem },
+      {
+        role: 'user',
+        content:
+          `Variante 1 (empathie): ${options[0]}\n\nVariante 2 (storytelling): ${options[1]}\n\nVariante 3 (expertise): ${options[2]}\n\n` +
+          'Quelle variante choisir (1, 2 ou 3) ? Réponds en JSON.',
+      },
+    ],
+    response_format: { type: 'json_object' },
+  });
+
+  const judgeRaw = judgeCompletion.choices[0]?.message?.content ?? '{}';
+  let judgeParsed: { winner?: number; reason?: string } = {};
+  try {
+    judgeParsed = JSON.parse(judgeRaw);
+  } catch {
+    judgeParsed = {};
+  }
+  const winnerIndex = Math.min(Math.max(1, Math.floor(Number(judgeParsed.winner) || 1)), 3) - 1;
+  return cleanOutput(options[winnerIndex] ?? options[0] ?? HUMAN_FALLBACKS.positiveShort);
+}

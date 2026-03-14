@@ -34,7 +34,7 @@ export function SidebarNav({
             href={item.href}
             className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition ${
               isActive
-                ? 'bg-blue-500 text-white'
+                ? 'bg-primary text-white shadow-[#2563eb]/20 shadow-md'
                 : 'text-zinc-400 hover:bg-zinc-800 hover:text-white'
             }`}
           >

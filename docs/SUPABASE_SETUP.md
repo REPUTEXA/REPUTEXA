@@ -45,6 +45,9 @@ SUPABASE_SERVICE_ROLE_KEY=eyJ...
 
 - **Connexion** : `/login` (email + mot de passe).  
 - **Inscription** : `/signup` (nom de l’établissement, email, mot de passe).  
+- **Google OAuth** : bouton « Se connecter avec Google ». Redirection via `/[locale]/auth/callback`. Profil auto avec `full_name`, `avatar_url`, `email`. Activer Auto-Link dans Auth → Providers → Google pour lier un compte existant.
+- **Mot de passe oublié** : lien sur login vers `/forgot-password`, email template Reputexa via Resend.
+- **Nom expéditeur emails** : Pour harmoniser l'affichage (Confirm Signup, Reset Password, Magic Link) en **REPUTEXA** dans le client mail, configurez dans Supabase Dashboard → Authentication → Email Templates le sujet et le corps. Si vous utilisez un SMTP personnalisé (ex. Resend), définissez le champ *From* au format : `REPUTEXA <votre-email@reputexa.fr>`.
 - Après connexion, redirection vers `/[locale]/dashboard`.
 
 Si la confirmation d’email est activée dans **Authentication → Providers → Email**, l’utilisateur devra valider son email avant d’être considéré comme connecté.

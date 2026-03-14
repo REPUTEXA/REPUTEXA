@@ -55,7 +55,7 @@ export function PhoneInput({
         className={`rpn-phone-wrapper flex items-center rounded-xl border overflow-hidden transition-all duration-200 ${
           showError
             ? 'border-red-300 dark:border-red-900 focus-within:ring-2 focus-within:ring-red-500/30 focus-within:border-red-500 dark:focus-within:border-red-600 bg-white dark:bg-zinc-800/50'
-            : 'border-slate-200 dark:border-zinc-700 focus-within:ring-2 focus-within:ring-blue-500/30 dark:focus-within:ring-indigo-500/30 focus-within:border-blue-500 dark:focus-within:border-indigo-500 bg-white dark:bg-zinc-800/50'
+            : 'border-slate-200 dark:border-zinc-700 focus-within:ring-2 focus-within:ring-[#2563eb]/30 dark:focus-within:ring-indigo-500/30 focus-within:border-primary dark:focus-within:border-indigo-500 bg-white dark:bg-zinc-800/50'
         } [&_.PhoneInput]:!border-0 [&_.PhoneInput]:!p-0 [&_.PhoneInputInput]:!border-0 [&_.PhoneInputInput]:focus:!ring-0 [&_.PhoneInputInput]:!rounded-none`}
       >
         <PhoneInputLib

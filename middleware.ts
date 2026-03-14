@@ -19,13 +19,27 @@ const PUBLIC_PATTERNS = [
   /^\/(fr|en|es|de|it)\/sign-in(\/.*)?$/,
   /^\/(fr|en|es|de|it)\/login$/,
   /^\/(fr|en|es|de|it)\/signup$/,
+  /^\/(fr|en|es|de|it)\/forgot-password$/,
+  /^\/(fr|en|es|de|it)\/reset-password$/,
+  /^\/(fr|en|es|de|it)\/confirm-email$/,
+  /^\/(fr|en|es|de|it)\/verify(\/.*)?$/,
+  /^\/(fr|en|es|de|it)\/auth\/callback/,
   /^\/(fr|en|es|de|it)\/choose-plan$/,
   /^\/(fr|en|es|de|it)\/pricing$/,
+  /^\/(fr|en|es|de|it)\/contact$/,
+  /^\/(fr|en|es|de|it)\/legal$/,
+  /^\/(fr|en|es|de|it)\/privacy$/,
+  /^\/(fr|en|es|de|it)\/terms$/,
   /^\/sign-up(\/.*)?$/,
   /^\/pricing$/,
   /^\/sign-in(\/.*)?$/,
   /^\/login$/,
   /^\/signup$/,
+  /^\/forgot-password$/,
+  /^\/reset-password$/,
+  /^\/confirm-email$/,
+  /^\/verify(\/.*)?$/,
+  /^\/auth\/callback/,
   /^\/choose-plan$/,
   /^\/(fr|en|es|de|it)\/quick-reply\/[^/]+$/, // Magic link sans login
 ];
@@ -48,7 +62,7 @@ export default async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  const { response: supabaseResponse, user: supabaseUser } = await updateSession(request);
+  const { response: supabaseResponse, user: supabaseUser, emailConfirmed } = await updateSession(request);
 
   const url = request.nextUrl.clone();
   const lang = url.searchParams.get('lang') ?? url.searchParams.get('locale');
@@ -82,6 +96,13 @@ export default async function middleware(request: NextRequest) {
     const nextUrl = encodeURIComponent(pathname + (request.nextUrl.search || ''));
     const loginUrl = new URL(`/${locale}/login`, request.url);
     loginUrl.searchParams.set('next', nextUrl);
+    return NextResponse.redirect(loginUrl);
+  }
+
+  if (supabaseUser && !emailConfirmed && !isPublicRoute(pathname)) {
+    const locale = VALID_LOCALES.find((l) => pathname.startsWith(`/${l}/`) || pathname === `/${l}`) ?? 'fr';
+    const loginUrl = new URL(`/${locale}/login`, request.url);
+    loginUrl.searchParams.set('message', 'confirm-email');
     return NextResponse.redirect(loginUrl);
   }
 

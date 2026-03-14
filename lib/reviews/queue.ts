@@ -1,16 +1,16 @@
 import crypto from 'crypto';
 
-export type ReviewStatus = 'pending' | 'generating' | 'scheduled' | 'published';
+export type ReviewStatus = 'pending' | 'generating' | 'scheduled' | 'published' | 'pending_publication';
 
-/** Délai aléatoire entre 30 min et 4 heures (en ms) */
+/** Délai human-like : entre 120 min (2h) et 420 min (7h) — simule temps de réflexion du patron */
 export function calculateDelayMs(): number {
-  const minMinutes = 30;
-  const maxMinutes = 4 * 60; // 4 heures
+  const minMinutes = 120;  // 2h
+  const maxMinutes = 420;  // 7h
   const minutes = Math.floor(Math.random() * (maxMinutes - minMinutes + 1)) + minMinutes;
   return minutes * 60 * 1000;
 }
 
-/** Date/heure de publication prévue (30 min à 4h après maintenant) */
+/** Date/heure de publication prévue (2h à 7h après maintenant) */
 export function calculateScheduledAt(): Date {
   return new Date(Date.now() + calculateDelayMs());
 }

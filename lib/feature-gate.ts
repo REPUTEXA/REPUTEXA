@@ -3,9 +3,9 @@
  * Plan: vision | pulse | zenith
  */
 
-export type PlanSlug = 'vision' | 'pulse' | 'zenith';
+export type PlanSlug = 'vision' | 'pulse' | 'zenith' | 'free';
 
-const PLAN_ORDER: PlanSlug[] = ['vision', 'pulse', 'zenith'];
+const PLAN_ORDER: PlanSlug[] = ['free', 'vision', 'pulse', 'zenith'];
 
 /** Fonctionnalités et plan minimum requis */
 export const FEATURES = {
@@ -29,6 +29,8 @@ export const FEATURES = {
   POS_CONNECTOR: 'pos_connector',
   /** Boost SEO : injection mots-clés dans réponses IA — Zenith */
   SEO_BOOST: 'seo_boost',
+  /** Chat Consultant Stratégique 24/7 — Zenith */
+  CONSULTANT_CHAT: 'consultant_chat',
 } as const;
 
 export type FeatureKey = (typeof FEATURES)[keyof typeof FEATURES];
@@ -45,10 +47,12 @@ const FEATURE_MIN_PLAN: Record<FeatureKey, PlanSlug> = {
   [FEATURES.AI_CAPTURE]: 'zenith',
   [FEATURES.POS_CONNECTOR]: 'zenith',
   [FEATURES.SEO_BOOST]: 'zenith',
+  [FEATURES.CONSULTANT_CHAT]: 'zenith',
 };
 
 /** Libellé du plan pour les messages upsell */
 export const PLAN_DISPLAY: Record<PlanSlug, string> = {
+  free: 'Gratuit',
   vision: 'Vision',
   pulse: 'Pulse',
   zenith: 'ZENITH',
@@ -86,9 +90,10 @@ export function getRequiredPlanDisplayName(feature: FeatureKey): string {
   return PLAN_DISPLAY[FEATURE_MIN_PLAN[feature]];
 }
 
-/** Normalise subscription_plan (vision/pulse/zenith ou legacy starter/manager/dominator) vers PlanSlug */
+/** Normalise subscription_plan (vision/pulse/zenith/free ou legacy starter/manager/dominator) vers PlanSlug */
 export function toPlanSlug(subscriptionPlan: string | null, selectedPlan?: string | null): PlanSlug {
   const s = (selectedPlan ?? subscriptionPlan ?? '').toLowerCase();
+  if (s === 'free') return 'free';
   if (s === 'vision' || s === 'starter') return 'vision';
   if (s === 'pulse' || s === 'manager') return 'pulse';
   if (s === 'zenith' || s === 'dominator') return 'zenith';

@@ -11,6 +11,7 @@ import {
   AlertTriangle,
   Calendar,
   ChevronDown,
+  UtensilsCrossed,
 } from 'lucide-react';
 
 type FilterType = 'all' | 'unanswered' | 'negative';
@@ -29,60 +30,34 @@ type MockReview = {
 const MOCK_REVIEWS: MockReview[] = [
   {
     id: '1',
-    name: 'Tom',
-    comment: 'Service impeccable, pizzas délicieuses. L\'équipe est aux petits soins. Je recommande vivement !',
-    rating: 5,
+    name: 'Camille',
+    comment:
+      "Cuisine raffinée et cuisson parfaite des viandes. Seul bémol : plus de 25 minutes d'attente entre les plats le samedi soir.",
+    rating: 4,
     source: 'Google',
     hasResponse: true,
   },
   {
     id: '2',
-    name: 'Robert',
-    comment: 'Très déçu du temps d\'attente, 45 min pour une salade. La qualité ne compense pas.',
-    rating: 2,
-    source: 'Google',
-    hasResponse: false,
-  },
-  {
-    id: '3',
-    name: 'Sophie',
-    comment: 'Cadre charmant, desserts maison excellents. Petit bémol sur le service un peu lent le samedi.',
-    rating: 4,
-    source: 'TripAdvisor',
-    hasResponse: true,
-  },
-  {
-    id: '4',
-    name: 'Marc',
-    comment: 'Commande livrée froide, pizza pas cuite au centre. Très déçu pour le prix.',
-    rating: 1,
-    source: 'Google',
-    hasResponse: false,
-  },
-  {
-    id: '5',
-    name: 'Claire',
-    comment: 'Décoration soignée, ambiance cosy. Les pâtes fraîches sont un régal. À refaire !',
+    name: 'Julien',
+    comment:
+      "Super accueil, terrasse agréable et carte des vins au top. Un peu d'attente au moment de l'addition.",
     rating: 5,
     source: 'TripAdvisor',
-    hasResponse: true,
-  },
-  {
-    id: '6',
-    name: 'Philippe',
-    comment: 'Correct sans plus. Le rapport qualité-prix est moyen pour la région.',
-    rating: 3,
-    source: 'Google',
     hasResponse: false,
   },
 ];
 
 const CHART_DATA: Record<ChartRange, number[]> = {
-  '7j': [3.2, 2.9, 3.5, 3.1, 2.7, 2.8, 3.0],
-  '30j': [2.8, 3.1, 2.9, 3.3, 3.0, 2.7, 2.9, 3.2, 3.1, 2.8],
-  '6m': [3.2, 2.9, 3.5, 3.1, 2.7, 2.8, 3.0, 3.2, 2.9, 3.4, 3.0, 2.7],
-  all: [2.8, 3.2, 2.9, 3.1, 3.0, 2.7, 2.9, 3.3],
-  perso: [2.9, 3.1, 2.8, 3.2, 3.0],
+  '7j': [4.3, 4.5, 4.2, 4.6, 4.4, 4.5, 4.3],
+  '30j': [
+    4.1, 4.2, 4.3, 4.1, 4.2, 4.4, 4.5, 4.3, 4.4, 4.6,
+    4.3, 4.2, 4.4, 4.5, 4.6, 4.3, 4.2, 4.1, 4.3, 4.5,
+    4.4, 4.6, 4.3, 4.2, 4.4, 4.5, 4.3, 4.2, 4.4, 4.5,
+  ],
+  '6m': [4.0, 4.1, 4.2, 4.3, 4.2, 4.4, 4.5, 4.3, 4.4, 4.6, 4.4, 4.5],
+  all: [4.0, 4.1, 4.2, 4.4, 4.3, 4.5, 4.4, 4.6],
+  perso: [4.2, 4.4, 4.3, 4.5, 4.4],
 };
 
 export function LandingDashboardMockup() {
@@ -103,7 +78,7 @@ export function LandingDashboardMockup() {
   const [search, setSearch] = useState('');
   const [filter, setFilter] = useState<FilterType>('all');
   const [platform, setPlatform] = useState<PlatformFilter>('all');
-  const [chartRange, setChartRange] = useState<ChartRange>('6m');
+  const [chartRange, setChartRange] = useState<ChartRange>('30j');
   const [platformOpen, setPlatformOpen] = useState(false);
 
   const today = new Date();
@@ -138,8 +113,8 @@ export function LandingDashboardMockup() {
   }, [search, filter, platform]);
 
   const chartValues = CHART_DATA[chartRange];
-  const positiveCount = MOCK_REVIEWS.filter((r) => r.rating >= 4).length;
-  const negativeCount = MOCK_REVIEWS.filter((r) => r.rating < 4).length;
+  const positiveCount = 72;
+  const negativeCount = 15;
 
   return (
     <div className="rounded-2xl sm:rounded-[32px] border border-white/10 bg-white/5 shadow-[0_24px_64px_rgba(15,23,42,0.85)] sm:shadow-[0_40px_120px_rgba(15,23,42,0.9)] p-1 sm:p-1.5 dashboard-glow min-w-0">
@@ -179,13 +154,18 @@ export function LandingDashboardMockup() {
         {/* Contenu du dashboard */}
         <div className="p-3 sm:p-4 md:p-5 bg-white space-y-3 sm:space-y-4 max-h-[70vh] overflow-y-auto">
           {/* Header */}
-          <div>
-            <h1 className="font-display font-bold text-lg sm:text-xl text-slate-900">
-              {t('overview')}
-            </h1>
-            <p className="text-[10px] sm:text-xs text-slate-500 mt-0.5 capitalize">
-              {dateStr} · La bella
-            </p>
+          <div className="flex items-center gap-2">
+            <div className="inline-flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-gradient-to-br from-amber-500 to-rose-500 text-white shadow-sm">
+              <UtensilsCrossed className="w-4 h-4" />
+            </div>
+            <div>
+              <h1 className="font-display font-bold text-lg sm:text-xl text-slate-900">
+                L&apos;Atelier Gourmet
+              </h1>
+              <p className="text-[10px] sm:text-xs text-slate-500 mt-0.5 capitalize">
+                {dateStr} · Dashboard Reputexa
+              </p>
+            </div>
           </div>
 
           {/* Bandeau alerte IA */}
@@ -220,7 +200,7 @@ export function LandingDashboardMockup() {
                   <div>
                     <p className="text-[10px] font-medium text-white/70">{t('avgRating')}</p>
                     <p className="text-base sm:text-lg font-display font-bold leading-tight">
-                      2.7<span className="text-sm font-medium">/5</span>
+                      4.4<span className="text-sm font-medium">/5</span>
                     </p>
                   </div>
                 </div>
@@ -240,7 +220,7 @@ export function LandingDashboardMockup() {
                   +12%
                 </span>
               </div>
-              <p className="text-base sm:text-lg font-display font-bold text-slate-900">6</p>
+              <p className="text-base sm:text-lg font-display font-bold text-slate-900">87</p>
               <p className="text-[10px] font-medium text-slate-500">{t('reviewsThisMonth')}</p>
             </div>
 
@@ -315,7 +295,7 @@ export function LandingDashboardMockup() {
                   />
                 ))}
               </div>
-              <p className="text-[9px] text-slate-400 mt-1">mars 2026</p>
+              <p className="text-[9px] text-slate-400 mt-1">30 derniers jours</p>
             </div>
 
             <div className="rounded-xl sm:rounded-2xl border border-slate-200 bg-white p-3 sm:p-4 shadow-[4px_6px_0_rgba(0,0,0,0.04)]">
@@ -361,6 +341,65 @@ export function LandingDashboardMockup() {
                   </div>
                 </div>
               </div>
+            </div>
+          </section>
+
+          {/* Bloc IA + mots-clés */}
+          <section className="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <div className="md:col-span-2 rounded-xl sm:rounded-2xl border border-slate-200 bg-slate-50 p-3 sm:p-4">
+              <h3 className="font-display font-semibold text-sm text-slate-900 mb-2">
+                Ce que vos clients disent
+              </h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <p className="text-[11px] font-medium text-emerald-600 mb-1.5">Points forts</p>
+                  <div className="flex flex-wrap gap-1.5">
+                    {['accueil', 'cuisson', 'vins'].map((k) => (
+                      <span
+                        key={k}
+                        className="inline-flex items-center gap-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-100 px-2.5 py-1 text-[11px]"
+                      >
+                        <span className="font-medium">#{k}</span>
+                      </span>
+                    ))}
+                  </div>
+                </div>
+                <div>
+                  <p className="text-[11px] font-medium text-rose-600 mb-1.5">Axes d&apos;amélioration</p>
+                  <div className="flex flex-wrap gap-1.5">
+                    {['terrasse', 'attente'].map((k) => (
+                      <span
+                        key={k}
+                        className="inline-flex items-center gap-1 rounded-full bg-rose-50 text-rose-700 border border-rose-100 px-2.5 py-1 text-[11px]"
+                      >
+                        <span className="font-medium">#{k}</span>
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </div>
+              <div className="mt-3 rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-[11px] text-slate-700 shadow-[0_8px_20px_rgba(15,23,42,0.04)]">
+                <p className="font-semibold text-slate-900 mb-0.5">L&apos;avis de l&apos;Expert IA</p>
+                <p className="text-slate-600 leading-snug">
+                  La qualité des plats est excellente, mais 12% des avis mentionnent une attente supérieure à 20 min le samedi
+                  soir. Action : Renforcez l&apos;équipe en salle pour stabiliser votre note au-dessus de 4.5.
+                </p>
+              </div>
+            </div>
+            <div className="rounded-xl sm:rounded-2xl border border-slate-200 bg-white p-3 sm:p-4 flex flex-col justify-between">
+              <div>
+                <p className="text-[11px] font-medium text-slate-500 mb-1">Score global du mois</p>
+                <p className="text-2xl font-display font-bold text-slate-900">4.4/5</p>
+                <p className="text-[10px] text-slate-500 mt-0.5">
+                  Objectif : maintenir votre réputation au-dessus de 4.5.
+                </p>
+              </div>
+              <Link
+                href="/signup"
+                className="mt-3 inline-flex items-center justify-center rounded-xl bg-slate-900 text-white text-[11px] font-semibold px-3 py-2 hover:bg-slate-800 transition-colors"
+              >
+                Découvrir le plan ZENITH
+              </Link>
             </div>
           </section>
 
@@ -432,7 +471,7 @@ export function LandingDashboardMockup() {
                   </p>
                 </div>
               ) : (
-                filteredReviews.slice(0, 6).map((r) => (
+                filteredReviews.slice(0, 2).map((r) => (
                   <div
                     key={r.id}
                     className="rounded-xl border border-slate-200 bg-white p-3 shadow-[4px_6px_0_rgba(0,0,0,0.04)] hover:shadow-md hover:border-slate-300 transition-all"

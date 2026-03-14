@@ -8,13 +8,12 @@ import { useLocale } from 'next-intl';
 import { createClient } from '@/lib/supabase/client';
 import { getSiteUrl } from '@/lib/site-url';
 import { Loader2, Mic } from 'lucide-react';
+import { StripePortalButton } from '@/components/dashboard/stripe-portal-button';
 import { PhoneInput, isValidPhoneNumber } from '@/components/phone-input';
 import { PasswordField } from '@/components/auth/password-field';
 import { SettingsSkeleton } from '@/components/auth/settings-skeleton';
 import { getAuthErrorMessage } from '@/lib/auth/errors';
 import { toast } from 'sonner';
-import { hasFeature, FEATURES } from '@/lib/feature-gate';
-
 const GOOGLE_BUSINESS_SCOPE = 'https://www.googleapis.com/auth/business.manage';
 
 export default function SettingsPage() {
@@ -37,19 +36,16 @@ export default function SettingsPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [whatsappPhone, setWhatsappPhone] = useState('');
   const [alertThresholdStars, setAlertThresholdStars] = useState(3);
-  const [seoKeywords, setSeoKeywords] = useState<string[]>([]);
-  const [selectedPlan, setSelectedPlan] = useState<'vision' | 'pulse' | 'zenith'>('vision');
+  const [, setSelectedPlan] = useState<'vision' | 'pulse' | 'zenith'>('vision');
   const [aiTone, setAiTone] = useState<'professional' | 'warm' | 'casual' | 'luxury' | 'humorous'>('professional');
   const [aiLength, setAiLength] = useState<'concise' | 'balanced' | 'detailed'>('balanced');
-  const [aiSignature, setAiSignature] = useState('');
-  const [aiUseTutoiement, setAiUseTutoiement] = useState(false);
   const [aiSafeMode, setAiSafeMode] = useState(true);
-  const [aiInstructions, setAiInstructions] = useState('');
+  const [aiCustomInstructions, setAiCustomInstructions] = useState('');
   const [loadingProfile, setLoadingProfile] = useState(true);
   const [savingProfile, setSavingProfile] = useState(false);
   const [savingAccount, setSavingAccount] = useState(false);
   const [savingNotifications, setSavingNotifications] = useState(false);
-  const [savingSeo, setSavingSeo] = useState(false);
+  const [savingAiPreferences, setSavingAiPreferences] = useState(false);
 
   // Vocal-to-style (ADN IA) state
   const [aiVoiceRecording, setAiVoiceRecording] = useState(false);
@@ -61,8 +57,6 @@ export default function SettingsPage() {
   // Aperçu "Ghostwriter" en direct
   const [previewText, setPreviewText] = useState('');
   const [animatedPreview, setAnimatedPreview] = useState('');
-
-  const hasSeoBoost = hasFeature(selectedPlan, FEATURES.SEO_BOOST);
 
   useEffect(() => {
     fetch('/api/profile')
@@ -84,14 +78,11 @@ export default function SettingsPage() {
         setGoogleLocationAddress(data.googleLocationAddress ?? null);
         if (data.whatsappPhone !== undefined) setWhatsappPhone(data.whatsappPhone ?? '');
         if (data.alertThresholdStars !== undefined) setAlertThresholdStars(data.alertThresholdStars ?? 3);
-        if (Array.isArray(data.seoKeywords)) setSeoKeywords(data.seoKeywords);
         if (data.selectedPlan) setSelectedPlan(data.selectedPlan);
         if (data.aiTone) setAiTone(data.aiTone);
         if (data.aiLength) setAiLength(data.aiLength);
-        if (typeof data.aiSignature === 'string') setAiSignature(data.aiSignature);
-        if (typeof data.aiUseTutoiement === 'boolean') setAiUseTutoiement(data.aiUseTutoiement);
         if (typeof data.aiSafeMode === 'boolean') setAiSafeMode(data.aiSafeMode);
-        if (typeof data.aiInstructions === 'string') setAiInstructions(data.aiInstructions);
+        if (typeof data.aiCustomInstructions === 'string') setAiCustomInstructions(data.aiCustomInstructions);
       })
       .catch((err) => toast.error(err instanceof Error ? err.message : 'Impossible de charger le profil'))
       .finally(() => setLoadingProfile(false));
@@ -138,13 +129,12 @@ export default function SettingsPage() {
             const prefRes = await fetch('/api/ai/preferences/from-voice', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                transcript,
-                aiTone,
-                aiLength,
-                aiInstructions,
-                aiSignature,
-              }),
+            body: JSON.stringify({
+              transcript,
+              aiTone,
+              aiLength,
+              aiCustomInstructions: aiCustomInstructions,
+            }),
             });
             const prefJson = await prefRes.json();
             if (!prefRes.ok) {
@@ -152,11 +142,8 @@ export default function SettingsPage() {
             }
             if (prefJson.aiTone) setAiTone(prefJson.aiTone);
             if (prefJson.aiLength) setAiLength(prefJson.aiLength);
-            if (typeof prefJson.aiInstructions === 'string') {
-              setAiInstructions(prefJson.aiInstructions);
-            }
-            if (typeof prefJson.aiSignature === 'string' && prefJson.aiSignature.trim()) {
-              setAiSignature(prefJson.aiSignature.trim());
+            if (typeof prefJson.aiCustomInstructions === 'string') {
+              setAiCustomInstructions(prefJson.aiCustomInstructions);
             }
             toast.success('Préférences IA mises à jour depuis votre voix ✅');
           } catch (err) {
@@ -231,28 +218,6 @@ export default function SettingsPage() {
       toast.error(msg);
     } finally {
       setSavingAccount(false);
-    }
-  };
-
-  const handleSaveSeo = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setSavingSeo(true);
-    try {
-      const res = await fetch('/api/profile', {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ seoKeywords: Array.isArray(seoKeywords) ? seoKeywords : [] }),
-      });
-      const data = await res.json();
-      if (!res.ok) {
-        toast.error(data?.error ?? 'Erreur lors de l\'enregistrement SEO');
-        return;
-      }
-      toast.success('Mots-clés SEO enregistrés ✅');
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'Erreur réseau');
-    } finally {
-      setSavingSeo(false);
     }
   };
 
@@ -335,54 +300,18 @@ export default function SettingsPage() {
   // Aperçu Ghostwriter: construit le texte et anime la frappe
   const previewExample =
     aiTone === 'warm'
-      ? `Merci beaucoup pour votre avis et d'avoir pris le temps de partager votre ressenti. Même si tout n'a pas été parfait cette fois-ci, votre retour nous aide vraiment à nous améliorer.${
-          aiSignature ? `\n\n${aiSignature}` : ''
-        }`
+      ? `Merci beaucoup pour votre avis et d'avoir pris le temps de partager votre ressenti. Même si tout n'a pas été parfait cette fois-ci, votre retour nous aide vraiment à nous améliorer.`
       : aiTone === 'casual'
-        ? `Merci pour ton message, on est vraiment désolés que l'expérience n'ait pas été au niveau. On va regarder ça de près pour que ta prochaine visite soit au top.${
-            aiSignature ? `\n\n${aiSignature}` : ''
-          }`
+        ? `Merci pour votre message. Nous sommes vraiment désolés que l'expérience n'ait pas été au niveau. Nous allons regarder ça de près pour que votre prochaine visite soit au top.`
         : aiTone === 'luxury'
-          ? `Nous vous remercions sincèrement pour votre retour et sommes navrés que votre expérience n’ait pas été à la hauteur de nos standards. Votre commentaire a été partagé avec l’équipe afin de corriger ces points sans délai.${
-              aiSignature ? `\n\n${aiSignature}` : ''
-            }`
+          ? `Nous vous remercions sincèrement pour votre retour et sommes navrés que votre expérience n’ait pas été à la hauteur de nos standards. Votre commentaire a été partagé avec l’équipe afin de corriger ces points sans délai.`
           : aiTone === 'humorous'
-            ? `Ouch, ce service n’était clairement pas digne de notre meilleure soirée ! Merci de nous l’avoir signalé, on va corriger le tir pour que votre prochaine visite soit une vraie réussite.${
-                aiSignature ? `\n\n${aiSignature}` : ''
-              }`
-            : `Merci d’avoir pris le temps de partager votre avis. Nous sommes désolés que votre expérience n’ait pas été pleinement satisfaisante et nous allons analyser votre retour pour nous améliorer.${
-                aiSignature ? `\n\n${aiSignature}` : ''
-              }`;
+            ? `Ouch, ce service n’était clairement pas digne de notre meilleure soirée ! Merci de nous l’avoir signalé, nous allons corriger le tir pour que votre prochaine visite soit une vraie réussite.`
+            : `Merci d’avoir pris le temps de partager votre avis. Nous sommes désolés que votre expérience n’ait pas été pleinement satisfaisante et nous allons analyser votre retour pour nous améliorer.`;
 
-  // Ajuste le tutoiement/vouvoiement dans l'aperçu selon le toggle
-  const applyTutoiementVouvoiement = (text: string): string => {
-    if (aiUseTutoiement) {
-      return text
-        .replace(/\bvotre avis\b/g, 'ton avis')
-        .replace(/\bvotre ressenti\b/g, 'ton ressenti')
-        .replace(/\bvotre retour\b/g, 'ton retour')
-        .replace(/\bvotre expérience\b/g, 'ton expérience')
-        .replace(/\bVotre commentaire\b/g, 'Ton commentaire')
-        .replace(/\bVotre prochaine visite\b/g, 'Ta prochaine visite')
-        .replace(/\bNous vous remercions\b/g, 'Nous te remercions')
-        .replace(/\b pour votre message\b/g, ' pour ton message')
-        .replace(/\b pour partager votre avis\b/g, ' pour partager ton avis')
-        .replace(/\b votre expérience\b/g, ' ton expérience')
-        .replace(/\b votre retour\b/g, ' ton retour');
-    }
-    if (aiTone === 'casual') {
-      return text
-        .replace(/\bton message\b/g, 'votre message')
-        .replace(/\bta prochaine visite\b/g, 'votre prochaine visite')
-        .replace(/\bon est vraiment désolés\b/g, 'nous sommes vraiment désolés');
-    }
-    return text;
-  };
-
-  const previewWithTutoiement = applyTutoiementVouvoiement(previewExample);
-  const enrichedPreviewExample = aiInstructions.trim()
-    ? `${previewWithTutoiement}\n\n[Note interne IA : ${aiInstructions.trim()}]`
-    : previewWithTutoiement;
+  const enrichedPreviewExample = aiCustomInstructions.trim()
+    ? `${previewExample}\n\n[Consignes : ${aiCustomInstructions.trim()}]`
+    : previewExample;
 
   useEffect(() => {
     setPreviewText(enrichedPreviewExample);
@@ -461,7 +390,7 @@ export default function SettingsPage() {
               value={fullName}
               onChange={(e) => setFullName(e.target.value)}
               autoComplete="name"
-              className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-800/50 text-slate-900 dark:text-zinc-100 placeholder:text-slate-400 dark:placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-blue-500/30 dark:focus:ring-indigo-500/30 focus:border-blue-500 dark:focus:border-indigo-500 transition-all duration-200"
+              className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-800/50 text-slate-900 dark:text-zinc-100 placeholder:text-slate-400 dark:placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-[#2563eb]/30 dark:focus:ring-indigo-500/30 focus:border-primary dark:focus:border-indigo-500 transition-all duration-200"
               placeholder="Jean Dupont"
             />
           </div>
@@ -475,7 +404,7 @@ export default function SettingsPage() {
               value={establishmentName}
               onChange={(e) => setEstablishmentName(e.target.value)}
               autoComplete="organization"
-              className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-800/50 text-slate-900 dark:text-zinc-100 placeholder:text-slate-400 dark:placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-blue-500/30 dark:focus:ring-indigo-500/30 focus:border-blue-500 dark:focus:border-indigo-500 transition-all duration-200"
+              className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-800/50 text-slate-900 dark:text-zinc-100 placeholder:text-slate-400 dark:placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-[#2563eb]/30 dark:focus:ring-indigo-500/30 focus:border-primary dark:focus:border-indigo-500 transition-all duration-200"
               placeholder="Mon Restaurant"
             />
           </div>
@@ -489,7 +418,7 @@ export default function SettingsPage() {
               value={address}
               onChange={(e) => setAddress(e.target.value)}
               autoComplete="street-address"
-              className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-800/50 text-slate-900 dark:text-zinc-100 placeholder:text-slate-400 dark:placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-blue-500/30 dark:focus:ring-indigo-500/30 focus:border-blue-500 dark:focus:border-indigo-500 transition-all duration-200"
+              className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-800/50 text-slate-900 dark:text-zinc-100 placeholder:text-slate-400 dark:placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-[#2563eb]/30 dark:focus:ring-indigo-500/30 focus:border-primary dark:focus:border-indigo-500 transition-all duration-200"
               placeholder="12 rue de la Paix, 75001 Paris"
             />
           </div>
@@ -507,7 +436,7 @@ export default function SettingsPage() {
           <button
             type="submit"
             disabled={savingProfile}
-            className="py-3 px-6 rounded-xl font-semibold text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none active:scale-[0.98] transition-all duration-300 flex items-center justify-center gap-2"
+            className="py-3 px-6 rounded-xl font-semibold text-white bg-primary hover:brightness-110 focus:outline-none focus:ring-2 focus:ring-[#2563eb] focus:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none active:scale-[0.98] transition-all duration-300 flex items-center justify-center gap-2"
           >
             {savingProfile ? (
               <>
@@ -519,6 +448,20 @@ export default function SettingsPage() {
             )}
           </button>
         </form>
+      </section>
+
+      {/* Abonnement et facturation */}
+      <section className="rounded-2xl border border-slate-200 dark:border-zinc-800/50 bg-white dark:bg-zinc-900/95 shadow-sm dark:shadow-none p-6">
+        <h2 className="font-display font-semibold text-lg text-slate-900 dark:text-zinc-100 mb-4">
+          Abonnement et facturation
+        </h2>
+        <p className="text-sm text-slate-500 dark:text-zinc-400 mb-4">
+          Gérez votre abonnement, vos moyens de paiement et consultez vos factures sur Stripe.
+        </p>
+        <StripePortalButton
+          locale={locale}
+          onError={(err) => toast.error(err.message || 'Impossible d\'ouvrir le portail de facturation')}
+        />
       </section>
 
       {/* Connexion aux Plateformes */}
@@ -589,6 +532,7 @@ export default function SettingsPage() {
           <form
             onSubmit={async (e) => {
               e.preventDefault();
+              setSavingAiPreferences(true);
               try {
                 const res = await fetch('/api/profile', {
                   method: 'PATCH',
@@ -596,10 +540,8 @@ export default function SettingsPage() {
                   body: JSON.stringify({
                     aiTone,
                     aiLength,
-                    aiSignature: aiSignature.trim(),
-                    aiUseTutoiement,
                     aiSafeMode,
-                    aiInstructions: aiInstructions.trim(),
+                    aiCustomInstructions: aiCustomInstructions.trim(),
                   }),
                 });
                 const data = await res.json().catch(() => ({}));
@@ -607,9 +549,11 @@ export default function SettingsPage() {
                   toast.error(data?.error ?? 'Erreur lors de la sauvegarde des préférences IA');
                   return;
                 }
-                toast.success('Préférences IA enregistrées ✅');
+                toast.success('Stratégie de marque mise à jour.');
               } catch (err) {
                 toast.error(err instanceof Error ? err.message : 'Erreur réseau');
+              } finally {
+                setSavingAiPreferences(false);
               }
             }}
             className="flex-1 space-y-4"
@@ -629,7 +573,7 @@ export default function SettingsPage() {
                 <select
                   value={aiTone}
                   onChange={(e) => setAiTone(e.target.value as typeof aiTone)}
-                  className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-800/50 text-slate-900 dark:text-zinc-100 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/30 dark:focus:ring-indigo-500/30 focus:border-blue-500 dark:focus:border-indigo-500"
+                  className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-800/50 text-slate-900 dark:text-zinc-100 text-sm focus:outline-none focus:ring-2 focus:ring-[#2563eb]/30 dark:focus:ring-indigo-500/30 focus:border-primary dark:focus:border-indigo-500"
                 >
                   <option value="professional">Professionnel</option>
                   <option value="warm">Chaleureux</option>
@@ -646,57 +590,12 @@ export default function SettingsPage() {
                 <select
                   value={aiLength}
                   onChange={(e) => setAiLength(e.target.value as typeof aiLength)}
-                  className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-800/50 text-slate-900 dark:text-zinc-100 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/30 dark:focus:ring-indigo-500/30 focus:border-blue-500 dark:focus:border-indigo-500"
+                  className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-800/50 text-slate-900 dark:text-zinc-100 text-sm focus:outline-none focus:ring-2 focus:ring-[#2563eb]/30 dark:focus:ring-indigo-500/30 focus:border-primary dark:focus:border-indigo-500"
                 >
                   <option value="concise">Concis</option>
                   <option value="balanced">Équilibré</option>
                   <option value="detailed">Détaillé</option>
                 </select>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-slate-700 dark:text-zinc-300 mb-1.5">
-                  Signature automatique
-                </label>
-                <input
-                  type="text"
-                  value={aiSignature}
-                  onChange={(e) => setAiSignature(e.target.value)}
-                  placeholder="À bientôt, l'équipe de REPUTEXA"
-                  className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-800/50 text-slate-900 dark:text-zinc-100 text-sm placeholder:text-slate-400 dark:placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-blue-500/30 dark:focus:ring-indigo-500/30 focus:border-blue-500 dark:focus:border-indigo-500"
-                />
-              </div>
-              <div className="space-y-2">
-                <label className="block text-sm font-medium text-slate-700 dark:text-zinc-300 mb-1.5">
-                  Tutoiement / Vouvoiement
-                </label>
-                <button
-                  type="button"
-                  onClick={() => setAiUseTutoiement((v) => !v)}
-                  className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium border transition-all duration-200 active:scale-[0.98] ${
-                    aiUseTutoiement
-                      ? 'bg-emerald-50 dark:bg-emerald-950/50 border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-400'
-                      : 'bg-slate-50 dark:bg-zinc-800/50 border-slate-200 dark:border-zinc-700 text-slate-600 dark:text-zinc-400'
-                  }`}
-                >
-                  <span
-                    className={`h-4 w-8 flex items-center rounded-full transition-colors ${
-                      aiUseTutoiement ? 'bg-emerald-500/80' : 'bg-slate-300'
-                    }`}
-                  >
-                    <span
-                      className={`h-3 w-3 rounded-full bg-white shadow-sm transform transition-transform ${
-                        aiUseTutoiement ? 'translate-x-4' : 'translate-x-1'
-                      }`}
-                    />
-                  </span>
-                  {aiUseTutoiement ? 'Tutoiement (tu)' : 'Vouvoiement (vous)'}
-                </button>
-                <p className="text-xs text-slate-500 dark:text-zinc-400">
-                  L&apos;IA adaptera les réponses en conséquence.
-                </p>
               </div>
             </div>
 
@@ -708,12 +607,12 @@ export default function SettingsPage() {
                 <div className="flex-1">
                   <textarea
                     rows={4}
-                    value={aiInstructions}
-                    onChange={(e) => setAiInstructions(e.target.value)}
+                    value={aiCustomInstructions}
+                    onChange={(e) => setAiCustomInstructions(e.target.value)}
                     placeholder={
                       "Ex : Ne jamais s'excuser pour les délais le samedi soir.\nToujours inviter à revenir goûter le nouveau dessert."
                     }
-                    className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-800/50 text-slate-900 dark:text-zinc-100 text-sm placeholder:text-slate-400 dark:placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-blue-500/30 dark:focus:ring-indigo-500/30 focus:border-blue-500 dark:focus:border-indigo-500"
+                    className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-800/50 text-slate-900 dark:text-zinc-100 text-sm placeholder:text-slate-400 dark:placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-[#2563eb]/30 dark:focus:ring-indigo-500/30 focus:border-primary dark:focus:border-indigo-500"
                   />
                   <p className="mt-1 text-xs text-slate-500 dark:text-zinc-400">
                     Ces instructions seront ajoutées au prompt système envoyé à l&apos;IA.
@@ -746,9 +645,17 @@ export default function SettingsPage() {
 
             <button
               type="submit"
-              className="mt-4 inline-flex items-center justify-center gap-2 py-3 px-6 rounded-xl font-semibold text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 active:scale-[0.98] transition-all duration-300"
+              disabled={savingAiPreferences}
+              className="mt-4 inline-flex items-center justify-center gap-2 py-3 px-6 rounded-xl font-semibold text-white bg-primary hover:brightness-110 focus:outline-none focus:ring-2 focus:ring-[#2563eb] focus:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none active:scale-[0.98] transition-all duration-300"
             >
-              Enregistrer les préférences IA
+              {savingAiPreferences ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  Enregistrement...
+                </>
+              ) : (
+                'Enregistrer'
+              )}
             </button>
           </form>
 
@@ -794,52 +701,6 @@ export default function SettingsPage() {
         </div>
       </section>
 
-      {/* SEO & Visibilité (Zenith) */}
-      {hasSeoBoost && (
-        <section className="rounded-2xl border border-slate-200 dark:border-zinc-800/50 bg-white dark:bg-zinc-900/95 shadow-sm dark:shadow-none p-6">
-          <h2 className="font-display font-semibold text-lg text-slate-900 dark:text-zinc-100 mb-4">SEO &amp; Visibilité</h2>
-          <form onSubmit={handleSaveSeo} className="space-y-4 max-w-xl">
-            <div>
-              <label htmlFor="settings-seo-keywords" className="block text-sm font-medium text-slate-700 dark:text-zinc-300 mb-1.5">
-                Mots-clés SEO
-              </label>
-              <textarea
-                id="settings-seo-keywords"
-                value={seoKeywords.join('\n')}
-                onChange={(e) =>
-                  setSeoKeywords(
-                    e.target.value
-                      .split('\n')
-                      .map((k) => k.trim())
-                      .filter(Boolean)
-                  )
-                }
-                rows={5}
-                className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-800/50 text-slate-900 dark:text-zinc-100 placeholder:text-slate-400 dark:placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-blue-500/30 dark:focus:ring-indigo-500/30 focus:border-blue-500 dark:focus:border-indigo-500"
-                placeholder={'Meilleure pizza de Nice\nTerrasse ensoleillée\nCuisine faite maison'}
-              />
-              <p className="text-xs text-slate-500 mt-1">
-                Un mot-clé par ligne. L&apos;IA les intégrera naturellement dans vos réponses pour renforcer le référencement local.
-              </p>
-            </div>
-            <button
-              type="submit"
-              disabled={savingSeo}
-              className="py-3 px-6 rounded-xl font-semibold text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none active:scale-[0.98] transition-all duration-300 flex items-center justify-center gap-2"
-            >
-              {savingSeo ? (
-                <>
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                  Enregistrement...
-                </>
-              ) : (
-                'Enregistrer'
-              )}
-            </button>
-          </form>
-        </section>
-      )}
-
       {/* Notifications */}
       <section className="rounded-2xl border border-slate-200 dark:border-zinc-800/50 bg-white dark:bg-zinc-900/95 shadow-sm dark:shadow-none p-6">
         <h2 className="font-display font-semibold text-lg text-slate-900 dark:text-zinc-100 mb-4">Notifications</h2>
@@ -864,7 +725,7 @@ export default function SettingsPage() {
               id="settings-alert-threshold"
               value={alertThresholdStars}
               onChange={(e) => setAlertThresholdStars(Number(e.target.value))}
-              className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-800/50 text-slate-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-blue-500/30 dark:focus:ring-indigo-500/30 focus:border-blue-500 dark:focus:border-indigo-500"
+              className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-800/50 text-slate-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-[#2563eb]/30 dark:focus:ring-indigo-500/30 focus:border-primary dark:focus:border-indigo-500"
             >
               <option value={2}>Alerter si &lt; 2 étoiles (1 étoile)</option>
               <option value={3}>Alerter si &lt; 3 étoiles</option>
@@ -876,7 +737,7 @@ export default function SettingsPage() {
           <button
             type="submit"
             disabled={savingNotifications}
-            className="py-3 px-6 rounded-xl font-semibold text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none active:scale-[0.98] transition-all duration-300 flex items-center justify-center gap-2"
+            className="py-3 px-6 rounded-xl font-semibold text-white bg-primary hover:brightness-110 focus:outline-none focus:ring-2 focus:ring-[#2563eb] focus:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none active:scale-[0.98] transition-all duration-300 flex items-center justify-center gap-2"
           >
             {savingNotifications ? (
               <>
@@ -926,7 +787,7 @@ export default function SettingsPage() {
           <button
             type="submit"
             disabled={savingAccount || !newPassword || newPassword.length < 6}
-            className="py-3 px-6 rounded-xl font-semibold text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none active:scale-[0.98] transition-all duration-300 flex items-center justify-center gap-2"
+            className="py-3 px-6 rounded-xl font-semibold text-white bg-primary hover:brightness-110 focus:outline-none focus:ring-2 focus:ring-[#2563eb] focus:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none active:scale-[0.98] transition-all duration-300 flex items-center justify-center gap-2"
           >
             {savingAccount ? (
               <>

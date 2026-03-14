@@ -3,17 +3,16 @@
 import { useState, useMemo, useRef, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useLocale } from 'next-intl';
-import { createClient } from '@/lib/supabase/client';
-import { getSiteUrl } from '@/lib/site-url';
 import { Link } from '@/i18n/navigation';
 import { Logo } from '@/components/logo';
 import { PasswordField } from '@/components/auth/password-field';
+import { AuthTurnstile } from '@/components/auth/turnstile';
 import { signupSchema, type SignupInput } from '@/lib/auth/schemas';
+import { storeSignupPending } from '@/lib/auth/signup-pending';
 import { getAuthErrorMessage } from '@/lib/auth/errors';
 import { toast } from 'sonner';
-import { Loader2 } from 'lucide-react';
+import { Loader2, MapPin } from 'lucide-react';
 import { PhoneInput, isValidPhoneNumber } from '@/components/phone-input';
-import { AddressAutocomplete } from '@/components/address-autocomplete';
 
 function getPasswordStrength(password: string): { level: 0 | 1 | 2 | 3; label: string; color: string } {
   if (!password.length) return { level: 0, label: '', color: '' };
@@ -56,11 +55,8 @@ export default function SignupPage() {
 
   const [fullName, setFullName] = useState('');
   const [establishmentName, setEstablishmentName] = useState('');
+  const [establishmentType, setEstablishmentType] = useState('');
   const [address, setAddress] = useState('');
-  const [street, setStreet] = useState('');
-  const [city, setCity] = useState('');
-  const [postalCode, setPostalCode] = useState('');
-  const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(null);
   const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -68,27 +64,13 @@ export default function SignupPage() {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showPasswordConfirm, setShowPasswordConfirm] = useState(false);
-  const [googleLoading, setGoogleLoading] = useState(false);
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
 
   const strength = useMemo(() => getPasswordStrength(password), [password]);
 
   useEffect(() => {
     fullNameRef.current?.focus();
   }, []);
-
-  async function handleGoogleSignIn() {
-    setGoogleLoading(true);
-    const supabase = createClient();
-    const nextRaw = searchParams?.get('next');
-    const next = nextRaw ? decodeURIComponent(nextRaw) : '';
-    const path = next?.startsWith('/') ? next : '/dashboard';
-    const redirectTo = `${getSiteUrl()}/${locale}${path}`;
-    await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: { redirectTo },
-    });
-    setGoogleLoading(false);
-  }
 
   const passwordsMatch = password === passwordConfirm && passwordConfirm.length > 0;
   const passwordsMismatch = passwordConfirm.length > 0 && password !== passwordConfirm;
@@ -102,6 +84,7 @@ export default function SignupPage() {
     const parsed = signupSchema.safeParse({
       fullName,
       establishmentName,
+      establishmentType,
       address: address.trim() || undefined,
       phone: phone.trim() || undefined,
       email,
@@ -114,97 +97,98 @@ export default function SignupPage() {
       return;
     }
     const data = parsed.data as SignupInput;
+    if (process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY && !turnstileToken) {
+      toast.error('Vérification de sécurité en cours. Réessayez dans un instant.');
+      return;
+    }
     setLoading(true);
-    const supabase = createClient();
+    try {
+      const verifyRes = await fetch('/api/auth/verify-turnstile', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ turnstileToken: turnstileToken ?? '', action: 'signup' }),
+      });
+      if (verifyRes.status === 429) {
+        const json = await verifyRes.json().catch(() => ({}));
+        toast.error(json.error ?? 'Trop de tentatives. Veuillez patienter une minute.');
+        setLoading(false);
+        return;
+      }
+      if (!verifyRes.ok) {
+        const json = await verifyRes.json().catch(() => ({}));
+        toast.error(json.error ?? 'Vérification échouée. Réessayez.');
+        setLoading(false);
+        return;
+      }
+    } catch {
+      toast.error('Erreur réseau. Réessayez.');
+      setLoading(false);
+      return;
+    }
+    if (data.phone) {
+      const res = await fetch('/api/auth/check-phone', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phone: data.phone }),
+      });
+      const json = await res.json().catch(() => ({}));
+      if (res.status === 429) {
+        toast.error(json.error ?? 'Trop de tentatives. Veuillez patienter une minute.');
+        setLoading(false);
+        return;
+      }
+      if (json.available === false) {
+        toast.error('Ce numéro de téléphone est déjà associé à un compte.');
+        setLoading(false);
+        return;
+      }
+    }
+
     const subscriptionPlan = isTrial ? 'zenith' : (PLAN_TO_METADATA[plan] ?? 'pulse');
     const selectedPlan = isTrial ? 'zenith' : plan;
 
-    const { data: authData, error } = await supabase.auth.signUp({
-      email: data.email,
-      password: data.password,
-      options: {
-        data: {
-          full_name: data.fullName,
-          business_name: data.establishmentName,
-          establishment_name: data.establishmentName,
-          address: data.address || undefined,
-          address_street: street || undefined,
-          address_city: city || undefined,
-          address_postal_code: postalCode || undefined,
-          address_lat: coords?.lat,
-          address_lng: coords?.lng,
-          phone: data.phone || undefined,
-          subscription_plan: subscriptionPlan,
-          selected_plan: selectedPlan,
-          signup_mode: isTrial ? 'trial' : 'checkout',
-        },
-      },
-    });
-
-    setLoading(false);
-    if (error) {
-      if (process.env.NODE_ENV === 'development') {
-        console.error('[signup] Supabase auth error:', error.message, error);
-      }
-      toast.error(getAuthErrorMessage(error));
-      return;
-    }
-
-    if (authData.user && !authData.session) {
-      toast.success('Compte créé ! Vérifiez votre boîte mail pour activer votre compte.');
-      setTimeout(() => {
-        window.location.href = `/${locale}/login?message=confirm-email`;
-      }, 1200);
-      return;
-    }
-
-    const { data: sessionData } = await supabase.auth.getSession();
-    if (!sessionData.session) {
-      toast.error('La session n\'a pas pu être créée. Réessayez ou contactez le support.');
-      return;
-    }
-
-    // Synchroniser les infos d'inscription vers le profil (paramètres)
-    fetch('/api/profile', {
-      method: 'PATCH',
+    const signupRes = await fetch('/api/auth/signup', {
+      method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
+        email: data.email,
+        password: data.password,
         fullName: data.fullName,
         establishmentName: data.establishmentName,
+        establishmentType: data.establishmentType,
         address: data.address || undefined,
         phone: data.phone || undefined,
+        subscriptionPlan,
+        selectedPlan,
+        signupMode: isTrial ? 'trial' : 'checkout',
+        locale,
       }),
-    }).catch(() => {});
+    });
 
-    toast.success(`Bienvenue ${data.fullName} ! 🎉 Vous êtes connecté.`);
-    if (isTrial) {
-      fetch('/api/send-welcome-email', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email: data.email,
-          establishmentName: data.establishmentName,
-          fullName: data.fullName,
-          locale,
-          type: 'trial',
-        }),
-      }).catch(() => {});
+    const signupJson = await signupRes.json().catch(() => ({}));
+    setLoading(false);
+
+    if (signupRes.status === 429) {
+      toast.error(signupJson.error ?? 'Trop de tentatives. Veuillez patienter une minute.');
+      return;
+    }
+    if (!signupRes.ok) {
+      toast.error(signupJson.error ?? getAuthErrorMessage({ message: signupJson.error }));
+      return;
     }
 
-    if (isTrial) {
-      setTimeout(() => {
-        window.location.href = `/${locale}/dashboard`;
-      }, 800);
-    } else {
-      setTimeout(() => {
-        window.location.href = `/${locale}/checkout?plan=${plan}`;
-      }, 800);
-    }
+    toast.success('Compte créé ! Entrez le code reçu par email pour activer votre compte.');
+    const normalizedEmail = data.email.trim().toLowerCase();
+    storeSignupPending({ email: normalizedEmail, password: data.password });
+    setTimeout(() => {
+      window.location.href = `/${locale}/verify?email=${encodeURIComponent(normalizedEmail)}`;
+    }, 1200);
   }
 
   const canSubmit =
     fullName.trim() &&
     establishmentName.trim() &&
+    establishmentType.trim() &&
     email.trim() &&
     password.length >= 6 &&
     passwordsMatch &&
@@ -212,7 +196,7 @@ export default function SignupPage() {
     !loading;
 
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-br from-slate-900/95 via-slate-800/90 to-blue-950/80">
+    <div className="min-h-screen flex flex-col bg-gradient-to-br from-slate-900/95 via-slate-800/90 to-slate-950/80">
       <header className="flex items-center justify-between px-4 sm:px-6 h-14 border-b border-white/5">
         <Link href="/" className="flex items-center gap-2 text-white" aria-label="REPUTEXA">
           <Logo />
@@ -225,7 +209,7 @@ export default function SignupPage() {
 
       <main className="flex-1 flex items-center justify-center px-4 py-10 sm:py-14">
         <div className="w-full max-w-md animate-fade-up">
-          <div className="rounded-[24px] border border-white/10 bg-white p-6 sm:p-8 shadow-2xl shadow-black/20">
+          <div className="rounded-[24px] border border-[#2563eb]/20 bg-white/95 backdrop-blur-sm p-6 sm:p-8 shadow-2xl shadow-black/20">
             <div className="flex flex-col items-center text-center mb-6">
               <Link href="/" className="mb-4" aria-label="REPUTEXA">
                 <Logo size="lg" />
@@ -238,9 +222,14 @@ export default function SignupPage() {
                   Vous avez choisi le plan <strong>{planDisplayName}</strong> — Finalisez votre inscription pour passer au paiement.
                 </p>
               ) : (
-                <p className="text-sm text-slate-500 mt-1">
-                  Accès ZENITH 14 jours — 100% gratuit, sans carte bancaire
-                </p>
+                <>
+                  <p className="text-sm text-slate-500 mt-1">
+                    Accès ZENITH 14 jours — 0€ aujourd&apos;hui, carte requise
+                  </p>
+                  <p className="text-sm text-emerald-600 dark:text-emerald-400 mt-2 px-3 py-2 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200/50 dark:border-emerald-800/50">
+                    14 jours gratuits sur le plan ZENITH. Carte bancaire requise pour valider l&apos;accès. Annulation en un clic depuis votre espace client.
+                  </p>
+                </>
               )}
             </div>
 
@@ -257,7 +246,7 @@ export default function SignupPage() {
                   onChange={(e) => setFullName(e.target.value)}
                   required
                   autoComplete="name"
-                  className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-all duration-200"
+                  className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#2563eb]/30 focus:border-primary transition-all duration-200"
                   placeholder="Jean Dupont"
                 />
               </div>
@@ -273,37 +262,45 @@ export default function SignupPage() {
                   onChange={(e) => setEstablishmentName(e.target.value)}
                   required
                   autoComplete="organization"
-                  className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-all duration-200"
+                  className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#2563eb]/30 focus:border-primary transition-all duration-200"
                   placeholder="La Frite d'Or"
                 />
+              </div>
+
+              <div>
+                <label htmlFor="signup-establishment-type" className="block text-sm font-medium text-slate-700 mb-1.5">
+                  Type d&apos;établissement <span className="text-red-500">*</span>
+                </label>
+                <input
+                  id="signup-establishment-type"
+                  type="text"
+                  value={establishmentType}
+                  onChange={(e) => setEstablishmentType(e.target.value)}
+                  required
+                  className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#2563eb]/30 focus:border-primary transition-all duration-200"
+                  placeholder="Hôtel, restaurant, bar, salon de coiffure..."
+                />
+                <p className="mt-1 text-xs text-slate-400">
+                  Indiquez le type d&apos;activité (ex&nbsp;: hôtel, restaurant, bar, cabinet médical...). Vous pouvez préciser librement.
+                </p>
               </div>
 
               <div>
                 <label htmlFor="signup-address" className="block text-sm font-medium text-slate-700 mb-1.5">
                   Adresse
                 </label>
-                <AddressAutocomplete
-                  id="signup-address"
-                  value={address}
-                  onChange={(addr, details) => {
-                    setAddress(addr);
-                    if (details) {
-                      setStreet(details.street);
-                      setCity(details.city);
-                      setPostalCode(details.postalCode);
-                      setCoords({ lat: details.lat, lng: details.lng });
-                    } else {
-                      setStreet('');
-                      setCity('');
-                      setPostalCode('');
-                      setCoords(null);
-                    }
-                  }}
-                  placeholder="Saisissez votre adresse..."
-                />
-                <input type="hidden" name="address_street" value={street} />
-                <input type="hidden" name="address_city" value={city} />
-                <input type="hidden" name="address_postal_code" value={postalCode} />
+                <div className="flex items-center gap-2 w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-slate-900 placeholder:text-slate-400 focus-within:ring-2 focus-within:ring-[#2563eb]/30 focus-within:border-primary transition-all duration-200">
+                  <MapPin className="shrink-0 w-4 h-4 text-slate-400" aria-hidden />
+                  <input
+                    id="signup-address"
+                    type="text"
+                    value={address}
+                    onChange={(e) => setAddress(e.target.value)}
+                    placeholder="Saisissez votre adresse..."
+                    autoComplete="street-address"
+                    className="flex-1 min-w-0 bg-transparent focus:outline-none placeholder:text-slate-400"
+                  />
+                </div>
               </div>
 
               <div>
@@ -329,7 +326,7 @@ export default function SignupPage() {
                   onChange={(e) => setEmail(e.target.value)}
                   required
                   autoComplete="email"
-                  className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-all duration-200"
+                  className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#2563eb]/30 focus:border-primary transition-all duration-200"
                   placeholder="vous@etablissement.com"
                 />
               </div>
@@ -388,10 +385,16 @@ export default function SignupPage() {
                 />
               </div>
 
+              <AuthTurnstile
+                onVerify={(token) => setTurnstileToken(token)}
+                onExpire={() => setTurnstileToken(null)}
+                action="signup"
+              />
+
               <button
                 type="submit"
                 disabled={!canSubmit}
-                className="w-full py-3 rounded-xl font-semibold text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none active:scale-[0.98] transition-all duration-300 flex items-center justify-center gap-2"
+                className="w-full py-3 rounded-xl font-semibold text-white bg-primary hover:brightness-110 focus:outline-none focus:ring-2 focus:ring-[#2563eb] focus:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none active:scale-[0.98] transition-all duration-300 flex items-center justify-center gap-2"
               >
                 {loading ? (
                   <>
@@ -402,48 +405,11 @@ export default function SignupPage() {
                   'Créer mon compte'
                 )}
               </button>
-
-              <div className="relative flex items-center gap-3 my-4">
-                <span className="flex-1 h-px bg-slate-200" />
-                <span className="text-xs font-medium text-slate-500">ou</span>
-                <span className="flex-1 h-px bg-slate-200" />
-              </div>
-
-              <button
-                type="button"
-                onClick={handleGoogleSignIn}
-                disabled={googleLoading}
-                className="w-full py-3 rounded-xl font-semibold text-slate-700 bg-white border border-slate-200 hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 disabled:opacity-50 disabled:pointer-events-none active:scale-[0.98] transition-all duration-300 flex items-center justify-center gap-2"
-              >
-                {googleLoading ? (
-                  <Loader2 className="w-5 h-5 animate-spin text-slate-500" />
-                ) : (
-                  <svg className="w-5 h-5" viewBox="0 0 24 24" aria-hidden>
-                    <path
-                      fill="#4285F4"
-                      d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-                    />
-                    <path
-                      fill="#34A853"
-                      d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-                    />
-                    <path
-                      fill="#FBBC05"
-                      d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
-                    />
-                    <path
-                      fill="#EA4335"
-                      d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
-                    />
-                  </svg>
-                )}
-                Continuer avec Google
-              </button>
             </form>
 
             <p className="text-center text-sm text-slate-500 mt-5">
               Déjà un compte ?{' '}
-              <Link href="/login" className="text-blue-600 hover:text-blue-700 font-medium">
+              <Link href="/login" className="text-primary hover:brightness-110 font-medium">
                 Se connecter
               </Link>
             </p>

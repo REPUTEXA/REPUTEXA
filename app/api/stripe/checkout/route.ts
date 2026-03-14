@@ -62,7 +62,7 @@ export async function POST(request: Request) {
     }
 
     const successUrl = `${baseUrl}/${locale}/dashboard?welcome=1&session_id={CHECKOUT_SESSION_ID}`;
-    const cancelUrl = `${baseUrl}/${locale}/checkout`;
+    const cancelUrl = `${baseUrl}/${locale}/dashboard`;
 
     const session = await stripe.checkout.sessions.create({
       customer: customerId,

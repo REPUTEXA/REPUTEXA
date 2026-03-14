@@ -2,9 +2,7 @@
 
 import { useTranslations } from 'next-intl';
 import { useState, useMemo, useEffect } from 'react';
-import { Zap, Shield, Loader2 } from 'lucide-react';
 import { StarRating } from '@/components/dashboard/star-rating';
-import { AIResponseModal } from '@/components/dashboard/ai-response-modal';
 
 type ReviewDisplay = {
   id: string;
@@ -17,23 +15,20 @@ type ReviewDisplay = {
 
 type Props = {
   reviews: ReviewDisplay[];
-  useSupabaseAuth: boolean;
+  useSupabaseAuth?: boolean;
   initialSearch?: string;
 };
 
 type FilterType = 'all' | 'unanswered' | 'negative';
 type PlatformFilter = 'all' | 'google' | 'tripadvisor' | 'yelp' | 'other';
 
-export function DashboardReviewsSection({ reviews, useSupabaseAuth, initialSearch = '' }: Props) {
+export function DashboardReviewsSection({ reviews, initialSearch = '' }: Props) {
   const t = useTranslations('DashboardReviews');
   const [filter, setFilter] = useState<FilterType>('all');
   const [search, setSearch] = useState(initialSearch);
   const [platform, setPlatform] = useState<PlatformFilter>('all');
   useEffect(() => { setSearch(initialSearch); }, [initialSearch]);
-  const [modalReviewId, setModalReviewId] = useState<string | null>(null);
-  const [respondedIds, setRespondedIds] = useState<Set<string>>(new Set());
-  const [shieldLoading, setShieldLoading] = useState<string | null>(null);
-  const [shieldMessage, setShieldMessage] = useState<string | null>(null);
+  const [respondedIds] = useState<Set<string>>(new Set());
 
   const filteredReviews = useMemo(() => {
     let list = reviews;
@@ -63,30 +58,6 @@ export function DashboardReviewsSection({ reviews, useSupabaseAuth, initialSearc
     return list;
   }, [reviews, filter, search, platform, respondedIds]);
 
-  const handleResponded = (id: string) => {
-    setRespondedIds((prev) => new Set(prev).add(id));
-    setModalReviewId(null);
-  };
-
-  const handleShieldReport = async (id: string) => {
-    if (!useSupabaseAuth) return;
-    setShieldLoading(id);
-    setShieldMessage(null);
-    try {
-      const res = await fetch(`/api/supabase/reviews/${id}/shield-report`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-      });
-      const data = await res.json().catch(() => ({}));
-      setShieldMessage(data.message ?? t('requestSent'));
-      setTimeout(() => setShieldMessage(null), 4000);
-    } catch {
-      setShieldMessage(t('errorReport'));
-    } finally {
-      setShieldLoading(null);
-    }
-  };
-
   const displayReviews = filteredReviews.slice(0, 6);
 
   return (
@@ -99,7 +70,7 @@ export function DashboardReviewsSection({ reviews, useSupabaseAuth, initialSearc
             placeholder={t('searchPlaceholder')}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="text-sm sm:text-xs px-3 py-2.5 sm:py-1.5 min-h-[44px] sm:min-h-0 rounded-2xl sm:rounded-lg border border-slate-200 dark:border-zinc-800/50 bg-white dark:bg-[#09090b] text-slate-900 dark:text-zinc-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/30 dark:focus:ring-indigo-500/50 max-w-[180px]"
+            className="text-sm sm:text-xs px-3 py-2.5 sm:py-1.5 min-h-[44px] sm:min-h-0 rounded-2xl sm:rounded-lg border border-slate-200 dark:border-zinc-800/50 bg-white dark:bg-[#09090b] text-slate-900 dark:text-zinc-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-[#2563eb]/30 dark:focus:ring-indigo-500/50 max-w-[180px]"
           />
           <div className="flex items-center gap-1">
             {(['all', 'unanswered', 'negative'] as const).map((f) => (
@@ -130,12 +101,6 @@ export function DashboardReviewsSection({ reviews, useSupabaseAuth, initialSearc
           </select>
         </div>
       </div>
-
-      {shieldMessage && (
-        <div className="rounded-lg bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 px-3 py-2 text-sm text-emerald-700 dark:text-emerald-400">
-          {shieldMessage}
-        </div>
-      )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {displayReviews.length === 0 ? (
@@ -173,8 +138,8 @@ export function DashboardReviewsSection({ reviews, useSupabaseAuth, initialSearc
                   </span>
                 </div>
                 <p className="text-sm text-slate-700 dark:text-zinc-400 leading-relaxed mb-4">{review.comment}</p>
-                <div className="flex items-center gap-3 flex-wrap">
-                  {hasResponse ? (
+                {hasResponse && (
+                  <div className="flex items-center gap-3 flex-wrap">
                     <span className="flex items-center gap-1.5 text-xs text-emerald-600 dark:text-emerald-400 font-medium">
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -191,46 +156,13 @@ export function DashboardReviewsSection({ reviews, useSupabaseAuth, initialSearc
                       </svg>
                       {t('responseSent')}
                     </span>
-                  ) : useSupabaseAuth ? (
-                    <button
-                      type="button"
-                      onClick={() => setModalReviewId(review.id)}
-                      className="inline-flex items-center gap-1.5 text-xs font-semibold text-sky-600 dark:text-indigo-400 hover:text-sky-700 dark:hover:text-indigo-300"
-                    >
-                      <Zap className="w-3.5 h-3.5" />
-                      Générer une réponse IA
-                    </button>
-                  ) : null}
-                  {useSupabaseAuth && (
-                    <button
-                      type="button"
-                      onClick={() => handleShieldReport(review.id)}
-                      disabled={!!shieldLoading}
-                      className="inline-flex items-center gap-1.5 text-xs font-medium text-slate-600 dark:text-zinc-400 hover:text-slate-800 dark:hover:text-slate-300 disabled:opacity-60"
-                    >
-                      {shieldLoading === review.id ? (
-                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                      ) : (
-                        <Shield className="w-3.5 h-3.5" />
-                      )}
-                      {t('shieldReport')}
-                    </button>
-                  )}
-                </div>
+                  </div>
+                )}
               </div>
             );
           })
         )}
       </div>
-
-      {modalReviewId && (
-        <AIResponseModal
-          reviewId={modalReviewId}
-          reviewText={reviews.find((r) => r.id === modalReviewId)?.comment ?? ''}
-          onClose={() => setModalReviewId(null)}
-          onResponded={() => handleResponded(modalReviewId)}
-        />
-      )}
     </section>
   );
 }

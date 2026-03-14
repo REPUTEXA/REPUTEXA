@@ -9,7 +9,7 @@ export async function GET() {
 
   const { data: profile, error } = await supabase
     .from('profiles')
-    .select('establishment_name, full_name, address, phone, website, whatsapp_phone, alert_threshold_stars, seo_keywords, subscription_plan, selected_plan, google_location_id, google_location_name, google_location_address, ai_tone, ai_length, ai_signature, ai_use_tutoiement, ai_safe_mode, ai_instructions')
+    .select('establishment_name, full_name, address, phone, website, whatsapp_phone, alert_threshold_stars, seo_keywords, subscription_plan, selected_plan, google_location_id, google_location_name, google_location_address, ai_tone, ai_length, ai_safe_mode, ai_custom_instructions')
     .eq('id', user.id)
     .single();
 
@@ -33,10 +33,8 @@ export async function GET() {
     googleLocationAddress: profile?.google_location_address ?? null,
     aiTone: profile?.ai_tone ?? 'professional',
     aiLength: profile?.ai_length ?? 'balanced',
-    aiSignature: profile?.ai_signature ?? '',
-    aiUseTutoiement: profile?.ai_use_tutoiement ?? false,
     aiSafeMode: profile?.ai_safe_mode ?? true,
-    aiInstructions: profile?.ai_instructions ?? '',
+    aiCustomInstructions: profile?.ai_custom_instructions ?? '',
   });
 }
 
@@ -57,10 +55,8 @@ export async function PATCH(request: Request) {
     seoKeywords,
     aiTone,
     aiLength,
-    aiSignature,
-    aiUseTutoiement,
     aiSafeMode,
-    aiInstructions,
+    aiCustomInstructions,
   } = body;
 
   const updates: Record<string, string | number | string[] | boolean> = {};
@@ -82,17 +78,11 @@ export async function PATCH(request: Request) {
   if (typeof aiLength === 'string') {
     updates.ai_length = aiLength;
   }
-  if (typeof aiSignature === 'string') {
-    updates.ai_signature = aiSignature;
-  }
-  if (typeof aiUseTutoiement === 'boolean') {
-    updates.ai_use_tutoiement = aiUseTutoiement;
-  }
   if (typeof aiSafeMode === 'boolean') {
     updates.ai_safe_mode = aiSafeMode;
   }
-  if (typeof aiInstructions === 'string') {
-    updates.ai_instructions = aiInstructions;
+  if (typeof aiCustomInstructions === 'string') {
+    updates.ai_custom_instructions = aiCustomInstructions.trim();
   }
 
   if (Object.keys(updates).length === 0) {

@@ -1,18 +1,12 @@
 import { NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { canSendEmail, sendEmail } from '@/lib/resend';
-import { getTrialReminder3DaysHtml } from '@/lib/emails/templates';
+import { getTrialEndProtectionEmailHtml } from '@/lib/emails/templates';
 
 const APP_URL = process.env.NEXT_PUBLIC_SITE_URL ?? process.env.NEXT_PUBLIC_APP_URL ?? 'https://reputexa.fr';
 const CRON_SECRET = process.env.CRON_SECRET;
-const TRIAL_REMINDER_FROM = process.env.RESEND_TRIAL_REMINDER_FROM ?? 'REPUTEXA <contact@reputexa.fr>';
+const TRIAL_REMINDER_FROM = process.env.RESEND_TRIAL_REMINDER_FROM ?? process.env.RESEND_FROM ?? 'REPUTEXA <contact@reputexa.fr>';
 const TRIAL_DAYS = 14;
-
-const PLAN_DISPLAY: Record<string, string> = {
-  vision: 'Vision',
-  pulse: 'Pulse',
-  zenith: 'ZENITH',
-};
 
 /**
  * Cron (1x/jour) : envoie le rappel J-3 aux utilisateurs dont trial_ends_at est dans 3 jours.
@@ -43,7 +37,7 @@ export async function GET(request: Request) {
     .from('profiles')
     .select('id, email, full_name, establishment_name, trial_ends_at, trial_started_at, trial_reminder_sent, subscription_status, selected_plan, subscription_plan')
     .not('email', 'is', null)
-    .neq('subscription_status', 'active')
+    .eq('subscription_status', 'trialing')
     .or(`trial_reminder_sent.is.null,trial_reminder_sent.eq.false`);
 
   if (!profiles?.length) {
@@ -67,29 +61,33 @@ export async function GET(request: Request) {
         : null;
     if (!trialEnd || trialEnd !== targetDateStr) continue;
 
-    const planSlug = (p.selected_plan || p.subscription_plan || 'zenith') as string;
-    const planName = PLAN_DISPLAY[planSlug] ?? 'ZENITH';
-    const checkoutUrl = `${APP_URL}/fr/checkout?plan=${planSlug}&trial=0`;
+    const checkoutUrl = `${APP_URL}/fr/dashboard/settings`;
     const fullName = (p.full_name || p.establishment_name || '') as string;
     const firstName = fullName.split(/\s+/)[0] || '';
 
-    const { count } = await admin
-      .from('reviews')
-      .select('id', { count: 'exact', head: true })
-      .eq('user_id', p.id)
-      .not('response_text', 'is', null);
-    const reviewsRepliedCount = count ?? 0;
+    const [{ count: totalCount }, { count: repliedCount }] = await Promise.all([
+      admin.from('reviews').select('id', { count: 'exact', head: true }).eq('user_id', p.id),
+      admin.from('reviews').select('id', { count: 'exact', head: true }).eq('user_id', p.id).not('response_text', 'is', null),
+    ]);
+    const total = (totalCount ?? 0) as number;
+    const replied = (repliedCount ?? 0) as number;
+    const bilanParts: string[] = [];
+    if (total > 0) bilanParts.push(`analysé ${total} avis`);
+    if (replied > 0) bilanParts.push(`répondu à ${replied} avis`);
+    bilanParts.push('boosté votre visibilité Google Maps', 'protégé votre note');
+    const bilanText = bilanParts.length > 0
+      ? `En 11 jours, nous avons ${bilanParts.join(', ')}.`
+      : 'Votre bouclier REPUTEXA est prêt à sécuriser votre e-réputation 24/7.';
 
-    const html = getTrialReminder3DaysHtml({
-      firstName: firstName || 'Bonjour',
-      planName,
-      reviewsRepliedCount,
+    const html = getTrialEndProtectionEmailHtml({
+      firstName: firstName || '',
+      bilanText,
       checkoutUrl,
     });
 
     const result = await sendEmail({
       to: p.email as string,
-      subject: '⏳ Plus que 3 jours pour sécuriser votre réputation sur Reputexa',
+      subject: 'Votre essai REPUTEXA se termine bientôt',
       html,
       from: TRIAL_REMINDER_FROM,
     });

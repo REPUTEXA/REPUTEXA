@@ -3,6 +3,7 @@ import { headers } from 'next/headers';
 import localFont from 'next/font/local';
 import { Toaster } from 'sonner';
 import { ThemeProviderRouteAware } from '@/components/theme-provider-route-aware';
+import { EstablishmentQueryProvider } from '@/lib/establishment-query-provider';
 import './globals.css';
 
 const geistSans = localFont({
@@ -17,11 +18,17 @@ const geistMono = localFont({
 });
 
 export const metadata: Metadata = {
-  title: 'REPUTEXA - Your 24/7 Customer Relationship Director',
-  description: 'Automate feedback, prevent negative reviews, and elevate your restaurant brand with AI. The ultimate reputation shield for restaurant owners.',
+  metadataBase: new URL('https://reputexa.fr'),
+  icons: { icon: '/logo.png' },
+  title: 'Reputexa | Votre Directeur de la Relation Client 24/7',
+  description:
+    "Automatisez vos avis, protégez votre e-réputation et boostez votre chiffre d'affaires grâce à l'IA.",
   openGraph: {
-    title: 'REPUTEXA - Your 24/7 Customer Relationship Director',
-    description: 'Automate feedback, prevent negative reviews, and elevate your restaurant brand with AI.',
+    title: 'Reputexa | Votre Directeur de la Relation Client 24/7',
+    description:
+      "Automatisez vos avis, protégez votre e-réputation et boostez votre chiffre d'affaires grâce à l'IA.",
+    siteName: 'Reputexa',
+    url: 'https://reputexa.fr',
   },
 };
 
@@ -31,17 +38,43 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const headersList = await headers();
-  const locale = headersList.get('x-next-intl-locale') ?? 'en';
+  const locale = headersList.get('x-next-intl-locale') ?? 'fr';
   const dir = ['ar', 'he'].includes(locale) ? 'rtl' : 'ltr';
+
+  const baseUrl = 'https://reputexa.fr';
 
   const organizationSchema = {
     '@context': 'https://schema.org',
     '@type': 'Organization',
     name: 'Reputexa',
-    url: 'https://reputexa.fr',
-    logo: 'https://reputexa.fr/logo.png',
-    description: 'Solution IA de gestion de réputation pour commerçants et restaurateurs.',
+    url: baseUrl,
+    logo: `${baseUrl}/logo.png`,
+    description:
+      "Solution IA de gestion de réputation pour commerçants et restaurateurs.",
     sameAs: ['https://www.instagram.com/reputexaa/'],
+  };
+
+  const siteNavigationSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'SiteNavigationElement',
+    name: ['Dashboard', 'Prix', 'Contact'],
+    url: [
+      `${baseUrl}/${locale}/dashboard`,
+      `${baseUrl}/${locale}/pricing`,
+      `${baseUrl}/${locale}/contact`,
+    ],
+  };
+
+  const webSiteSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    name: 'Reputexa',
+    url: baseUrl,
+    potentialAction: {
+      '@type': 'SearchAction',
+      target: `${baseUrl}/search?q={search_term_string}`,
+      'query-input': 'required name=search_term_string',
+    },
   };
 
   return (
@@ -51,14 +84,24 @@ export default async function RootLayout({
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
         />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(siteNavigationSchema) }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(webSiteSchema) }}
+        />
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased transition-colors duration-200`}
       >
-        <ThemeProviderRouteAware>
-          {children}
-          <Toaster richColors position="top-center" />
-        </ThemeProviderRouteAware>
+        <EstablishmentQueryProvider>
+          <ThemeProviderRouteAware>
+            {children}
+            <Toaster richColors position="top-center" />
+          </ThemeProviderRouteAware>
+        </EstablishmentQueryProvider>
       </body>
     </html>
   );

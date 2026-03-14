@@ -1,14 +1,16 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useLocale } from 'next-intl';
 import { createClient } from '@/lib/supabase/client';
 import { getSiteUrl } from '@/lib/site-url';
+import { consumeSignupPending } from '@/lib/auth/signup-pending';
 import { Link } from '@/i18n/navigation';
 import { Logo } from '@/components/logo';
 import { PasswordField } from '@/components/auth/password-field';
-import { loginSchema, type LoginInput } from '@/lib/auth/schemas';
+import { AuthTurnstile } from '@/components/auth/turnstile';
+import { loginSchema } from '@/lib/auth/schemas';
 import { getAuthErrorMessage } from '@/lib/auth/errors';
 import { toast } from 'sonner';
 import { Loader2 } from 'lucide-react';
@@ -24,41 +26,90 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
 
   const confirmMessage = searchParams?.get('message') === 'confirm-email';
+  const passwordResetMessage = searchParams?.get('message') === 'password-reset';
+  const authCallbackFailed = searchParams?.get('error') === 'auth-callback-failed';
 
   useEffect(() => {
     emailRef.current?.focus();
   }, []);
 
-  async function handleGoogleSignIn() {
+  useEffect(() => {
+    if (authCallbackFailed) {
+      toast.error('Le lien de confirmation a expiré ou est invalide. Connectez-vous avec votre email et mot de passe.');
+    }
+  }, [authCallbackFailed]);
+
+  useEffect(() => {
+    const pending = consumeSignupPending();
+    if (!pending) return;
+    (async () => {
+      const supabase = createClient();
+      const { error } = await supabase.auth.signInWithPassword({ email: pending.email, password: pending.password });
+      if (!error) {
+        const nextRaw = searchParams?.get('next');
+        const target = nextRaw?.startsWith('/') ? nextRaw : `/${locale}/dashboard`;
+        router.replace(target);
+      }
+    })();
+  }, [locale, router, searchParams]);
+
+  const handleGoogleSignIn = useCallback(async () => {
     setGoogleLoading(true);
     const supabase = createClient();
     const nextRaw = searchParams?.get('next');
-    const next = nextRaw ? decodeURIComponent(nextRaw) : '';
-    const path = next?.startsWith('/') ? next : '/dashboard';
-    const redirectTo = `${getSiteUrl()}/${locale}${path}`;
+    const next = nextRaw ? decodeURIComponent(nextRaw) : '/dashboard';
+    const path = next.startsWith('/') ? next : '/dashboard';
+    const redirectTo = `${getSiteUrl()}/${locale}/auth/callback?next=${encodeURIComponent(path)}`;
     await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: { redirectTo },
     });
     setGoogleLoading(false);
-  }
+  }, [locale, searchParams]);
 
-  async function handleSubmit(e: React.FormEvent) {
+  const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
     const parsed = loginSchema.safeParse({ email, password });
     if (!parsed.success) {
-      const msg = parsed.error.issues[0]?.message ?? 'Vérifiez les champs.';
-      toast.error(msg);
+      toast.error(parsed.error.issues[0]?.message ?? 'Vérifiez les champs.');
       return;
     }
-    const { email: validatedEmail, password: validatedPassword } = parsed.data as LoginInput;
+    const { email: signInEmail, password: signInPassword } = parsed.data;
+    if (process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY && !turnstileToken) {
+      toast.error('Vérification de sécurité en cours. Réessayez dans un instant.');
+      return;
+    }
     setLoading(true);
+    try {
+      const verifyRes = await fetch('/api/auth/verify-turnstile', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ turnstileToken: turnstileToken ?? '', action: 'login' }),
+      });
+      if (verifyRes.status === 429) {
+        const json = await verifyRes.json().catch(() => ({}));
+        toast.error(json.error ?? 'Trop de tentatives. Veuillez patienter une minute.');
+        setLoading(false);
+        return;
+      }
+      if (!verifyRes.ok) {
+        const json = await verifyRes.json().catch(() => ({}));
+        toast.error(json.error ?? 'Vérification échouée. Réessayez.');
+        setLoading(false);
+        return;
+      }
+    } catch {
+      toast.error('Erreur réseau. Réessayez.');
+      setLoading(false);
+      return;
+    }
     const supabase = createClient();
     const { error } = await supabase.auth.signInWithPassword({
-      email: validatedEmail,
-      password: validatedPassword,
+      email: signInEmail,
+      password: signInPassword,
     });
     setLoading(false);
     if (error) {
@@ -69,10 +120,10 @@ export default function LoginPage() {
     const next = nextRaw ? decodeURIComponent(nextRaw) : '';
     const target = next?.startsWith('/') ? next : `/${locale}/dashboard`;
     router.replace(target);
-  }
+  }, [email, password, turnstileToken, locale, searchParams, router]);
 
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-br from-slate-900/95 via-slate-800/90 to-blue-950/80">
+    <div className="min-h-screen flex flex-col bg-gradient-to-br from-slate-900/95 via-slate-800/90 to-slate-950/80">
       <header className="flex items-center justify-between px-4 sm:px-6 h-14 border-b border-white/5">
         <Link href="/" className="flex items-center gap-2 text-white" aria-label="REPUTEXA">
           <Logo />
@@ -85,7 +136,7 @@ export default function LoginPage() {
 
       <main className="flex-1 flex items-center justify-center px-4 py-10 sm:py-14">
         <div className="w-full max-w-md animate-fade-up">
-          <div className="rounded-[24px] border border-white/10 bg-white p-6 sm:p-8 shadow-2xl shadow-black/20">
+          <div className="rounded-[24px] border border-[#2563eb]/20 bg-white/95 backdrop-blur-sm p-6 sm:p-8 shadow-2xl shadow-black/20">
             <div className="flex flex-col items-center text-center mb-6">
               <Link href="/" className="mb-4" aria-label="REPUTEXA">
                 <Logo size="lg" />
@@ -100,8 +151,18 @@ export default function LoginPage() {
 
             <form onSubmit={handleSubmit} className="space-y-4" noValidate>
               {confirmMessage && (
-                <div className="rounded-xl bg-emerald-50 border border-emerald-200 px-4 py-3 text-sm text-emerald-700">
-                  Vérifiez votre boîte mail et cliquez sur le lien pour activer votre compte, puis connectez-vous.
+                <div className="rounded-xl bg-[#2563eb]/5 border border-[#2563eb]/20 backdrop-blur-sm px-4 py-3 text-sm text-slate-700">
+                  <strong className="text-[#2563eb]">Vérifiez votre boîte mail</strong> et cliquez sur le lien pour activer votre compte, puis connectez-vous.
+                </div>
+              )}
+              {passwordResetMessage && (
+                <div className="rounded-xl bg-[#2563eb]/5 border border-[#2563eb]/20 backdrop-blur-sm px-4 py-3 text-sm text-slate-700">
+                  <strong className="text-[#2563eb]">Votre mot de passe a été réinitialisé.</strong> Connectez-vous avec votre nouveau mot de passe.
+                </div>
+              )}
+              {authCallbackFailed && (
+                <div className="rounded-xl bg-amber-50 border border-amber-200 px-4 py-3 text-sm text-amber-800">
+                  <strong>Lien expiré ou invalide.</strong> Connectez-vous avec votre email et mot de passe.
                 </div>
               )}
               <div>
@@ -116,14 +177,22 @@ export default function LoginPage() {
                   onChange={(e) => setEmail(e.target.value)}
                   required
                   autoComplete="email"
-                  className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-all duration-200"
+                  className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#2563eb]/30 focus:border-primary transition-all duration-200"
                   placeholder="vous@etablissement.com"
                 />
               </div>
               <div>
-                <label htmlFor="login-password" className="block text-sm font-medium text-slate-700 mb-1.5">
-                  Mot de passe <span className="text-red-500">*</span>
-                </label>
+                <div className="flex items-center justify-between mb-1.5">
+                  <label htmlFor="login-password" className="block text-sm font-medium text-slate-700">
+                    Mot de passe <span className="text-red-500">*</span>
+                  </label>
+                  <Link
+                    href="/forgot-password"
+                    className="text-sm text-[#2563eb] hover:brightness-110 font-medium"
+                  >
+                    Mot de passe oublié ?
+                  </Link>
+                </div>
                 <PasswordField
                   id="login-password"
                   value={password}
@@ -135,10 +204,15 @@ export default function LoginPage() {
                   required
                 />
               </div>
+              <AuthTurnstile
+                onVerify={(token) => setTurnstileToken(token)}
+                onExpire={() => setTurnstileToken(null)}
+                action="login"
+              />
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full py-3 rounded-xl font-semibold text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none active:scale-[0.98] transition-all duration-300 flex items-center justify-center gap-2"
+                className="w-full py-3 rounded-xl font-semibold text-white bg-primary hover:brightness-110 focus:outline-none focus:ring-2 focus:ring-[#2563eb] focus:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none active:scale-[0.98] transition-all duration-300 flex items-center justify-center gap-2"
               >
                 {loading ? (
                   <>
@@ -160,7 +234,7 @@ export default function LoginPage() {
                 type="button"
                 onClick={handleGoogleSignIn}
                 disabled={googleLoading}
-                className="w-full py-3 rounded-xl font-semibold text-slate-700 bg-white border border-slate-200 hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 disabled:opacity-50 disabled:pointer-events-none active:scale-[0.98] transition-all duration-300 flex items-center justify-center gap-2"
+                className="w-full py-3 rounded-xl font-semibold text-slate-700 bg-white border border-[#2563eb]/30 hover:border-[#2563eb]/50 focus:outline-none focus:ring-2 focus:ring-[#2563eb]/30 focus:border-[#2563eb] disabled:opacity-50 disabled:pointer-events-none active:scale-[0.98] transition-all duration-300 flex items-center justify-center gap-2"
               >
                 {googleLoading ? (
                   <Loader2 className="w-5 h-5 animate-spin text-slate-500" />
@@ -190,7 +264,7 @@ export default function LoginPage() {
 
             <p className="text-center text-sm text-slate-500 mt-5">
               Pas encore de compte ?{' '}
-              <Link href="/signup?mode=trial" className="text-blue-600 hover:text-blue-700 font-medium">
+              <Link href="/signup?mode=trial" className="text-primary hover:brightness-110 font-medium">
                 S&apos;inscrire
               </Link>
             </p>

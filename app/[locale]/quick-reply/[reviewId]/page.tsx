@@ -68,7 +68,7 @@ export default function QuickReplyPage() {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-50">
-        <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
       </div>
     );
   }
@@ -116,14 +116,14 @@ export default function QuickReplyPage() {
                 onChange={(e) => setResponseText(e.target.value)}
                 rows={5}
                 required
-                className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500"
+                className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#2563eb]/30 focus:border-primary"
                 placeholder="Votre réponse professionnelle..."
               />
             </div>
             <button
               type="submit"
               disabled={saving}
-              className="w-full py-3 rounded-xl font-semibold text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-50 active:scale-[0.98] flex items-center justify-center gap-2"
+              className="w-full py-3 rounded-xl font-semibold text-white bg-primary hover:brightness-110 disabled:opacity-50 active:scale-[0.98] flex items-center justify-center gap-2"
             >
               {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
               Valider la réponse

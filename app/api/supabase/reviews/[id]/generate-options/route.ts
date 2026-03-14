@@ -4,10 +4,10 @@ import { createClient } from '@/lib/supabase/server';
 import { FEATURES, hasFeature, toPlanSlug } from '@/lib/feature-gate';
 import {
   HUMAN_CHARTER_BASE,
-  ZENITH_CONCIERGE_ADDON,
-  buildSeoInvisibleInstruction,
+  buildZenithSeoInstruction,
   HUMAN_FALLBACKS,
 } from '@/lib/ai/concierge-prompts';
+import { runZenithTripleJudge } from '@/lib/ai/zenith-triple-judge';
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -16,11 +16,6 @@ const openai = new OpenAI({
 const SYSTEM_PROMPT_SINGLE = `Tu es un expert en e-réputation. Génère une seule réponse pour l'avis client, en respectant les préférences de style et de ton fournies.
 ${HUMAN_CHARTER_BASE}
 Réponds UNIQUEMENT en JSON valide : {"content": "Ta réponse ici", "detectedLanguage": "fr"}
-Détecte la langue de l'avis et réponds dans la MÊME langue.`;
-
-const SYSTEM_PROMPT_TRIPLE = `Tu es un expert en e-réputation. Génère exactement 3 variantes de réponses pour l'avis client, en respectant strictement les préférences de style et de ton fournies.
-${HUMAN_CHARTER_BASE}
-Réponds UNIQUEMENT en JSON valide : {"options": ["Réponse A", "Réponse B", "Réponse C"], "detectedLanguage": "fr"}
 Détecte la langue de l'avis et réponds dans la MÊME langue.`;
 
 export async function POST(
@@ -43,11 +38,11 @@ export async function POST(
     }
 
     const [reviewRes, profileRes] = await Promise.all([
-      supabase.from('reviews').select('id, comment, rating, response_text').eq('id', id).eq('user_id', user.id).single(),
+      supabase.from('reviews').select('id, comment, rating, response_text, reviewer_name').eq('id', id).eq('user_id', user.id).single(),
       supabase
         .from('profiles')
         .select(
-          'seo_keywords, subscription_plan, selected_plan, establishment_name, ai_tone, ai_length, ai_signature, ai_use_tutoiement, ai_safe_mode, ai_instructions'
+          'seo_keywords, subscription_plan, selected_plan, establishment_name, address, ai_tone, ai_length, ai_safe_mode, ai_custom_instructions'
         )
         .eq('id', user.id)
         .single(),
@@ -70,7 +65,9 @@ export async function POST(
     const seoKeywords = Array.isArray(profile?.seo_keywords)
       ? profile.seo_keywords.filter((k): k is string => typeof k === 'string').slice(0, 10)
       : [];
-    const useSeo = hasFeature(planSlug, FEATURES.SEO_BOOST) && seoKeywords.length > 0;
+    const useSeo = hasFeature(planSlug, FEATURES.SEO_BOOST);
+    const establishmentName = profile?.establishment_name?.trim() || 'client';
+    const businessContext = [seoKeywords[0], profile?.address?.trim()].filter(Boolean).join(' à ') || establishmentName;
 
     const toneLabel = (() => {
       switch (profile?.ai_tone) {
@@ -98,54 +95,34 @@ export async function POST(
       }
     })();
 
-    const signature = (profile?.ai_signature ?? '').trim();
-    const extraInstructions = (profile?.ai_instructions ?? '').trim();
-    const useTutoiement = profile?.ai_use_tutoiement ?? false;
+    const customInstructions = (profile?.ai_custom_instructions ?? '').trim();
 
     const styleInstruction = `
 PRÉFÉRENCES DE STYLE À RESPECTER :
 - Ton: ${toneLabel}.
 - Longueur des réponses: ${lengthLabel}.
-- Registre: ${useTutoiement ? 'utilise le tutoiement (tu) partout' : 'utilise le vouvoiement (vous) partout'}.
-${signature ? `- Ajoute systématiquement cette signature à la fin : "${signature}".` : ''}
-${extraInstructions ? `- Consigne(s) spécifique(s) du restaurateur : ${extraInstructions}` : ''}`.trim();
+- Registre: utilise EXCLUSIVEMENT le vouvoiement (vous). Le tutoiement est strictement interdit.
+- Ne jamais signer avec une formule fixe : rédige une conclusion variée, chaleureuse et contextuelle.
+${customInstructions ? `- CONSIGNES PRIORITAIRES du restaurateur (à intégrer naturellement) : ${customInstructions}` : ''}`.trim();
 
     const isZenith = planSlug === 'zenith';
 
     if (isZenith) {
-      const systemPrompt =
-        SYSTEM_PROMPT_TRIPLE +
-        '\n\n' +
-        styleInstruction +
-        '\n\n' +
-        ZENITH_CONCIERGE_ADDON +
-        (useSeo ? buildSeoInvisibleInstruction(seoKeywords) : '');
-
-      const completion = await openai.chat.completions.create({
-        model: 'gpt-4o-mini',
-        messages: [
-          { role: 'system', content: systemPrompt },
-          {
-            role: 'user',
-            content: `Avis: "${review.comment}" | Note: ${review.rating}/5 | Établissement: ${profile?.establishment_name || 'client'}. Génère 3 options de réponse en JSON.`,
-          },
-        ],
-        response_format: { type: 'json_object' },
+      const winner = await runZenithTripleJudge(openai, {
+        reviewComment: review.comment,
+        reviewerName: review.reviewer_name ?? 'Client',
+        rating: review.rating,
+        establishmentName: profile?.establishment_name ?? establishmentName,
+        businessContext,
+        seoKeywords,
+        styleInstruction,
+        aiTon: profile?.ai_tone ?? undefined,
+        aiLength: profile?.ai_length ?? undefined,
+        aiCustomInstructions: customInstructions || undefined,
       });
-
-      const content = completion.choices[0]?.message?.content;
-      if (!content) throw new Error('No response from OpenAI');
-
-      const parsed = JSON.parse(content) as { options?: string[]; detectedLanguage?: string };
-      const options = Array.isArray(parsed.options) ? parsed.options.slice(0, 3) : [];
-
       return NextResponse.json({
-        options: options.length >= 3 ? options : [
-          options[0] ?? HUMAN_FALLBACKS.genericThanks,
-          options[1] ?? HUMAN_FALLBACKS.positiveShort,
-          options[2] ?? 'À très vite !',
-        ],
-        detectedLanguage: parsed.detectedLanguage ?? 'fr',
+        options: [winner],
+        detectedLanguage: 'fr',
       });
     }
 
@@ -153,15 +130,16 @@ ${extraInstructions ? `- Consigne(s) spécifique(s) du restaurateur : ${extraIns
       SYSTEM_PROMPT_SINGLE +
       '\n\n' +
       styleInstruction +
-      (useSeo ? buildSeoInvisibleInstruction(seoKeywords) : '');
+      (useSeo ? buildZenithSeoInstruction(establishmentName, businessContext, seoKeywords) : '');
 
     const completionSingle = await openai.chat.completions.create({
       model: 'gpt-4o-mini',
+      temperature: 0.8,
       messages: [
         { role: 'system', content: systemPromptSingle },
         {
           role: 'user',
-          content: `Avis: "${review.comment}" | Note: ${review.rating}/5 | Établissement: ${profile?.establishment_name || 'client'}. Génère une réponse en JSON.`,
+          content: `Avis: "${review.comment}" | Client: ${review.reviewer_name ?? 'Client'} | Note: ${review.rating}/5 | Établissement: ${profile?.establishment_name || 'client'}. Génère une réponse en JSON. La clé "content" doit contenir uniquement le texte brut.`,
         },
       ],
       response_format: { type: 'json_object' },
@@ -171,7 +149,8 @@ ${extraInstructions ? `- Consigne(s) spécifique(s) du restaurateur : ${extraIns
     if (!contentSingle) throw new Error('No response from OpenAI');
 
     const parsedSingle = JSON.parse(contentSingle) as { content?: string; detectedLanguage?: string };
-    const singleResponse = parsedSingle.content ?? HUMAN_FALLBACKS.genericThanks;
+    let singleResponse = (parsedSingle.content ?? HUMAN_FALLBACKS.genericThanks).trim();
+    singleResponse = singleResponse.replace(/^["']|["']$/g, '').replace(/^Voici la réponse\s*:?\s*/i, '');
 
     return NextResponse.json({
       options: [singleResponse],

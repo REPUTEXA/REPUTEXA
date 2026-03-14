@@ -44,12 +44,12 @@ export function ProspectsList({ prospects }: { prospects: Prospect[] }) {
                 <p className="text-sm text-zinc-500">
                   {p.category} • {p.city}
                 </p>
-                <p className="mt-1 text-sm text-blue-600">{p.rating}/5</p>
+                <p className="mt-1 text-sm text-primary">{p.rating}/5</p>
               </div>
               <button
                 type="button"
                 onClick={() => setSelectedPitch(p.pitch ?? '')}
-                className="flex items-center gap-2 rounded-lg bg-blue-500 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-600"
+                className="flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white transition hover:brightness-110"
               >
                 <Sparkles className="h-4 w-4" />
                 {t('contact')}
@@ -80,7 +80,7 @@ export function ProspectsList({ prospects }: { prospects: Prospect[] }) {
             <button
               type="button"
               onClick={handleCopy}
-              className="flex w-full items-center justify-center gap-2 rounded-lg bg-blue-500 px-4 py-2 font-medium text-white transition hover:bg-blue-600"
+              className="flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2 font-medium text-white transition hover:brightness-110"
             >
               {copied ? (
                 <>

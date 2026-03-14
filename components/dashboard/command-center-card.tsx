@@ -54,7 +54,7 @@ export function CommandCenterCard({
         <div className="p-3 sm:p-4 md:p-6 bg-gradient-to-br from-[#f8fafc] to-white">
           <div className="flex items-center justify-between mb-4 sm:mb-6 gap-2 flex-wrap">
             <div className="flex items-center gap-2 sm:gap-3 min-w-0">
-              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-gradient-to-br from-blue-600 to-blue-500 flex items-center justify-center shadow-lg shadow-blue-500/20 shrink-0">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-primary flex items-center justify-center shadow-lg shadow-[#2563eb]/20 shrink-0">
                 <span className="text-white font-bold text-xs sm:text-sm">R</span>
               </div>
               <div className="min-w-0">
@@ -78,8 +78,8 @@ export function CommandCenterCard({
             </div>
 
             <div className="bg-white p-2.5 sm:p-3 md:p-4 rounded-lg sm:rounded-xl border border-slate-200 shadow-soft min-w-0">
-              <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-lg bg-blue-100 flex items-center justify-center mb-1.5 sm:mb-2">
-                <MessageSquare className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-blue-600" />
+              <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-lg bg-[#2563eb]/10 flex items-center justify-center mb-1.5 sm:mb-2">
+                <MessageSquare className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-primary" />
               </div>
               <p className="text-lg sm:text-xl md:text-2xl font-display font-bold text-slate-900">
                 {totalReviews}
@@ -111,7 +111,7 @@ export function CommandCenterCard({
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
             <div className="bg-white p-3 sm:p-4 rounded-lg sm:rounded-xl border border-slate-200 shadow-soft min-w-0">
               <h4 className="font-semibold text-slate-900 text-xs sm:text-sm mb-2 sm:mb-3 flex items-center gap-2">
-                <Brain className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-blue-600 shrink-0" />
+                <Brain className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-primary shrink-0" />
                 {t('insightsTitle')}
               </h4>
               <div className="space-y-2">
@@ -138,7 +138,7 @@ export function CommandCenterCard({
 
             <div className="bg-white p-3 sm:p-4 rounded-lg sm:rounded-xl border border-slate-200 shadow-soft min-w-0">
               <h4 className="font-semibold text-slate-900 text-xs sm:text-sm mb-2 sm:mb-3 flex items-center gap-2">
-                <BarChart2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-blue-600 shrink-0" />
+                <BarChart2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-primary shrink-0" />
                 Évolution cette semaine
               </h4>
               <div className="flex items-end gap-1 sm:gap-2 h-14 sm:h-20">
@@ -149,7 +149,7 @@ export function CommandCenterCard({
                     <div key={day + idx} className="flex-1 flex flex-col items-center">
                       <div
                         className={`w-full rounded-t transition-all duration-500 ${
-                          isToday ? 'bg-blue-500' : 'bg-slate-200'
+                          isToday ? 'bg-primary' : 'bg-slate-200'
                         }`}
                         style={{ height: heights[idx] }}
                       />

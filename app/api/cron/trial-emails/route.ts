@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
-import { canSendEmail, sendEmail } from '@/lib/resend';
+import { canSendEmail, sendEmail, DEFAULT_FROM } from '@/lib/resend';
 import { getUrgencyEmailHtml, getExpirationEmailHtml } from '@/lib/emails/templates';
 
 const APP_URL = process.env.NEXT_PUBLIC_SITE_URL ?? process.env.NEXT_PUBLIC_APP_URL ?? 'https://reputexa.com';
@@ -101,6 +101,7 @@ export async function GET(request: Request) {
         to: email,
         subject: 'Votre essai REPUTEXA est terminé — Activez votre abonnement',
         html,
+        from: process.env.RESEND_FROM ?? DEFAULT_FROM,
       });
       if (result.success) sentJ0++;
     }

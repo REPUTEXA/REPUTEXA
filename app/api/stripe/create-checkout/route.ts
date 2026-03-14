@@ -9,6 +9,7 @@ const PLAN_TO_PRICE_ENV: Record<string, string> = {
   vision: 'STRIPE_PRICE_ID_VISION',
   pulse: 'STRIPE_PRICE_ID_PULSE',
   zenith: 'STRIPE_PRICE_ID_ZENITH',
+  'zenith-trial': 'STRIPE_PRICE_ID_ZENITH',
   starter: 'STRIPE_PRICE_ID_VISION',
   manager: 'STRIPE_PRICE_ID_PULSE',
   dominator: 'STRIPE_PRICE_ID_ZENITH',
@@ -30,6 +31,8 @@ export async function POST(request: Request) {
     const planType = searchParams.get('planType') ?? 'manager';
     const planSlug = (searchParams.get('planSlug') ?? (planType === 'dominator' ? 'zenith' : planType === 'manager' ? 'pulse' : 'vision')) as string;
     const skipTrial = searchParams.get('skipTrial') === '1' || searchParams.get('skipTrial') === 'true';
+    const isZenithTrial = planSlug === 'zenith-trial';
+    const effectivePlanSlug = isZenithTrial ? 'zenith' : planSlug;
     const baseUrl = getSiteUrl();
 
     const priceId = process.env[PLAN_TO_PRICE_ENV[planSlug] ?? PLAN_TO_PRICE_ENV.pulse];
@@ -62,8 +65,10 @@ export async function POST(request: Request) {
       customerId = customer.id;
     }
 
-    const successUrl = `${baseUrl}/${locale}/dashboard?welcome=1&session_id={CHECKOUT_SESSION_ID}`;
-    const cancelUrl = `${baseUrl}/${locale}/choose-plan`;
+    const successUrl = isZenithTrial
+      ? `${baseUrl}/${locale}/dashboard?status=trial_started&plan=zenith&session_id={CHECKOUT_SESSION_ID}`
+      : `${baseUrl}/${locale}/dashboard?status=success&plan=${effectivePlanSlug}&session_id={CHECKOUT_SESSION_ID}`;
+    const cancelUrl = `${baseUrl}/${locale}/choose-plan?error=payment_cancelled`;
 
     const lineItems: Stripe.Checkout.SessionCreateParams['line_items'] = [
       { price: priceId, quantity: 1 },
@@ -77,10 +82,10 @@ export async function POST(request: Request) {
         : { customer_email: customerEmail }),
       line_items: lineItems,
       subscription_data: {
-        metadata: { planSlug },
-        ...(skipTrial ? {} : { trial_period_days: TRIAL_DAYS }),
+        metadata: { planSlug: effectivePlanSlug },
+        ...(isZenithTrial ? { trial_period_days: TRIAL_DAYS } : (skipTrial ? {} : { trial_period_days: TRIAL_DAYS })),
       },
-      metadata: { planSlug },
+      metadata: { planSlug: effectivePlanSlug },
       success_url: successUrl,
       cancel_url: cancelUrl,
       allow_promotion_codes: true,

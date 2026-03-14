@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useMemo } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { StarRating } from '@/components/dashboard/star-rating';
 import { getSiteUrl } from '@/lib/site-url';
 import { SourceLogo } from '@/components/dashboard/source-logo';
@@ -21,6 +22,7 @@ type Review = {
   ai_response: string | null;
   whatsapp_sent: boolean;
   quick_reply_token: string | null;
+  is_toxic?: boolean;
 };
 
 function isSeoBoosted(text: string | null, keywords: string[]): boolean {
@@ -41,48 +43,37 @@ function formatCountdown(scheduledAt: string): string {
 }
 
 export default function ReviewsPage() {
-  const [reviews, setReviews] = useState<Review[]>([]);
-  const [seoKeywords, setSeoKeywords] = useState<string[]>([]);
-  const [loading, setLoading] = useState(true);
   const [actingId, setActingId] = useState<string | null>(null);
   const [editId, setEditId] = useState<string | null>(null);
   const [editText, setEditText] = useState('');
   const [sourceFilter, setSourceFilter] = useState<ReviewSource | 'all'>('all');
-  const [addForm, setAddForm] = useState({ reviewerName: '', rating: 5, comment: '', source: 'google' as string });
-  const [adding, setAdding] = useState(false);
-  const [, setTick] = useState(0);
 
-  useEffect(() => {
-    fetch('/api/supabase/reviews')
-      .then(async (r) => {
-        const data = await r.json().catch(() => ({}));
-        if (!r.ok || data.error) throw new Error(data.error ?? 'Impossible de charger les avis');
-        return data;
-      })
-      .then((data) => {
-        setReviews(data.reviews ?? []);
-        setSeoKeywords(Array.isArray(data.seoKeywords) ? data.seoKeywords : []);
-      })
-      .catch((err) => toast.error(err instanceof Error ? err.message : 'Impossible de charger les avis'))
-      .finally(() => setLoading(false));
-  }, []);
+  const { data, isLoading: queryLoading, refetch } = useQuery({
+    queryKey: ['reviews'],
+    queryFn: async () => {
+      const r = await fetch('/api/supabase/reviews');
+      const data = await r.json().catch(() => ({}));
+      if (!r.ok) throw new Error(data.error ?? 'Impossible de charger les avis');
+      return data;
+    },
+    refetchInterval: 60000,
+  });
 
-  useEffect(() => {
-    const interval = setInterval(() => setTick((x) => x + 1), 60000);
-    return () => clearInterval(interval);
-  }, []);
+  const reviews = (data?.reviews ?? []) as Review[];
+  const seoKeywords = Array.isArray(data?.seoKeywords) ? data.seoKeywords : [];
+  const loading = queryLoading;
 
   const filteredReviews = useMemo(() => {
-    if (sourceFilter === 'all') return reviews;
-    return reviews.filter((r) => (r.source ?? 'google').toLowerCase() === sourceFilter);
+    const base =
+      sourceFilter === 'all'
+        ? reviews
+        : reviews.filter((r) => (r.source ?? 'google').toLowerCase() === sourceFilter);
+    // Les avis marqués comme TOXIC sont gérés dans la section "Alertes" uniquement.
+    return base.filter((r) => !r.is_toxic);
   }, [reviews, sourceFilter]);
 
-  const actionRequired = useMemo(
-    () => filteredReviews.filter((r) => r.status === 'pending' || r.rating < 4),
-    [filteredReviews]
-  );
   const automated = useMemo(
-    () => filteredReviews.filter((r) => r.status === 'scheduled' || r.status === 'generating'),
+    () => filteredReviews.filter((r) => r.status === 'scheduled' || r.status === 'generating' || r.status === 'pending_publication'),
     [filteredReviews]
   );
 
@@ -102,19 +93,7 @@ export default function ReviewsPage() {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? 'Erreur');
-      setReviews((prev) =>
-        prev.map((r) =>
-          r.id === id
-            ? {
-                ...r,
-                status: data.status ?? r.status,
-                scheduled_at: data.scheduled_at ?? r.scheduled_at,
-                ai_response: action === 'edit' && responseText ? responseText : r.ai_response,
-                response_text: action === 'edit' && responseText ? responseText : r.response_text,
-              }
-            : r
-        )
-      );
+      await refetch();
       setEditId(null);
       if (action === 'publish_now') toast.success('Réponse publiée ✅');
       else if (action === 'cancel') toast.success('Publication annulée');
@@ -141,42 +120,6 @@ export default function ReviewsPage() {
     return `${base}/${loc}/quick-reply/${r.id}?t=${r.quick_reply_token}`;
   };
 
-  const handleAddReview = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setAdding(true);
-    try {
-      const res = await fetch('/api/supabase/reviews', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(addForm),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error ?? 'Erreur');
-      setReviews((prev) => [
-        {
-          id: data.id,
-          reviewer_name: addForm.reviewerName,
-          rating: addForm.rating,
-          comment: addForm.comment,
-          source: addForm.source,
-          response_text: null,
-          status: data.status,
-          scheduled_at: data.scheduled_at,
-          ai_response: data.ai_response,
-          whatsapp_sent: false,
-          quick_reply_token: data.quick_reply_token,
-        },
-        ...prev,
-      ]);
-      setAddForm({ reviewerName: '', rating: 5, comment: '', source: 'google' });
-      toast.success('Avis ajouté ✅');
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'Erreur');
-    } finally {
-      setAdding(false);
-    }
-  };
-
   const SOURCE_TABS: { value: ReviewSource | 'all'; label: string }[] = [
     { value: 'all', label: 'Tous' },
     { value: 'google', label: 'Google' },
@@ -187,7 +130,7 @@ export default function ReviewsPage() {
   if (loading) {
     return (
       <div className="px-4 sm:px-6 py-6 flex items-center justify-center min-h-[200px]">
-        <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
       </div>
     );
   }
@@ -220,89 +163,6 @@ export default function ReviewsPage() {
           </button>
         ))}
       </div>
-
-      {/* Form add review */}
-      <section className="rounded-2xl sm:rounded-3xl border border-slate-200 bg-white p-6 shadow-sm dark:bg-[#09090b] dark:border-zinc-800/50 transition-all duration-300">
-        <h2 className="font-display font-semibold text-lg text-slate-900 dark:text-zinc-100 mb-4">Ajouter un avis (simulation)</h2>
-        <form onSubmit={handleAddReview} className="flex flex-wrap gap-4">
-          <input
-            type="text"
-            placeholder="Nom du client"
-            value={addForm.reviewerName}
-            onChange={(e) => setAddForm({ ...addForm, reviewerName: e.target.value })}
-            required
-            className="flex-1 min-w-[140px] px-4 py-2.5 rounded-xl border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-800/50 text-slate-900 dark:text-zinc-100 placeholder:text-slate-400 dark:placeholder:text-zinc-500"
-          />
-          <select
-            value={addForm.rating}
-            onChange={(e) => setAddForm({ ...addForm, rating: Number(e.target.value) })}
-            className="w-24 px-4 py-2.5 rounded-xl border border-slate-200"
-          >
-            {[1, 2, 3, 4, 5].map((n) => (
-              <option key={n} value={n}>{n}/5</option>
-            ))}
-          </select>
-          <select
-            value={addForm.source}
-            onChange={(e) => setAddForm({ ...addForm, source: e.target.value })}
-            className="w-36 px-4 py-2.5 rounded-xl border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-800/50 text-slate-900 dark:text-zinc-100"
-          >
-            <option value="google">Google</option>
-            <option value="tripadvisor">TripAdvisor</option>
-            <option value="trustpilot">Trustpilot</option>
-          </select>
-          <input
-            type="text"
-            placeholder="Commentaire"
-            value={addForm.comment}
-            onChange={(e) => setAddForm({ ...addForm, comment: e.target.value })}
-            required
-            className="flex-1 min-w-[200px] px-4 py-2.5 rounded-xl border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-800/50 text-slate-900 dark:text-zinc-100 placeholder:text-slate-400 dark:placeholder:text-zinc-500"
-          />
-          <button
-            type="submit"
-            disabled={adding}
-            className="px-6 py-2.5 rounded-xl bg-blue-600 text-white font-semibold hover:bg-blue-700 disabled:opacity-50 active:scale-[0.98] flex items-center gap-2"
-          >
-            {adding ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
-            Ajouter
-          </button>
-        </form>
-      </section>
-
-      {/* Actions Requises */}
-      <section>
-        <h2 className="font-display font-bold text-lg text-slate-900 dark:text-zinc-100 mb-3 flex items-center gap-2">
-          🔥 Actions Requises
-        </h2>
-        <p className="text-sm text-slate-500 dark:text-zinc-400 mb-4">
-          Avis négatifs ou en attente de validation.
-        </p>
-        {actionRequired.length === 0 ? (
-          <div className="rounded-2xl border border-slate-200 dark:border-zinc-800/50 bg-white dark:bg-zinc-800/30 p-8 text-center text-slate-500 dark:text-zinc-400">
-            Aucun avis nécessitant une action.
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            {actionRequired.map((review) => (
-              <ReviewCard
-                key={review.id}
-                review={review}
-                actingId={actingId}
-                editId={editId}
-                editText={editText}
-                setEditId={setEditId}
-                setEditText={setEditText}
-                runAction={runAction}
-                handleEditSubmit={handleEditSubmit}
-                quickReplyUrl={quickReplyUrl(review)}
-                formatCountdown={formatCountdown}
-                isSeoBoosted={isBoosted(review)}
-              />
-            ))}
-          </div>
-        )}
-      </section>
 
       {/* Automatisé */}
       <section>
@@ -438,7 +298,7 @@ function ReviewCard({
               type="button"
               onClick={() => handleEditSubmit(review.id)}
               disabled={isActing}
-              className="px-3 py-1.5 rounded-lg bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 disabled:opacity-50"
+              className="px-3 py-1.5 rounded-lg bg-primary text-white text-sm font-medium hover:brightness-110 disabled:opacity-50"
             >
               Enregistrer
             </button>
@@ -465,7 +325,7 @@ function ReviewCard({
             <Pencil className="w-4 h-4" />
             Modifier la réponse
           </button>
-          {(review.status === 'scheduled' || review.status === 'generating') && (
+          {(review.status === 'scheduled' || review.status === 'generating' || review.status === 'pending_publication') && (
             <>
               <button
                 type="button"

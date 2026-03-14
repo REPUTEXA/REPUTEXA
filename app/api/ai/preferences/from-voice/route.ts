@@ -25,12 +25,12 @@ export async function POST(req: Request) {
       transcript,
       aiTone,
       aiLength,
-      aiInstructions,
+      aiCustomInstructions,
     }: {
       transcript?: string;
       aiTone?: string;
       aiLength?: string;
-      aiInstructions?: string;
+      aiCustomInstructions?: string;
     } = body ?? {};
 
     if (!transcript || typeof transcript !== 'string' || !transcript.trim()) {
@@ -43,8 +43,7 @@ export async function POST(req: Request) {
       'Tu DOIS répondre UNIQUEMENT en JSON avec les clés suivantes :',
       '- "aiTone": un des valeurs suivantes: "professional", "warm", "casual", "luxury", "humorous".',
       '- "aiLength": un des valeurs suivantes: "concise", "balanced", "detailed".',
-      '- "aiInstructions": une version mise à jour et réécrite des instructions, maximum 4 phrases.',
-      '- "aiSignature": optionnelle, une courte signature si cela a du sens (sinon renvoie simplement une chaîne vide).',
+      '- "aiCustomInstructions": une version mise à jour et réécrite des instructions spécifiques du restaurateur, maximum 4 phrases.',
       'Ne commente pas, ne rajoute pas de texte en dehors du JSON.',
     ].join('\n');
 
@@ -52,7 +51,7 @@ export async function POST(req: Request) {
       'Préférences actuelles :',
       `- Ton: ${aiTone || ''}`,
       `- Longueur: ${aiLength || ''}`,
-      `- Instructions: ${aiInstructions || ''}`,
+      `- Instructions: ${aiCustomInstructions || ''}`,
       '',
       'Ce que le gérant vient de dire à voix haute (transcription brute) :',
       transcript.trim(),
@@ -89,15 +88,12 @@ export async function POST(req: Request) {
     const nextInstructions =
       typeof parsed.aiInstructions === 'string' && parsed.aiInstructions.trim()
         ? parsed.aiInstructions.trim()
-        : (typeof aiInstructions === 'string' ? aiInstructions : '');
-    const nextSignature =
-      typeof parsed.aiSignature === 'string' ? parsed.aiSignature.trim() : (typeof body.aiSignature === 'string' ? body.aiSignature : '');
+        : (typeof aiCustomInstructions === 'string' ? aiCustomInstructions : '');
 
     return NextResponse.json({
       aiTone: nextTone,
       aiLength: nextLength,
-      aiInstructions: nextInstructions,
-      aiSignature: nextSignature,
+      aiCustomInstructions: nextInstructions,
     });
   } catch (error) {
     console.error('[ai/preferences/from-voice]', error);

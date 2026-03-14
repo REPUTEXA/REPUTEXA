@@ -13,22 +13,16 @@ import {
 } from 'recharts';
 import {
   format,
-  subDays,
-  subMonths,
-  isAfter,
-  isBefore,
   startOfDay,
   endOfDay,
   startOfMonth,
-  endOfMonth,
   differenceInDays,
   eachDayOfInterval,
   eachMonthOfInterval,
 } from 'date-fns';
 import { fr, enUS, es, de, it } from 'date-fns/locale';
-import { motion } from 'framer-motion';
-import { Calendar } from 'lucide-react';
 import { useTheme } from 'next-themes';
+import { useSearchParams } from 'next/navigation';
 
 type ChartReview = {
   createdAt: string;
@@ -39,8 +33,6 @@ type OverviewChartProps = {
   reviews: ChartReview[];
   locale: string;
 };
-
-type RangeKey = '7d' | '30d' | '6m' | 'all' | 'custom';
 
 type ChartPoint = {
   date: string;
@@ -78,30 +70,16 @@ function CustomTooltip({
 export function OverviewChart({ reviews, locale }: OverviewChartProps) {
   const t = useTranslations('Chart');
   const [isMounted, setIsMounted] = useState(false);
-  const [range, setRange] = useState<RangeKey>('6m');
-  const [customFrom, setCustomFrom] = useState<string>('');
-  const [customTo, setCustomTo] = useState<string>('');
-  const [showCustomPanel, setShowCustomPanel] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
   const { resolvedTheme } = useTheme();
+  const searchParams = useSearchParams();
 
   useEffect(() => {
     setIsMounted(true);
   }, []);
 
-  useEffect(() => {
-    if (range === 'custom') return;
-    setIsLoading(true);
-    const id = setTimeout(() => setIsLoading(false), 300);
-    return () => clearTimeout(id);
-  }, [range]);
-
-  useEffect(() => {
-    if (range !== 'custom') return;
-    setIsLoading(true);
-    const id = setTimeout(() => setIsLoading(false), 300);
-    return () => clearTimeout(id);
-  }, [range, customFrom, customTo]);
+  const fromParam = searchParams.get('from');
+  const toParam = searchParams.get('to');
+  const periodParam = searchParams.get('period') as '7d' | '30d' | '3m' | '12m' | null;
 
   /** Génère une courbe mock oscillant entre 3.5 et 4.8, progression positive */
   const generateMockRating = (index: number, total: number): number => {
@@ -115,7 +93,6 @@ export function OverviewChart({ reviews, locale }: OverviewChartProps) {
     const localeMap = { fr, en: enUS, es, de, it } as const;
     const localeObj = localeMap[locale as keyof typeof localeMap] ?? fr;
     const today = startOfDay(new Date());
-    const now = endOfDay(today);
 
     const parsed = reviews
       .map((r) => {
@@ -125,67 +102,58 @@ export function OverviewChart({ reviews, locale }: OverviewChartProps) {
       })
       .filter((v): v is { date: Date; rating: number } => v !== null);
 
-    type PeriodMode = '7d' | '30d' | 'months';
     let fromDate: Date;
-    let toDate: Date = now;
+    let toDate: Date;
+
+    if (fromParam && toParam) {
+      const f = new Date(fromParam);
+      const t = new Date(toParam);
+      if (!Number.isNaN(f.getTime()) && !Number.isNaN(t.getTime())) {
+        fromDate = startOfDay(f);
+        toDate = endOfDay(t);
+      } else {
+        fromDate = startOfMonth(new Date(today.getFullYear(), today.getMonth() - 5, 1));
+        toDate = endOfDay(today);
+      }
+    } else {
+      fromDate = startOfMonth(new Date(today.getFullYear(), today.getMonth() - 5, 1));
+      toDate = endOfDay(today);
+    }
+
+    const diffDays = Math.max(1, differenceInDays(toDate, fromDate) + 1);
+    type PeriodMode = 'days' | 'months';
     let mode: PeriodMode;
 
-    if (range === '7d') {
-      fromDate = startOfDay(subDays(today, 6));
-      toDate = now;
-      mode = '7d';
-    } else if (range === '30d') {
-      fromDate = startOfDay(subDays(today, 29));
-      toDate = now;
-      mode = '30d';
-    } else if (range === '6m') {
-      fromDate = startOfMonth(subMonths(today, 5));
-      toDate = endOfMonth(today);
+    if (periodParam === '12m' || diffDays > 60) {
       mode = 'months';
-    } else if (range === 'all' && parsed.length > 0) {
-      const minDate = new Date(Math.min(...parsed.map((p) => p.date.getTime())));
-      fromDate = startOfMonth(minDate);
-      toDate = endOfMonth(today);
+    } else if (periodParam === '3m' || diffDays > 31) {
       mode = 'months';
-    } else if (range === 'custom' && customFrom && customTo) {
-      fromDate = startOfDay(new Date(customFrom));
-      toDate = endOfDay(new Date(customTo));
-      const diff = differenceInDays(toDate, fromDate);
-      mode = diff > 31 ? 'months' : diff > 7 ? '30d' : '7d';
     } else {
-      fromDate = startOfMonth(subMonths(today, 5));
-      toDate = endOfMonth(today);
-      mode = 'months';
+      mode = 'days';
     }
 
     const filtered = parsed.filter(({ date }) => {
-      if (isBefore(date, fromDate)) return false;
-      if (isAfter(date, toDate)) return false;
+      if (date < fromDate) return false;
+      if (date > toDate) return false;
       return true;
     });
 
-    let periods: { date: Date; sortKey: string; label: string; tooltipLabel: string; showTick: boolean }[] = [];
+    let periods: {
+      date: Date;
+      sortKey: string;
+      label: string;
+      tooltipLabel: string;
+      showTick: boolean;
+    }[] = [];
 
-    if (mode === '7d') {
-      const days = eachDayOfInterval({ start: fromDate, end: today });
-      periods = days.map((d, i) => {
-        const isLast = i === days.length - 1;
-        return {
-          date: d,
-          sortKey: format(d, 'yyyy-MM-dd'),
-          label: isLast ? (locale === 'en' ? 'Today' : 'Aujourd\'hui') : format(d, 'EEEE', { locale: localeObj }),
-          tooltipLabel: format(d, 'd MMMM yyyy', { locale: localeObj }),
-          showTick: true,
-        };
-      });
-    } else if (mode === '30d') {
-      const days = eachDayOfInterval({ start: fromDate, end: today });
+    if (mode === 'days') {
+      const days = eachDayOfInterval({ start: fromDate, end: toDate });
       periods = days.map((d, i) => ({
         date: d,
         sortKey: format(d, 'yyyy-MM-dd'),
-        label: format(d, 'dd MMM', { locale: localeObj }),
+        label: format(d, diffDays <= 7 ? 'EEE' : 'dd MMM', { locale: localeObj }),
         tooltipLabel: format(d, 'd MMMM yyyy', { locale: localeObj }),
-        showTick: i % 5 === 0 || i === days.length - 1,
+        showTick: diffDays <= 7 ? true : i % 5 === 0 || i === days.length - 1,
       }));
     } else {
       const months = eachMonthOfInterval({ start: fromDate, end: toDate });
@@ -235,14 +203,13 @@ export function OverviewChart({ reviews, locale }: OverviewChartProps) {
       if (p.avgRating != null) return p;
       const prev = rawPoints.slice(0, i).reverse().find((x) => x.avgRating != null)?.avgRating;
       const next = rawPoints.slice(i + 1).find((x) => x.avgRating != null)?.avgRating;
-      const interpolated = prev != null && next != null
-        ? (prev + next) / 2
-        : prev ?? next ?? 4.0;
+      const interpolated =
+        prev != null && next != null ? (prev + next) / 2 : prev ?? next ?? 4.0;
       return { ...p, avgRating: Math.round(interpolated * 100) / 100 };
     });
 
     return rawPoints;
-  }, [reviews, locale, range, customFrom, customTo]);
+  }, [reviews, locale, fromParam, toParam, periodParam]);
 
   if (!isMounted) return null;
 
@@ -254,110 +221,19 @@ export function OverviewChart({ reviews, locale }: OverviewChartProps) {
     <div className="space-y-4">
       <div className="flex items-center justify-between gap-2 flex-wrap">
         <div>
-          <h3 className="font-display font-semibold text-slate-900 dark:text-zinc-100">{t('title')}</h3>
+          <h3 className="font-display font-semibold text-slate-900 dark:text-zinc-100">
+            {t('title')}
+          </h3>
           <p className="text-xs text-slate-500 dark:text-zinc-400 mt-0.5">
-            {range === 'all'
-              ? t('periodAll')
-              : range === 'custom'
-                ? t('periodCustom')
-                : `${t('periodLabel')} : ${t(`range${range}` as 'range7d' | 'range30d' | 'range6m' | 'rangeAll')}`}
+            {fromParam && toParam
+              ? `${t('periodLabel')} : ${fromParam} → ${toParam}`
+              : t('periodAll')}
           </p>
-        </div>
-        <div className="flex items-center gap-1.5">
-          {(['7d', '30d', '6m', 'all', 'custom'] as const).map((r) => (
-            <button
-              key={r}
-              type="button"
-              onClick={() => setRange(r)}
-              className={`px-2.5 py-1 rounded-full text-xs font-medium border transition-all ${
-                range === r
-                  ? 'bg-sky-600 text-white border-sky-600 shadow-inner ring-1 ring-sky-500/50'
-                  : 'bg-white dark:bg-zinc-800/50 text-slate-600 dark:text-zinc-400 border-slate-200 dark:border-zinc-700 hover:bg-slate-50 dark:hover:bg-zinc-700/50'
-              }`}
-            >
-              {r === 'custom' ? (
-                <span className="inline-flex items-center gap-1">
-                  <Calendar className="w-3 h-3" />
-                  {t('rangeCustom')}
-                </span>
-              ) : (
-                t(`range${r}` as 'range7d' | 'range30d' | 'range6m' | 'rangeAll')
-              )}
-            </button>
-          ))}
         </div>
       </div>
 
-      {range === 'custom' && (
-        <div className="relative inline-block text-xs text-slate-600">
-            <button
-              type="button"
-              onClick={() => setShowCustomPanel((v) => !v)}
-              className="mt-1 inline-flex items-center gap-1 rounded-full border border-slate-200 bg-white px-3 py-1 font-medium shadow-sm hover:bg-slate-50 transition-colors"
-            >
-              📅 {t('calendar')}
-            </button>
-          {showCustomPanel && (
-            <motion.div
-              initial={{ opacity: 0, y: 6, scale: 0.98 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              transition={{ duration: 0.18 }}
-              className="absolute z-20 mt-2 w-64 rounded-xl border border-slate-200 bg-white p-3 shadow-lg"
-            >
-              <p className="mb-2 text-[11px] font-semibold text-slate-700">
-                {t('customPanel')}
-              </p>
-              <div className="space-y-2">
-                <div className="flex items-center justify-between gap-2">
-                  <span className="text-[11px] text-slate-500">{t('from')}</span>
-                  <input
-                    type="date"
-                    value={customFrom}
-                    onChange={(e) => setCustomFrom(e.target.value)}
-                    className="w-40 px-2 py-1 rounded-lg border border-slate-200 text-[11px] focus:outline-none focus:ring-2 focus:ring-sky-500/30 focus:border-sky-500 bg-white"
-                  />
-                </div>
-                <div className="flex items-center justify-between gap-2">
-                  <span className="text-[11px] text-slate-500">{t('to')}</span>
-                  <input
-                    type="date"
-                    value={customTo}
-                    onChange={(e) => setCustomTo(e.target.value)}
-                    className="w-40 px-2 py-1 rounded-lg border border-slate-200 text-[11px] focus:outline-none focus:ring-2 focus:ring-sky-500/30 focus:border-sky-500 bg-white"
-                  />
-                </div>
-                <div className="flex justify-end gap-2 pt-1">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setCustomFrom('');
-                      setCustomTo('');
-                    }}
-                    className="rounded-full px-2 py-0.5 text-[11px] text-slate-500 hover:bg-slate-50"
-                  >
-                    {t('reset')}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setShowCustomPanel(false)}
-                    className="rounded-full bg-sky-600 px-3 py-0.5 text-[11px] font-semibold text-white hover:bg-sky-700"
-                  >
-                    {t('close')}
-                  </button>
-                </div>
-              </div>
-            </motion.div>
-          )}
-        </div>
-      )}
-
       <div className="relative h-52 w-full min-w-0 overflow-x-hidden">
-        {isLoading && (
-          <div className="absolute inset-0 z-10 rounded-2xl bg-white/50 backdrop-blur-[2px] flex items-center justify-center">
-            <div className="h-6 w-6 animate-spin rounded-full border-2 border-sky-500 border-t-transparent" />
-          </div>
-        )}
-        <div className={isLoading ? 'h-full opacity-50 transition-opacity' : 'h-full transition-opacity'}>
+        <div className="h-full transition-opacity duration-300">
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={data}>
               <CartesianGrid strokeDasharray="3 3" stroke={gridColor} vertical={false} />
@@ -368,8 +244,6 @@ export function OverviewChart({ reviews, locale }: OverviewChartProps) {
                 tick={{ fontSize: 10, fill: axisColor }}
                 minTickGap={12}
                 interval="preserveStartEnd"
-                angle={range === '7d' ? -20 : 0}
-                textAnchor={range === '7d' ? 'end' : 'middle'}
               />
               <YAxis
                 tickLine={false}
@@ -380,20 +254,23 @@ export function OverviewChart({ reviews, locale }: OverviewChartProps) {
                 allowDecimals={false}
                 padding={{ top: 16, bottom: 8 }}
               />
-              <Tooltip content={<CustomTooltip avgRatingLabel={t('avgRating')} />} wrapperStyle={{ maxWidth: 200 }} />
+              <Tooltip
+                content={<CustomTooltip avgRatingLabel={t('avgRating')} />}
+                wrapperStyle={{ maxWidth: 200 }}
+              />
               <Line
                 type="monotone"
                 dataKey="avgRating"
-                stroke="hsl(215 90% 52%)"
+                stroke="#2563eb"
                 strokeWidth={1.5}
-                dot={{ r: 2.5, fill: 'hsl(215 90% 52%)' }}
+                dot={{ r: 2.5, fill: '#2563eb' }}
                 activeDot={{ r: 4, strokeWidth: 0 }}
                 isAnimationActive
               />
             </LineChart>
           </ResponsiveContainer>
         </div>
-        {!data.length && !isLoading && (
+        {!data.length && (
           <div className="absolute inset-0 flex items-center justify-center text-xs text-slate-400">
             {t('noData')}
           </div>

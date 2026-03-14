@@ -51,7 +51,7 @@ export function SimulateReviewForm() {
           value={form.reviewText}
           onChange={(e) => setForm({ ...form, reviewText: e.target.value })}
           placeholder={t('placeholder.review')}
-          className="rounded-lg border border-white/20 bg-white/10 px-3 py-2 text-sm text-white placeholder-white/40 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+          className="rounded-lg border border-white/20 bg-white/10 px-3 py-2 text-sm text-white placeholder-white/40 focus:border-primary focus:outline-none focus:ring-1 focus:ring-[#2563eb]"
         />
       </div>
       <div className="flex w-24 flex-col gap-1">
@@ -59,7 +59,7 @@ export function SimulateReviewForm() {
         <select
           value={form.rating}
           onChange={(e) => setForm({ ...form, rating: Number(e.target.value) })}
-          className="rounded-lg border border-white/20 bg-white/10 px-3 py-2 text-sm text-white focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+          className="rounded-lg border border-white/20 bg-white/10 px-3 py-2 text-sm text-white focus:border-primary focus:outline-none focus:ring-1 focus:ring-[#2563eb]"
         >
           {[1, 2, 3, 4, 5].map((n) => (
             <option key={n} value={n}>
@@ -76,7 +76,7 @@ export function SimulateReviewForm() {
           value={form.establishmentName}
           onChange={(e) => setForm({ ...form, establishmentName: e.target.value })}
           placeholder={t('placeholder.establishment')}
-          className="rounded-lg border border-white/20 bg-white/10 px-3 py-2 text-sm text-white placeholder-white/40 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+          className="rounded-lg border border-white/20 bg-white/10 px-3 py-2 text-sm text-white placeholder-white/40 focus:border-primary focus:outline-none focus:ring-1 focus:ring-[#2563eb]"
         />
       </div>
       <div className="flex min-w-[120px] flex-col gap-1">
@@ -87,13 +87,13 @@ export function SimulateReviewForm() {
           value={form.city}
           onChange={(e) => setForm({ ...form, city: e.target.value })}
           placeholder={t('placeholder.city')}
-          className="rounded-lg border border-white/20 bg-white/10 px-3 py-2 text-sm text-white placeholder-white/40 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+          className="rounded-lg border border-white/20 bg-white/10 px-3 py-2 text-sm text-white placeholder-white/40 focus:border-primary focus:outline-none focus:ring-1 focus:ring-[#2563eb]"
         />
       </div>
       <button
         type="submit"
         disabled={loading}
-        className="flex items-center gap-2 rounded-lg bg-blue-500 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-600 disabled:opacity-50"
+        className="flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white transition hover:brightness-110 disabled:opacity-50"
       >
         {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
         {t('simulate')}

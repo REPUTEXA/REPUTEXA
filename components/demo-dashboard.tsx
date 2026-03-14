@@ -229,10 +229,10 @@ export function DemoDashboard({ onClose }: { onClose: () => void }) {
                 </div>
               </div>
 
-              <div className="rounded-xl border border-blue-500/30 bg-gradient-to-br from-blue-500/10 to-violet-500/10 p-4">
+              <div className="rounded-xl border border-[#2563eb]/30 bg-gradient-to-br from-[#2563eb]/10 to-violet-500/10 p-4">
                 <div className="flex items-center gap-2 mb-2">
-                  <Zap className="w-4 h-4 text-blue-400" aria-hidden />
-                  <span className="text-sm font-semibold text-blue-300">
+                  <Zap className="w-4 h-4 text-[#2563eb]" aria-hidden />
+                  <span className="text-sm font-semibold text-[#2563eb]">
                     {locale === 'fr'
                       ? `Génération des réponses IA (${generated.filter(Boolean).length + (currentIndex !== null ? 1 : 0)}/3)`
                       : `Generating AI replies (${generated.filter(Boolean).length + (currentIndex !== null ? 1 : 0)}/3)`}
@@ -242,7 +242,7 @@ export function DemoDashboard({ onClose }: { onClose: () => void }) {
                   {displayText}
                   {currentIndex !== null && (
                     <span
-                      className="inline-block w-0.5 h-4 ml-0.5 bg-blue-400 animate-pulse align-middle"
+                      className="inline-block w-0.5 h-4 ml-0.5 bg-[#2563eb] animate-pulse align-middle"
                       aria-hidden
                     />
                   )}
@@ -271,7 +271,7 @@ export function DemoDashboard({ onClose }: { onClose: () => void }) {
                           ? `Option ${idx + 1} · génération en cours…`
                           : `Option ${idx + 1} · generating…`}
                       </span>
-                      <span className="h-3 w-3 rounded-full bg-blue-400 animate-pulse" aria-hidden />
+                      <span className="h-3 w-3 rounded-full bg-[#2563eb] animate-pulse" aria-hidden />
                     </div>
                   );
                 }

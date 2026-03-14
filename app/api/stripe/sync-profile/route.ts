@@ -25,14 +25,16 @@ export async function POST(request: Request) {
 
     const stripe = new Stripe(secretKey);
     const session = await stripe.checkout.sessions.retrieve(sessionId, {
-      expand: ['customer'],
+      expand: ['customer', 'subscription'],
     });
 
     const customer = session.customer as Stripe.Customer | null;
+    const stripeCustomerId = typeof session.customer === 'string' ? session.customer : customer?.id ?? null;
     const customerEmail =
       (typeof customer === 'object' && customer?.email) ||
       (session.customer_details?.email ?? '');
     const planSlug = String(session.metadata?.planSlug ?? '');
+    const subscriptionId = session.subscription as string | null;
 
     if (!customerEmail) {
       return NextResponse.json({ ok: false, error: 'No customer email' }, { status: 400 });
@@ -40,6 +42,19 @@ export async function POST(request: Request) {
 
     const validPlan = ['vision', 'pulse', 'zenith'].includes(planSlug) ? planSlug : 'pulse';
     const subscriptionPlan = PLAN_SLUG_TO_SUBSCRIPTION[validPlan] ?? 'pulse';
+
+    let subscriptionStatus = 'active';
+    let trialEndsAt: string | null = null;
+
+    if (subscriptionId) {
+      const subscription = typeof session.subscription === 'object' && session.subscription
+        ? (session.subscription as Stripe.Subscription)
+        : await stripe.subscriptions.retrieve(subscriptionId);
+      subscriptionStatus = subscription.status === 'trialing' ? 'trialing' : subscription.status === 'active' ? 'active' : 'expired';
+      trialEndsAt = subscription.trial_end
+        ? new Date(subscription.trial_end * 1000).toISOString()
+        : null;
+    }
 
     const admin = createAdminClient();
     if (!admin) {
@@ -58,8 +73,10 @@ export async function POST(request: Request) {
         .update({
           selected_plan: validPlan,
           subscription_plan: subscriptionPlan,
-          subscription_status: 'active',
-          trial_ends_at: null,
+          subscription_status: subscriptionStatus,
+          trial_ends_at: subscriptionStatus === 'trialing' ? trialEndsAt : null,
+          stripe_subscription_id: subscriptionId,
+          ...(stripeCustomerId ? { stripe_customer_id: stripeCustomerId } : {}),
         })
         .eq('id', profiles[0].id);
     }

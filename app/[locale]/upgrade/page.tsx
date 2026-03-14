@@ -12,7 +12,7 @@ export default function UpgradePage() {
   const locale = useLocale();
 
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-br from-slate-900 via-slate-800 to-blue-950">
+    <div className="min-h-screen flex flex-col bg-gradient-to-br from-slate-900 via-slate-800 to-slate-950">
       <header className="flex items-center justify-between px-4 sm:px-6 h-14 border-b border-white/10">
         <Link href="/" className="flex items-center gap-2 text-white" aria-label="REPUTEXA">
           <Logo />
@@ -31,16 +31,16 @@ export default function UpgradePage() {
             </div>
             <div>
               <h1 className="font-display text-2xl sm:text-3xl font-bold text-white">
-                Votre essai est terminé
+                Choisissez votre plan
               </h1>
               <p className="text-white/60 text-sm mt-0.5">
-                Choisissez un plan pour continuer
+                14 jours gratuits avec carte · Annulation en un clic
               </p>
             </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-            <div className="flex flex-col rounded-2xl border border-white/10 bg-white/5 backdrop-blur-sm p-6 hover:border-blue-500/50 transition-all duration-300">
+            <div className="flex flex-col rounded-2xl border border-white/10 bg-white/5 backdrop-blur-sm p-6 hover:border-[#2563eb]/50 transition-all duration-300">
               <p className="font-display font-bold text-lg text-white">{t('pricing.vision.name')}</p>
               <p className="text-xs text-white/50 mt-0.5">{t('pricing.vision.for')}</p>
               <p className="mt-4 text-2xl font-bold text-white">
@@ -58,14 +58,14 @@ export default function UpgradePage() {
               </ul>
               <Link
                 href={`/checkout?plan=vision`}
-                className="mt-6 block w-full py-2.5 rounded-xl bg-blue-600 text-white text-center font-semibold text-sm hover:bg-blue-700 active:scale-[0.98] transition-colors"
+                className="mt-6 block w-full py-2.5 rounded-xl bg-primary text-white text-center font-semibold text-sm hover:brightness-110 active:scale-[0.98] transition-colors"
               >
                 S&apos;abonner
               </Link>
             </div>
 
-            <div className="flex flex-col rounded-2xl border-2 border-blue-500 bg-blue-500/10 backdrop-blur-sm p-6 relative scale-105 shadow-glow">
-              <span className="absolute -top-3 left-1/2 -translate-x-1/2 text-xs font-bold px-3 py-1 bg-blue-600 text-white rounded-full">
+            <div className="flex flex-col rounded-2xl border-2 border-[#2563eb] bg-[#2563eb]/10 backdrop-blur-sm p-6 relative scale-105 shadow-glow">
+              <span className="absolute -top-3 left-1/2 -translate-x-1/2 text-xs font-bold px-3 py-1 bg-primary text-white rounded-full">
                 Recommandé
               </span>
               <p className="font-display font-bold text-lg text-white">{t('pricing.pulse.name')}</p>
@@ -93,13 +93,13 @@ export default function UpgradePage() {
               </ul>
               <Link
                 href={`/checkout?plan=pulse`}
-                className="mt-6 block w-full py-2.5 rounded-xl bg-white text-blue-600 text-center font-semibold text-sm hover:bg-white/90 active:scale-[0.98] transition-colors"
+                className="mt-6 block w-full py-2.5 rounded-xl bg-white text-primary text-center font-semibold text-sm hover:bg-white/90 active:scale-[0.98] transition-colors"
               >
                 S&apos;abonner
               </Link>
             </div>
 
-            <div className="flex flex-col rounded-2xl border-2 border-blue-400/50 bg-white/5 backdrop-blur-sm p-6 hover:border-blue-400 transition-all duration-300">
+            <div className="flex flex-col rounded-2xl border-2 border-[#2563eb]/40 bg-white/5 backdrop-blur-sm p-6 hover:border-[#2563eb] transition-all duration-300">
               <p className="font-display font-bold text-lg text-white">{t('pricing.zenith.name')}</p>
               <p className="text-xs text-white/50 mt-0.5">{t('pricing.zenith.for')}</p>
               <p className="mt-4 text-2xl font-bold text-white">
@@ -107,21 +107,25 @@ export default function UpgradePage() {
               </p>
               <ul className="mt-4 space-y-2 flex-1">
                 <li className="flex items-center gap-2 text-sm text-white/80">
-                  <Check className="w-4 h-4 text-blue-400 shrink-0" />
+                  <Check className="w-4 h-4 text-[#2563eb] shrink-0" />
+                  {t('pricing.comparison.card_consultant')}
+                </li>
+                <li className="flex items-center gap-2 text-sm text-white/80">
+                  <Check className="w-4 h-4 text-[#2563eb] shrink-0" />
                   {t('pricing.comparison.ai_capture')}
                 </li>
                 <li className="flex items-center gap-2 text-sm text-white/80">
-                  <Check className="w-4 h-4 text-blue-400 shrink-0" />
+                  <Check className="w-4 h-4 text-[#2563eb] shrink-0" />
                   {t('pricing.comparison.pos_connector')}
                 </li>
                 <li className="flex items-center gap-2 text-sm text-white/80">
-                  <Check className="w-4 h-4 text-blue-400 shrink-0" />
+                  <Check className="w-4 h-4 text-[#2563eb] shrink-0" />
                   {t('pricing.comparison.shield_alert')}
                 </li>
               </ul>
               <Link
                 href={`/checkout?plan=zenith`}
-                className="mt-6 block w-full py-2.5 rounded-xl bg-blue-600 text-white text-center font-semibold text-sm hover:bg-blue-700 active:scale-[0.98] transition-colors"
+                className="mt-6 block w-full py-2.5 rounded-xl bg-primary text-white text-center font-semibold text-sm hover:brightness-110 active:scale-[0.98] transition-colors"
               >
                 S&apos;abonner
               </Link>

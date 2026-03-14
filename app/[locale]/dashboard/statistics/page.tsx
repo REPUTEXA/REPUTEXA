@@ -1,8 +1,11 @@
 import { setRequestLocale, getTranslations } from 'next-intl/server';
+import { cookies } from 'next/headers';
 import { prisma } from '@/lib/prisma';
 import { createClient } from '@/lib/supabase/server';
 import { StatisticsOverview } from '@/components/dashboard/statistics-overview';
-import { FileText } from 'lucide-react';
+import { ArchivesInsightsSection } from '@/components/dashboard/archives-insights-section';
+import { WeeklyInsightSection } from '@/components/dashboard/weekly-insight-section';
+import { toPlanSlug } from '@/lib/feature-gate';
 
 type Props = {
   params: Promise<{ locale: string }>;
@@ -31,11 +34,27 @@ export default async function StatisticsPage({ params }: Props) {
   } = await supabase.auth.getUser();
 
   let reviews: ReviewDisplay[] = [];
+  let planSlug: 'vision' | 'pulse' | 'zenith' = 'vision';
 
   if (supabaseUser) {
-    const { data: supabaseReviews } = await supabase
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('subscription_plan, selected_plan')
+      .eq('id', supabaseUser.id)
+      .single();
+    planSlug = toPlanSlug(profile?.subscription_plan ?? null, profile?.selected_plan ?? null);
+
+    const activeLocationId = (await cookies()).get('reputexa_active_location')?.value ?? null;
+    let reviewsQuery = supabase
       .from('reviews')
       .select('id, reviewer_name, rating, comment, source, response_text, created_at')
+      .eq('user_id', supabaseUser.id);
+    if (activeLocationId === 'profile') {
+      reviewsQuery = reviewsQuery.is('establishment_id', null);
+    } else if (activeLocationId && /^[0-9a-f-]{36}$/i.test(activeLocationId)) {
+      reviewsQuery = reviewsQuery.eq('establishment_id', activeLocationId);
+    }
+    const { data: supabaseReviews } = await reviewsQuery
       .order('created_at', { ascending: false })
       .limit(200);
     reviews = (supabaseReviews ?? []).map((r) => {
@@ -80,26 +99,21 @@ export default async function StatisticsPage({ params }: Props) {
   }
 
   return (
-    <div className="px-4 sm:px-6 py-6 space-y-6">
-      <div className="flex items-center justify-between gap-3 flex-wrap">
-        <div>
-          <h1 className="font-display font-bold text-2xl text-slate-900 dark:text-slate-50">
-            {t('title')}
-          </h1>
-          <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">
-            {t('description')}
-          </p>
-        </div>
-        <a
-          href={`/api/reports/monthly?locale=${locale}`}
-          className="inline-flex items-center gap-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 dark:border-white/[0.07] px-3.5 py-2 text-xs font-semibold text-slate-700 dark:text-slate-50 hover:shadow-[-8px_12px_24px_-10px_rgba(0,0,0,0.1),_0px_10px_15px_-3px_rgba(0,0,0,0.1)] dark:hover:shadow-[4px_6px_0_rgba(0,0,0,0.5)] dark:hover:border-slate-700 transition-all duration-300 ease-in-out"
-        >
-          <FileText className="w-4 h-4" />
-          {t('downloadPdf')}
-        </a>
-      </div>
+    <div className="px-4 sm:px-6 md:px-8 py-6 sm:py-8 space-y-6 max-w-[1600px] mx-auto relative z-10">
+      <header>
+        <h1 className="font-display font-bold text-2xl text-slate-900 dark:text-slate-50">
+          {t('title')}
+        </h1>
+        <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">
+          {t('description')}
+        </p>
+      </header>
 
-      <StatisticsOverview reviews={reviews} locale={locale} />
+      <StatisticsOverview reviews={reviews} locale={locale} planSlug={planSlug} />
+
+      <WeeklyInsightSection planSlug={planSlug} />
+
+      <ArchivesInsightsSection planSlug={planSlug} locale={locale} />
     </div>
   );
 }

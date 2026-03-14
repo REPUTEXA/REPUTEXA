@@ -7,6 +7,10 @@ import { toPlanSlug } from '@/lib/feature-gate';
 import { getRemainingTrialDays, formatTrialEndDate } from '@/lib/trial-utils';
 import { DashboardShell } from '@/components/dashboard/dashboard-shell';
 import { StripeSyncOnReturn } from '@/components/dashboard/stripe-sync-on-return';
+import { SyncLocationFromUrl } from '@/components/dashboard/sync-location-from-url';
+import { ActiveLocationProvider } from '@/lib/active-location-context';
+
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: 'REPUTEXA - Dashboard',
@@ -21,7 +25,6 @@ export default async function DashboardLayout({ children, params }: Props) {
   const { locale } = await params;
   setRequestLocale(locale);
 
-  const TRIAL_DAYS = 14;
   const PLAN_DISPLAY: Record<string, string> = {
     starter: 'Vision',
     manager: 'Pulse',
@@ -29,10 +32,10 @@ export default async function DashboardLayout({ children, params }: Props) {
     vision: 'Vision',
     pulse: 'Pulse',
     zenith: 'ZENITH',
+    free: 'Vision',
   };
 
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  let user: { id: string } | null = null;
   let establishmentName = 'Mon établissement';
   let fullName = '';
   let avatarUrl: string | null = null;
@@ -41,9 +44,14 @@ export default async function DashboardLayout({ children, params }: Props) {
   let showPaywall = false;
   let showTrialBanner = false;
   let planDisplayName = 'Pulse';
-  let selectedPlanSlug: 'vision' | 'pulse' | 'zenith' = 'pulse';
+  let selectedPlanSlug: 'vision' | 'pulse' | 'zenith' | 'free' = 'pulse';
   let isTrialing = false;
   let hasActiveSubscription = false;
+
+  try {
+    const supabase = await createClient();
+    const { data: { user: u } } = await supabase.auth.getUser();
+    user = u;
 
   if (user) {
     const { data: profile, error: profileError } = await supabase
@@ -63,27 +71,28 @@ export default async function DashboardLayout({ children, params }: Props) {
       planDisplayName = PLAN_DISPLAY[profile.subscription_plan] ?? 'Pulse';
       selectedPlanSlug = toPlanSlug(profile.subscription_plan, profile.selected_plan ?? undefined);
 
-      const trialEnd = profile.trial_ends_at
-        ? new Date(profile.trial_ends_at)
-        : profile.trial_started_at
-          ? (() => { const d = new Date(profile.trial_started_at); d.setDate(d.getDate() + TRIAL_DAYS); return d; })()
-          : null;
+      const status = profile.subscription_status;
+      const trialEnd = profile.trial_ends_at ? new Date(profile.trial_ends_at) : null;
       const now = new Date();
       const trialInFuture = trialEnd && now < trialEnd;
-      hasActiveSubscription = profile.subscription_status === 'active';
-      isTrialing = !!trialInFuture && !hasActiveSubscription;
 
-      // Redirection /upgrade : trial expiré ET pas d'abonnement actif (pas de stripe)
-      if (profile.subscription_status === 'expired') {
+      // Accès uniquement si trialing ou active (Stripe). Annulation pendant essai = accès jusqu'à trial_ends_at.
+      hasActiveSubscription = status === 'active';
+      isTrialing = status === 'trialing' && !!trialInFuture;
+
+      if (status !== 'trialing' && status !== 'active') {
         showPaywall = true;
-      } else if (trialEnd && !hasActiveSubscription && now >= trialEnd) {
+      } else if (status === 'trialing' && trialEnd && now >= trialEnd) {
         showPaywall = true;
-      } else if (trialInFuture) {
+      } else if (isTrialing && trialEnd) {
         trialDaysLeft = getRemainingTrialDays(trialEnd);
         trialEndDate = formatTrialEndDate(trialEnd, locale);
-        showTrialBanner = !hasActiveSubscription;
+        showTrialBanner = true;
       }
     }
+  }
+  } catch (e) {
+    console.error('[dashboard layout]', e);
   }
 
   const isCriticalPhase = trialDaysLeft !== null && trialDaysLeft <= 2;
@@ -93,25 +102,31 @@ export default async function DashboardLayout({ children, params }: Props) {
   }
 
   return (
-    <DashboardShell
+    <ActiveLocationProvider
       establishmentName={establishmentName}
-      fullName={fullName}
-      avatarUrl={avatarUrl}
-      trialDaysLeft={trialDaysLeft}
-      trialEndDate={trialEndDate}
-      showTrialBanner={showTrialBanner}
-      planDisplayName={planDisplayName}
       selectedPlanSlug={selectedPlanSlug}
-      isCriticalPhase={isCriticalPhase}
-      showPaywall={showPaywall}
-      isTrialing={isTrialing}
-      hasActiveSubscription={hasActiveSubscription}
-      locale={locale}
     >
-      <Suspense fallback={null}>
-        <StripeSyncOnReturn />
-      </Suspense>
-      {children}
-    </DashboardShell>
+      <DashboardShell
+        establishmentName={establishmentName}
+        fullName={fullName}
+        avatarUrl={avatarUrl}
+        trialDaysLeft={trialDaysLeft}
+        trialEndDate={trialEndDate}
+        showTrialBanner={showTrialBanner}
+        planDisplayName={planDisplayName}
+        selectedPlanSlug={selectedPlanSlug}
+        isCriticalPhase={isCriticalPhase}
+        showPaywall={showPaywall}
+        isTrialing={isTrialing}
+        hasActiveSubscription={hasActiveSubscription}
+        locale={locale}
+      >
+        <Suspense fallback={null}>
+          <StripeSyncOnReturn />
+          <SyncLocationFromUrl />
+        </Suspense>
+        {children}
+      </DashboardShell>
+    </ActiveLocationProvider>
   );
 }

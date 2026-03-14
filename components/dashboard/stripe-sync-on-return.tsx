@@ -27,6 +27,7 @@ export function StripeSyncOnReturn() {
       .then((res) => res.json())
       .then(() => {
         router.refresh();
+        setTimeout(() => router.refresh(), 500);
       })
       .catch(() => {});
   }, [searchParams, router]);

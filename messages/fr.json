@@ -1,4 +1,36 @@
 {
+  "PricingPage": {
+    "headline": "Choisissez votre plan",
+    "subtitle": "14 jours d'essai gratuit · Sans engagement",
+    "monthly": "Mensuel",
+    "annual": "Annuel",
+    "annualBadge": "-20%",
+    "perMonth": "/mois",
+    "perYear": "/an",
+    "backToDashboard": "Retour au dashboard",
+    "ctaChoose": "Choisir ce plan",
+    "ctaSubscribe": "Commencer mes 14 jours gratuits",
+    "ctaTrial": "Commencer mes 14 jours gratuits",
+    "checkoutError": "Erreur lors de la redirection vers le paiement",
+    "stripeReassurance": "Paiement sécurisé par Stripe. Sans engagement.",
+    "trialMention": "0€ aujourd'hui. Carte requise pour valider l'accès. Annulation en un clic depuis votre espace client.",
+    "visionTitle": "Vision",
+    "visionDesc": "L'essentiel pour démarrer",
+    "visionFeature1": "Réponse IA illimitée",
+    "visionFeature2": "Dashboard de base",
+    "pulseTitle": "Pulse",
+    "pulseDesc": "Réactivité et contrôle total",
+    "pulseBadge": "Populaire",
+    "pulseFeature1": "Tout Vision",
+    "pulseFeature2": "Analyse de Sentiment",
+    "pulseFeature3": "Support Prioritaire",
+    "zenithBadge": "Recommandé",
+    "zenithTitle": "Zenith",
+    "zenithDesc": "La forteresse de votre réputation",
+    "zenithFeature1": "Tout Pulse",
+    "zenithFeature2": "Rapport Stratégique Mensuel",
+    "zenithFeature3": "Consultant Stratégique 24h/7j"
+  },
   "Pricing": {
     "vision_title": "VISION",
     "vision_price": "59€",
@@ -35,7 +67,7 @@
       "faq": "FAQ",
       "contact": "Contact",
       "login": "Connexion",
-      "trial": "Essai gratuit"
+      "trial": "Commencer mes 14 jours gratuits"
     },
     "hero": {
       "pill": "IA de réputation • Restaurants, Coiffeurs, Hôtels...",
@@ -43,9 +75,9 @@
       "headlineHighlight": "IA",
       "promise": "Réponse humaine garantie (25-45min)",
       "tagline": "Répondez à tous vos avis en quelques secondes, surveillez votre e-réputation en temps réel et augmentez votre note moyenne — automatiquement.",
-      "ctaPrimary": "Essayer gratuitement",
+      "ctaPrimary": "Commencer mes 14 jours gratuits",
       "ctaSecondary": "Voir la démo",
-      "trialInfo": "Aucune CB requise · 14 jours d'essai · Annulation à tout moment"
+      "trialInfo": "0€ aujourd'hui. Carte requise pour valider l'accès. Annulation en un clic depuis votre espace client."
     },
     "scan": {
       "title": "Découvrez ce que vous perdez",
@@ -53,7 +85,7 @@
       "ctaScan": "Analyser ma réputation",
       "loading": "Analyse IA en cours",
       "alert": "ALERTE : Vous perdez environ {count} clients/mois",
-      "ctaSignup": "Arrêter l'hémorragie — Essai gratuit 14j"
+      "ctaSignup": "Arrêter l'hémorragie — 14 jours gratuits"
     },
     "demo": {
       "title": "Démo : L'IA en action",
@@ -169,14 +201,14 @@
       "headline": "Tarifs simples et transparents",
       "subtitle": "Commencez gratuitement, évoluez à votre rythme.",
       "ctaSubscribe": "S'abonner maintenant",
-      "ctaTrial": "Essayer gratuitement 14j",
-      "trialMention": "14 jours d'essai gratuit — Sans CB",
+      "ctaTrial": "Commencer mes 14 jours gratuits",
+      "trialMention": "0€ aujourd'hui. Carte requise. Annulation en un clic.",
       "vision": {
         "name": "Vision",
         "for": "L'essentiel pour votre image",
         "price": "59",
         "cta": "S'abonner maintenant",
-        "trialMention": "14 jours d'essai gratuit — Sans carte bancaire"
+        "trialMention": "0€ aujourd'hui. Carte requise. Annulation en un clic."
       },
       "pulse": {
         "name": "Pulse",
@@ -192,6 +224,7 @@
         "price": "179",
         "cta": "S'abonner maintenant"
       },
+      "paymentCancelledMessage": "Paiement annulé. Vous pouvez réessayer en sélectionnant un plan ci-dessous.",
       "comparison": {
         "reponses_avis": "Réponses aux avis",
         "reponses_avis_val": "Automatique & illimité",
@@ -231,6 +264,7 @@
         "card_triple": "Triple Vérification IA (Choisit la meilleure réponse)",
         "card_boost_seo": "Boost SEO (Mots-clés IA)",
         "card_ai_capture": "IA de capture (WhatsApp 30 min après visite)",
+        "card_consultant": "Consultant Stratégique 24h/7j",
         "card_langues_autres": "Toutes langues (Natif)"
       }
     },
@@ -299,11 +333,34 @@
       "terms": "Conditions d'utilisation"
     }
   },
+  "Auth": {
+    "login": "Connexion",
+    "rateLimit": "Trop de tentatives. Veuillez patienter une minute.",
+    "captchaRequired": "Vérification de sécurité requise.",
+    "captchaVerifying": "Vérification de sécurité en cours. Réessayez dans un instant.",
+    "genericError": "Une erreur est survenue.",
+    "networkError": "Erreur réseau. Réessayez.",
+    "invalidEmail": "Format d'email invalide.",
+    "ForgotPassword": {
+      "title": "Mot de passe oublié ?",
+      "subtitle": "Saisissez votre email et nous vous enverrons un lien sécurisé.",
+      "emailLabel": "Email",
+      "placeholder": "vous@etablissement.com",
+      "submit": "Envoyer le lien de récupération",
+      "sending": "Envoi en cours...",
+      "successTitle": "Si un compte existe",
+      "successMessage": "avec cet email, vous recevrez un lien pour réinitialiser votre mot de passe.",
+      "backToLogin": "Retour à la connexion",
+      "backHome": "Retour à l'accueil",
+      "enterEmail": "Veuillez saisir votre email."
+    }
+  },
   "Dashboard": {
     "sidebar": {
       "overview": "Vue d'ensemble",
       "aiResponses": "Réponses IA",
       "statistics": "Statistiques",
+      "consultant": "Consultant IA",
       "establishments": "Mes Établissements",
       "prospects": "Prospects (Sniper)",
       "alerts": "Alertes",
@@ -341,7 +398,8 @@
     "establishments": {
       "title": "Mes Établissements",
       "description": "Connectez vos établissements pour gérer leurs avis",
-      "comingSoon": "Bientôt disponible."
+      "comingSoon": "Bientôt disponible.",
+      "addEstablishment": "Ajouter un établissement"
     },
     "settings": {
       "title": "Paramètres",
@@ -532,7 +590,57 @@
   "Statistics": {
     "title": "Statistiques",
     "description": "Analysez vos performances e-réputation",
-    "downloadPdf": "Télécharger le rapport PDF"
+    "downloadPdf": "Télécharger le rapport PDF",
+    "reputationScore": "Score de réputation",
+    "avgResponseTime": "Temps de réponse moyen",
+    "aiWordsGenerated": "Mots générés par l'IA",
+    "reviewsPerStar": "avis par étoile",
+    "onAverage": "en moyenne",
+    "responseGoal": "Objectif : répondre sous 24h à chaque avis.",
+    "ratingDistribution": "Répartition des notes",
+    "topKeywords": "Top mots-clés",
+    "topKeywordsDesc": "Ce que vos clients mentionnent le plus",
+    "noEnoughText": "Pas encore assez de texte dans les avis.",
+    "monthlyComparison": "Comparaison mensuelle",
+    "volumeDesc": "Volume d'avis — mois en cours vs mois précédent",
+    "currentMonth": "Mois en cours",
+    "previousMonth": "Mois précédent",
+    "noCompareData": "Pas encore assez de données pour comparer les deux derniers mois.",
+    "whatClientsSay": "Ce que vos clients disent",
+    "strengths": "Points forts",
+    "improvementAreas": "Axe d'amélioration",
+    "expertInsight": "L'avis de l'Expert IA",
+    "expertInsightDesc": "Analyse stratégique synthétisée par l'IA.",
+    "benchmarkSector": "Benchmark sectoriel",
+    "benchmarkSectorDesc": "Comparaison avec la moyenne de votre secteur.",
+    "aiPredictions": "Prédictions IA",
+    "aiPredictionsDesc": "Tendance prédite sur les 3 prochains mois.",
+    "upgrade": "Upgrade",
+    "unlockPulse": "Passez à Pulse pour débloquer l'analyse de sentiment.",
+    "unlockZenith": "Passez à ZENITH pour le benchmark sectoriel et les prédictions IA.",
+    "insightsTitle": "Insights stratégiques IA",
+    "insightsSubtitle": "3 axes d'amélioration basés sur vos derniers avis.",
+    "insightsLoading": "Chargement des insights…",
+    "insightsError": "Impossible de charger les insights.",
+    "responseTimeEmpty": "Calibrage…",
+    "aiWordsPlaceholder": "L'IA prépare vos prochaines réponses…",
+    "reputationScoreTooltip": "Indice de performance basé sur votre note, la fréquence des avis et votre réactivité. Un score élevé améliore votre positionnement Google.",
+    "responseTimeSubtitle": "Vitesse de réponse moyenne de l'IA. Clé pour la satisfaction client.",
+    "aiWordsSubtitle": "Contenu stratégique rédigé automatiquement par Reputexa.",
+    "sentimentSectionDesc": "Points clés extraits de vos avis par notre IA pour orienter vos décisions.",
+    "ratingEvolution": "Évolution des notes",
+    "period7d": "7j",
+    "period14d": "14j",
+    "period30d": "30j",
+    "period90d": "90j",
+    "evolutionAvgRating": "Note moyenne",
+    "impactQuotidien": "Impact quotidien",
+    "tempsTotalGagne": "Temps total gagné",
+    "derniereReponseEnvoyee": "Dernière réponse envoyée",
+    "lastResponseNow": "À l'instant",
+    "lastResponseAgo": "Il y a {count} min",
+    "lastResponseHoursAgo": "Il y a {count}h",
+    "lastResponseDaysAgo": "Il y a {count}j"
   },
   "Share": {
     "whatsappMessage": "Regardez mon score Reputexa ! Ma note moyenne : {rating}/5 — Géré par l'IA 🚀",

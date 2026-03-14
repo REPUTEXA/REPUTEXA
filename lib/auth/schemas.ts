@@ -1,6 +1,7 @@
 import { z } from 'zod';
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const PHONE_E164_REGEX = /^\+[1-9]\d{7,14}$/;
 const MIN_PASSWORD_LENGTH = 6;
 const MAX_PASSWORD_LENGTH = 72;
 
@@ -27,8 +28,19 @@ export const signupSchema = z
       .min(1, 'Le nom de l\'établissement est requis')
       .transform((v) => v.trim())
       .refine((v) => v.length >= 2, 'Minimum 2 caractères'),
+    establishmentType: z
+      .string()
+      .min(1, 'Le type d\'établissement est requis')
+      .transform((v) => v.trim())
+      .refine((v) => v.length >= 2, 'Minimum 2 caractères'),
     address: z.string().optional(),
-    phone: z.string().optional(),
+    phone: z
+      .string()
+      .optional()
+      .refine(
+        (v) => !v || v.trim() === '' || PHONE_E164_REGEX.test(v.replace(/\s/g, '')),
+        'Format de numéro invalide'
+      ),
     email: z
       .string()
       .min(1, 'L\'email est requis')

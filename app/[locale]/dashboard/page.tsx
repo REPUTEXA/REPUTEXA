@@ -1,18 +1,23 @@
 import { setRequestLocale } from 'next-intl/server';
+import { cookies } from 'next/headers';
 import { getTranslations } from 'next-intl/server';
+import { startOfDay, endOfDay, subDays, subMonths } from 'date-fns';
 import { prisma } from '@/lib/prisma';
 import { createClient } from '@/lib/supabase/server';
 import { Link } from '@/i18n/navigation';
 import { Info, Star as StarIconSmall, ThumbsUp, AlertTriangle } from 'lucide-react';
 import { DashboardReviewsSection } from '@/components/dashboard/dashboard-reviews-section';
 import { StatsCard } from '@/components/dashboard/stats-card';
-import { OverviewChart } from '@/components/dashboard/overview-chart';
+import { RatingEvolutionChart } from '@/components/dashboard/rating-evolution-chart';
 import { PlatformDistributionChart } from '@/components/dashboard/platform-distribution-chart';
 import { WhatsAppShareButton } from '@/components/share/whatsapp-share-button';
+import { DashboardDateRangePicker } from '@/components/dashboard/dashboard-date-range-picker';
+import { SuccessPaymentToast } from '@/components/dashboard/success-payment-toast';
+import { SubscriptionSuccessEffects } from '@/components/dashboard/subscription-success-effects';
 
 type Props = {
   params: Promise<{ locale: string }>;
-  searchParams: Promise<{ welcome?: string; q?: string }>;
+  searchParams: Promise<{ welcome?: string; status?: string; plan?: string; q?: string; from?: string; to?: string; period?: string }>;
 };
 
 export const dynamic = 'force-dynamic';
@@ -29,7 +34,7 @@ type ReviewDisplay = {
 
 export default async function DashboardPage({ params, searchParams }: Props) {
   const { locale } = await params;
-  const { welcome, q } = await searchParams;
+  const { welcome, status, plan, q, from, to, period } = await searchParams;
   setRequestLocale(locale);
 
   const t = await getTranslations('Dashboard.overview');
@@ -42,6 +47,54 @@ export default async function DashboardPage({ params, searchParams }: Props) {
   let securityAlerts = 0;
   let establishmentName = 'Mon établissement';
 
+  const today = startOfDay(new Date());
+  const defaultFrom = startOfDay(subMonths(today, 1));
+
+  let fromDate: Date | null = null;
+  let toDate: Date | null = null;
+
+  if (from && to) {
+    const parsedFrom = new Date(from);
+    const parsedTo = new Date(to);
+    if (!Number.isNaN(parsedFrom.getTime()) && !Number.isNaN(parsedTo.getTime())) {
+      fromDate = startOfDay(parsedFrom);
+      toDate = endOfDay(parsedTo);
+    }
+  }
+
+  if (!fromDate || !toDate) {
+    if (period === '7d') {
+      fromDate = startOfDay(subDays(today, 6));
+      toDate = endOfDay(today);
+    } else if (period === '30d') {
+      fromDate = startOfDay(subDays(today, 29));
+      toDate = endOfDay(today);
+    } else if (period === '3m') {
+      fromDate = startOfDay(subMonths(today, 3));
+      toDate = endOfDay(today);
+    } else if (period === '12m') {
+      fromDate = startOfDay(subMonths(today, 12));
+      toDate = endOfDay(today);
+    } else {
+      fromDate = defaultFrom;
+      toDate = endOfDay(today);
+    }
+  }
+
+  const currentFromIso = fromDate.toISOString();
+  const currentToIso = toDate.toISOString();
+
+  const diffMs = toDate.getTime() - fromDate.getTime();
+  const prevTo = new Date(fromDate.getTime() - 1);
+  const prevFrom = new Date(prevTo.getTime() - diffMs);
+  const prevFromIso = prevFrom.toISOString();
+  const prevToIso = prevTo.toISOString();
+
+  let prevTotalReviews = 0;
+  let prevAvgRating = 0;
+  let prevPositiveCount = 0;
+  let prevNegativeCount = 0;
+
   if (supabaseUser) {
     const { data: profile } = await supabase
       .from('profiles')
@@ -50,11 +103,19 @@ export default async function DashboardPage({ params, searchParams }: Props) {
       .single();
     if (profile?.establishment_name) establishmentName = profile.establishment_name;
 
-    const { data: supabaseReviews } = await supabase
+    const activeLocationId = (await cookies()).get('reputexa_active_location')?.value ?? null;
+    let reviewsQuery = supabase
       .from('reviews')
       .select('id, reviewer_name, rating, comment, source, response_text, created_at')
-      .order('created_at', { ascending: false })
-      .limit(30);
+      .eq('user_id', supabaseUser.id)
+      .gte('created_at', currentFromIso)
+      .lte('created_at', currentToIso);
+    if (activeLocationId === 'profile') {
+      reviewsQuery = reviewsQuery.is('establishment_id', null);
+    } else if (activeLocationId && /^[0-9a-f-]{36}$/i.test(activeLocationId)) {
+      reviewsQuery = reviewsQuery.eq('establishment_id', activeLocationId);
+    }
+    const { data: supabaseReviews } = await reviewsQuery.order('created_at', { ascending: false });
     reviews = (supabaseReviews ?? []).map((r) => {
       const safeRating = typeof r.rating === 'number' && Number.isFinite(r.rating) ? r.rating : 0;
       const created =
@@ -74,14 +135,42 @@ export default async function DashboardPage({ params, searchParams }: Props) {
     totalReviews = reviews.length;
     avgRating = reviews.length ? reviews.reduce((s, r) => s + r.rating, 0) / reviews.length : 0;
     securityAlerts = reviews.filter((r) => r.rating < 3).length;
+
+    let prevReviewsQuery = supabase
+      .from('reviews')
+      .select('id, rating, created_at')
+      .eq('user_id', supabaseUser.id)
+      .gte('created_at', prevFromIso)
+      .lte('created_at', prevToIso);
+    if (activeLocationId === 'profile') {
+      prevReviewsQuery = prevReviewsQuery.is('establishment_id', null);
+    } else if (activeLocationId && /^[0-9a-f-]{36}$/i.test(activeLocationId)) {
+      prevReviewsQuery = prevReviewsQuery.eq('establishment_id', activeLocationId);
+    }
+    const { data: prevReviewsRaw } = await prevReviewsQuery;
+
+    const prevReviews = (prevReviewsRaw ?? []).map((r) => {
+      const safeRating =
+        typeof r.rating === 'number' && Number.isFinite(r.rating) ? r.rating : 0;
+      return { rating: safeRating, createdAt: String(r.created_at ?? '') };
+    });
+
+    prevTotalReviews = prevReviews.length;
+    prevAvgRating = prevReviews.length
+      ? prevReviews.reduce((s, r) => s + r.rating, 0) / prevReviews.length
+      : 0;
+    prevPositiveCount = prevReviews.filter((r) => r.rating >= 4).length;
+    prevNegativeCount = prevReviews.filter((r) => r.rating <= 3).length;
   } else {
-    const [prismaReviews, statsData, securityAlertsCount] = await Promise.all([
-      prisma.review.findMany({ orderBy: { createdAt: 'desc' }, take: 20 }),
-      prisma.review.aggregate({
-        _count: { id: true },
-        _avg: { rating: true },
+    const [prismaReviews, prevPrismaReviews] = await Promise.all([
+      prisma.review.findMany({
+        where: { createdAt: { gte: fromDate, lte: toDate } },
+        orderBy: { createdAt: 'desc' },
       }),
-      prisma.review.count({ where: { rating: { lt: 3 } } }),
+      prisma.review.findMany({
+        where: { createdAt: { gte: prevFrom, lte: prevTo } },
+        orderBy: { createdAt: 'desc' },
+      }),
     ]);
     reviews = prismaReviews.map((r) => {
       const safeRating = typeof r.rating === 'number' && Number.isFinite(r.rating) ? r.rating : 0;
@@ -99,20 +188,52 @@ export default async function DashboardPage({ params, searchParams }: Props) {
         createdAt: created,
       };
     });
-    totalReviews = statsData._count.id;
-    avgRating = statsData._avg.rating ?? 0;
-    securityAlerts = securityAlertsCount;
+    totalReviews = reviews.length;
+    avgRating = reviews.length ? reviews.reduce((s, r) => s + r.rating, 0) / reviews.length : 0;
+    securityAlerts = reviews.filter((r) => r.rating < 3).length;
+
+    prevTotalReviews = prevPrismaReviews.length;
+    prevAvgRating = prevPrismaReviews.length
+      ? prevPrismaReviews.reduce(
+          (s, r) =>
+            s +
+            (typeof r.rating === 'number' && Number.isFinite(r.rating) ? r.rating : 0),
+          0,
+        ) / prevPrismaReviews.length
+      : 0;
+    prevPositiveCount = prevPrismaReviews.filter(
+      (r) => typeof r.rating === 'number' && r.rating >= 4,
+    ).length;
+    prevNegativeCount = prevPrismaReviews.filter(
+      (r) => typeof r.rating === 'number' && r.rating <= 3,
+    ).length;
   }
 
   const positiveCount = reviews.filter((r) => r.rating >= 4).length;
   const negativeCount = reviews.filter((r) => r.rating <= 3).length;
 
+  const computeDelta = (current: number, previous: number): number | null => {
+    if (!previous || previous <= 0) return null;
+    return ((current - previous) / previous) * 100;
+  };
+
+  const avgRatingDelta = computeDelta(avgRating, prevAvgRating);
+  const totalReviewsDelta = computeDelta(totalReviews, prevTotalReviews);
+  const positiveDelta = computeDelta(positiveCount, prevPositiveCount);
+  const negativeDelta = computeDelta(negativeCount, prevNegativeCount);
+
   return (
     <div className="px-4 sm:px-6 md:px-8 py-6 sm:py-8 space-y-6 max-w-[1600px] mx-auto">
-      {welcome === '1' && (
+      <SuccessPaymentToast />
+      <SubscriptionSuccessEffects />
+      {(welcome === '1' || status === 'success' || status === 'trial_started') && (
         <div className="rounded-2xl bg-emerald-500/15 dark:bg-emerald-500/10 border border-emerald-500/30 dark:border-emerald-500/20 p-4 text-emerald-800 dark:text-emerald-200">
-          <p className="font-medium">Bienvenue ! Votre essai gratuit de 14 jours a bien été activé.</p>
-          <p className="mt-1 text-sm opacity-90 dark:text-emerald-200/90">Aucun débit aujourd&apos;hui. Explorez toutes les fonctionnalités.</p>
+          <p className="font-medium">
+            Bienvenue ! {plan
+              ? `Votre abonnement ${plan === 'zenith' ? 'ZENITH' : plan.charAt(0).toUpperCase() + plan.slice(1)} a bien été activé.`
+              : 'Votre essai gratuit de 14 jours a bien été activé.'}
+          </p>
+          <p className="mt-1 text-sm opacity-90 dark:text-emerald-200/90">Explorez toutes les fonctionnalités de votre plan.</p>
         </div>
       )}
 
@@ -127,6 +248,8 @@ export default async function DashboardPage({ params, searchParams }: Props) {
           · {establishmentName}
         </p>
       </div>
+
+      <DashboardDateRangePicker />
 
       {/* Contenu principal (stats + avis) */}
       {/* Bandeau alerte IA — masqué si 0 avis */}
@@ -174,9 +297,11 @@ export default async function DashboardPage({ params, searchParams }: Props) {
                   </p>
                 </div>
               </div>
-              {totalReviews > 0 && (
+              {avgRatingDelta != null && (
                 <span className="inline-flex items-center rounded-full bg-emerald-400/15 text-emerald-100 border border-emerald-300/60 px-2 py-0.5 text-[10px] font-semibold">
-                  +8% vs mois dernier
+                  {avgRatingDelta >= 0 ? '+' : ''}
+                  {avgRatingDelta.toFixed(0)}
+                  % vs période précédente
                 </span>
               )}
             </div>
@@ -196,9 +321,11 @@ export default async function DashboardPage({ params, searchParams }: Props) {
             <div className="w-8 h-8 rounded-xl bg-sky-50 dark:bg-sky-500/15 flex items-center justify-center">
               <StarIconSmall className="w-4 h-4 text-sky-600" />
             </div>
-            {totalReviews > 0 && (
+            {totalReviewsDelta != null && (
               <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 dark:bg-emerald-500/10 px-2 py-0.5 text-[10px] font-semibold text-emerald-600">
-                +12%
+                {totalReviewsDelta >= 0 ? '+' : ''}
+                {totalReviewsDelta.toFixed(0)}
+                %
               </span>
             )}
           </div>
@@ -214,9 +341,11 @@ export default async function DashboardPage({ params, searchParams }: Props) {
             <div className="w-8 h-8 rounded-xl bg-emerald-50 dark:bg-emerald-500/15 flex items-center justify-center">
               <ThumbsUp className="w-4 h-4 text-emerald-600" />
             </div>
-            {totalReviews > 0 && (
+            {positiveDelta != null && (
               <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 dark:bg-emerald-500/10 px-2 py-0.5 text-[10px] font-semibold text-emerald-600">
-                +5%
+                {positiveDelta >= 0 ? '+' : ''}
+                {positiveDelta.toFixed(0)}
+                %
               </span>
             )}
           </div>
@@ -233,9 +362,11 @@ export default async function DashboardPage({ params, searchParams }: Props) {
             <div className="w-8 h-8 rounded-xl bg-red-50 flex items-center justify-center">
               <AlertTriangle className="w-4 h-4 text-red-600" />
             </div>
-            {totalReviews > 0 && (
+            {negativeDelta != null && (
               <span className="inline-flex items-center gap-1 rounded-full bg-red-50 dark:bg-red-500/10 px-2 py-0.5 text-[10px] font-semibold text-red-500">
-                -2%
+                {negativeDelta >= 0 ? '+' : ''}
+                {negativeDelta.toFixed(0)}
+                %
               </span>
             )}
           </div>
@@ -251,7 +382,7 @@ export default async function DashboardPage({ params, searchParams }: Props) {
       <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {/* Évolution de la note */}
         <div className="lg:col-span-2 rounded-2xl bg-white dark:bg-[#09090b] border border-slate-200 dark:border-zinc-800/50 shadow-sm dark:shadow-[4px_6px_0_rgba(0,0,0,0.5)] hover:shadow-[-8px_12px_24px_-10px_rgba(0,0,0,0.1),_0px_10px_15px_-3px_rgba(0,0,0,0.1)] dark:hover:shadow-[4px_6px_0_rgba(0,0,0,0.6)] dark:hover:border-zinc-700 p-5 transition-all duration-300 ease-in-out">
-          <OverviewChart reviews={reviews} locale={locale} />
+          <RatingEvolutionChart reviews={reviews} locale={locale} />
         </div>
 
         {/* Avis par plateforme */}

@@ -82,12 +82,6 @@ export default function HomePage() {
             >
               {t('nav.login')}
             </Link>
-            <Link
-              href="/signup?mode=trial"
-              className="gradient-primary text-white text-sm font-semibold px-4 py-2.5 min-h-[44px] min-w-[44px] inline-flex items-center justify-center rounded-2xl hover:opacity-90 active:scale-[0.98] transition-all duration-300 ease-in-out"
-            >
-              {t('nav.trial')}
-            </Link>
           </div>
         </div>
       </nav>
@@ -145,7 +139,7 @@ export default function HomePage() {
         <section className="py-12 sm:py-20 md:py-24 relative overflow-hidden">
           <div className="max-w-6xl mx-auto px-4 sm:px-6 relative safe-area-section">
             <div className="text-center mb-6 sm:mb-10">
-              <span className="inline-block bg-blue-500/15 text-blue-300 px-2.5 sm:px-3 py-1 rounded-full text-[10px] sm:text-xs font-semibold uppercase tracking-wider mb-3 sm:mb-4">
+              <span className="inline-block bg-[#2563eb]/10 text-[#2563eb] px-2.5 sm:px-3 py-1 rounded-full text-[10px] sm:text-xs font-semibold uppercase tracking-wider mb-3 sm:mb-4">
                 CENTRE DE COMMANDE IA
               </span>
               <h2 className="font-display text-2xl sm:text-3xl md:text-4xl font-bold text-white tracking-heading">
@@ -182,7 +176,7 @@ export default function HomePage() {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {[
-              { icon: Globe, key: 'multilingue', iconBg: 'bg-blue-50', iconColor: 'text-blue-600', badgeClass: 'border-indigo-400/60 bg-indigo-500/15 text-indigo-700' },
+              { icon: Globe, key: 'multilingue', iconBg: 'bg-[#2563eb]/5', iconColor: 'text-primary', badgeClass: 'border-indigo-400/60 bg-indigo-500/15 text-indigo-700' },
               { icon: ShieldCheck, key: 'bouclier', iconBg: 'bg-red-50', iconColor: 'text-red-500', badgeClass: 'border-indigo-400/60 bg-indigo-500/15 text-indigo-700' },
               { icon: MessageSquareWarning, key: 'whatsapp', iconBg: 'bg-amber-50', iconColor: 'text-amber-600', badgeClass: 'border-indigo-400/60 bg-indigo-500/15 text-indigo-700' },
               { icon: Zap, key: 'capture', iconBg: 'bg-purple-50', iconColor: 'text-purple-600', badgeClass: 'border-emerald-400/60 bg-emerald-500/15 text-emerald-700' },
@@ -402,7 +396,7 @@ export default function HomePage() {
             </div>
 
             {/* Plan Zenith - bordure lumineuse bleue (offre ultime) */}
-            <div className="flex flex-col h-full rounded-2xl sm:rounded-3xl border-2 border-blue-500/50 p-6 relative bg-card shadow-[0_0_24px_rgba(59,130,246,0.12)] transition-all duration-300 ease-in-out hover:-translate-y-1 hover:shadow-[0_24px_48px_rgba(59,130,246,0.2)] hover:border-primary/60">
+            <div className="flex flex-col h-full rounded-2xl sm:rounded-3xl border-2 border-[#2563eb]/50 p-6 relative bg-card shadow-[0_0_24px_rgba(37,99,235,0.12)] transition-all duration-300 ease-in-out hover:-translate-y-1 hover:shadow-[0_24px_48px_rgba(37,99,235,0.2)] hover:border-primary/60">
               <div className="mb-5">
                 <p className="font-display font-bold text-lg text-foreground">
                   {t('pricing.zenith.name')}
@@ -447,6 +441,10 @@ export default function HomePage() {
                 </li>
                 <li className="flex items-center gap-2.5 text-sm">
                   <Check className="w-4 h-4 flex-shrink-0 text-primary" aria-hidden="true" />
+                  <span className="text-foreground/80 font-semibold">{t('pricing.comparison.card_consultant')}</span>
+                </li>
+                <li className="flex items-center gap-2.5 text-sm">
+                  <Check className="w-4 h-4 flex-shrink-0 text-primary" aria-hidden="true" />
                   <span className="text-foreground/80">{t('pricing.comparison.card_langues_autres')}</span>
                 </li>
               </ul>
@@ -465,14 +463,6 @@ export default function HomePage() {
               </Link>
             </div>
           </div>
-          <p className="text-center mt-8">
-            <Link
-              href="/pricing"
-              className="text-sm font-medium text-blue-600 hover:text-blue-700"
-            >
-              Voir le tableau comparatif →
-            </Link>
-          </p>
         </div>
       </section>
 
@@ -483,7 +473,7 @@ export default function HomePage() {
       >
         <div className="max-w-3xl mx-auto">
           <div className="text-center mb-12">
-            <span className="inline-flex items-center rounded-md px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 border-transparent shadow hover:bg-primary/80 bg-blue-100 text-blue-700 border-0 mb-4">
+            <span className="inline-flex items-center rounded-md px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 border-transparent shadow hover:bg-primary/80 bg-[#2563eb]/10 text-[#2563eb] border-0 mb-4">
               {t('nav.faq')}
             </span>
             <h2 className="font-display text-3xl sm:text-4xl font-bold text-slate-900">
@@ -555,6 +545,20 @@ export default function HomePage() {
             <Logo size="sm" />
             <span className="font-display font-bold text-white">REPUTEXA</span>
           </Link>
+          <nav className="flex flex-wrap items-center justify-center gap-4 md:gap-6" aria-label="Pied de page">
+            <Link href="/legal" className="text-sm text-white/50 hover:text-white transition-colors">
+              Mentions légales
+            </Link>
+            <Link href="/privacy" className="text-sm text-white/50 hover:text-white transition-colors">
+              {t('footer.privacy')}
+            </Link>
+            <Link href="/terms" className="text-sm text-white/50 hover:text-white transition-colors">
+              {t('footer.terms')}
+            </Link>
+            <Link href="/contact" className="text-sm text-white/50 hover:text-white transition-colors">
+              Contact
+            </Link>
+          </nav>
           <p className="text-sm text-white/30">{t('footer.rights')}</p>
         </div>
       </footer>

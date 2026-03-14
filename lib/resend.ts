@@ -1,7 +1,10 @@
 import { Resend } from 'resend';
 
 const apiKey = process.env.RESEND_API_KEY;
-const from = process.env.RESEND_FROM ?? 'REPUTEXA <onboarding@resend.dev>';
+
+/** Format strict : "REPUTEXA <email@reputexa.fr>". Override via RESEND_FROM. */
+export const DEFAULT_FROM = 'REPUTEXA <noreply@reputexa.fr>';
+const from = process.env.RESEND_FROM ?? DEFAULT_FROM;
 
 export const resend = apiKey ? new Resend(apiKey) : null;
 

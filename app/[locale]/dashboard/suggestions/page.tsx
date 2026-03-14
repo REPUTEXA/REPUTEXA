@@ -19,7 +19,7 @@ type AppSuggestion = {
 
 const STATUS_STYLES: Record<string, string> = {
   PENDING: 'bg-amber-500/10 text-amber-400',
-  IN_PROGRESS: 'bg-blue-500/10 text-blue-400',
+  IN_PROGRESS: 'bg-[#2563eb]/10 text-[#2563eb]',
   DONE: 'bg-emerald-500/10 text-emerald-400',
 };
 
@@ -240,7 +240,7 @@ export default function SuggestionsPage() {
                 onChange={(e) => setTitle(e.target.value)}
                 placeholder={t('form.placeholderTitle')}
                 maxLength={200}
-                className="flex-1 px-4 py-3 min-h-[44px] rounded-2xl border border-slate-200 dark:border-zinc-800/50 bg-white dark:bg-[#09090b] text-slate-900 dark:text-zinc-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/30 dark:focus:ring-indigo-500/50 focus:border-blue-500 dark:focus:border-indigo-500/50 transition-all duration-200"
+                className="flex-1 px-4 py-3 min-h-[44px] rounded-2xl border border-slate-200 dark:border-zinc-800/50 bg-white dark:bg-[#09090b] text-slate-900 dark:text-zinc-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-[#2563eb]/30 dark:focus:ring-indigo-500/50 focus:border-primary dark:focus:border-indigo-500/50 transition-all duration-200"
               />
               <input
                 ref={fileInputRef}
@@ -296,7 +296,7 @@ export default function SuggestionsPage() {
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder={t('form.placeholderDescription')}
                 rows={5}
-                className="w-full px-4 py-3 pr-14 min-h-[120px] rounded-2xl border border-slate-200 dark:border-zinc-800/50 bg-white dark:bg-[#09090b] text-slate-900 dark:text-zinc-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/30 dark:focus:ring-indigo-500/50 focus:border-blue-500 dark:focus:border-indigo-500/50 resize-none transition-all duration-200"
+                className="w-full px-4 py-3 pr-14 min-h-[120px] rounded-2xl border border-slate-200 dark:border-zinc-800/50 bg-white dark:bg-[#09090b] text-slate-900 dark:text-zinc-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-[#2563eb]/30 dark:focus:ring-indigo-500/50 focus:border-primary dark:focus:border-indigo-500/50 resize-none transition-all duration-200"
               />
               <button
                 type="button"
@@ -320,7 +320,7 @@ export default function SuggestionsPage() {
           <button
             type="submit"
             disabled={submitting}
-            className="inline-flex items-center justify-center gap-2 min-h-[44px] py-3 px-6 rounded-2xl font-semibold text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-slate-900 disabled:opacity-50 disabled:pointer-events-none active:scale-[0.98] transition-transform duration-200"
+            className="inline-flex items-center justify-center gap-2 min-h-[44px] py-3 px-6 rounded-2xl font-semibold text-white bg-primary hover:brightness-110 focus:outline-none focus:ring-2 focus:ring-[#2563eb] focus:ring-offset-2 dark:focus:ring-offset-slate-900 disabled:opacity-50 disabled:pointer-events-none active:scale-[0.98] transition-transform duration-200"
           >
             {submitting ? (
               <>
@@ -366,7 +366,7 @@ export default function SuggestionsPage() {
                       disabled={!!upvoting}
                       className={`shrink-0 flex flex-col items-center gap-0.5 p-2 rounded-lg transition-colors ${
                         s.user_has_upvoted
-                          ? 'bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400'
+                          ? 'bg-[#2563eb]/10 dark:bg-[#2563eb]/20 text-[#2563eb] dark:text-[#2563eb]'
                           : 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-zinc-400 hover:bg-slate-200 dark:hover:bg-white/5'
                       }`}
                     >

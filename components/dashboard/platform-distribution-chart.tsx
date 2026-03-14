@@ -23,10 +23,10 @@ type PieDatum = {
 };
 
 const COLORS: Record<PlatformKey, string> = {
-  Google: 'hsl(215 90% 52%)',
-  TripAdvisor: 'hsl(175 80% 42%)',
-  Yelp: 'hsl(0 72% 51%)',
-  Other: 'hsl(220 10% 80%)',
+  Google: '#2563eb',
+  TripAdvisor: '#14b8a6',
+  Yelp: '#ef4444',
+  Other: '#cbd5f5',
 };
 
 function mapSourceToPlatform(sourceRaw: string | null | undefined): PlatformKey {

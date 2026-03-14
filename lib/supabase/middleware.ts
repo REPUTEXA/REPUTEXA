@@ -26,5 +26,6 @@ export async function updateSession(request: NextRequest) {
   );
 
   const { data: { user } } = await supabase.auth.getUser();
-  return { response, user };
+  const emailConfirmed = user?.email_confirmed_at != null;
+  return { response, user, emailConfirmed };
 }

@@ -35,6 +35,7 @@ export async function generateModifiedResponse(
   try {
     const completion = await openai.chat.completions.create({
       model: 'gpt-4o-mini',
+      temperature: 0.8,
       messages: [
         { role: 'system', content: SYSTEM_PROMPT },
         {
@@ -50,8 +51,9 @@ Génère la V2 de la réponse.`,
       ],
     });
 
-    const content = completion.choices[0]?.message?.content?.trim();
-    return content && content.length > 0 ? content : input.firstResponse;
+    let content = completion.choices[0]?.message?.content?.trim() ?? '';
+    content = content.replace(/^["']|["']$/g, '').replace(/^Voici la réponse\s*:?\s*/i, '');
+    return content.length > 0 ? content : input.firstResponse;
   } catch (error) {
     if (process.env.NODE_ENV === 'development') {
       console.error('[whatsapp-alerts] generateModifiedResponse error:', error);

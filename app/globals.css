@@ -94,6 +94,7 @@ body {
   @apply bg-background text-foreground antialiased font-sans;
   font-feature-settings: "rlig" 1, "calt" 1;
   letter-spacing: 0.01em;
+  -webkit-font-smoothing: antialiased;
 }
 
 /* Glassmorphism utility */
@@ -262,7 +263,7 @@ body {
 
 /* RepuAI design tokens (design exactement pareil) */
 .gradient-primary {
-  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 50%, #1d4ed8 100%);
+  background: linear-gradient(135deg, #2563eb 0%, #2563eb 50%, #2563eb 100%);
 }
 .gradient-hero {
   background: linear-gradient(180deg, #0f1729 0%, #0c1222 50%, #0a0f1a 100%);
@@ -351,22 +352,13 @@ body {
   transform: scale(0.98);
 }
 
-/* Dashboard dark mode Ultra-Premium: fond noir pur, texture subtile */
+/* Dashboard: fond cohérent, contenu au-dessus des décors */
+.dashboard-main-bg {
+  isolation: isolate;
+  background-color: rgb(248 250 252);
+}
 .dark .dashboard-main-bg {
   background-color: #030303;
-}
-@media (min-width: 768px) {
-  .dark .dashboard-main-bg {
-    background-image: radial-gradient(at top right, rgba(79, 70, 229, 0.04), transparent 60%);
-  }
-  .dark .dashboard-main-bg::before {
-    content: "";
-    position: fixed;
-    inset: 0;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.02'/%3E%3C/svg%3E");
-    pointer-events: none;
-    z-index: 0;
-  }
 }
 
 /* Input 16px min - évite zoom iOS (dashboard) + Ultra-Premium dark inputs */
@@ -427,9 +419,9 @@ body {
     text-wrap: balance;
   }
   .gradient-text {
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 via-teal-400 to-orange-400;
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-[#2563eb] via-[#2563eb] to-[#2563eb];
   }
   .text-gradient {
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-[#60a5fa] to-[#22d3ee];
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-[#2563eb] to-[#2563eb];
   }
 }

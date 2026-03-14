@@ -29,7 +29,7 @@ export function GenerateWithAIButton({
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className={`flex items-center gap-1.5 text-xs font-semibold text-blue-400 hover:text-blue-300 transition-colors ${className}`}
+        className={`flex items-center gap-1.5 text-xs font-semibold text-primary hover:brightness-110 transition-colors ${className}`}
       >
         <Zap className="h-3.5 w-3.5" />
         {label}

@@ -6,16 +6,22 @@ import { type PlanSlug } from '@/lib/feature-gate';
 import { PlanUpgradeModal } from './plan-upgrade-modal';
 
 const PLAN_ICONS: Record<PlanSlug, typeof Eye> = {
+  free: Eye,
   vision: Eye,
   pulse: Zap,
   zenith: Crown,
 };
 
 const PLAN_STYLES: Record<PlanSlug, { bg: string; border: string; icon: string; glow?: string }> = {
+  free: {
+    bg: 'from-slate-500/15 to-slate-500/5',
+    border: 'border-slate-400/40 dark:border-zinc-800/50',
+    icon: 'text-slate-400',
+  },
   vision: {
-    bg: 'from-sky-500/20 to-blue-500/10',
-    border: 'border-sky-400/40 dark:border-zinc-800/50',
-    icon: 'text-sky-300',
+    bg: 'from-[#2563eb]/15 to-[#2563eb]/5',
+    border: 'border-[#2563eb]/40 dark:border-zinc-800/50',
+    icon: 'text-[#2563eb]',
   },
   pulse: {
     bg: 'from-amber-500/20 to-orange-500/10',

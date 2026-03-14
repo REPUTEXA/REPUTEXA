@@ -53,7 +53,7 @@ export function UpgradeModal({ featureKey, onClose }: Props) {
           <button
             type="button"
             onClick={handleUpgrade}
-            className="flex-1 min-h-[44px] py-2.5 rounded-2xl bg-blue-600 dark:bg-indigo-600 text-white font-semibold hover:bg-blue-700 dark:hover:bg-indigo-500 active:scale-[0.98] transition-transform"
+            className="flex-1 min-h-[44px] py-2.5 rounded-2xl bg-primary dark:bg-indigo-600 text-white font-semibold hover:brightness-110 dark:hover:bg-indigo-500 active:scale-[0.98] transition-transform"
           >
             Passer au plan {planName}
           </button>

@@ -16,8 +16,10 @@ Guide pour configurer Stripe (webhook, produits, variables) sans te prendre la t
    - Exemple : si ton site est `https://reputexa-abc123.vercel.app`, mets :  
      `https://reputexa-abc123.vercel.app/api/stripe/webhook`
 4. **Événements à sélectionner :**
-   - Recherche : `checkout.session.completed`
-   - Coche **checkout.session.completed**
+   - `checkout.session.completed`
+   - `customer.subscription.updated`
+   - `invoice.paid`
+   - `invoice.payment_failed`
 5. Clique **"Ajouter un endpoint"**
 6. Clique sur ton endpoint → **"Révéler"** le **Signing secret** (commence par `whsec_`)
 7. Copie-le et mets-le dans `.env` : `STRIPE_WEBHOOK_SECRET=whsec_...`
@@ -35,9 +37,12 @@ Dans ton `.env` (local) et dans Vercel (Settings → Environment Variables) :
 | `STRIPE_PRICE_ID_VISION` | Stripe → Products → Prix Vision 59€/mois | `price_...` |
 | `STRIPE_PRICE_ID_PULSE` | Stripe → Products → Prix Pulse 97€/mois | `price_...` |
 | `STRIPE_PRICE_ID_ZENITH` | Stripe → Products → Prix Zenith 157€/mois | `price_...` |
+| `STRIPE_ADDON_PRODUCT_ID` | Produit Stripe pour addons établissements (voir ci-dessous) | `prod_...` |
 | `NEXT_PUBLIC_APP_URL` | URL de ton site en prod | `https://reputexa.vercel.app` |
 
 **Important :** Crée 3 prix (Price IDs) dans Stripe pour Vision, Pulse et Zenith avec essai 14 jours.
+
+**Addons établissements (multi-lieux) :** Crée un produit Stripe "REPUTEXA Addon" (sans prix fixe). L’API crée automatiquement les prix au prorata (47€, 78€, 143€, etc.) selon la remise. Renseigne `STRIPE_ADDON_PRODUCT_ID` avec l’ID du produit. Si absent, l’ajout d’établissement ne facture pas via Stripe (dev ou abonnement trial).
 
 ---
 

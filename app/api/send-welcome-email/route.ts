@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server';
-import { canSendEmail, sendEmail } from '@/lib/resend';
+import { canSendEmail, sendEmail, DEFAULT_FROM } from '@/lib/resend';
 import { getWelcomeEmailHtml } from '@/lib/emails/templates';
 import { getSiteUrl } from '@/lib/site-url';
+import { logWelcomeUrls } from '@/lib/debug-email-urls';
 
 /**
  * Envoi email J+0 (Bienvenue) après inscription.
@@ -24,6 +25,7 @@ export async function POST(request: Request) {
     }
 
     const loginUrl = `${getSiteUrl()}/${locale}/dashboard`;
+    logWelcomeUrls(email, locale);
     const PLAN_DISPLAY: Record<string, string> = { vision: 'Vision', pulse: 'Pulse', zenith: 'ZENITH' };
     const planName = PLAN_DISPLAY[body.planSlug as string] ?? 'Premium';
 
@@ -37,6 +39,7 @@ export async function POST(request: Request) {
       to: email,
       subject,
       html,
+      from: process.env.RESEND_FROM ?? DEFAULT_FROM,
     });
 
     if (!result.success) {

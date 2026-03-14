@@ -36,13 +36,39 @@ export async function POST(request: Request) {
 
     const { searchParams } = new URL(request.url);
     const locale = searchParams.get('locale') ?? 'fr';
+    const flow = searchParams.get('flow');
     const baseUrl = getSiteUrl().replace(/\/+$/, '');
-    const returnUrl = `${baseUrl}/${locale}/dashboard/settings`;
 
-    const session = await stripe.billingPortal.sessions.create({
+    const isUpgradeFlow = flow === 'upgrade';
+    const returnUrl = isUpgradeFlow
+      ? `${baseUrl}/${locale}/dashboard?status=upgraded`
+      : `${baseUrl}/${locale}/dashboard/settings`;
+
+    const sessionParams: Stripe.BillingPortal.SessionCreateParams = {
       customer: customerId,
       return_url: returnUrl,
-    });
+    };
+
+    if (isUpgradeFlow) {
+      const subscriptions = await stripe.subscriptions.list({
+        customer: customerId,
+        status: 'all',
+        limit: 5,
+      });
+      const subscription = subscriptions.data.find(
+        (s) => s.status === 'active' || s.status === 'trialing'
+      );
+      if (subscription) {
+        sessionParams.flow_data = {
+          type: 'subscription_update',
+          subscription_update: {
+            subscription: subscription.id,
+          },
+        };
+      }
+    }
+
+    const session = await stripe.billingPortal.sessions.create(sessionParams);
 
     return NextResponse.json({ url: session.url });
   } catch (err) {

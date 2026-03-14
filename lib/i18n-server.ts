@@ -64,7 +64,7 @@ export async function getReportTranslations(locale: string): Promise<ReportTrans
     roadmapSubtitle: R.roadmapSubtitle ?? RF.roadmapSubtitle ?? 'Recurring trends and recommendations',
     insufficientData: R.insufficientData ?? RF.insufficientData ?? 'Insufficient data for recommendations.',
     problemDetected: R.problemDetected ?? RF.problemDetected ?? 'Problem detected',
-    solutionReputexa: R.solutionReputexa ?? RF.solutionReputexa ?? 'Reputexa solution',
+    solutionReputexa: R.solutionReputexa ?? RF.solutionReputexa ?? 'REPUTEXA solution',
     expectedImpact: R.expectedImpact ?? RF.expectedImpact ?? 'Expected impact',
     myEstablishment: R.myEstablishment ?? RF.myEstablishment ?? 'My establishment',
   };

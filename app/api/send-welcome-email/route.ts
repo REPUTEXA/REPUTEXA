@@ -1,54 +1,13 @@
 import { NextResponse } from 'next/server';
-import { canSendEmail, sendEmail, DEFAULT_FROM } from '@/lib/resend';
-import { getWelcomeEmailHtml } from '@/lib/emails/templates';
-import { getSiteUrl } from '@/lib/site-url';
-import { logWelcomeUrls } from '@/lib/debug-email-urls';
 
 /**
- * Envoi email J+0 (Bienvenue) après inscription.
- * Appelé par le client après signUp Supabase réussi.
+ * Envoi email de bienvenue — DÉSACTIVÉ pour éviter les doublons.
+ * Les emails WelcomePaid et WelcomeZenithTrial sont envoyés uniquement par le webhook Stripe
+ * après checkout.session.completed.
  */
-export async function POST(request: Request) {
-  try {
-    if (!canSendEmail()) {
-      console.log('[send-welcome-email] Resend non configuré — Email envoyé (simulé en local)');
-      return NextResponse.json({ sent: false, reason: 'Resend not configured' }, { status: 200 });
-    }
-    const body = await request.json().catch(() => ({}));
-    const email = typeof body.email === 'string' ? body.email.trim() : '';
-    const establishmentName = typeof body.establishmentName === 'string' ? body.establishmentName.trim() : '';
-    const locale = typeof body.locale === 'string' ? body.locale : 'fr';
-    const type = (body.type === 'premium' ? 'premium' : 'trial') as 'trial' | 'premium';
-
-    if (!email) {
-      return NextResponse.json({ error: 'email required' }, { status: 400 });
-    }
-
-    const loginUrl = `${getSiteUrl()}/${locale}/dashboard`;
-    logWelcomeUrls(email, locale);
-    const PLAN_DISPLAY: Record<string, string> = { vision: 'Vision', pulse: 'Pulse', zenith: 'ZENITH' };
-    const planName = PLAN_DISPLAY[body.planSlug as string] ?? 'Premium';
-
-    const html = type === 'premium'
-      ? (await import('@/lib/emails/templates')).getWelcomePremiumEmailHtml({ establishmentName, planName, loginUrl })
-      : getWelcomeEmailHtml({ establishmentName, loginUrl });
-    const subject = type === 'premium'
-      ? 'Bienvenue en Premium REPUTEXA — Votre abonnement est actif'
-      : 'Bienvenue chez REPUTEXA — Essai ZENITH 14 jours activé';
-    const result = await sendEmail({
-      to: email,
-      subject,
-      html,
-      from: process.env.RESEND_FROM ?? DEFAULT_FROM,
-    });
-
-    if (!result.success) {
-      return NextResponse.json({ sent: false, error: result.error }, { status: 500 });
-    }
-    console.log('Email envoyé');
-    return NextResponse.json({ sent: true });
-  } catch (e) {
-    console.error('[send-welcome-email]', e);
-    return NextResponse.json({ error: 'Send failed' }, { status: 500 });
-  }
+export async function POST() {
+  return NextResponse.json(
+    { sent: false, reason: 'Welcome emails sent by Stripe webhook only' },
+    { status: 200 }
+  );
 }

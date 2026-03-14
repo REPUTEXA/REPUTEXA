@@ -59,7 +59,7 @@ export default function ReviewsPage() {
     refetchInterval: 60000,
   });
 
-  const reviews = (data?.reviews ?? []) as Review[];
+  const reviews = useMemo(() => (data?.reviews ?? []) as Review[], [data?.reviews]);
   const seoKeywords = Array.isArray(data?.seoKeywords) ? data.seoKeywords : [];
   const loading = queryLoading;
 

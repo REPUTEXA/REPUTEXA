@@ -19,9 +19,10 @@ type BaseEmailLayoutProps = {
   children: React.ReactNode;
   buttonText?: string;
   buttonUrl?: string;
+  supportUrl?: string;
 };
 
-export function BaseEmailLayout({ title, children, buttonText, buttonUrl }: BaseEmailLayoutProps) {
+export function BaseEmailLayout({ title, children, buttonText, buttonUrl, supportUrl }: BaseEmailLayoutProps) {
   return (
     <Html lang="fr">
       <Head>
@@ -30,16 +31,16 @@ export function BaseEmailLayout({ title, children, buttonText, buttonUrl }: Base
       </Head>
       <Body style={{ margin: 0, padding: 0, backgroundColor: '#f8fafc', fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" }}>
         <Container style={{ maxWidth: 560, margin: '0 auto', padding: '32px 16px' }}>
-          <Section style={{ backgroundColor: PRIMARY_COLOR, borderRadius: '16px 16px 0 0', padding: 24, textAlign: 'center' }}>
+          <Section style={{ backgroundColor: PRIMARY_COLOR, borderRadius: '16px 16px 0 0', padding: '28px 24px', textAlign: 'center' }}>
             <Img
-              src={`${LOGO_URL}/logo.png`}
+              src={`${LOGO_URL}/logo-hd.png`}
               alt="REPUTEXA"
-              width={160}
-              height={40}
-              style={{ display: 'block', height: 40, width: 'auto', maxWidth: 180, margin: '0 auto' }}
+              width={200}
+              height={48}
+              style={{ display: 'block', height: 48, width: 'auto', maxWidth: 200, margin: '0 auto' }}
             />
           </Section>
-          <Section style={{ backgroundColor: '#ffffff', padding: '32px 24px', borderRadius: '0 0 16px 16px', boxShadow: '0 1px 3px rgba(0,0,0,0.08)' }}>
+          <Section style={{ backgroundColor: '#ffffff', padding: '36px 28px', borderRadius: '0 0 16px 16px', boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
             <Text style={{ fontSize: 22, fontWeight: 700, color: '#0f172a', margin: '0 0 16px', lineHeight: 1.3 }}>
               {title}
             </Text>
@@ -63,6 +64,13 @@ export function BaseEmailLayout({ title, children, buttonText, buttonUrl }: Base
               </Section>
             )}
             <Text style={{ marginTop: 24, fontSize: 13, color: '#64748b' }}>— L&apos;équipe REPUTEXA</Text>
+            {supportUrl && (
+              <Text style={{ marginTop: 12, fontSize: 12, color: '#94a3b8' }}>
+                <a href={supportUrl} style={{ color: '#2563eb', textDecoration: 'none' }}>
+                  Besoin d&apos;aide ? Contactez le support
+                </a>
+              </Text>
+            )}
           </Section>
         </Container>
       </Body>

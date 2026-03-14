@@ -1,5 +1,6 @@
 import { setRequestLocale } from 'next-intl/server';
 import { cookies } from 'next/headers';
+import { Suspense } from 'react';
 import { getTranslations } from 'next-intl/server';
 import { startOfDay, endOfDay, subDays, subMonths } from 'date-fns';
 import { prisma } from '@/lib/prisma';
@@ -12,8 +13,7 @@ import { RatingEvolutionChart } from '@/components/dashboard/rating-evolution-ch
 import { PlatformDistributionChart } from '@/components/dashboard/platform-distribution-chart';
 import { WhatsAppShareButton } from '@/components/share/whatsapp-share-button';
 import { DashboardDateRangePicker } from '@/components/dashboard/dashboard-date-range-picker';
-import { SuccessPaymentToast } from '@/components/dashboard/success-payment-toast';
-import { SubscriptionSuccessEffects } from '@/components/dashboard/subscription-success-effects';
+import { SuccessEffectsWrapper } from '@/components/dashboard/success-effects-wrapper';
 
 type Props = {
   params: Promise<{ locale: string }>;
@@ -224,8 +224,9 @@ export default async function DashboardPage({ params, searchParams }: Props) {
 
   return (
     <div className="px-4 sm:px-6 md:px-8 py-6 sm:py-8 space-y-6 max-w-[1600px] mx-auto">
-      <SuccessPaymentToast />
-      <SubscriptionSuccessEffects />
+      <Suspense fallback={null}>
+        <SuccessEffectsWrapper />
+      </Suspense>
       {(welcome === '1' || status === 'success' || status === 'trial_started') && (
         <div className="rounded-2xl bg-emerald-500/15 dark:bg-emerald-500/10 border border-emerald-500/30 dark:border-emerald-500/20 p-4 text-emerald-800 dark:text-emerald-200">
           <p className="font-medium">
@@ -240,7 +241,7 @@ export default async function DashboardPage({ params, searchParams }: Props) {
       {/* Titre & date */}
       <div>
         <h1 className="font-display font-bold text-2xl text-slate-900 dark:text-zinc-100">{t('title')}</h1>
-        <p className="text-sm text-slate-500 dark:text-zinc-400 mt-0.5">
+        <p className="text-sm text-slate-500 dark:text-zinc-400 mt-0.5" suppressHydrationWarning>
           {new Date().toLocaleDateString(
             locale === 'en' ? 'en-US' : 'fr-FR',
             { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }
@@ -253,7 +254,7 @@ export default async function DashboardPage({ params, searchParams }: Props) {
 
       {/* Contenu principal (stats + avis) */}
       {/* Bandeau alerte IA — masqué si 0 avis */}
-      {totalReviews > 0 && (
+      {totalReviews > 0 && securityAlerts > 0 && (
       <div className="flex items-center gap-3 rounded-2xl border border-sky-100 dark:border-zinc-800/50 bg-sky-50 dark:bg-sky-950/40 px-4 py-3">
         <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-sky-100 dark:bg-sky-500/20 text-sky-600 dark:text-sky-400">
           <Info className="h-4 w-4" />
@@ -262,9 +263,9 @@ export default async function DashboardPage({ params, searchParams }: Props) {
           <p className="text-sm font-medium text-slate-900 dark:text-zinc-100">
             L&apos;IA a détecté{' '}
             <span className="text-sky-600 font-semibold">
-              {securityAlerts} nouveaux avis négatifs
+              {securityAlerts} avis négatif{securityAlerts > 1 ? 's' : ''}
             </span>{' '}
-            cette semaine
+            sur la période affichée
           </p>
           <p className="text-xs text-slate-500 dark:text-zinc-400">
             Des réponses personnalisées ont été préparées et sont prêtes à envoyer.

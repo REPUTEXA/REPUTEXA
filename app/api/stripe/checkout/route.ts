@@ -61,7 +61,9 @@ export async function POST(request: Request) {
       customerId = customer.id;
     }
 
-    const successUrl = `${baseUrl}/${locale}/dashboard?welcome=1&session_id={CHECKOUT_SESSION_ID}`;
+    const planSlugMap = { starter: 'vision', manager: 'pulse', dominator: 'zenith' } as const;
+    const planSlug = planSlugMap[planType];
+    const successUrl = `${baseUrl}/api/stripe/checkout-success?session_id={CHECKOUT_SESSION_ID}&locale=${locale}&plan=${planSlug}&status=trial_started`;
     const cancelUrl = `${baseUrl}/${locale}/dashboard`;
 
     const session = await stripe.checkout.sessions.create({
@@ -71,8 +73,9 @@ export async function POST(request: Request) {
       line_items: [{ price: priceId, quantity: 1 }],
       subscription_data: {
         trial_period_days: TRIAL_DAYS,
-        metadata: { supabaseUserId: user.id },
+        metadata: { supabaseUserId: user.id, planSlug },
       },
+      metadata: { planSlug },
       success_url: successUrl,
       cancel_url: cancelUrl,
       allow_promotion_codes: true,

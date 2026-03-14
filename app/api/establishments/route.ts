@@ -17,7 +17,7 @@ export async function GET() {
 
   const { data: profile } = await supabase
     .from('profiles')
-    .select('subscription_plan, selected_plan, establishment_name, address, google_location_id, google_location_name, google_location_address')
+    .select('subscription_plan, selected_plan, establishment_name, establishment_type, address, google_location_id, google_location_name, google_location_address')
     .eq('id', user.id)
     .single();
 
@@ -79,6 +79,7 @@ export async function GET() {
   const principal = {
     id: 'profile',
     name: profile?.establishment_name?.trim() || 'Mon établissement',
+    establishmentType: profile?.establishment_type?.trim() || null,
     address: profile?.address?.trim() || null,
     googleStatus: (profile?.google_location_id ? 'connected' : 'disconnected') as 'connected' | 'disconnected',
     googleLocationName: profile?.google_location_name ?? null,

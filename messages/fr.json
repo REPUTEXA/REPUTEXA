@@ -214,7 +214,7 @@
         "name": "Pulse",
         "badge": "LE PLUS POPULAIRE",
         "for": "Réactivité et contrôle total",
-        "price": "98",
+        "price": "97",
         "cta": "S'abonner maintenant"
       },
       "zenith": {
@@ -483,7 +483,7 @@
         "reviewLabel": "📝 *Avis client :*",
         "aiSuggestionLabel": "🤖 *Suggestion de réponse IA :*",
         "cta": "Répondez 'OK' pour valider cette réponse ou envoyez un vocal pour la modifier.",
-        "poweredBy": "_Propulsé par Reputexa AI_"
+        "poweredBy": "_Propulsé par REPUTEXA_"
       },
       "weeklyRecap": {
         "title": "📊 Ton Récap Hebdo",
@@ -583,7 +583,7 @@
     "roadmapSubtitle": "Analyse des tendances récurrentes et recommandations actionnables",
     "insufficientData": "Données insuffisantes pour générer des recommandations détaillées ce mois-ci.",
     "problemDetected": "Problème détecté",
-    "solutionReputexa": "Solution Reputexa",
+    "solutionReputexa": "Solution REPUTEXA",
     "expectedImpact": "Impact attendu",
     "myEstablishment": "Mon établissement"
   },

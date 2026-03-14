@@ -27,6 +27,7 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
+  const [loginError, setLoginError] = useState<string | null>(null);
 
   const confirmMessage = searchParams?.get('message') === 'confirm-email';
   const passwordResetMessage = searchParams?.get('message') === 'password-reset';
@@ -82,6 +83,7 @@ export default function LoginPage() {
       toast.error('Vérification de sécurité en cours. Réessayez dans un instant.');
       return;
     }
+    setLoginError(null);
     setLoading(true);
     try {
       const verifyRes = await fetch('/api/auth/verify-turnstile', {
@@ -113,7 +115,8 @@ export default function LoginPage() {
     });
     setLoading(false);
     if (error) {
-      toast.error(getAuthErrorMessage(error));
+      const friendlyMsg = getAuthErrorMessage(error);
+      setLoginError(friendlyMsg);
       return;
     }
     const nextRaw = searchParams?.get('next');
@@ -163,6 +166,11 @@ export default function LoginPage() {
               {authCallbackFailed && (
                 <div className="rounded-xl bg-amber-50 border border-amber-200 px-4 py-3 text-sm text-amber-800">
                   <strong>Lien expiré ou invalide.</strong> Connectez-vous avec votre email et mot de passe.
+                </div>
+              )}
+              {loginError && (
+                <div className="rounded-xl bg-amber-50 border border-amber-200 px-4 py-3 text-sm text-amber-800">
+                  {loginError}
                 </div>
               )}
               <div>

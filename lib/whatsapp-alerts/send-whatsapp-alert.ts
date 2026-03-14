@@ -155,8 +155,8 @@ export async function sendWhatsAppAlert(
     const poweredBy =
       alerts.poweredBy ??
       (locale === 'fr'
-        ? '_Propulsé par Reputexa AI_'
-        : '_Powered by Reputexa AI_');
+        ? '_Propulsé par REPUTEXA_'
+        : '_Powered by REPUTEXA_');
 
     const body = [
       title,

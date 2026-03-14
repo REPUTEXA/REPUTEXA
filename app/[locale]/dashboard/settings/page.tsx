@@ -24,6 +24,7 @@ export default function SettingsPage() {
   const locale = useLocale();
   const [fullName, setFullName] = useState('');
   const [establishmentName, setEstablishmentName] = useState('');
+  const [establishmentType, setEstablishmentType] = useState('');
   const [address, setAddress] = useState('');
   const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
@@ -70,6 +71,7 @@ export default function SettingsPage() {
       .then((data) => {
         if (data.fullName !== undefined) setFullName(data.fullName ?? '');
         if (data.establishmentName !== undefined) setEstablishmentName(data.establishmentName ?? '');
+        if (data.establishmentType !== undefined) setEstablishmentType(data.establishmentType ?? '');
         if (data.address !== undefined) setAddress(data.address ?? '');
         if (data.phone !== undefined) setPhone(data.phone ?? '');
         if (data.email !== undefined) setEmail(data.email ?? '');
@@ -181,6 +183,7 @@ export default function SettingsPage() {
         body: JSON.stringify({
           fullName: fullName.trim(),
           establishmentName: establishmentName.trim(),
+          establishmentType: establishmentType.trim(),
           address: address.trim(),
           phone: phone.trim(),
         }),
@@ -406,6 +409,21 @@ export default function SettingsPage() {
               autoComplete="organization"
               className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-800/50 text-slate-900 dark:text-zinc-100 placeholder:text-slate-400 dark:placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-[#2563eb]/30 dark:focus:ring-indigo-500/30 focus:border-primary dark:focus:border-indigo-500 transition-all duration-200"
               placeholder="Mon Restaurant"
+            />
+          </div>
+          <div>
+            <label htmlFor="settings-establishment-type" className="block text-sm font-medium text-slate-700 dark:text-zinc-300 mb-1.5">
+              Type d&apos;établissement <span className="text-red-500">*</span>
+            </label>
+            <input
+              id="settings-establishment-type"
+              type="text"
+              value={establishmentType}
+              onChange={(e) => setEstablishmentType(e.target.value)}
+              required
+              autoComplete="organization-title"
+              className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-800/50 text-slate-900 dark:text-zinc-100 placeholder:text-slate-400 dark:placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-[#2563eb]/30 dark:focus:ring-indigo-500/30 focus:border-primary dark:focus:border-indigo-500 transition-all duration-200"
+              placeholder="Hôtel, restaurant, bar, salon de coiffure..."
             />
           </div>
           <div>

@@ -10,8 +10,15 @@ export function getAuthErrorMessage(error: { message?: string; status?: number }
 
   const msg = error.message.toLowerCase();
 
-  if (msg.includes('invalid login credentials') || msg.includes('invalid_credentials'))
-    return 'Email ou mot de passe incorrect.';
+  if (
+    msg.includes('invalid login credentials') ||
+    msg.includes('invalid_credentials') ||
+    msg.includes('invalid email') ||
+    msg.includes('invalid password') ||
+    msg.includes('email not found') ||
+    msg.includes('user not found')
+  )
+    return 'Email ou mot de passe incorrect. Vérifiez vos identifiants ou créez un compte.';
   if (msg.includes('email not confirmed')) return 'Vérifiez votre boîte mail pour confirmer votre compte.';
   if (msg.includes('user already registered') || msg.includes('already been registered'))
     return 'Un compte existe déjà avec cet email.';

@@ -10,7 +10,7 @@ import { type PlanSlug } from '@/lib/feature-gate';
 const PLAN_CONFIG: Record<PlanSlug, { icon: typeof Eye; name: string; price: string }> = {
   free: { icon: Eye, name: 'Gratuit', price: '0' },
   vision: { icon: Eye, name: 'Vision', price: '59' },
-  pulse: { icon: Zap, name: 'Pulse', price: '98' },
+  pulse: { icon: Zap, name: 'Pulse', price: '97' },
   zenith: { icon: Crown, name: 'ZENITH', price: '179' },
 };
 

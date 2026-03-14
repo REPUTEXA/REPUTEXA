@@ -4,8 +4,11 @@ const FONT_FALLBACK = "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, He
 /** URL publique du site pour le logo */
 const LOGO_BASE = process.env.NEXT_PUBLIC_SITE_URL || process.env.NEXT_PUBLIC_APP_URL || 'https://reputexa.fr';
 
+/** Support URL par défaut */
+const SUPPORT_URL = `${LOGO_BASE.replace(/\/$/, '')}/fr/contact`;
+
 /**
- * Template maître Zenith : header bleu REPUTEXA (logo), contenu, CTA ou code OTP, footer gris.
+ * Template maître Zenith : header bleu REPUTEXA (logo HD), contenu, CTA, footer avec lien support.
  * Si otpCode est fourni, affiche un gros code à 6 chiffres (en plus du bouton optionnel).
  */
 export function renderZenithEmail(
@@ -13,7 +16,8 @@ export function renderZenithEmail(
   content: string,
   buttonText: string,
   buttonUrl: string,
-  otpCode?: string
+  otpCode?: string,
+  supportUrl?: string
 ): string {
   const opts = {
     title,
@@ -21,9 +25,10 @@ export function renderZenithEmail(
     buttonText,
     buttonUrl,
     otpCode: otpCode && /^\d{6}$/.test(otpCode) ? otpCode : undefined,
+    supportUrl: supportUrl ?? null,
   };
 
-  const logoImgUrl = `${LOGO_BASE}/logo.png`;
+  const logoImgUrl = `${LOGO_BASE}/logo-hd.png`;
   const hasOtp = !!opts.otpCode;
   const hasButton = !!opts.buttonText && !!opts.buttonUrl;
 
@@ -65,16 +70,17 @@ export function renderZenithEmail(
     <tr><td align="center" style="padding:32px 16px;">
       <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:560px;">
         <tr>
-          <td style="background-color:#2563eb;border-radius:16px 16px 0 0;padding:24px;text-align:center;">
-            <img src="${logoImgUrl}" alt="REPUTEXA" width="160" height="40" style="display:block;height:40px;width:auto;max-width:180px;margin:0 auto;border:0;outline:none;text-decoration:none;-ms-interpolation-mode:bicubic;" />
+          <td style="background-color:#2563eb;border-radius:16px 16px 0 0;padding:28px 24px;text-align:center;">
+            <img src="${logoImgUrl}" alt="REPUTEXA" width="200" height="48" style="display:block;height:48px;width:auto;max-width:200px;margin:0 auto;border:0;outline:none;text-decoration:none;-ms-interpolation-mode:bicubic;" />
           </td>
         </tr>
         <tr>
-          <td style="background-color:#ffffff;padding:32px 24px;border-radius:0 0 16px 16px;box-shadow:0 1px 3px rgba(0,0,0,0.08);">
+          <td style="background-color:#ffffff;padding:36px 28px;border-radius:0 0 16px 16px;box-shadow:0 1px 3px rgba(0,0,0,0.06);">
             <h1 style="font-size:22px;font-weight:700;color:#0f172a;margin:0 0 16px;line-height:1.3;font-family:${FONT_FALLBACK};">${opts.title}</h1>
             ${opts.content}
             ${ctaBlock}
             <p style="margin:24px 0 0;font-size:13px;color:#64748b;font-family:${FONT_FALLBACK};">— L'équipe REPUTEXA</p>
+            ${opts.supportUrl ? `<p style="margin:12px 0 0;font-size:12px;color:#94a3b8;"><a href="${opts.supportUrl}" style="color:#2563eb;text-decoration:none;">Besoin d'aide ? Contactez le support</a></p>` : ''}
           </td>
         </tr>
       </table>
@@ -230,16 +236,94 @@ export function getWelcomeTrial14EmailHtml(params: {
   );
 }
 
-export function getWelcomePremiumEmailHtml(params: {
-  establishmentName: string;
+/**
+ * Mail Payant (WelcomePaid) — Envoyé après checkout.session.completed sans essai.
+ * Avantages adaptés au plan : Vision (essentiel + IA), Pulse (+ rapports, réactivité), Zenith (élite, consultant, gestion totale).
+ */
+export function getWelcomePaidHtml(params: {
   planName: string;
+  establishmentName: string;
   loginUrl: string;
+  supportUrl?: string;
 }) {
+  const plan = (params.planName || '').toLowerCase();
+  let benefitsHtml = '';
+  if (plan.includes('zenith')) {
+    benefitsHtml = `
+      <ul style="margin: 0 0 24px; padding-left: 20px; font-size: 14px; color: #334155; line-height: 1.7;">
+        <li style="margin-bottom: 8px;"><strong>Consultant IA 24/7</strong> — Posez vos questions stratégiques</li>
+        <li style="margin-bottom: 8px;"><strong>Gestion totale</strong> — Multi-établissements, Boost SEO, Bouclier avis toxiques</li>
+        <li style="margin-bottom: 8px;"><strong>IA de capture</strong> — Sollicitez les avis par WhatsApp</li>
+      </ul>`;
+  } else if (plan.includes('pulse')) {
+    benefitsHtml = `
+      <ul style="margin: 0 0 24px; padding-left: 20px; font-size: 14px; color: #334155; line-height: 1.7;">
+        <li style="margin-bottom: 8px;"><strong>Rapports détaillés</strong> — PDF mensuel + Recap WhatsApp hebdo</li>
+        <li style="margin-bottom: 8px;"><strong>Réactivité</strong> — Alertes avis négatifs en temps réel</li>
+        <li style="margin-bottom: 8px;"><strong>Bouclier avis toxiques</strong> — Détection et signalement auto</li>
+      </ul>`;
+  } else {
+    benefitsHtml = `
+      <ul style="margin: 0 0 24px; padding-left: 20px; font-size: 14px; color: #334155; line-height: 1.7;">
+        <li style="margin-bottom: 8px;"><strong>L'essentiel</strong> — Réponses IA illimitées en langue locale</li>
+        <li style="margin-bottom: 8px;"><strong>IA intelligente</strong> — Rédaction automatique des réponses</li>
+        <li style="margin-bottom: 8px;"><strong>Rapport PDF mensuel</strong> — Suivi de votre e-réputation</li>
+      </ul>`;
+  }
   const content = `
-    <p style="margin: 0 0 16px;">Bonjour${params.establishmentName ? ` ${params.establishmentName}` : ''},</p>
-    <p style="margin: 0 0 24px;">Votre abonnement <strong>${params.planName}</strong> est actif. Votre facture vous a été envoyée par email.</p>
+    <p style="margin: 0 0 16px; font-size: 15px; color: #334155; line-height: 1.6;">Bonjour${params.establishmentName ? ` ${params.establishmentName}` : ''},</p>
+    <p style="margin: 0 0 16px; font-size: 15px; color: #334155; line-height: 1.6;">Merci pour votre confiance. Votre abonnement <strong>${params.planName}</strong> est actif. Votre surveillance 24/7 est activée.</p>
+    <p style="margin: 0 0 12px; font-size: 14px; font-weight: 600; color: #0f172a;">Vos avantages :</p>
+    ${benefitsHtml}
+    <p style="margin: 0 0 24px; font-size: 13px; color: #64748b;">Votre facture vous a été envoyée par email.</p>
   `.trim();
-  return renderZenithEmail('Bienvenue en Premium !', content, 'Accéder à mon dashboard', params.loginUrl);
+  const supportUrl = params.supportUrl ?? SUPPORT_URL;
+  return renderZenithEmail(
+    `Bienvenue — ${params.planName} activé`,
+    content,
+    'Accéder à mon dashboard',
+    params.loginUrl,
+    undefined,
+    supportUrl
+  );
+}
+
+/**
+ * Mail Essai (WelcomeZenithTrial) — Envoyé après checkout.session.completed avec trial.
+ * Texte exact : "Bienvenue dans l'élite... Tes 3 missions...". Date de fin = maintenant + 14 jours.
+ */
+export function getWelcomeZenithTrialHtml(params: {
+  loginUrl: string;
+  settingsUrl?: string;
+  supportUrl?: string;
+}) {
+  const trialEndDate = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000);
+  const formattedEnd = trialEndDate.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
+  const settingsUrl = params.settingsUrl ?? `${LOGO_BASE.replace(/\/$/, '')}/fr/dashboard/settings`;
+
+  const content = `
+    <p style="margin: 0 0 16px; font-size: 15px; color: #334155; line-height: 1.6;">Bienvenue dans l'élite de la réputation. Tu as maintenant les mêmes outils que les plus grandes entreprises.</p>
+    <p style="margin: 0 0 12px; font-size: 14px; font-weight: 600; color: #0f172a;">Tes 3 missions pour démarrer :</p>
+    <div style="background: #f1f5f9; border-radius: 12px; padding: 20px; margin-bottom: 24px; border-left: 4px solid #2563eb;">
+      <ol style="margin: 0; padding-left: 20px; font-size: 14px; color: #334155; line-height: 1.8;">
+        <li style="margin-bottom: 8px;"><strong>Connecter Google Business</strong> — Paramètres → Connexions → Connecter Google</li>
+        <li style="margin-bottom: 8px;"><strong>Configurer WhatsApp</strong> — Reçois tes alertes avis négatifs en temps réel</li>
+        <li style="margin-bottom: 8px;"><strong>Tester le Consultant IA</strong> — Pose tes questions stratégiques 24/7</li>
+      </ol>
+    </div>
+    <p style="margin: 0 0 24px; font-size: 13px; color: #64748b; line-height: 1.5; background: #f8fafc; padding: 12px; border-radius: 8px; border: 1px solid #e2e8f0;">
+      Ton essai se termine le <strong>${formattedEnd}</strong>. Annulation en un clic dans <a href="${settingsUrl}" style="color: #2563eb; text-decoration: none;">tes paramètres</a>.
+    </p>
+  `.trim();
+  const supportUrl = params.supportUrl ?? SUPPORT_URL;
+  return renderZenithEmail(
+    "C'est parti ! Tes 14 jours d'accès Total Zénith commencent.",
+    content,
+    'Accéder à mon dashboard',
+    params.loginUrl,
+    undefined,
+    supportUrl
+  );
 }
 
 /**
@@ -298,8 +382,8 @@ export function getVerifyEmailHtml(params: { confirmUrl?: string; otpCode?: stri
   return renderZenithEmail(
     'Confirmez votre adresse email',
     content,
-    params.confirmUrl ? 'Confirmer mon email' : '',
-    params.confirmUrl || '#',
+    params.otpCode ? '' : (params.confirmUrl ? 'Confirmer mon email' : ''),
+    params.otpCode ? '' : (params.confirmUrl || '#'),
     params.otpCode
   );
 }
@@ -415,6 +499,27 @@ export function getEstablishmentDeletedEmailHtml(params: {
     'Suppression confirmée — Établissement retiré',
     content,
     'Accéder à mes établissements',
+    params.dashboardUrl
+  );
+}
+
+/**
+ * Email de confirmation d'upgrade — envoyé quand le plan change (Stripe Portal).
+ */
+export function getUpgradeConfirmationEmailHtml(params: {
+  planName: string;
+  establishmentName: string;
+  dashboardUrl: string;
+}) {
+  const content = `
+    <p style="margin: 0 0 16px;">Bonjour${params.establishmentName ? ` ${params.establishmentName}` : ''},</p>
+    <p style="margin: 0 0 24px;">Votre abonnement a été mis à niveau vers le plan <strong>${params.planName}</strong>. Les nouvelles fonctionnalités sont immédiatement accessibles.</p>
+    <p style="margin: 0 0 24px;">Le prorata a été calculé automatiquement. Vous trouverez le détail sur votre prochaine facture Stripe.</p>
+  `.trim();
+  return renderZenithEmail(
+    'Confirmation de mise à niveau',
+    content,
+    'Accéder au dashboard',
     params.dashboardUrl
   );
 }

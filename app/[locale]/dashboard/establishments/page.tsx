@@ -33,6 +33,7 @@ type GoogleLocation = { id: string; fullName: string; name: string; address: str
 type Establishment = {
   id: string;
   name: string;
+  establishmentType?: string | null;
   address: string | null;
   googleStatus: 'connected' | 'disconnected';
   googleLocationName: string | null;
@@ -58,6 +59,7 @@ export default function EstablishmentsPage() {
   const [modalEditOpen, setModalEditOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<Establishment | null>(null);
   const [editName, setEditName] = useState('');
+  const [editEstablishmentType, setEditEstablishmentType] = useState('');
   const [editAddress, setEditAddress] = useState('');
   const [addName, setAddName] = useState('');
   const [addAddress, setAddAddress] = useState('');
@@ -206,6 +208,7 @@ export default function EstablishmentsPage() {
   const openEdit = (e: Establishment) => {
     setEditingItem(e);
     setEditName(e.name);
+    setEditEstablishmentType(e.establishmentType ?? '');
     setEditAddress(e.address || '');
     setModalEditOpen(true);
   };
@@ -223,7 +226,11 @@ export default function EstablishmentsPage() {
         const res = await fetch('/api/profile', {
           method: 'PATCH',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ establishmentName: editName.trim(), address: editAddress.trim() || '' }),
+          body: JSON.stringify({
+            establishmentName: editName.trim(),
+            establishmentType: editEstablishmentType.trim(),
+            address: editAddress.trim() || '',
+          }),
         });
         const json = await res.json().catch(() => ({}));
         if (!res.ok) throw new Error(json.error ?? 'Erreur');
@@ -723,6 +730,25 @@ export default function EstablishmentsPage() {
                   className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/50 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary"
                 />
               </div>
+              {editingItem.isPrincipal && (
+                <div>
+                  <label
+                    htmlFor="edit-establishment-type"
+                    className="block text-sm font-medium text-slate-600 dark:text-slate-300 mb-1.5"
+                  >
+                    Type d&apos;établissement <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    id="edit-establishment-type"
+                    type="text"
+                    value={editEstablishmentType}
+                    onChange={(e) => setEditEstablishmentType(e.target.value)}
+                    required={editingItem.isPrincipal}
+                    placeholder="Hôtel, restaurant, bar..."
+                    className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/50 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary"
+                  />
+                </div>
+              )}
               <div>
                 <label
                   htmlFor="edit-address"

@@ -62,7 +62,7 @@ export function WeeklyInsightSection({ planSlug }: Props) {
       })
       .catch(() => setReports([]))
       .finally(() => setLoading(false));
-  }, [canAccess, activeLocationId]);
+  }, [canAccess, activeLocationId, openTab]);
 
   if (!canAccess) return null;
 

@@ -219,7 +219,7 @@
         "name": "Pulse",
         "badge": "MOST POPULAR",
         "for": "Responsiveness and total control",
-        "price": "98",
+        "price": "97",
         "cta": "Try for Free"
       },
       "zenith": {
@@ -407,7 +407,7 @@
         "reviewLabel": "📝 *Customer review:*",
         "aiSuggestionLabel": "🤖 *AI-suggested reply :*",
         "cta": "Reply 'OK' to approve this reply or send a voice message to edit it.",
-        "poweredBy": "_Powered by Reputexa AI_"
+        "poweredBy": "_Powered by REPUTEXA_"
       },
       "weeklyRecap": {
         "title": "📊 Your Weekly Recap",
@@ -507,7 +507,7 @@
     "roadmapSubtitle": "Analysis of recurring trends and actionable recommendations",
     "insufficientData": "Insufficient data to generate detailed recommendations this month.",
     "problemDetected": "Problem detected",
-    "solutionReputexa": "Reputexa solution",
+    "solutionReputexa": "REPUTEXA solution",
     "expectedImpact": "Expected impact",
     "myEstablishment": "My establishment"
   },

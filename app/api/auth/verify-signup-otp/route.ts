@@ -3,7 +3,6 @@ import Stripe from 'stripe';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { checkAuthRateLimit } from '@/lib/rate-limit';
 import { canSendEmail, sendEmail } from '@/lib/resend';
-import { getWelcomeEliteEmailHtml } from '@/lib/emails/templates';
 import { getSiteUrl } from '@/lib/site-url';
 
 const TRIAL_DAYS = 14;
@@ -117,18 +116,8 @@ export async function POST(request: Request) {
 
     const isTrialing = profile?.subscription_status === 'trialing';
 
-    if (canSendEmail()) {
-      const baseUrl = getSiteUrl().replace(/\/+$/, '');
-      const fullName = (profile?.full_name || profile?.establishment_name || '') as string;
-      const firstName = fullName.split(/\s+/)[0] || '';
-      const whatsappUrl = `${baseUrl}/${locale}/dashboard/settings`;
-
-      sendEmail({
-        to: email,
-        subject: `Bienvenue dans l'élite de la réputation${firstName ? `, ${firstName}` : ''} 🛡️`,
-        html: getWelcomeEliteEmailHtml({ firstName, whatsappSettingsUrl: whatsappUrl }),
-      }).catch((e) => console.error('[verify-signup-otp] Email 1:', e));
-    }
+    // Pas d'email de bienvenue ici : le webhook Stripe envoie WelcomePaid ou WelcomeZenithTrial
+    // après checkout.session.completed pour éviter les doublons.
 
     if (isTrialing) {
       return NextResponse.json({ ok: true, redirectTo: '/dashboard' });
@@ -136,7 +125,7 @@ export async function POST(request: Request) {
 
     // Créer la session Stripe — TOUJOURS renvoyer stripeUrl, jamais /checkout ou /choose-plan
     // Zenith (trial) → STRIPE_PRICE_ID_ZENITH + 14 jours → 0€
-    // Pulse (checkout) → STRIPE_PRICE_ID_PULSE → 98€ immédiat
+    // Pulse (checkout) → STRIPE_PRICE_ID_PULSE → 97€ immédiat
     const plan = ['vision', 'pulse', 'zenith'].includes(selectedPlan) ? selectedPlan : 'zenith';
     const skipTrial = signupMode === 'checkout';
     const secretKey = process.env.STRIPE_SECRET_KEY;
@@ -161,7 +150,8 @@ export async function POST(request: Request) {
     try {
       const stripe = new Stripe(secretKey);
       const baseUrl = getSiteUrl().replace(/\/+$/, '');
-      const successUrl = `${baseUrl}/${locale}/dashboard?status=success&plan=${plan}&session_id={CHECKOUT_SESSION_ID}`;
+      const statusParam = skipTrial ? 'success' : 'trial_started';
+      const successUrl = `${baseUrl}/api/stripe/checkout-success?session_id={CHECKOUT_SESSION_ID}&locale=${locale}&plan=${plan}&status=${statusParam}`;
       const cancelUrl = `${baseUrl}/${locale}/choose-plan?error=payment_cancelled`;
 
       let customerId: string | null = null;

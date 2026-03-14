@@ -6,6 +6,7 @@ import { createClient } from '@/lib/supabase/server';
 import { toPlanSlug } from '@/lib/feature-gate';
 import { getRemainingTrialDays, formatTrialEndDate } from '@/lib/trial-utils';
 import { DashboardShell } from '@/components/dashboard/dashboard-shell';
+import { DashboardLoadingFallback } from '@/components/dashboard/dashboard-loading-fallback';
 import { StripeSyncOnReturn } from '@/components/dashboard/stripe-sync-on-return';
 import { SyncLocationFromUrl } from '@/components/dashboard/sync-location-from-url';
 import { ActiveLocationProvider } from '@/lib/active-location-context';
@@ -76,11 +77,11 @@ export default async function DashboardLayout({ children, params }: Props) {
       const now = new Date();
       const trialInFuture = trialEnd && now < trialEnd;
 
-      // Accès uniquement si trialing ou active (Stripe). Annulation pendant essai = accès jusqu'à trial_ends_at.
-      hasActiveSubscription = status === 'active';
+      // Accès si trialing, active ou past_due (paiement échoué = période de grâce).
+      hasActiveSubscription = status === 'active' || status === 'past_due';
       isTrialing = status === 'trialing' && !!trialInFuture;
 
-      if (status !== 'trialing' && status !== 'active') {
+      if (status !== 'trialing' && status !== 'active' && status !== 'past_due') {
         showPaywall = true;
       } else if (status === 'trialing' && trialEnd && now >= trialEnd) {
         showPaywall = true;
@@ -106,6 +107,7 @@ export default async function DashboardLayout({ children, params }: Props) {
       establishmentName={establishmentName}
       selectedPlanSlug={selectedPlanSlug}
     >
+      <Suspense fallback={<DashboardLoadingFallback />}>
       <DashboardShell
         establishmentName={establishmentName}
         fullName={fullName}
@@ -127,6 +129,7 @@ export default async function DashboardLayout({ children, params }: Props) {
         </Suspense>
         {children}
       </DashboardShell>
+      </Suspense>
     </ActiveLocationProvider>
   );
 }

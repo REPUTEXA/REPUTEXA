@@ -20,13 +20,15 @@ export function SuccessPaymentToast() {
     if ((status !== 'success' && status !== 'trial_started') || shownRef.current) return;
 
     shownRef.current = true;
-    const planName = plan && PLAN_DISPLAY[plan] ? PLAN_DISPLAY[plan] : plan ?? 'Premium';
-    const message = status === 'trial_started'
-      ? `Félicitations ! Votre essai ${planName} est activé. Profitez de 14 jours gratuits !`
-      : `Félicitations ! Votre plan ${planName} est maintenant actif.`;
-    toast.success(message, {
-      duration: 5000,
-    });
+    try {
+      const planName = plan && PLAN_DISPLAY[plan] ? PLAN_DISPLAY[plan] : plan ?? 'Premium';
+      const message = status === 'trial_started'
+        ? `Félicitations ! Votre essai ${planName} est activé. Profitez de 14 jours gratuits !`
+        : `Félicitations ! Votre plan ${planName} est maintenant actif.`;
+      toast.success(message, { duration: 5000 });
+    } catch {
+      // Sonner non prêt ou erreur — ne pas faire planter la page
+    }
   }, [searchParams]);
 
   return null;

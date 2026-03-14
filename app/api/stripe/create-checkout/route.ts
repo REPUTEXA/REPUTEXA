@@ -66,8 +66,8 @@ export async function POST(request: Request) {
     }
 
     const successUrl = isZenithTrial
-      ? `${baseUrl}/${locale}/dashboard?status=trial_started&plan=zenith&session_id={CHECKOUT_SESSION_ID}`
-      : `${baseUrl}/${locale}/dashboard?status=success&plan=${effectivePlanSlug}&session_id={CHECKOUT_SESSION_ID}`;
+      ? `${baseUrl}/api/stripe/checkout-success?session_id={CHECKOUT_SESSION_ID}&locale=${locale}&plan=zenith&status=trial_started`
+      : `${baseUrl}/api/stripe/checkout-success?session_id={CHECKOUT_SESSION_ID}&locale=${locale}&plan=${effectivePlanSlug}&status=success`;
     const cancelUrl = `${baseUrl}/${locale}/choose-plan?error=payment_cancelled`;
 
     const lineItems: Stripe.Checkout.SessionCreateParams['line_items'] = [

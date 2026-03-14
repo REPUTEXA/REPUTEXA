@@ -4,8 +4,7 @@ import Stripe from 'stripe';
 import { prisma } from '@/lib/prisma';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { canSendEmail, sendEmail, DEFAULT_FROM } from '@/lib/resend';
-import { getEstablishmentAddedEmailHtml } from '@/lib/emails/templates';
-import { getWelcomeZenithTrialHtml, getWelcomePaidHtml } from '@/lib/emails/react-welcome-templates';
+import { getEstablishmentAddedEmailHtml, getUpgradeConfirmationEmailHtml, getWelcomePaidHtml, getWelcomeZenithTrialHtml } from '@/lib/emails/templates';
 import { toPlanSlug } from '@/lib/feature-gate';
 import { getTotalMonthlyPrice } from '@/lib/establishments';
 
@@ -13,6 +12,24 @@ const PLAN_SLUG_TO_SUBSCRIPTION: Record<string, string> = {
   vision: 'vision',
   pulse: 'pulse',
   zenith: 'zenith',
+};
+
+function getPlanSlugFromSubscription(subscription: Stripe.Subscription): string | null {
+  const priceId = subscription.items?.data?.[0]?.price?.id;
+  if (!priceId) return null;
+  const v = process.env.STRIPE_PRICE_ID_VISION;
+  const p = process.env.STRIPE_PRICE_ID_PULSE;
+  const z = process.env.STRIPE_PRICE_ID_ZENITH;
+  if (v && priceId === v) return 'vision';
+  if (p && priceId === p) return 'pulse';
+  if (z && priceId === z) return 'zenith';
+  return null;
+}
+
+const PLAN_DISPLAY: Record<string, string> = {
+  vision: 'Vision',
+  pulse: 'Pulse',
+  zenith: 'ZENITH',
 };
 
 export async function POST(request: Request) {
@@ -102,14 +119,14 @@ export async function POST(request: Request) {
 
             if (canSendEmail()) {
               const establishmentName = (profiles[0].establishment_name as string) ?? '';
-              const PLAN_DISPLAY: Record<string, string> = { vision: 'Vision', pulse: 'Pulse', zenith: 'ZENITH' };
               const planName = PLAN_DISPLAY[validPlan] ?? 'Premium';
               const appUrl = process.env.NEXT_PUBLIC_SITE_URL ?? process.env.NEXT_PUBLIC_APP_URL ?? 'https://reputexa.fr';
               const loginUrl = `${appUrl}/fr/dashboard`;
               const settingsUrl = `${appUrl}/fr/dashboard/settings`;
-              const guideUrl = `${appUrl}/fr/dashboard`;
+              const supportUrl = `${appUrl}/fr/contact`;
+
               if (profileStatus === 'trialing') {
-                const html = await getWelcomeZenithTrialHtml({ loginUrl, settingsUrl });
+                const html = getWelcomeZenithTrialHtml({ loginUrl, settingsUrl, supportUrl });
                 sendEmail({
                   to: customerEmail,
                   subject: "🚀 C'est parti ! Tes 14 jours d'accès Total Zénith commencent.",
@@ -117,11 +134,11 @@ export async function POST(request: Request) {
                   from: process.env.RESEND_FROM ?? DEFAULT_FROM,
                 }).catch(() => {});
               } else {
-                const html = await getWelcomePaidHtml({
+                const html = getWelcomePaidHtml({
                   planName,
                   establishmentName,
                   loginUrl,
-                  guideUrl,
+                  supportUrl,
                 });
                 sendEmail({
                   to: customerEmail,
@@ -161,23 +178,65 @@ export async function POST(request: Request) {
       }
     }
 
-    // Synchroniser profiles quand le statut Stripe change (ex: trialing → active à la fin de l'essai)
+    // Synchroniser profiles quand le statut Stripe change (ex: trialing → active, changement de plan)
     if (event.type === 'customer.subscription.updated') {
       const subscription = event.data.object as Stripe.Subscription;
+      const previousAttributes = (event.data as { previous_attributes?: Record<string, unknown> }).previous_attributes ?? {};
       const subscriptionId = subscription.id;
       const stripeStatus = subscription.status;
-      const profileStatus = stripeStatus === 'trialing' ? 'trialing' : stripeStatus === 'active' ? 'active' : 'expired';
+      const profileStatus = stripeStatus === 'trialing' ? 'trialing' : stripeStatus === 'active' ? 'active' : stripeStatus === 'past_due' ? 'past_due' : 'expired';
       const trialEnd = subscription.trial_end ? new Date(subscription.trial_end * 1000) : null;
+      const newPlanSlug = getPlanSlugFromSubscription(subscription);
+      const planChanged = typeof previousAttributes.items !== 'undefined' && newPlanSlug;
 
       const admin = createAdminClient();
       if (admin) {
-        await admin
+        const { data: profiles } = await admin
           .from('profiles')
-          .update({
-            subscription_status: profileStatus,
-            trial_ends_at: profileStatus === 'trialing' ? trialEnd?.toISOString() ?? null : null,
-          })
+          .select('id, selected_plan, subscription_plan, establishment_name, email')
           .eq('stripe_subscription_id', subscriptionId);
+
+        if (profiles?.length) {
+          const profile = profiles[0];
+          const subscriptionPlan = (newPlanSlug && PLAN_SLUG_TO_SUBSCRIPTION[newPlanSlug]) ?? profile.subscription_plan ?? 'pulse';
+          const selectedPlan = newPlanSlug ?? profile.selected_plan ?? 'vision';
+
+          await admin
+            .from('profiles')
+            .update({
+              subscription_status: profileStatus,
+              trial_ends_at: profileStatus === 'trialing' ? trialEnd?.toISOString() ?? null : null,
+              selected_plan: selectedPlan,
+              subscription_plan: subscriptionPlan,
+            })
+            .eq('stripe_subscription_id', subscriptionId);
+
+          if (planChanged && profile.email && canSendEmail()) {
+            const planName = PLAN_DISPLAY[newPlanSlug ?? ''] ?? 'Premium';
+            const establishmentName = (profile.establishment_name as string) ?? '';
+            const appUrl = process.env.NEXT_PUBLIC_SITE_URL ?? process.env.NEXT_PUBLIC_APP_URL ?? 'https://reputexa.fr';
+            const dashboardUrl = `${appUrl}/fr/dashboard`;
+            const html = getUpgradeConfirmationEmailHtml({
+              planName,
+              establishmentName,
+              dashboardUrl,
+            });
+            sendEmail({
+              to: profile.email as string,
+              subject: 'Confirmation de mise à niveau — REPUTEXA',
+              html,
+              from: process.env.RESEND_FROM ?? DEFAULT_FROM,
+            }).catch(() => {});
+          }
+        } else {
+          await admin
+            .from('profiles')
+            .update({
+              subscription_status: profileStatus,
+              trial_ends_at: profileStatus === 'trialing' ? trialEnd?.toISOString() ?? null : null,
+            })
+            .eq('stripe_subscription_id', subscriptionId);
+        }
       }
     }
 

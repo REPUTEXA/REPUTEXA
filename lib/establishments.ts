@@ -1,6 +1,6 @@
 /**
  * Tarification multi-établissements REPUTEXA
- * Prix mensuels base (VISION 59€, PULSE 98€, ZENITH 179€)
+ * Prix mensuels base (VISION 59€, PULSE 97€, ZENITH 179€)
  * Remise dégressive : 1er 0%, 2e -20%, 3e -30%, 4e -40%, 5e+ -50%
  */
 
@@ -9,7 +9,7 @@ import type { PlanSlug } from '@/lib/feature-gate';
 export const PLAN_PRICES: Record<PlanSlug, number> = {
   free: 0,
   vision: 59,
-  pulse: 98,
+  pulse: 97,
   zenith: 179,
 };
 

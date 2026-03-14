@@ -107,6 +107,7 @@ export function EstablishmentSelector({
                 key={loc.id}
                 type="button"
                 role="option"
+                aria-selected={loc.id === activeLocationId}
                 onClick={() => handleSelect(loc.id)}
                 className={`w-full px-3 py-2.5 flex items-center gap-3 text-left transition-colors ${
                   loc.id === activeLocationId

@@ -9,7 +9,7 @@ export async function GET() {
 
   const { data: profile, error } = await supabase
     .from('profiles')
-    .select('establishment_name, full_name, address, phone, website, whatsapp_phone, alert_threshold_stars, seo_keywords, subscription_plan, selected_plan, google_location_id, google_location_name, google_location_address, ai_tone, ai_length, ai_safe_mode, ai_custom_instructions')
+    .select('establishment_name, establishment_type, full_name, address, phone, website, whatsapp_phone, alert_threshold_stars, seo_keywords, subscription_plan, selected_plan, google_location_id, google_location_name, google_location_address, ai_tone, ai_length, ai_safe_mode, ai_custom_instructions')
     .eq('id', user.id)
     .single();
 
@@ -19,6 +19,7 @@ export async function GET() {
   const planSlug = toPlanSlug(profile?.subscription_plan ?? null, profile?.selected_plan ?? null);
   return NextResponse.json({
     establishmentName: profile?.establishment_name ?? '',
+    establishmentType: profile?.establishment_type ?? '',
     fullName: profile?.full_name ?? '',
     address: profile?.address ?? '',
     phone: profile?.phone ?? '',
@@ -46,6 +47,7 @@ export async function PATCH(request: Request) {
   const body = await request.json().catch(() => ({}));
   const {
     establishmentName,
+    establishmentType,
     fullName,
     address,
     phone,
@@ -61,6 +63,7 @@ export async function PATCH(request: Request) {
 
   const updates: Record<string, string | number | string[] | boolean> = {};
   if (typeof establishmentName === 'string') updates.establishment_name = establishmentName.trim();
+  if (typeof establishmentType === 'string') updates.establishment_type = establishmentType.trim();
   if (typeof fullName === 'string') updates.full_name = fullName.trim();
   if (typeof address === 'string') updates.address = address.trim();
   if (typeof phone === 'string') updates.phone = phone.trim();

@@ -6,7 +6,7 @@ import { useSearchParams, useParams } from 'next/navigation';
 import { Link } from '@/i18n/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { getSiteUrl } from '@/lib/site-url';
-import { LogOut, LayoutDashboard, BarChart2, Bell, Lightbulb, Settings, Menu, X, Search, Building2, CheckCircle2, TrendingUp, FileText, Sparkles } from 'lucide-react';
+import { LogOut, LayoutDashboard, BarChart2, Bell, Lightbulb, Settings, Menu, X, Search, Building2, CheckCircle2, TrendingUp, FileText, Sparkles, ArrowUpCircle } from 'lucide-react';
 import { Logo } from '@/components/logo';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { LanguageSelector } from '@/components/language-selector';
@@ -58,6 +58,7 @@ const navItems: Array<{
   { href: '/dashboard/growth', icon: TrendingUp, key: 'growth', minPlan: 'zenith' },
   { href: '/dashboard/suggestions', icon: Lightbulb, key: 'suggestions', minPlan: 'pulse' },
   { href: '/dashboard/establishments', icon: Building2, key: 'establishments', minPlan: 'vision' },
+  { href: '/dashboard/upgrade', icon: ArrowUpCircle, key: 'upgrade', minPlan: 'vision' },
   { href: '/dashboard/settings', icon: Settings, key: 'settings', minPlan: 'vision' },
 ];
 

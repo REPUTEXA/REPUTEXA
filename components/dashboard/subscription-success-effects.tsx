@@ -3,29 +3,39 @@
 import { useEffect, useRef, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useRouter, usePathname } from '@/i18n/navigation';
-import confetti from 'canvas-confetti';
 
 function fireConfetti() {
-  const count = 200;
-  const defaults = { origin: { y: 0.7 }, zIndex: 9999 };
-  function fire(particleRatio: number, opts: confetti.Options) {
-    confetti({ ...defaults, ...opts, particleCount: Math.floor(count * particleRatio) });
-  }
-  fire(0.25, { spread: 26, startVelocity: 55 });
-  fire(0.2, { spread: 60 });
-  fire(0.35, { spread: 100, decay: 0.91, scalar: 0.8 });
-  fire(0.1, { spread: 120, startVelocity: 25, decay: 0.92, scalar: 1.2 });
-  fire(0.1, { spread: 120, startVelocity: 45 });
+  void import('canvas-confetti')
+    .then((mod) => {
+      const confetti = mod.default;
+      const count = 200;
+      const defaults = { origin: { y: 0.7 }, zIndex: 9999 };
+      const fire = (particleRatio: number, opts: { spread?: number; startVelocity?: number; decay?: number; scalar?: number }) => {
+        confetti({ ...defaults, ...opts, particleCount: Math.floor(count * particleRatio) });
+      };
+      fire(0.25, { spread: 26, startVelocity: 55 });
+      fire(0.2, { spread: 60 });
+      fire(0.35, { spread: 100, decay: 0.91, scalar: 0.8 });
+      fire(0.1, { spread: 120, startVelocity: 25, decay: 0.92, scalar: 1.2 });
+      fire(0.1, { spread: 120, startVelocity: 45 });
+    })
+    .catch(() => {});
 }
 
 export function SubscriptionSuccessEffects() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const pathname = usePathname();
+  const [isMounted, setIsMounted] = useState(false);
   const [showInitModal, setShowInitModal] = useState(false);
   const doneRef = useRef(false);
 
   useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!isMounted) return;
     const status = searchParams?.get('status');
     if ((status !== 'success' && status !== 'trial_started') || doneRef.current) return;
 
@@ -44,9 +54,9 @@ export function SubscriptionSuccessEffects() {
       router.replace(cleanUrl, { scroll: false });
     }, 3000);
     return () => clearTimeout(t);
-  }, [searchParams, router, pathname]);
+  }, [isMounted, searchParams, router, pathname]);
 
-  if (!showInitModal) return null;
+  if (!isMounted || !showInitModal) return null;
 
   return (
     <div

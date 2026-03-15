@@ -34,7 +34,7 @@ export default function UpgradePage() {
                 Choisissez votre plan
               </h1>
               <p className="text-white/60 text-sm mt-0.5">
-                14 jours gratuits avec carte · Annulation en un clic
+                Essai gratuit avec carte · Annulation en un clic
               </p>
             </div>
           </div>

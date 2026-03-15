@@ -17,9 +17,11 @@ export async function GET() {
 
   const { data: profile } = await supabase
     .from('profiles')
-    .select('subscription_plan, selected_plan, establishment_name, establishment_type, address, google_location_id, google_location_name, google_location_address')
+    .select('subscription_plan, selected_plan, establishment_name, establishment_type, address, google_location_id, google_location_name, google_location_address, subscription_quantity, default_establishment_id')
     .eq('id', user.id)
     .single();
+
+  const defaultEstablishmentId = (profile?.default_establishment_id as string | null) ?? null;
 
   const planSlug = toPlanSlug(
     profile?.subscription_plan ?? null,
@@ -75,7 +77,8 @@ export async function GET() {
 
   const principalAvgRating = getAvg('profile');
 
-  // Établissement principal en première position
+  const profileIsDefault = defaultEstablishmentId == null;
+
   const principal = {
     id: 'profile',
     name: profile?.establishment_name?.trim() || 'Mon établissement',
@@ -87,7 +90,7 @@ export async function GET() {
     priceAfterDiscount: getPriceAfterDiscount(basePrice, 0),
     discountPercent: 0,
     index: 0,
-    isPrincipal: true,
+    isPrincipal: profileIsDefault,
   };
 
   const addons = (establishments ?? []).map((e, i) => {
@@ -103,19 +106,28 @@ export async function GET() {
       priceAfterDiscount: getPriceAfterDiscount(basePrice, idx),
       discountPercent: discount,
       index: idx,
-      isPrincipal: false,
+      isPrincipal: e.id === defaultEstablishmentId,
     };
   });
 
-  const list = [principal, ...addons];
+  // Ordre : établissement par défaut en premier (profil ou addon)
+  const defaultAddon = addons.find((a) => a.id === defaultEstablishmentId);
+  const others = addons.filter((a) => a.id !== defaultEstablishmentId);
+  const list = profileIsDefault
+    ? [principal, ...addons]
+    : defaultAddon
+      ? [defaultAddon, principal, ...others]
+      : [principal, ...addons];
 
   const totalSavings = getTotalSavings(planSlug, list.length);
+  const subscriptionQuantity = Math.max(1, (profile?.subscription_quantity as number | null) ?? 1);
 
   return NextResponse.json({
     establishments: list,
     planSlug,
     basePrice,
     totalSavings,
+    subscriptionQuantity,
   });
   } catch (err) {
     console.error('[api/establishments GET]', err);
@@ -147,12 +159,33 @@ export async function POST(request: Request) {
     );
   }
 
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('subscription_quantity')
+    .eq('id', user.id)
+    .single();
+  const subscriptionQuantity = Math.max(1, (profile?.subscription_quantity as number | null) ?? 1);
+
   const { count } = await supabase
     .from('establishments')
     .select('id', { head: true, count: 'exact' })
     .eq('user_id', user.id);
 
-  const displayOrder = (count ?? 0);
+  const establishmentCount = count ?? 0;
+  const totalSlots = 1 + establishmentCount;
+  if (totalSlots >= subscriptionQuantity) {
+    return NextResponse.json(
+      {
+        error: 'Limite d\'établissements atteinte. Mettez à jour votre abonnement pour en ajouter.',
+        limitReached: true,
+        subscriptionQuantity,
+        billingPortalPath: '/api/stripe/portal',
+      },
+      { status: 403 }
+    );
+  }
+
+  const displayOrder = establishmentCount;
 
   const { data: inserted, error } = await supabase
     .from('establishments')

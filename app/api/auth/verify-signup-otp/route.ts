@@ -2,16 +2,10 @@ import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { checkAuthRateLimit } from '@/lib/rate-limit';
-import { canSendEmail, sendEmail } from '@/lib/resend';
 import { getSiteUrl } from '@/lib/site-url';
+import { getStripePriceId, type PlanSlug } from '@/config/pricing';
 
 const TRIAL_DAYS = 14;
-// Uniquement ces 3 variables d'environnement — jamais de redirection /checkout ou /choose-plan
-const PLAN_TO_PRICE_ENV: Record<string, string> = {
-  vision: 'STRIPE_PRICE_ID_VISION',
-  pulse: 'STRIPE_PRICE_ID_PULSE',
-  zenith: 'STRIPE_PRICE_ID_ZENITH',
-};
 
 /** Normalise le code : uniquement les 6 chiffres (espaces, unicode, etc. supprimés) */
 function normalizeOtpCode(raw: string): string {
@@ -107,12 +101,13 @@ export async function POST(request: Request) {
 
     // FORCER extraction depuis user_metadata (source de vérité à l'inscription)
     const { data: authUser } = await admin.auth.admin.getUserById(otpRow.user_id);
-    const meta = (authUser?.user?.user_metadata ?? {}) as { signup_mode?: string; selected_plan?: string };
+    const meta = (authUser?.user?.user_metadata ?? {}) as { signup_mode?: string; selected_plan?: string; signup_annual?: boolean };
     const signupMode: 'trial' | 'checkout' = meta?.signup_mode === 'checkout' ? 'checkout' : 'trial';
     const metaPlan = meta?.selected_plan;
     const selectedPlan = (metaPlan && ['vision', 'pulse', 'zenith'].includes(metaPlan))
       ? metaPlan
       : (profile?.selected_plan ?? 'zenith');
+    const annual = signupMode === 'checkout' && (meta?.signup_annual === true || meta?.signup_annual === 'true');
 
     const isTrialing = profile?.subscription_status === 'trialing';
 
@@ -124,25 +119,20 @@ export async function POST(request: Request) {
     }
 
     // Créer la session Stripe — TOUJOURS renvoyer stripeUrl, jamais /checkout ou /choose-plan
-    // Zenith (trial) → STRIPE_PRICE_ID_ZENITH + 14 jours → 0€
-    // Pulse (checkout) → STRIPE_PRICE_ID_PULSE → 97€ immédiat
-    const plan = ['vision', 'pulse', 'zenith'].includes(selectedPlan) ? selectedPlan : 'zenith';
+    // Trial → price mensuel Zenith + 14 jours. Checkout → price mensuel ou annuel selon signup_annual (choix gravé depuis la landing/pricing).
+    const plan = (['vision', 'pulse', 'zenith'].includes(selectedPlan) ? selectedPlan : 'zenith') as PlanSlug;
     const skipTrial = signupMode === 'checkout';
     const secretKey = process.env.STRIPE_SECRET_KEY;
-    const envKey = PLAN_TO_PRICE_ENV[plan] ?? 'STRIPE_PRICE_ID_ZENITH';
-    const priceId = process.env[envKey] ?? null;
-
-    console.error('[verify-signup-otp] Stripe config:', {
-      hasSecretKey: !!secretKey,
-      envKey,
-      hasPriceId: !!priceId,
-      priceIdPrefix: priceId ? priceId.slice(0, 12) + '...' : null,
-    });
+    const priceId = getStripePriceId(plan, annual);
 
     if (!secretKey || !priceId) {
-      console.error('[verify-signup-otp] STRIPE_SECRET_KEY ou STRIPE_PRICE_ID_* manquant');
+      console.error('[verify-signup-otp] STRIPE_SECRET_KEY ou priceId manquant', { plan, annual });
       return NextResponse.json(
-        { error: 'Configuration paiement indisponible. Contactez le support.' },
+        {
+          error: annual
+            ? 'Tarif annuel non configuré pour ce plan. Contactez le support ou réessayez en facturation mensuelle.'
+            : 'Configuration paiement indisponible. Contactez le support.',
+        },
         { status: 500 }
       );
     }
@@ -152,7 +142,7 @@ export async function POST(request: Request) {
       const baseUrl = getSiteUrl().replace(/\/+$/, '');
       const statusParam = skipTrial ? 'success' : 'trial_started';
       const successUrl = `${baseUrl}/api/stripe/checkout-success?session_id={CHECKOUT_SESSION_ID}&locale=${locale}&plan=${plan}&status=${statusParam}`;
-      const cancelUrl = `${baseUrl}/${locale}/choose-plan?error=payment_cancelled`;
+      const cancelUrl = `${baseUrl}/${locale}/pricing?plan=${plan}&annual=${annual ? '1' : '0'}&status=cancelled`;
 
       let customerId: string | null = null;
       const existing = await stripe.customers.list({ email, limit: 1 });

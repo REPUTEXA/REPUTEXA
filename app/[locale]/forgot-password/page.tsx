@@ -54,7 +54,9 @@ export default function ForgotPasswordPage() {
       if (res.status === 429) {
         toast.error(translatedError || t('rateLimit'));
       } else if (!res.ok) {
-        if (errorKey?.toLowerCase().includes('user not found') === false) {
+        const err = errorKey?.toLowerCase() ?? '';
+        const isNotFound = err.includes('user not found') || err.includes('email not found') || err.includes('with this email');
+        if (!isNotFound) {
           toast.error(translatedError || t('genericError'));
         }
       } else if (json.sent === false && json.reason) {
@@ -65,7 +67,11 @@ export default function ForgotPasswordPage() {
         const baseUrl = rawBaseUrl.replace(/\/+$/, '');
         const resetUrl = `${baseUrl}/${locale}/auth/callback?next=/reset-password`;
         const { error } = await supabase.auth.resetPasswordForEmail(trimmed, { redirectTo: resetUrl });
-        if (error) toast.error(error.message ?? t('genericError'));
+        const errMsg = error?.message?.toLowerCase() ?? '';
+        const isNotFound = errMsg.includes('user not found') || errMsg.includes('email not found') || errMsg.includes('with this email');
+        if (error && !isNotFound) {
+          toast.error(error.message ?? t('genericError'));
+        }
       }
     } catch {
       toast.error(t('networkError'));
@@ -110,12 +116,6 @@ export default function ForgotPasswordPage() {
                 <p className="text-sm text-slate-700">
                   <strong className="text-[#2563eb]">{tFp('successTitle')}</strong> {tFp('successMessage')}
                 </p>
-                <Link
-                  href="/login"
-                  className="inline-block mt-4 text-sm font-medium text-[#2563eb] hover:brightness-110"
-                >
-                  {tFp('backToLogin')}
-                </Link>
               </div>
             ) : (
               <form onSubmit={handleSubmit} className="space-y-4" noValidate>

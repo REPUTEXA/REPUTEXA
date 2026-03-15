@@ -12,11 +12,19 @@ export function canSendEmail(): boolean {
   return Boolean(apiKey && resend);
 }
 
+export type EmailAttachment = {
+  filename: string;
+  content: Buffer | Uint8Array | string;
+  contentType?: string;
+};
+
 export async function sendEmail(params: {
   to: string;
   subject: string;
   html: string;
   from?: string;
+  replyTo?: string;
+  attachments?: EmailAttachment[];
 }) {
   if (!resend) {
     console.warn('[Resend] RESEND_API_KEY not set, email not sent');
@@ -27,6 +35,15 @@ export async function sendEmail(params: {
     to: params.to,
     subject: params.subject,
     html: params.html,
+    replyTo: params.replyTo,
+    attachments: params.attachments?.map((a) => {
+      const buf = Buffer.isBuffer(a.content) ? a.content : Buffer.from(a.content);
+      return {
+        filename: a.filename,
+        content: buf.toString('base64'),
+        contentType: a.contentType,
+      };
+    }),
   });
   if (error) {
     console.error('[Resend]', error);

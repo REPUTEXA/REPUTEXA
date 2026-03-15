@@ -1,8 +1,9 @@
 'use client';
 
+import { useEffect } from 'react';
 import { useLocale } from 'next-intl';
 import { useTranslations } from 'next-intl';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { Link } from '@/i18n/navigation';
 import { Logo } from '@/components/logo';
 import { CheckCircle2 } from 'lucide-react';
@@ -11,9 +12,17 @@ import { formatPrice } from '@/lib/format-price';
 export default function ChoosePlanPage() {
   const t = useTranslations('HomePage');
   const locale = useLocale();
+  const router = useRouter();
   const searchParams = useSearchParams();
   const noTrial = searchParams?.get('trial') === '0';
   const paymentCancelled = searchParams?.get('error') === 'payment_cancelled';
+
+  // Rediriger vers la page pricing (expérience annulation unifiée) au lieu d'afficher une bannière
+  useEffect(() => {
+    if (paymentCancelled) {
+      router.replace(`/${locale}/pricing?status=cancelled`);
+    }
+  }, [paymentCancelled, locale, router]);
 
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-slate-50 via-white to-slate-100/40">
@@ -29,11 +38,6 @@ export default function ChoosePlanPage() {
 
       <main className="flex-1 flex items-center justify-center px-4 py-12">
         <div className="w-full max-w-4xl">
-          {paymentCancelled && (
-            <div className="mb-6 px-4 py-3 rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 text-amber-800 dark:text-amber-200 text-sm text-center">
-              {t('pricing.paymentCancelledMessage')}
-            </div>
-          )}
           <div className="text-center mb-10">
             <h1 className="font-display text-3xl font-bold text-slate-900">
               Choisissez votre plan
@@ -41,7 +45,7 @@ export default function ChoosePlanPage() {
             <p className="text-slate-500 mt-2">
               {noTrial
                 ? "Paiement immédiat — Accès direct à votre dashboard"
-                : "14 jours gratuits — Carte requise pour valider l'accès"}
+                : "Essai gratuit — Carte requise pour valider l'accès"}
             </p>
           </div>
 

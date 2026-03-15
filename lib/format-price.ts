@@ -6,7 +6,6 @@
 const USD_AMOUNTS: Record<string, string> = {
   '59': '65',
   '97': '107',
-  '157': '175',
   '179': '199',
 };
 

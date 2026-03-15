@@ -1,19 +1,27 @@
 {
   "PricingPage": {
     "headline": "Choisissez votre plan",
-    "subtitle": "14 jours d'essai gratuit · Sans engagement",
+    "subtitle": "Essai gratuit · Sans engagement",
     "monthly": "Mensuel",
     "annual": "Annuel",
     "annualBadge": "-20%",
     "perMonth": "/mois",
     "perYear": "/an",
+    "billedAnnually": "Facturé annuellement ({amount})",
+    "establishments": "Établissements",
+    "perEstablishments": "pour {count} établissements",
+    "savings": "Économisez {amount}",
+    "savingsBadge": "Économisez {amount}",
     "backToDashboard": "Retour au dashboard",
     "ctaChoose": "Choisir ce plan",
-    "ctaSubscribe": "Commencer mes 14 jours gratuits",
-    "ctaTrial": "Commencer mes 14 jours gratuits",
+    "ctaSubscribe": "Essai gratuit",
+    "ctaTrial": "Essai gratuit",
     "checkoutError": "Erreur lors de la redirection vers le paiement",
+    "paymentCancelledToast": "Paiement non finalisé. Vos options ont été conservées.",
+    "resumeCheckoutToast": "Vous aviez commencé une souscription. Souhaitez-vous reprendre ?",
     "stripeReassurance": "Paiement sécurisé par Stripe. Sans engagement.",
     "trialMention": "0€ aujourd'hui. Carte requise pour valider l'accès. Annulation en un clic depuis votre espace client.",
+    "prorataMessage": "Le prorata est calculé automatiquement. Vous ne payez que la différence au moment du changement.",
     "visionTitle": "Vision",
     "visionDesc": "L'essentiel pour démarrer",
     "visionFeature1": "Réponse IA illimitée",
@@ -39,7 +47,7 @@
     "pulse_price": "97€",
     "pulse_desc": "Idéal pour les zones touristiques",
     "zenith_title": "ZENITH",
-    "zenith_price": "157€",
+    "zenith_price": "179€",
     "zenith_desc": "La protection absolue de votre CA"
   },
   "Features": {
@@ -67,7 +75,7 @@
       "faq": "FAQ",
       "contact": "Contact",
       "login": "Connexion",
-      "trial": "Commencer mes 14 jours gratuits"
+      "trial": "Essai gratuit"
     },
     "hero": {
       "pill": "IA de réputation • Restaurants, Coiffeurs, Hôtels...",
@@ -75,7 +83,7 @@
       "headlineHighlight": "IA",
       "promise": "Réponse humaine garantie (25-45min)",
       "tagline": "Répondez à tous vos avis en quelques secondes, surveillez votre e-réputation en temps réel et augmentez votre note moyenne — automatiquement.",
-      "ctaPrimary": "Commencer mes 14 jours gratuits",
+      "ctaPrimary": "Essai gratuit",
       "ctaSecondary": "Voir la démo",
       "trialInfo": "0€ aujourd'hui. Carte requise pour valider l'accès. Annulation en un clic depuis votre espace client."
     },
@@ -85,7 +93,7 @@
       "ctaScan": "Analyser ma réputation",
       "loading": "Analyse IA en cours",
       "alert": "ALERTE : Vous perdez environ {count} clients/mois",
-      "ctaSignup": "Arrêter l'hémorragie — 14 jours gratuits"
+      "ctaSignup": "Arrêter l'hémorragie — Essai gratuit"
     },
     "demo": {
       "title": "Démo : L'IA en action",
@@ -171,7 +179,7 @@
       "controlScore": "Score 3.2 → 4.8",
       "controlShield": "Bouclier Anti-Avis Actif",
       "controlTime": "gagnées cette semaine",
-      "cta": "Activer mon plan ZENITH — 157€/mois"
+      "cta": "Activer mon plan ZENITH — 179€/mois"
     },
     "preuve": {
       "trustLine": "Déjà +200 entreprises font confiance à REPUTEXA pour automatiser leur e-réputation.",
@@ -191,17 +199,17 @@
         "bouclier": { "title": "Protection de Marque 24h/7j", "desc": "Détection automatique des insultes et faux avis. L'IA génère et envoie instantanément une requête de suppression officielle auprès de Google pour protéger votre e-réputation.", "badge": "Inclus PULSE • ZENITH" },
         "whatsapp": { "title": "Réactivité Commando", "desc": "Ne ratez plus aucune urgence. Recevez une notification WhatsApp immédiate uniquement pour les mauvais avis, vous permettant d'éteindre l'incendie avant qu'il ne se propage.", "badge": "Inclus PULSE • ZENITH" },
         "capture": { "title": "Générateur de 5 Étoiles", "desc": "Notre IA sollicite vos clients via WhatsApp 30 min après leur visite pour collecter leur avis. Ne laissez plus la chance décider de votre note : provoquez votre succès.", "badge": "Exclusif ZENITH" },
-        "boostSeo": { "title": "Domination SEO Locale", "desc": "L'IA injecte intelligemment vos mots-clés stratégiques dans chaque réponse pour forcer Google à vous remonter en 1ère page des recherches. Soyez le premier choix dans votre ville.", "badge": "Exclusif ZENITH" },
+        "boostSeo": { "title": "Domination SEO Locale", "desc": "L'IA injecte intelligemment des mots-clés stratégiques dans chaque réponse pour forcer Google à vous remonter en 1ère page des recherches. Soyez le premier choix dans votre ville.", "badge": "Exclusif ZENITH" },
         "reporting": { "title": "Pilotage Stratégique", "desc": "Recevez des rapports mensuels détaillés avec graphiques de progression et analyses de sentiments. Prenez des décisions basées sur des données réelles pour faire croître votre commerce.", "badge": "Inclus VISION • PULSE • ZENITH" }
       }
     },
     "perMonth": "/mois",
-    "pricingTrial": "14 jours d'essai gratuit — Sans carte bancaire",
+    "pricingTrial": "Essai gratuit — Sans carte bancaire",
     "pricing": {
       "headline": "Tarifs simples et transparents",
       "subtitle": "Commencez gratuitement, évoluez à votre rythme.",
       "ctaSubscribe": "S'abonner maintenant",
-      "ctaTrial": "Commencer mes 14 jours gratuits",
+      "ctaTrial": "Essai gratuit",
       "trialMention": "0€ aujourd'hui. Carte requise. Annulation en un clic.",
       "vision": {
         "name": "Vision",
@@ -366,6 +374,7 @@
       "alerts": "Alertes",
       "growth": "Croissance Zenith",
       "suggestions": "Suggestions",
+      "updates": "Mises à jour",
       "settings": "Paramètres",
       "upgrade": "Upgrader",
       "unlockCta": "Débloquez les réponses illimitées"
@@ -530,7 +539,9 @@
     "responseSent": "Réponse envoyée",
     "generateAI": "Générer une réponse IA",
     "shieldReport": "Signaler via Bouclier IA",
-    "noMatch": "Aucun avis ne correspond aux filtres."
+    "noMatch": "Aucun avis ne correspond aux filtres.",
+    "emptyTitle": "Aucun avis pour l'instant",
+    "emptyDesc": "Connectez votre établissement Google pour importer vos avis et générer vos premières réponses IA."
   },
   "CommandCenter": {
     "myRestaurant": "Mon Restaurant",

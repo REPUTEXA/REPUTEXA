@@ -1,19 +1,27 @@
 {
   "PricingPage": {
     "headline": "Choose your plan",
-    "subtitle": "14-day free trial · No commitment",
+    "subtitle": "Free trial · No commitment",
     "monthly": "Monthly",
     "annual": "Annual",
     "annualBadge": "-20%",
     "perMonth": "/month",
     "perYear": "/year",
+    "billedAnnually": "Billed annually ({amount})",
+    "establishments": "Establishments",
+    "perEstablishments": "for {count} establishments",
+    "savings": "Save {amount}",
+    "savingsBadge": "Save {amount}",
     "backToDashboard": "Back to dashboard",
     "ctaChoose": "Choose this plan",
     "ctaSubscribe": "Subscribe now",
-    "ctaTrial": "Try free for 14 days",
+    "ctaTrial": "Free trial",
     "checkoutError": "Error redirecting to payment",
+    "paymentCancelledToast": "Payment not completed. Your options have been preserved.",
+    "resumeCheckoutToast": "You had started a subscription. Would you like to resume?",
     "stripeReassurance": "Secure payment by Stripe. No commitment.",
     "trialMention": "14-day free trial — No credit card required",
+    "prorataMessage": "Proration is calculated automatically. You only pay the difference at the time of change.",
     "visionTitle": "Vision",
     "visionDesc": "The essentials to get started",
     "visionFeature1": "Unlimited AI replies",
@@ -37,7 +45,7 @@
     "pulse_title": "PULSE",
     "pulse_price": "$97",
     "zenith_title": "ZENITH",
-    "zenith_price": "$157"
+    "zenith_price": "$199"
   },
   "Features": {
     "vision_replies": "Unlimited replies (Local language only)",
@@ -73,7 +81,7 @@
       "headline": "Your 24/7 Customer Relationship Director.",
       "headlineHighlight": "Protect Your Reputation, Effortlessly.",
       "tagline": "Automate feedback, prevent negative reviews, and elevate your brand with AI.",
-      "ctaPrimary": "Start free trial",
+      "ctaPrimary": "Free trial",
       "ctaSecondary": "See How It Works",
       "trialInfo": "No credit card required · 14-day free trial · Cancel anytime"
     },
@@ -83,7 +91,7 @@
       "ctaScan": "Analyze my reputation",
       "loading": "AI analysis in progress",
       "alert": "ALERT: You are losing approximately {count} customers/month",
-      "ctaSignup": "Stop the bleeding — 14-day free trial"
+      "ctaSignup": "Stop the bleeding — Free trial"
     },
     "demo": {
       "title": "Demo: AI in Action",
@@ -176,7 +184,7 @@
       "controlScore": "Score 3.2 → 4.8",
       "controlShield": "Anti-Review Shield Active",
       "controlTime": "saved this week",
-      "cta": "Activate my ZENITH plan — $157/month"
+      "cta": "Activate my ZENITH plan — $199/month"
     },
     "preuve": {
       "trustLine": "Already +200 companies trust REPUTEXA to automate their e-reputation.",
@@ -206,7 +214,7 @@
       "headline": "Invest in Your Reputation. Not Just a Tool—Your 24/7 Digital Director.",
       "subtitle": "Three plans. One mission: protect and grow your reputation.",
       "ctaSubscribe": "Subscribe now",
-      "ctaTrial": "Try free for 14 days",
+      "ctaTrial": "Free trial",
       "trialMention": "14-day free trial — No credit card required",
       "vision": {
         "name": "Vision",
@@ -333,6 +341,7 @@
       "alerts": "Alerts",
       "growth": "Zenith Growth",
       "suggestions": "Suggestions",
+      "updates": "Updates",
       "settings": "Settings",
       "upgrade": "Upgrade",
       "unlockCta": "Unlock unlimited responses"
@@ -454,7 +463,9 @@
     "responseSent": "Response sent",
     "generateAI": "Generate AI response",
     "shieldReport": "Report via Shield AI",
-    "noMatch": "No reviews match the filters."
+    "noMatch": "No reviews match the filters.",
+    "emptyTitle": "No reviews yet",
+    "emptyDesc": "Connect your Google establishment to import reviews and generate your first AI responses."
   },
   "CommandCenter": {
     "myRestaurant": "My Restaurant",

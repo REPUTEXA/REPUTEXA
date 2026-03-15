@@ -2,7 +2,9 @@
 
 import { useTranslations } from 'next-intl';
 import { useState, useMemo, useEffect } from 'react';
+import { Link } from '@/i18n/navigation';
 import { StarRating } from '@/components/dashboard/star-rating';
+import { EmptyStateIllustration } from '@/components/dashboard/empty-state-illustration';
 
 type ReviewDisplay = {
   id: string;
@@ -104,11 +106,26 @@ export function DashboardReviewsSection({ reviews, initialSearch = '' }: Props) 
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {displayReviews.length === 0 ? (
-          <div className="col-span-2 rounded-2xl border border-slate-200 dark:border-zinc-800/50 bg-white dark:bg-[#09090b] p-10 text-center shadow-sm dark:shadow-[4px_6px_0_rgba(0,0,0,0.5)]">
-            <p className="text-slate-500 dark:text-zinc-400">
-              {t('noMatch')}
-            </p>
-          </div>
+          reviews.length === 0 ? (
+            <div className="col-span-2">
+              <EmptyStateIllustration
+                title={t('emptyTitle') ?? "Aucun avis pour l'instant"}
+                description={t('emptyDesc') ?? "Connectez votre établissement Google pour importer vos avis et générer vos premières réponses IA."}
+                action={
+                  <Link
+                    href="/dashboard/settings"
+                    className="inline-flex items-center gap-2 px-5 py-3 rounded-xl font-semibold text-white bg-[#2563eb] hover:brightness-110 transition-all shadow-lg shadow-[#2563eb]/20"
+                  >
+                    🚀 Connecter mon établissement
+                  </Link>
+                }
+              />
+            </div>
+          ) : (
+            <div className="col-span-2 rounded-2xl border border-slate-200 dark:border-zinc-800/50 bg-white dark:bg-[#09090b] p-10 text-center shadow-sm dark:shadow-[4px_6px_0_rgba(0,0,0,0.5)]">
+              <p className="text-slate-500 dark:text-zinc-400">{t('noMatch')}</p>
+            </div>
+          )
         ) : (
           displayReviews.map((review) => {
             const hasResponse = !!review.responseText || respondedIds.has(review.id);

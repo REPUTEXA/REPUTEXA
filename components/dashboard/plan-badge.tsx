@@ -1,9 +1,9 @@
 'use client';
 
 import { useState } from 'react';
-import { Eye, Zap, Crown } from 'lucide-react';
+import { Eye, Zap, Crown, Loader2 } from 'lucide-react';
 import { type PlanSlug } from '@/lib/feature-gate';
-import { PlanUpgradeModal } from './plan-upgrade-modal';
+import { toast } from 'sonner';
 
 const PLAN_ICONS: Record<PlanSlug, typeof Eye> = {
   free: Eye,
@@ -45,6 +45,17 @@ type Props = {
   locale: string;
 };
 
+/** Ouvre le Portail Client Stripe (écran "Mettre à jour l'abonnement"). Zéro interface de sélection en interne. */
+async function openStripePortal(locale: string): Promise<string | null> {
+  const url = new URL('/api/stripe/portal', window.location.origin);
+  url.searchParams.set('locale', locale);
+  url.searchParams.set('flow', 'upgrade');
+  const res = await fetch(url.toString(), { method: 'POST', credentials: 'include' });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data.error ?? 'Erreur');
+  return data.url ?? null;
+}
+
 export function PlanBadge({
   planSlug,
   planDisplayName,
@@ -53,7 +64,7 @@ export function PlanBadge({
   hasActiveSubscription,
   locale,
 }: Props) {
-  const [modalOpen, setModalOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
   const Icon = PLAN_ICONS[planSlug];
   const styles = PLAN_STYLES[planSlug];
 
@@ -68,36 +79,42 @@ export function PlanBadge({
       : 'text-amber-300'
     : 'text-white';
 
+  const handleClick = async () => {
+    setLoading(true);
+    try {
+      const portalUrl = await openStripePortal(locale);
+      if (portalUrl) window.location.href = portalUrl;
+      else toast.error('Impossible d\'ouvrir le portail de facturation.');
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Erreur');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
-    <>
-      <div
-        className={`m-3 p-4 rounded-xl bg-gradient-to-br ${styles.bg} border ${styles.border} ${styles.glow ?? ''} flex flex-col gap-2`}
-      >
-        <div className="flex items-center gap-2">
-          <div className={`w-8 h-8 rounded-lg flex items-center justify-center bg-white/10 ${styles.icon}`}>
-            <Icon className="h-4 w-4 flex-shrink-0" />
-          </div>
-          <span className={`text-xs font-semibold ${labelColorClass}`}>
-            {label}
-          </span>
+    <div
+      className={`m-3 p-4 rounded-xl bg-gradient-to-br ${styles.bg} border ${styles.border} ${styles.glow ?? ''} flex flex-col gap-2`}
+    >
+      <div className="flex items-center gap-2">
+        <div className={`w-8 h-8 rounded-lg flex items-center justify-center bg-white/10 ${styles.icon}`}>
+          <Icon className="h-4 w-4 flex-shrink-0" />
         </div>
+        <span className={`text-xs font-semibold ${labelColorClass}`}>
+          {label}
+        </span>
+      </div>
+      {!isTrialing && (
         <button
           type="button"
-          onClick={() => setModalOpen(true)}
-          className="w-full py-2 text-xs font-medium rounded-lg bg-white/10 hover:bg-white/5 dark:hover:bg-white/5 text-white/90 transition-colors"
+          onClick={handleClick}
+          disabled={loading}
+          className="w-full py-2 text-xs font-medium rounded-lg bg-white/10 hover:bg-white/5 dark:hover:bg-white/5 text-white/90 transition-colors disabled:opacity-60 flex items-center justify-center gap-1.5"
         >
-          {hasActiveSubscription || isTrialing ? 'Changer de plan' : 'Passer au niveau supérieur'}
+          {loading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : null}
+          {hasActiveSubscription ? 'Changer de plan' : 'Passer au niveau supérieur'}
         </button>
-      </div>
-      {modalOpen && (
-        <PlanUpgradeModal
-          currentPlanSlug={planSlug}
-          isTrialing={isTrialing}
-          hasActiveSubscription={hasActiveSubscription}
-          locale={locale}
-          onClose={() => setModalOpen(false)}
-        />
       )}
-    </>
+    </div>
   );
 }

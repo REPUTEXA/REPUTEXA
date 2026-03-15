@@ -47,3 +47,29 @@ export async function transcribeAudioFromUrl(
 
   return typeof transcription === 'string' ? transcription : transcription.text;
 }
+
+/**
+ * Transcrit un buffer audio (ex: enregistrement vocal du formulaire contact).
+ * Supporte .webm, .ogg, .mp3, .wav, .m4a, etc.
+ */
+export async function transcribeAudioFromBuffer(
+  buffer: Buffer | Uint8Array,
+  options?: { filename?: string; language?: string }
+): Promise<string> {
+  if (!process.env.OPENAI_API_KEY) {
+    throw new Error('OPENAI_API_KEY is not configured');
+  }
+
+  const buf = Buffer.isBuffer(buffer) ? buffer : Buffer.from(buffer);
+  const ext = options?.filename?.split('.').pop()?.toLowerCase() || 'webm';
+  const safeExt = ['webm', 'ogg', 'mp3', 'wav', 'm4a', 'mp4', 'mpeg'].includes(ext) ? ext : 'webm';
+  const file = await toFile(buf, `audio.${safeExt}`);
+
+  const transcription = await openai.audio.transcriptions.create({
+    file,
+    model: 'whisper-1',
+    language: options?.language ?? 'fr',
+  });
+
+  return typeof transcription === 'string' ? transcription : transcription.text;
+}

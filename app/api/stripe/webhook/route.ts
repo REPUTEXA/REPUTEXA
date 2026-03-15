@@ -1,12 +1,12 @@
 import { NextResponse } from 'next/server';
 import { headers } from 'next/headers';
+import { revalidatePath } from 'next/cache';
 import Stripe from 'stripe';
 import { prisma } from '@/lib/prisma';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { canSendEmail, sendEmail, DEFAULT_FROM } from '@/lib/resend';
-import { getEstablishmentAddedEmailHtml, getUpgradeConfirmationEmailHtml, getWelcomePaidHtml, getWelcomeZenithTrialHtml } from '@/lib/emails/templates';
-import { toPlanSlug } from '@/lib/feature-gate';
-import { getTotalMonthlyPrice } from '@/lib/establishments';
+import { getUpgradeConfirmationEmailHtml, getWelcomePaidHtml, getWelcomeZenithTrialHtml } from '@/lib/emails/templates';
+import { getPlanSlugFromSubscription, getSubscriptionQuantity } from '@/lib/stripe-subscription';
 
 const PLAN_SLUG_TO_SUBSCRIPTION: Record<string, string> = {
   vision: 'vision',
@@ -14,16 +14,17 @@ const PLAN_SLUG_TO_SUBSCRIPTION: Record<string, string> = {
   zenith: 'zenith',
 };
 
-function getPlanSlugFromSubscription(subscription: Stripe.Subscription): string | null {
-  const priceId = subscription.items?.data?.[0]?.price?.id;
-  if (!priceId) return null;
-  const v = process.env.STRIPE_PRICE_ID_VISION;
-  const p = process.env.STRIPE_PRICE_ID_PULSE;
-  const z = process.env.STRIPE_PRICE_ID_ZENITH;
-  if (v && priceId === v) return 'vision';
-  if (p && priceId === p) return 'pulse';
-  if (z && priceId === z) return 'zenith';
-  return null;
+const DASHBOARD_LOCALES = ['fr', 'en', 'es', 'de', 'it'] as const;
+
+function revalidateDashboard() {
+  try {
+    for (const locale of DASHBOARD_LOCALES) {
+      revalidatePath(`/${locale}/dashboard`, 'layout');
+    }
+    revalidatePath('/dashboard', 'layout');
+  } catch (e) {
+    console.error('[stripe/webhook] revalidatePath failed', e);
+  }
 }
 
 const PLAN_DISPLAY: Record<string, string> = {
@@ -31,6 +32,34 @@ const PLAN_DISPLAY: Record<string, string> = {
   pulse: 'Pulse',
   zenith: 'ZENITH',
 };
+
+/** Ordre de gamme pour trier les abonnements (plus haut = mieux) */
+function getPlanTierRank(planSlug: string | null): number {
+  if (planSlug === 'zenith') return 3;
+  if (planSlug === 'pulse') return 2;
+  if (planSlug === 'vision') return 1;
+  return 0;
+}
+
+/**
+ * Parmi les abonnements actifs/trialing du client, retourne le "canonical" :
+ * le plus haut de gamme, puis le plus récent, pour éviter plusieurs abonnements et garder un seul ref.
+ */
+function pickCanonicalSubscription(subscriptions: Stripe.Subscription[]): Stripe.Subscription | null {
+  const eligible = subscriptions.filter(
+    (s) => s.status === 'active' || s.status === 'trialing'
+  );
+  if (eligible.length === 0) return null;
+  eligible.sort((a, b) => {
+    const planA = getPlanSlugFromSubscription(a);
+    const planB = getPlanSlugFromSubscription(b);
+    const rankA = getPlanTierRank(planA);
+    const rankB = getPlanTierRank(planB);
+    if (rankB !== rankA) return rankB - rankA; // plus haut de gamme d'abord
+    return (b.created ?? 0) - (a.created ?? 0); // puis plus récent
+  });
+  return eligible[0];
+}
 
 export async function POST(request: Request) {
   const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
@@ -96,6 +125,17 @@ export async function POST(request: Request) {
       const customerEmail =
         session.customer_details?.email ??
         (typeof cust === 'object' && cust?.email ? cust.email : undefined);
+      const isAddEstablishmentFlow = session.metadata?.flow === 'add-establishment';
+      const previousSubscriptionId = session.metadata?.previous_subscription_id as string | undefined;
+
+      if (previousSubscriptionId && isAddEstablishmentFlow) {
+        try {
+          await stripe.subscriptions.cancel(previousSubscriptionId);
+        } catch (e) {
+          console.error('[stripe/webhook] Cancel previous sub (add-establishment):', e);
+        }
+      }
+
       if (customerEmail && typeof customerEmail === 'string') {
         const admin = createAdminClient();
         if (admin) {
@@ -105,19 +145,25 @@ export async function POST(request: Request) {
             .eq('email', customerEmail)
             .limit(1);
           if (profiles?.length) {
+            const qty = getSubscriptionQuantity(subscription);
+            const periodEnd = subscription.current_period_end
+              ? new Date(subscription.current_period_end * 1000).toISOString()
+              : null;
             await admin
               .from('profiles')
               .update({
                 selected_plan: validPlan,
                 subscription_plan: subscriptionPlan,
                 subscription_status: profileStatus,
+                subscription_quantity: qty,
+                subscription_period_end: periodEnd,
                 trial_ends_at: profileStatus === 'trialing' && trialEnd ? trialEnd.toISOString() : null,
                 stripe_subscription_id: subscriptionId,
                 stripe_customer_id: customerId,
               })
               .eq('id', profiles[0].id);
 
-            if (canSendEmail()) {
+            if (!isAddEstablishmentFlow && canSendEmail()) {
               const establishmentName = (profiles[0].establishment_name as string) ?? '';
               const planName = PLAN_DISPLAY[validPlan] ?? 'Premium';
               const appUrl = process.env.NEXT_PUBLIC_SITE_URL ?? process.env.NEXT_PUBLIC_APP_URL ?? 'https://reputexa.fr';
@@ -151,9 +197,10 @@ export async function POST(request: Request) {
           }
         }
       }
+      revalidateDashboard();
     }
 
-    // Abonnement annulé / expiré (essai terminé sans paiement, résiliation, etc.)
+    // Abonnement supprimé : current_period_end est passé → on repasse en free
     if (event.type === 'customer.subscription.deleted') {
       const subscription = event.data.object as Stripe.Subscription;
       const subscriptionId = subscription.id;
@@ -170,158 +217,149 @@ export async function POST(request: Request) {
               subscription_plan: 'free',
               selected_plan: 'vision',
               subscription_status: 'expired',
+              subscription_quantity: 1,
+              subscription_period_end: null,
               trial_ends_at: null,
               stripe_subscription_id: null,
             })
             .eq('id', profiles[0].id);
         }
       }
+      revalidateDashboard();
     }
 
-    // Synchroniser profiles quand le statut Stripe change (ex: trialing → active, changement de plan)
+    // customer.subscription.updated : quantité (établissements) et plan mis à jour dans profiles.
+    // Déclenché par create-bulk-expansion (Stripe Expansion Engine) : après paiement de la facture,
+    // subscription_quantity est déjà à jour, les nouveaux slots sont visibles au retour sur le dashboard.
     if (event.type === 'customer.subscription.updated') {
       const subscription = event.data.object as Stripe.Subscription;
       const previousAttributes = (event.data as { previous_attributes?: Record<string, unknown> }).previous_attributes ?? {};
-      const subscriptionId = subscription.id;
-      const stripeStatus = subscription.status;
-      const profileStatus = stripeStatus === 'trialing' ? 'trialing' : stripeStatus === 'active' ? 'active' : stripeStatus === 'past_due' ? 'past_due' : 'expired';
-      const trialEnd = subscription.trial_end ? new Date(subscription.trial_end * 1000) : null;
-      const newPlanSlug = getPlanSlugFromSubscription(subscription);
-      const planChanged = typeof previousAttributes.items !== 'undefined' && newPlanSlug;
+      const customerId = typeof subscription.customer === 'string' ? subscription.customer : subscription.customer?.id;
+      if (!customerId) return NextResponse.json({ received: true });
 
       const admin = createAdminClient();
-      if (admin) {
-        const { data: profiles } = await admin
+      if (!admin) return NextResponse.json({ received: true });
+
+      // Plusieurs abonnements actifs possibles : on ne garde que le plus récent / haut de gamme
+      const allSubs = await stripe.subscriptions.list({
+        customer: customerId,
+        status: 'all',
+        limit: 20,
+      });
+      const canonical = pickCanonicalSubscription(allSubs.data);
+      if (!canonical) return NextResponse.json({ received: true });
+
+      const subscriptionId = canonical.id;
+      // plan_id dérivé du premier item (subscription.items.data[0].price.id) — downgrade OK, Stripe gère le crédit
+      const firstItemPriceId = canonical.items?.data?.[0]?.price?.id ?? null;
+      const newPlanSlug = getPlanSlugFromSubscription(canonical);
+      const qty = getSubscriptionQuantity(canonical);
+      const stripeStatus = canonical.status;
+      const profileStatus = stripeStatus === 'trialing' ? 'trialing' : stripeStatus === 'active' ? 'active' : stripeStatus === 'past_due' ? 'past_due' : 'expired';
+      const trialEnd = canonical.trial_end ? new Date(canonical.trial_end * 1000) : null;
+      const periodEnd = canonical.current_period_end
+        ? new Date(canonical.current_period_end * 1000).toISOString()
+        : null;
+      const subscriptionPlan = (newPlanSlug && PLAN_SLUG_TO_SUBSCRIPTION[newPlanSlug]) ?? 'pulse';
+      const selectedPlan = newPlanSlug ?? 'vision';
+      const planChanged = typeof previousAttributes.items !== 'undefined' && newPlanSlug;
+
+      // Trouver le profile par stripe_customer_id (prioritaire) ou par stripe_subscription_id
+      let profiles = await admin
+        .from('profiles')
+        .select('id, selected_plan, subscription_plan, subscription_quantity, establishment_name, email')
+        .eq('stripe_customer_id', customerId)
+        .limit(1);
+      if (!profiles?.length) {
+        profiles = await admin
           .from('profiles')
-          .select('id, selected_plan, subscription_plan, establishment_name, email')
-          .eq('stripe_subscription_id', subscriptionId);
+          .select('id, selected_plan, subscription_plan, subscription_quantity, establishment_name, email')
+          .eq('stripe_subscription_id', subscriptionId)
+          .limit(1);
+      }
+      if (!profiles?.length) {
+        const { data: bySub } = await admin
+          .from('profiles')
+          .select('id, selected_plan, subscription_plan, subscription_quantity, establishment_name, email')
+          .eq('stripe_subscription_id', subscription.id)
+          .limit(1);
+        if (bySub?.length) profiles = bySub;
+      }
 
-        if (profiles?.length) {
-          const profile = profiles[0];
-          const subscriptionPlan = (newPlanSlug && PLAN_SLUG_TO_SUBSCRIPTION[newPlanSlug]) ?? profile.subscription_plan ?? 'pulse';
-          const selectedPlan = newPlanSlug ?? profile.selected_plan ?? 'vision';
+      if (profiles?.length) {
+        const profile = profiles[0];
+        const oldPlan = (profile.selected_plan ?? profile.subscription_plan) ?? '—';
+        const oldQty = (profile.subscription_quantity as number | null) ?? null;
 
-          await admin
-            .from('profiles')
-            .update({
-              subscription_status: profileStatus,
-              trial_ends_at: profileStatus === 'trialing' ? trialEnd?.toISOString() ?? null : null,
-              selected_plan: selectedPlan,
-              subscription_plan: subscriptionPlan,
-            })
-            .eq('stripe_subscription_id', subscriptionId);
+        // Logs clairs pour Vercel / debug
+        if (oldPlan !== selectedPlan) {
+          console.log('[stripe/webhook] Plan mis à jour :', oldPlan, '->', selectedPlan, '(price_id:', firstItemPriceId ?? '—', ')');
+        }
+        if (oldQty !== null && oldQty !== qty) {
+          console.log('[stripe/webhook] Nouvelle quantité :', oldQty, '->', qty);
+        }
+        console.log('[stripe/webhook] customer.subscription.updated', {
+          subscriptionId,
+          customerId,
+          status: stripeStatus,
+          planSlug: newPlanSlug,
+          quantity: qty,
+          totalSubs: allSubs.data.length,
+        });
 
-          if (planChanged && profile.email && canSendEmail()) {
-            const planName = PLAN_DISPLAY[newPlanSlug ?? ''] ?? 'Premium';
-            const establishmentName = (profile.establishment_name as string) ?? '';
-            const appUrl = process.env.NEXT_PUBLIC_SITE_URL ?? process.env.NEXT_PUBLIC_APP_URL ?? 'https://reputexa.fr';
-            const dashboardUrl = `${appUrl}/fr/dashboard`;
-            const html = getUpgradeConfirmationEmailHtml({
-              planName,
-              establishmentName,
-              dashboardUrl,
-            });
-            sendEmail({
-              to: profile.email as string,
-              subject: 'Confirmation de mise à niveau — REPUTEXA',
-              html,
-              from: process.env.RESEND_FROM ?? DEFAULT_FROM,
-            }).catch(() => {});
-          }
-        } else {
-          await admin
-            .from('profiles')
-            .update({
-              subscription_status: profileStatus,
-              trial_ends_at: profileStatus === 'trialing' ? trialEnd?.toISOString() ?? null : null,
-            })
-            .eq('stripe_subscription_id', subscriptionId);
+        // Force sync : quantité et plan mis à jour immédiatement (downgrade = on met à jour, pas de blocage)
+        await admin
+          .from('profiles')
+          .update({
+            stripe_subscription_id: subscriptionId,
+            stripe_customer_id: customerId,
+            subscription_status: profileStatus,
+            subscription_period_end: periodEnd,
+            trial_ends_at: profileStatus === 'trialing' ? trialEnd?.toISOString() ?? null : null,
+            selected_plan: selectedPlan,
+            subscription_plan: subscriptionPlan,
+            subscription_quantity: qty,
+          })
+          .eq('id', profile.id);
+
+        if (planChanged && profile.email && canSendEmail()) {
+          const planName = PLAN_DISPLAY[newPlanSlug ?? ''] ?? 'Premium';
+          const establishmentName = (profile.establishment_name as string) ?? '';
+          const appUrl = process.env.NEXT_PUBLIC_SITE_URL ?? process.env.NEXT_PUBLIC_APP_URL ?? 'https://reputexa.fr';
+          const dashboardUrl = `${appUrl}/fr/dashboard`;
+          const html = getUpgradeConfirmationEmailHtml({
+            planName,
+            establishmentName,
+            dashboardUrl,
+          });
+          sendEmail({
+            to: profile.email as string,
+            subject: 'Confirmation de mise à niveau — REPUTEXA',
+            html,
+            from: process.env.RESEND_FROM ?? DEFAULT_FROM,
+          }).catch(() => {});
         }
       }
+      revalidateDashboard();
     }
 
-    // Addon prorata : paiement réussi → créer l'établissement, envoyer l'email
+    // Facture payée (ex. après expansion) : synchroniser subscription_quantity pour afficher les nouveaux slots.
     if (event.type === 'invoice.paid') {
       const invoice = event.data.object as Stripe.Invoice & { subscription?: string };
       const subscriptionId = typeof invoice.subscription === 'string' ? invoice.subscription : null;
-      const customerId = invoice.customer as string | null;
-
-      if (subscriptionId && customerId) {
+      if (subscriptionId) {
         const subscription = await stripe.subscriptions.retrieve(subscriptionId);
-        const pendingRaw = subscription.metadata?.pendingAddon;
-        if (pendingRaw) {
-          try {
-            const pending = JSON.parse(pendingRaw) as {
-              userId: string;
-              name: string;
-              address: string | null;
-              googleLocationId: string | null;
-              googleLocationName: string | null;
-              googleLocationAddress: string | null;
-              displayOrder: number;
-            };
-
-            const admin = createAdminClient();
-            if (admin) {
-              const { data: inserted, error } = await admin
-                .from('establishments')
-                .insert({
-                  user_id: pending.userId,
-                  name: pending.name,
-                  address: pending.address,
-                  google_location_id: pending.googleLocationId,
-                  google_location_name: pending.googleLocationName,
-                  google_location_address: pending.googleLocationAddress,
-                  google_connected_at: pending.googleLocationId ? new Date().toISOString() : null,
-                  display_order: pending.displayOrder,
-                })
-                .select('id, name')
-                .single();
-
-              if (!error && inserted) {
-                const { data: profile } = await admin
-                  .from('profiles')
-                  .select('subscription_plan, selected_plan')
-                  .eq('id', pending.userId)
-                  .single();
-
-                const planSlug = toPlanSlug(
-                  profile?.subscription_plan ?? null,
-                  profile?.selected_plan ?? null
-                );
-                const { count } = await admin
-                  .from('establishments')
-                  .select('id', { head: true, count: 'exact' })
-                  .eq('user_id', pending.userId);
-                const totalNextMonth = getTotalMonthlyPrice(planSlug, count ?? 0);
-                const customer = await stripe.customers.retrieve(customerId);
-                const customerEmail = (customer && !('deleted' in customer) && customer.email) || invoice.customer_email;
-                const appUrl = process.env.NEXT_PUBLIC_SITE_URL ?? process.env.NEXT_PUBLIC_APP_URL ?? 'https://reputexa.fr';
-
-                if (customerEmail && canSendEmail()) {
-                  const html = getEstablishmentAddedEmailHtml({
-                    establishmentName: pending.name,
-                    totalNextMonth,
-                    dashboardUrl: `${appUrl}/fr/dashboard/establishments`,
-                  });
-                  sendEmail({
-                    to: customerEmail,
-                    subject: 'Nouvel établissement ajouté - Reputexa',
-                    html,
-                    from: process.env.RESEND_FROM ?? DEFAULT_FROM,
-                  }).catch(() => {});
-                }
-
-                await stripe.subscriptions.update(subscriptionId, {
-                  metadata: { pendingAddon: '' },
-                });
-              }
-            }
-          } catch (e) {
-            console.error('[stripe/webhook] invoice.paid pendingAddon', e);
-          }
+        const qty = getSubscriptionQuantity(subscription);
+        const customerId = typeof subscription.customer === 'string' ? subscription.customer : subscription.customer?.id;
+        const admin = createAdminClient();
+        if (admin && customerId) {
+          await admin
+            .from('profiles')
+            .update({ subscription_quantity: qty })
+            .eq('stripe_customer_id', customerId);
         }
       }
+      revalidateDashboard();
     }
 
     // Paiement échoué : passer subscription_status en past_due
@@ -329,12 +367,6 @@ export async function POST(request: Request) {
       const invoice = event.data.object as Stripe.Invoice & { subscription?: string };
       const subscriptionId = typeof invoice.subscription === 'string' ? invoice.subscription : null;
       if (subscriptionId) {
-        const subscription = await stripe.subscriptions.retrieve(subscriptionId);
-        if (subscription.metadata?.pendingAddon) {
-          await stripe.subscriptions.update(subscriptionId, {
-            metadata: { pendingAddon: '' },
-          });
-        }
         const admin = createAdminClient();
         if (admin) {
           await admin
@@ -343,11 +375,18 @@ export async function POST(request: Request) {
             .eq('stripe_subscription_id', subscriptionId);
         }
       }
+      revalidateDashboard();
     }
 
     return NextResponse.json({ received: true });
   } catch (error) {
-    console.error('[stripe/webhook]', error);
-    return NextResponse.json({ error: 'Webhook handler failed' }, { status: 500 });
+    console.error('[stripe/webhook] Handler failed:', error);
+    const msg = error instanceof Error ? error.message : String(error);
+    const stack = error instanceof Error ? error.stack : undefined;
+    if (stack) console.error('[stripe/webhook] Stack:', stack);
+    return NextResponse.json(
+      { error: 'Webhook handler failed', details: msg },
+      { status: 500 }
+    );
   }
 }

@@ -1,8 +1,8 @@
 'use client';
 
-import { Component, type ReactNode } from 'react';
+import { Suspense, Component, type ReactNode } from 'react';
 import { SuccessPaymentToast } from './success-payment-toast';
-import { SubscriptionSuccessEffects } from './subscription-success-effects';
+import { SuccessOverlay } from './success-overlay';
 import { UpgradeSuccessToast } from './upgrade-success-toast';
 
 /**
@@ -35,9 +35,11 @@ class SuccessEffectsErrorBoundary extends Component<
 export function SuccessEffectsWrapper() {
   return (
     <SuccessEffectsErrorBoundary>
-      <SuccessPaymentToast />
-      <SubscriptionSuccessEffects />
-      <UpgradeSuccessToast />
+      <Suspense fallback={null}>
+        <SuccessPaymentToast />
+        <SuccessOverlay />
+        <UpgradeSuccessToast />
+      </Suspense>
     </SuccessEffectsErrorBoundary>
   );
 }

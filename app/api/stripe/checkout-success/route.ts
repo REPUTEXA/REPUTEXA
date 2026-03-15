@@ -23,9 +23,12 @@ export async function GET(request: Request) {
     const locale = searchParams.get('locale') ?? 'fr';
     const plan = searchParams.get('plan') ?? 'pulse';
     const statusParam = searchParams.get('status') ?? 'success';
+    const flow = searchParams.get('flow') ?? '';
 
     const baseUrl = getSiteUrl().replace(/\/+$/, '');
-    const dashboardUrl = `${baseUrl}/${locale}/dashboard?status=${statusParam}&plan=${plan}`;
+    const dashboardUrl = flow === 'add-establishment'
+      ? `${baseUrl}/${locale}/dashboard?status=upgraded&showUpdates=true`
+      : `${baseUrl}/${locale}/dashboard?status=${statusParam}&plan=${plan}`;
 
     if (!sessionId || !secretKey) {
       return NextResponse.redirect(`${baseUrl}/${locale}/dashboard`);
@@ -77,12 +80,29 @@ export async function GET(request: Request) {
         .limit(1);
 
       if (profiles && profiles.length > 0) {
+        const subscription =
+          typeof session.subscription === 'object' && session.subscription
+            ? (session.subscription as Stripe.Subscription)
+            : subscriptionId
+              ? await stripe.subscriptions.retrieve(subscriptionId)
+              : null;
+        const quantity =
+          subscription?.items?.data?.[0]?.quantity != null
+            ? Math.max(1, Number(subscription.items.data[0].quantity))
+            : 1;
+        const periodEnd =
+          subscription?.current_period_end != null
+            ? new Date(subscription.current_period_end * 1000).toISOString()
+            : null;
+
         await admin
           .from('profiles')
           .update({
             selected_plan: validPlan,
             subscription_plan: subscriptionPlan,
             subscription_status: subscriptionStatus,
+            subscription_quantity: quantity,
+            subscription_period_end: periodEnd,
             trial_ends_at: subscriptionStatus === 'trialing' ? trialEndsAt : null,
             stripe_subscription_id: subscriptionId,
             ...(stripeCustomerId ? { stripe_customer_id: stripeCustomerId } : {}),

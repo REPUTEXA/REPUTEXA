@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { hasFeature, toPlanSlug, FEATURES } from '@/lib/feature-gate';
+import { validateEstablishmentId } from '@/lib/validate-establishment';
 
 /**
  * GET : récupère les weekly insights pour l'utilisateur connecté.
@@ -26,7 +27,8 @@ export async function GET(request: Request) {
   }
 
   const { searchParams } = new URL(request.url);
-  const establishmentId = searchParams.get('establishmentId')?.trim() || null;
+  const rawEstablishmentId = searchParams.get('establishmentId')?.trim() || null;
+  const establishmentId = await validateEstablishmentId(supabase, rawEstablishmentId ?? 'profile');
 
   let query = supabase
     .from('weekly_insights')
@@ -36,7 +38,7 @@ export async function GET(request: Request) {
 
   if (establishmentId === 'profile') {
     query = query.is('establishment_id', null);
-  } else if (establishmentId && /^[0-9a-f-]{36}$/i.test(establishmentId)) {
+  } else if (establishmentId) {
     query = query.eq('establishment_id', establishmentId);
   }
 

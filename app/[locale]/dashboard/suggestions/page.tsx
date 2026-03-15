@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
-import { Loader2, Mic, Camera, Send, ThumbsUp } from 'lucide-react';
+import { Loader2, Mic, Camera, Send, ThumbsUp, Check } from 'lucide-react';
 import { toast } from 'sonner';
 import { useTranslations } from 'next-intl';
 
@@ -13,14 +13,15 @@ type AppSuggestion = {
   status: string;
   upvotes_count: number;
   created_at: string;
+  completed_at?: string | null;
   user_has_upvoted: boolean;
   image_url?: string | null;
 };
 
 const STATUS_STYLES: Record<string, string> = {
-  PENDING: 'bg-amber-500/10 text-amber-400',
-  IN_PROGRESS: 'bg-[#2563eb]/10 text-[#2563eb]',
-  DONE: 'bg-emerald-500/10 text-emerald-400',
+  PENDING: 'bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-400/30',
+  IN_PROGRESS: 'bg-[#2563eb]/15 text-[#2563eb] border border-[#2563eb]/30',
+  DONE: 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-400/30',
 };
 
 function formatDate(s: string): string {
@@ -42,6 +43,7 @@ export default function SuggestionsPage() {
   const [transcribing, setTranscribing] = useState(false);
   const [suggestingTitle, setSuggestingTitle] = useState(false);
   const [upvoting, setUpvoting] = useState<string | null>(null);
+  const [statusUpdating, setStatusUpdating] = useState<string | null>(null);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -206,10 +208,40 @@ export default function SuggestionsPage() {
     }
   };
 
+  const handleStatusChange = async (id: string, newStatus: string) => {
+    setStatusUpdating(id);
+    try {
+      const res = await fetch(`/api/app-suggestions/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: newStatus }),
+        credentials: 'include',
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error ?? 'Erreur');
+      setSuggestions((prev) =>
+        prev.map((s) => (s.id === id ? { ...s, status: data.suggestion.status, completed_at: data.suggestion.completed_at ?? null } : s))
+      );
+      if (newStatus === 'DONE') {
+        toast.success('Suggestion archivée et ajoutée aux mises à jour !');
+      }
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Erreur');
+    } finally {
+      setStatusUpdating(null);
+    }
+  };
+
   const getStatusBadge = (status: string) => {
     const style = STATUS_STYLES[status] ?? STATUS_STYLES.PENDING;
     const label = t(`list.status.${status}` as Parameters<typeof t>[0]);
-    return <span className={`px-2.5 py-1 rounded-lg text-xs font-medium ${style}`}>{label}</span>;
+    const isDone = status === 'DONE';
+    return (
+      <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-medium ${style}`}>
+        {isDone && <Check className="w-3.5 h-3.5" strokeWidth={2.5} />}
+        {label}
+      </span>
+    );
   };
 
   return (
@@ -354,54 +386,73 @@ export default function SuggestionsPage() {
             </p>
           ) : (
             <ul className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {suggestions.map((s) => (
-                <li
-                  key={s.id}
-                  className="p-5 rounded-xl border border-slate-100 dark:border-slate-800 dark:border-white/[0.05] bg-slate-50/50 dark:bg-slate-800/30 shadow-[4px_6px_0_rgba(0,0,0,0.04)] dark:shadow-[4px_6px_0_rgba(0,0,0,0.5)] transition-colors duration-200"
-                >
-                  <div className="flex gap-4">
-                    <button
-                      type="button"
-                      onClick={() => handleUpvote(s.id)}
-                      disabled={!!upvoting}
-                      className={`shrink-0 flex flex-col items-center gap-0.5 p-2 rounded-lg transition-colors ${
-                        s.user_has_upvoted
-                          ? 'bg-[#2563eb]/10 dark:bg-[#2563eb]/20 text-[#2563eb] dark:text-[#2563eb]'
-                          : 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-zinc-400 hover:bg-slate-200 dark:hover:bg-white/5'
-                      }`}
-                    >
-                      {upvoting === s.id ? (
-                        <Loader2 className="w-5 h-5 animate-spin" />
-                      ) : (
-                        <ThumbsUp className="w-5 h-5" />
-                      )}
-                      <span className="text-xs font-semibold">{s.upvotes_count}</span>
-                    </button>
-                    <div className="min-w-0 flex-1">
-                      {s.image_url && (
-                        <Image
-                          src={s.image_url}
-                          alt=""
-                          width={400}
-                          height={128}
-                          className="mb-2 w-full max-h-32 rounded-lg object-cover border border-slate-200 dark:border-slate-700"
-                          unoptimized
-                        />
-                      )}
-                      <p className="font-medium text-slate-900 dark:text-zinc-100">{s.title}</p>
-                      {s.description && (
-                        <p className="text-sm text-slate-600 dark:text-zinc-400 mt-1 line-clamp-3">
-                          {s.description}
+              {suggestions.map((s) => {
+                const isDone = s.status === 'DONE';
+                return (
+                  <li
+                    key={s.id}
+                    className={`p-5 rounded-xl border transition-all duration-200 ${
+                      isDone
+                        ? 'border-slate-200/80 dark:border-zinc-700/80 bg-slate-50/80 dark:bg-slate-800/20 opacity-90'
+                        : 'border-slate-100 dark:border-slate-800 dark:border-white/[0.05] bg-slate-50/50 dark:bg-slate-800/30 shadow-[4px_6px_0_rgba(0,0,0,0.04)] dark:shadow-[4px_6px_0_rgba(0,0,0,0.5)]'
+                    }`}
+                  >
+                    <div className="flex gap-4">
+                      <button
+                        type="button"
+                        onClick={() => handleUpvote(s.id)}
+                        disabled={!!upvoting}
+                        className={`shrink-0 flex flex-col items-center gap-0.5 p-2 rounded-lg transition-colors ${
+                          s.user_has_upvoted
+                            ? 'bg-[#2563eb]/10 dark:bg-[#2563eb]/20 text-[#2563eb] dark:text-[#2563eb]'
+                            : 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-zinc-400 hover:bg-slate-200 dark:hover:bg-white/5'
+                        }`}
+                      >
+                        {upvoting === s.id ? (
+                          <Loader2 className="w-5 h-5 animate-spin" />
+                        ) : (
+                          <ThumbsUp className="w-5 h-5" />
+                        )}
+                        <span className="text-xs font-semibold">{s.upvotes_count}</span>
+                      </button>
+                      <div className="min-w-0 flex-1">
+                        {s.image_url && (
+                          <Image
+                            src={s.image_url}
+                            alt=""
+                            width={400}
+                            height={128}
+                            className="mb-2 w-full max-h-32 rounded-lg object-cover border border-slate-200 dark:border-slate-700"
+                            unoptimized
+                          />
+                        )}
+                        <p className={`font-medium text-slate-900 dark:text-zinc-100 ${isDone ? 'line-through decoration-slate-400 dark:decoration-zinc-500' : ''}`}>
+                          {s.title}
                         </p>
-                      )}
-                      <div className="mt-2 flex items-center gap-2 text-xs text-slate-500 dark:text-zinc-1000">
-                        <span>{formatDate(s.created_at)}</span>
-                        {getStatusBadge(s.status)}
+                        {s.description && (
+                          <p className={`text-sm text-slate-600 dark:text-zinc-400 mt-1 line-clamp-3 ${isDone ? 'opacity-75' : ''}`}>
+                            {s.description}
+                          </p>
+                        )}
+                        <div className="mt-2 flex flex-wrap items-center gap-2 text-xs text-slate-500 dark:text-zinc-500">
+                          <span>{formatDate(s.created_at)}</span>
+                          {getStatusBadge(s.status)}
+                          <select
+                            value={s.status}
+                            onChange={(e) => handleStatusChange(s.id, e.target.value)}
+                            disabled={!!statusUpdating}
+                            className="ml-auto px-2 py-1 rounded-lg border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-slate-700 dark:text-zinc-300 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-[#2563eb]/30 disabled:opacity-50"
+                          >
+                            <option value="PENDING">{t('list.status.PENDING')}</option>
+                            <option value="IN_PROGRESS">{t('list.status.IN_PROGRESS')}</option>
+                            <option value="DONE">{t('list.status.DONE')}</option>
+                          </select>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                </li>
-              ))}
+                  </li>
+                );
+              })}
             </ul>
           )}
         </div>

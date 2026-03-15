@@ -13,7 +13,6 @@ import { RatingEvolutionChart } from '@/components/dashboard/rating-evolution-ch
 import { PlatformDistributionChart } from '@/components/dashboard/platform-distribution-chart';
 import { WhatsAppShareButton } from '@/components/share/whatsapp-share-button';
 import { DashboardDateRangePicker } from '@/components/dashboard/dashboard-date-range-picker';
-import { SuccessEffectsWrapper } from '@/components/dashboard/success-effects-wrapper';
 
 type Props = {
   params: Promise<{ locale: string }>;
@@ -34,7 +33,7 @@ type ReviewDisplay = {
 
 export default async function DashboardPage({ params, searchParams }: Props) {
   const { locale } = await params;
-  const { welcome, status, plan, q, from, to, period } = await searchParams;
+  const { q, from, to, period } = await searchParams;
   setRequestLocale(locale);
 
   const t = await getTranslations('Dashboard.overview');
@@ -224,20 +223,6 @@ export default async function DashboardPage({ params, searchParams }: Props) {
 
   return (
     <div className="px-4 sm:px-6 md:px-8 py-6 sm:py-8 space-y-6 max-w-[1600px] mx-auto">
-      <Suspense fallback={null}>
-        <SuccessEffectsWrapper />
-      </Suspense>
-      {(welcome === '1' || status === 'success' || status === 'trial_started') && (
-        <div className="rounded-2xl bg-emerald-500/15 dark:bg-emerald-500/10 border border-emerald-500/30 dark:border-emerald-500/20 p-4 text-emerald-800 dark:text-emerald-200">
-          <p className="font-medium">
-            Bienvenue ! {plan
-              ? `Votre abonnement ${plan === 'zenith' ? 'ZENITH' : plan.charAt(0).toUpperCase() + plan.slice(1)} a bien été activé.`
-              : 'Votre essai gratuit de 14 jours a bien été activé.'}
-          </p>
-          <p className="mt-1 text-sm opacity-90 dark:text-emerald-200/90">Explorez toutes les fonctionnalités de votre plan.</p>
-        </div>
-      )}
-
       {/* Titre & date */}
       <div>
         <h1 className="font-display font-bold text-2xl text-slate-900 dark:text-zinc-100">{t('title')}</h1>

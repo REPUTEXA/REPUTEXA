@@ -33,6 +33,7 @@
     "react-dom": "^18",
     "react-email": "^5.2.9",
     "react-google-places-autocomplete": "^4.1.0",
+    "react-joyride": "^2.9.3",
     "react-phone-number-input": "^3.4.16",
     "react-turnstile": "^1.1.5",
     "recharts": "^3.8.0",

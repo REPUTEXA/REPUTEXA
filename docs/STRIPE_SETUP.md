@@ -37,12 +37,19 @@ Dans ton `.env` (local) et dans Vercel (Settings → Environment Variables) :
 | `STRIPE_PRICE_ID_VISION` | Stripe → Products → Prix Vision 59€/mois | `price_...` |
 | `STRIPE_PRICE_ID_PULSE` | Stripe → Products → Prix Pulse 97€/mois | `price_...` |
 | `STRIPE_PRICE_ID_ZENITH` | Stripe → Products → Prix Zenith 157€/mois | `price_...` |
+| `STRIPE_PRICE_ID_VISION_ANNUAL` | Vision facturé annuellement (-20%) | `price_...` |
+| `STRIPE_PRICE_ID_PULSE_ANNUAL` | Pulse facturé annuellement (-20%) | `price_...` |
+| `STRIPE_PRICE_ID_ZENITH_ANNUAL` | Zenith facturé annuellement (-20%) | `price_...` |
 | `STRIPE_ADDON_PRODUCT_ID` | Produit Stripe pour addons établissements (voir ci-dessous) | `prod_...` |
 | `NEXT_PUBLIC_APP_URL` | URL de ton site en prod | `https://reputexa.vercel.app` |
 
-**Important :** Crée 3 prix (Price IDs) dans Stripe pour Vision, Pulse et Zenith avec essai 14 jours.
+**Important :** Crée 6 prix dans Stripe avec *Graduated Tiers* : Vision, Pulse, Zenith × Mensuel, Annuel. Paliers : 1er 0%, 2e -20%, 3e -30%, 4e -40%, 5e+ -50%. L’annuel applique -20%. La quantité (nombre d’établissements) est gérée dans la subscription principale via `adjustable_quantity`.
 
-**Addons établissements (multi-lieux) :** Crée un produit Stripe "REPUTEXA Addon" (sans prix fixe). L’API crée automatiquement les prix au prorata (47€, 78€, 143€, etc.) selon la remise. Renseigne `STRIPE_ADDON_PRODUCT_ID` avec l’ID du produit. Si absent, l’ajout d’établissement ne facture pas via Stripe (dev ou abonnement trial).
+**Portail facturation (Customer Portal) :** Stripe → Settings → Billing → Customer portal → active "Subscription updates" pour permettre : changement de plan (Vision/Pulse/Zenith), changement de période (mensuel ↔ annuel), ajustement de la quantité (établissements). Le lien `/api/stripe/portal?flow=upgrade` ou `flow=add-establishment` ouvre directement la page de mise à jour.
+
+**CRITIQUE – Éviter qu’un changement de plan crée un nouvel abonnement :** Dans le portail (Settings → Billing → Customer portal → Subscription updates), configure :
+- **Update a subscription** : l’utilisateur doit **modifier** l’abonnement existant (remplacer le plan/prix), pas ajouter un nouveau produit. Si l’option "Add products" est activée, désactive-la ou assure-toi que "Update subscription" remplace bien l’item existant.
+- **Proration behavior** : mets **"Always invoice"** pour que la prévisualisation du prorata s’affiche et que la facturation soit immédiate au clic sur Confirmer (l’utilisateur est ensuite renvoyé vers `/dashboard?status=upgraded` avec la base déjà à jour via le webhook).
 
 ---
 

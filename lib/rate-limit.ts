@@ -36,3 +36,24 @@ export function checkAuthRateLimit(request: Request): { ok: boolean; remaining?:
 
   return { ok: true, remaining: MAX_REQUESTS - timestamps.length };
 }
+
+/** Contact form: 10 requêtes / minute par IP (transcribe + submit) */
+const CONTACT_WINDOW_MS = 60 * 1000;
+const CONTACT_MAX_REQUESTS = 10;
+const contactStore = new Map<string, number[]>();
+
+export function checkContactRateLimit(request: Request): { ok: boolean; remaining?: number } {
+  const ip = getClientIP(request);
+  const key = `contact:${ip}`;
+  const now = Date.now();
+
+  let timestamps = contactStore.get(key) ?? [];
+  timestamps = timestamps.filter((t) => t > now - CONTACT_WINDOW_MS);
+
+  if (timestamps.length >= CONTACT_MAX_REQUESTS) {
+    return { ok: false };
+  }
+  timestamps.push(now);
+  contactStore.set(key, timestamps);
+  return { ok: true, remaining: CONTACT_MAX_REQUESTS - timestamps.length };
+}

@@ -1,18 +1,26 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useTranslations } from 'next-intl';
 import { useLocale } from 'next-intl';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Link } from '@/i18n/navigation';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Logo } from '@/components/logo';
+import { BillingToggle } from '@/components/billing/billing-toggle';
+import { useBillingCycle } from '@/lib/billing-cycle-context';
 import { createClient } from '@/lib/supabase/client';
-import { Check, Loader2 } from 'lucide-react';
+import { Check, Loader2, Building2 } from 'lucide-react';
 import { toast } from 'sonner';
-
-const MONTHLY_EUR: Record<string, number> = { vision: 59, pulse: 97, zenith: 157 };
-const MONTHLY_USD: Record<string, number> = { vision: 65, pulse: 107, zenith: 175 };
-const ANNUAL_MULTIPLIER = 0.8;
+import { saveCheckoutIntent, getCheckoutIntent } from '@/lib/checkout-intent';
+import {
+  calculatePrice,
+  calculateSavings,
+  calculateAnnualSavings,
+  PLAN_BASE_PRICES_EUR,
+  PLAN_BASE_PRICES_USD,
+  type PlanSlug,
+} from '@/config/pricing';
 
 const PLAN_TO_STRIPE: Record<string, 'starter' | 'manager' | 'dominator'> = {
   vision: 'starter',
@@ -20,11 +28,39 @@ const PLAN_TO_STRIPE: Record<string, 'starter' | 'manager' | 'dominator'> = {
   zenith: 'dominator',
 };
 
+/** Ordre d'affichage constant : Vision, Pulse, Zenith (Mensuel ou Annuel). */
+const PLAN_ORDER: PlanSlug[] = ['vision', 'pulse', 'zenith'];
+
+type PlanConfig = {
+  slug: PlanSlug;
+  titleKey: string;
+  descKey: string;
+  featureKeys: string[];
+  badgeKey: string | null;
+  primary: boolean;
+};
+
+const PLAN_CONFIG: PlanConfig[] = [
+  { slug: 'vision', titleKey: 'visionTitle', descKey: 'visionDesc', featureKeys: ['visionFeature1', 'visionFeature2'], badgeKey: null, primary: false },
+  { slug: 'pulse', titleKey: 'pulseTitle', descKey: 'pulseDesc', featureKeys: ['pulseFeature1', 'pulseFeature2', 'pulseFeature3'], badgeKey: 'pulseBadge', primary: false },
+  { slug: 'zenith', titleKey: 'zenithTitle', descKey: 'zenithDesc', featureKeys: ['zenithFeature1', 'zenithFeature2', 'zenithFeature3'], badgeKey: 'zenithBadge', primary: true },
+];
+
 export default function PricingPage() {
   const t = useTranslations('PricingPage');
   const locale = useLocale();
   const router = useRouter();
-  const [annual, setAnnual] = useState(false);
+  const searchParams = useSearchParams();
+  const { isAnnual: annual, setBillingCycle } = useBillingCycle();
+  const [quantity, setQuantity] = useState(1);
+  const cancelledHandledRef = useRef(false);
+  const resumeHandledRef = useRef(false);
+  const setQuantityClamped = (value: number | ((prev: number) => number)) => {
+    setQuantity((prev) => {
+      const v = typeof value === 'function' ? value(prev) : value;
+      return Math.min(15, Math.max(1, Math.round(Number(v)) || 1));
+    });
+  };
   const [session, setSession] = useState<{ user: { id: string } } | null>(null);
   const [sessionLoading, setSessionLoading] = useState(true);
   const [checkoutLoading, setCheckoutLoading] = useState<string | null>(null);
@@ -42,22 +78,98 @@ export default function PricingPage() {
     return () => subscription.unsubscribe();
   }, []);
 
-  const formatPrice = (planKey: string) => {
-    const base = useUsd ? MONTHLY_USD[planKey] ?? 0 : MONTHLY_EUR[planKey] ?? 0;
-    const amount = annual ? Math.round(base * 12 * ANNUAL_MULTIPLIER) : base;
-    return new Intl.NumberFormat(locale === 'en' ? 'en-US' : 'fr-FR', {
+  // Retour annulation Stripe : toast élégant + forcer toggle depuis URL + scroll vers le plan
+  const statusCancelled = searchParams?.get('status') === 'cancelled';
+  const urlPlan = searchParams?.get('plan');
+  const urlAnnual = searchParams?.get('annual');
+  useEffect(() => {
+    if (!statusCancelled || cancelledHandledRef.current) return;
+    cancelledHandledRef.current = true;
+    toast.info(t('paymentCancelledToast'), {
+      duration: 5000,
+      className: 'border-slate-200 dark:border-slate-700 shadow-lg',
+    });
+    if (urlAnnual === '1') setBillingCycle('year');
+    else if (urlAnnual === '0') setBillingCycle('month');
+    const plan = urlPlan && ['vision', 'pulse', 'zenith'].includes(urlPlan) ? urlPlan : null;
+    if (plan) {
+      const id = `plan-card-${plan}`;
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        });
+      });
+    }
+    // Retirer status=cancelled de l'URL pour que un refresh ne réaffiche pas le toast
+    const url = new URL(window.location.href);
+    url.searchParams.delete('status');
+    window.history.replaceState(null, '', url.pathname + url.search);
+  }, [statusCancelled, urlPlan, urlAnnual, setBillingCycle, t]);
+
+  // Fallback localStorage : utilisateur revient plus tard sans passer par cancel_url
+  useEffect(() => {
+    if (statusCancelled || resumeHandledRef.current) return;
+    try {
+      const raw = typeof window !== 'undefined' ? window.localStorage.getItem(CHECKOUT_INTENT_KEY) : null;
+      if (!raw) return;
+      const data = JSON.parse(raw) as { plan?: string; annual?: boolean; quantity?: number; timestamp?: number };
+      if (!data?.plan || !data.timestamp || Date.now() - data.timestamp > INTENT_MAX_AGE_MS) return;
+      resumeHandledRef.current = true;
+      if (data.annual === true) setBillingCycle('year');
+      else if (data.annual === false) setBillingCycle('month');
+      if (typeof data.quantity === 'number' && data.quantity >= 1 && data.quantity <= 15) {
+      setQuantityClamped(data.quantity);
+    }
+    const plan = ['vision', 'pulse', 'zenith'].includes(data.plan) ? data.plan : null;
+    if (plan) {
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          document.getElementById(`plan-card-${plan}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        });
+      });
+      toast.info(t('resumeCheckoutToast'), {
+        duration: 6000,
+        className: 'border-slate-200 dark:border-slate-700 shadow-lg',
+      });
+    }
+  }, [statusCancelled, setBillingCycle, t]);
+
+  const getBasePrice = (planKey: string) =>
+    (useUsd ? PLAN_BASE_PRICES_USD : PLAN_BASE_PRICES_EUR)[planKey as PlanSlug] ?? 0;
+  const getSavingsAmount = (planKey: string) =>
+    calculateSavings(getBasePrice(planKey), quantity);
+  const getAnnualSavingsAmount = (planKey: string) =>
+    calculateAnnualSavings(getBasePrice(planKey), quantity);
+
+  const currencyFmt = (amount: number) =>
+    new Intl.NumberFormat(locale === 'en' ? 'en-US' : 'fr-FR', {
       style: 'currency',
       currency: useUsd ? 'USD' : 'EUR',
       minimumFractionDigits: 0,
       maximumFractionDigits: 0,
     }).format(amount);
+
+  const formatPrice = (planKey: string) => {
+    const amount = calculatePrice(getBasePrice(planKey), quantity, annual);
+    return currencyFmt(amount);
+  };
+
+  /** Pour l'affichage annuel : prix mensuel équivalent (total annuel / 12) et total annuel pour "Facturé annuellement". */
+  const getAnnualDisplay = (planKey: string) => {
+    const totalAnnual = calculatePrice(getBasePrice(planKey), quantity, true);
+    return { monthlyEquivalent: totalAnnual / 12, totalAnnual };
   };
 
   const suffix = annual ? t('perYear') : t('perMonth');
 
+  const sortedPlans = [...PLAN_CONFIG].sort(
+    (a, b) => PLAN_ORDER.indexOf(a.slug) - PLAN_ORDER.indexOf(b.slug)
+  );
+
   const handleSubscribe = (planKey: string) => {
+    saveCheckoutIntent(planKey, annual, quantity);
     if (!session) {
-      router.push(`/${locale}/signup?mode=checkout&plan=${planKey}`);
+      router.push(`/${locale}/signup?mode=checkout&plan=${planKey}&annual=${annual ? '1' : '0'}`);
       return;
     }
     handleCheckout(planKey);
@@ -65,13 +177,17 @@ export default function PricingPage() {
 
   const handleCheckout = async (planKey: string) => {
     if (!session) return;
+    saveCheckoutIntent(planKey, annual, quantity);
     setCheckoutLoading(planKey);
+    const qty = Math.min(15, Math.max(1, quantity));
     try {
       const params = new URLSearchParams({
         locale,
         planType: PLAN_TO_STRIPE[planKey] ?? 'manager',
         planSlug: planKey,
       });
+      if (annual) params.set('annual', '1');
+      params.set('quantity', String(qty));
       if (annual) params.set('skipTrial', '1');
       const res = await fetch(`/api/stripe/create-checkout?${params}`, {
         method: 'POST',
@@ -124,143 +240,175 @@ export default function PricingPage() {
           </p>
         </div>
 
-        {/* Toggle Monthly / Annual */}
-        <div className="flex justify-center items-center gap-3 mb-12">
-          <span className={`text-sm font-medium transition-colors ${!annual ? 'text-slate-900 dark:text-slate-100' : 'text-slate-500 dark:text-slate-400'}`}>
-            {t('monthly')}
-          </span>
-          <button
-            type="button"
-            role="switch"
-            aria-checked={annual}
-            onClick={() => setAnnual((a) => !a)}
-            className={`relative w-14 h-7 rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-[#2563eb] focus:ring-offset-2 ${annual ? 'bg-[#2563eb]' : 'bg-slate-300 dark:bg-slate-600'}`}
-          >
-            <span
-              className={`absolute top-1 w-5 h-5 rounded-full bg-white shadow transition-transform duration-200 ${annual ? 'left-8' : 'left-1'}`}
-            />
-          </button>
-          <span className={`text-sm font-medium transition-colors ${annual ? 'text-slate-900 dark:text-slate-100' : 'text-slate-500 dark:text-slate-400'}`}>
-            {t('annual')}
-          </span>
-          <span className="ml-2 px-2 py-0.5 rounded-md bg-emerald-100 dark:bg-emerald-900/50 text-emerald-700 dark:text-emerald-300 text-xs font-bold">
-            {t('annualBadge')}
-          </span>
+        {/* Toggle Monthly / Annual — catalogue synchronisé avec le cycle */}
+        <div className="flex justify-center mb-12">
+          <BillingToggle
+            annualBadge={t('annualBadge')}
+            monthlyLabel={t('monthly')}
+            annualLabel={t('annual')}
+          />
         </div>
 
-        {/* 3 cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {/* Vision */}
-          <div className="rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm p-6 flex flex-col">
-            <h2 className="font-display font-bold text-xl text-slate-900 dark:text-slate-100">
-              {t('visionTitle')}
-            </h2>
-            <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-              {t('visionDesc')}
-            </p>
-            <p className="mt-4 text-2xl font-bold text-slate-900 dark:text-slate-100">
-              {formatPrice('vision')}
-              <span className="text-sm font-normal text-slate-500 dark:text-slate-400 ml-1">{suffix}</span>
-            </p>
-            <ul className="mt-6 space-y-3 flex-1">
-              <li className="flex items-start gap-2 text-sm text-slate-700 dark:text-slate-200">
-                <Check className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
-                {t('visionFeature1')}
-              </li>
-              <li className="flex items-start gap-2 text-sm text-slate-700 dark:text-slate-200">
-                <Check className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
-                {t('visionFeature2')}
-              </li>
-            </ul>
-            <PlanButton
-              planKey="vision"
-              loading={checkoutLoading === 'vision'}
-              sessionLoading={sessionLoading}
-              onSubscribe={() => handleSubscribe('vision')}
-              trialHref="/signup?mode=trial"
-              t={t}
-            />
-          </div>
+        {/* Badge Économisez (annuel et/ou quantité) */}
+        {(() => {
+          const basePulse = getBasePrice('pulse');
+          const savingsDegressive = calculateSavings(basePulse, quantity);
+          const savingsAnnual = annual ? calculateAnnualSavings(basePulse, quantity) : 0;
+          const totalSavings = savingsDegressive + savingsAnnual;
+          if (totalSavings <= 0) return null;
+          return (
+            <div className="flex justify-center mb-8">
+              <span className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-50 dark:bg-emerald-900/30 border border-emerald-200 dark:border-emerald-700/50 text-emerald-700 dark:text-emerald-300 text-sm font-semibold">
+                {t('savingsBadge', {
+                  amount: new Intl.NumberFormat(locale === 'en' ? 'en-US' : 'fr-FR', {
+                    style: 'currency',
+                    currency: useUsd ? 'USD' : 'EUR',
+                    maximumFractionDigits: 0,
+                  }).format(totalSavings),
+                })}
+              </span>
+            </div>
+          );
+        })()}
 
-          {/* Pulse */}
-          <div className="rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm p-6 flex flex-col relative">
-            <span className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-slate-600 dark:bg-slate-500 text-white text-xs font-bold">
-              {t('pulseBadge')}
+        {/* Slider quantité établissements — prix mis à jour dynamiquement */}
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-6 mb-12 max-w-md mx-auto">
+          <div className="flex items-center gap-2 shrink-0">
+            <Building2 className="w-5 h-5 text-slate-500 dark:text-slate-400" />
+            <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
+              {t('establishments')}
             </span>
-            <h2 className="font-display font-bold text-xl text-slate-900 dark:text-slate-100 mt-1">
-              {t('pulseTitle')}
-            </h2>
-            <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-              {t('pulseDesc')}
-            </p>
-            <p className="mt-4 text-2xl font-bold text-slate-900 dark:text-slate-100">
-              {formatPrice('pulse')}
-              <span className="text-sm font-normal text-slate-500 dark:text-slate-400 ml-1">{suffix}</span>
-            </p>
-            <ul className="mt-6 space-y-3 flex-1">
-              <li className="flex items-start gap-2 text-sm text-slate-700 dark:text-slate-200">
-                <Check className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
-                {t('pulseFeature1')}
-              </li>
-              <li className="flex items-start gap-2 text-sm text-slate-700 dark:text-slate-200">
-                <Check className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
-                {t('pulseFeature2')}
-              </li>
-              <li className="flex items-start gap-2 text-sm text-slate-700 dark:text-slate-200">
-                <Check className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
-                {t('pulseFeature3')}
-              </li>
-            </ul>
-            <PlanButton
-              planKey="pulse"
-              loading={checkoutLoading === 'pulse'}
-              sessionLoading={sessionLoading}
-              onSubscribe={() => handleSubscribe('pulse')}
-              trialHref="/signup?mode=trial"
-              t={t}
-              primary
-            />
           </div>
+          <div className="flex items-center gap-4 w-full sm:w-auto">
+            <button
+              type="button"
+              onClick={() => setQuantityClamped((q) => q - 1)}
+              disabled={quantity <= 1}
+              className="w-10 h-10 shrink-0 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-semibold disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
+            >
+              −
+            </button>
+            <input
+              type="range"
+              min={1}
+              max={15}
+              value={Math.min(15, Math.max(1, quantity))}
+              onChange={(e) => setQuantityClamped(Number(e.target.value))}
+              className="flex-1 h-2 rounded-full appearance-none bg-slate-200 dark:bg-slate-700 accent-[#2563eb] cursor-pointer"
+            />
+            <button
+              type="button"
+              onClick={() => setQuantityClamped((q) => q + 1)}
+              disabled={quantity >= 15}
+              className="w-10 h-10 shrink-0 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-semibold disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
+            >
+              +
+            </button>
+            <span className="min-w-[2rem] text-center font-bold text-slate-900 dark:text-slate-100 tabular-nums">
+              {quantity}
+            </span>
+          </div>
+        </div>
+        <p className="text-center text-xs text-slate-500 dark:text-slate-400 mb-10 max-w-md mx-auto">
+          {t('prorataMessage')}
+        </p>
 
-          {/* Zenith - Mise en avant */}
-          <div className="rounded-2xl bg-white dark:bg-slate-900 border-2 border-[#2563eb] shadow-lg shadow-[#2563eb]/15 p-6 flex flex-col relative ring-2 ring-[#2563eb]/20">
-            <span className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-[#2563eb] text-white text-xs font-bold">
-              {t('zenithBadge')}
-            </span>
-            <h2 className="font-display font-bold text-xl text-slate-900 dark:text-slate-100 mt-1">
-              {t('zenithTitle')}
-            </h2>
-            <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-              {t('zenithDesc')}
-            </p>
-            <p className="mt-4 text-2xl font-bold text-[#2563eb]">
-              {formatPrice('zenith')}
-              <span className="text-sm font-normal text-slate-500 dark:text-slate-400 ml-1">{suffix}</span>
-            </p>
-            <ul className="mt-6 space-y-3 flex-1">
-              <li className="flex items-start gap-2 text-sm text-slate-700 dark:text-slate-200">
-                <Check className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
-                {t('zenithFeature1')}
-              </li>
-              <li className="flex items-start gap-2 text-sm text-slate-700 dark:text-slate-200">
-                <Check className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
-                {t('zenithFeature2')}
-              </li>
-              <li className="flex items-start gap-2 text-sm text-slate-700 dark:text-slate-200">
-                <Check className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
-                {t('zenithFeature3')}
-              </li>
-            </ul>
-            <PlanButton
-              planKey="zenith"
-              loading={checkoutLoading === 'zenith'}
-              sessionLoading={sessionLoading}
-              onSubscribe={() => handleSubscribe('zenith')}
-              trialHref="/signup?mode=trial"
-              t={t}
-              primary
-            />
-          </div>
+        {/* Cartes triées par PLAN_ORDER : Vision, Pulse, Zenith (Mensuel ou Annuel). */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6" data-plan-order={PLAN_ORDER.join(',')}>
+          {sortedPlans.map((plan) => {
+            const slug = plan.slug;
+            const isZenith = plan.primary;
+            const { monthlyEquivalent, totalAnnual } = getAnnualDisplay(slug);
+            const cardBorder = isZenith
+              ? 'border-2 border-[#2563eb] shadow-lg shadow-[#2563eb]/15 ring-2 ring-[#2563eb]/20'
+              : 'border border-slate-200 dark:border-slate-800 shadow-sm';
+            const priceClass = isZenith ? 'text-[#2563eb]' : 'text-slate-900 dark:text-slate-100';
+
+            return (
+              <div
+                key={slug}
+                id={`plan-card-${slug}`}
+                className={`rounded-2xl bg-white dark:bg-slate-900 ${cardBorder} p-6 flex flex-col relative`}
+              >
+                {plan.badgeKey && (
+                  <span
+                    className={`absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full text-white text-xs font-bold ${isZenith ? 'bg-[#2563eb]' : 'bg-slate-600 dark:bg-slate-500'}`}
+                  >
+                    {t(plan.badgeKey)}
+                  </span>
+                )}
+                <h2 className={`font-display font-bold text-xl text-slate-900 dark:text-slate-100 ${plan.badgeKey ? 'mt-1' : ''}`}>
+                  {t(plan.titleKey)}
+                </h2>
+                <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
+                  {t(plan.descKey)}
+                </p>
+                <div className="mt-4">
+                  {annual ? (
+                    <>
+                      <AnimatePresence mode="wait">
+                        <motion.p
+                          key={`annual-${slug}-${quantity}`}
+                          initial={{ opacity: 0, y: 4 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: -4 }}
+                          transition={{ duration: 0.2 }}
+                          className={`text-2xl font-bold ${priceClass}`}
+                        >
+                          {currencyFmt(monthlyEquivalent)}
+                          <span className="text-sm font-normal text-slate-500 dark:text-slate-400 ml-1">{t('perMonth')}</span>
+                        </motion.p>
+                      </AnimatePresence>
+                      <p className="mt-0.5 text-sm text-slate-500 dark:text-slate-400">
+                        {t('billedAnnually', { amount: currencyFmt(totalAnnual) })}
+                      </p>
+                    </>
+                  ) : (
+                    <AnimatePresence mode="wait">
+                      <motion.p
+                        key={`monthly-${slug}-${quantity}`}
+                        initial={{ opacity: 0, y: 4 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -4 }}
+                        transition={{ duration: 0.2 }}
+                        className={`text-2xl font-bold ${priceClass}`}
+                      >
+                        {formatPrice(slug)}
+                        <span className="text-sm font-normal text-slate-500 dark:text-slate-400 ml-1">{suffix}</span>
+                      </motion.p>
+                    </AnimatePresence>
+                  )}
+                </div>
+                {quantity > 1 && (
+                  <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">
+                    {t('perEstablishments', { count: quantity })}
+                    {getSavingsAmount(slug) > 0 && (
+                      <span className="ml-2 text-emerald-600 dark:text-emerald-400 font-medium">
+                        · {t('savings', { amount: currencyFmt(getSavingsAmount(slug)) })}
+                      </span>
+                    )}
+                  </p>
+                )}
+                <ul className="mt-6 space-y-3 flex-1">
+                  {plan.featureKeys.map((key) => (
+                    <li key={key} className="flex items-start gap-2 text-sm text-slate-700 dark:text-slate-200">
+                      <Check className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
+                      {t(key)}
+                    </li>
+                  ))}
+                </ul>
+                <PlanButton
+                  planKey={slug}
+                  loading={checkoutLoading === slug}
+                  sessionLoading={sessionLoading}
+                  onSubscribe={() => handleSubscribe(slug)}
+                  trialHref="/signup?mode=trial"
+                  t={t}
+                  primary={plan.primary}
+                />
+              </div>
+            );
+          })}
         </div>
 
         <p className="text-center text-sm text-slate-500 dark:text-slate-400 mt-8">

@@ -3,24 +3,38 @@ import { createClient } from '@/lib/supabase/server';
 
 /**
  * GET /api/app-suggestions
- * Liste des suggestions produit communautaires (app_suggestions), triées par upvotes.
+ * Liste des suggestions produit communautaires.
+ * ?status=DONE : uniquement les terminées (pour page Mises à jour), tri par completed_at.
  */
-export async function GET() {
+export async function GET(request: Request) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const { data, error } = await supabase
+  const { searchParams } = new URL(request.url);
+  const statusFilter = searchParams.get('status');
+
+  let query = supabase
     .from('app_suggestions')
-    .select('id, title, description, status, upvotes_count, created_at, user_id, image_url')
-    .order('upvotes_count', { ascending: false })
-    .order('created_at', { ascending: false })
+    .select('id, title, description, status, upvotes_count, created_at, user_id, image_url, completed_at')
     .limit(100);
+
+  if (statusFilter === 'DONE') {
+    query = query.eq('status', 'DONE').not('completed_at', 'is', null).order('completed_at', { ascending: false });
+  } else {
+    query = query.order('upvotes_count', { ascending: false }).order('created_at', { ascending: false });
+  }
+
+  const { data, error } = await query;
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+
+  if (statusFilter === 'DONE') {
+    return NextResponse.json({ suggestions: data ?? [] });
   }
 
   const { data: myUpvotes } = await supabase

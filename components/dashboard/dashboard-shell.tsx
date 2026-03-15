@@ -6,13 +6,17 @@ import { useSearchParams, useParams } from 'next/navigation';
 import { Link } from '@/i18n/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { getSiteUrl } from '@/lib/site-url';
-import { LogOut, LayoutDashboard, BarChart2, Bell, Lightbulb, Settings, Menu, X, Search, Building2, CheckCircle2, TrendingUp, FileText, Sparkles, ArrowUpCircle } from 'lucide-react';
+import { LogOut, LayoutDashboard, BarChart2, Bell, Lightbulb, Settings, Menu, X, Search, Building2, CheckCircle2, TrendingUp, FileText, Sparkles, Rss, Loader2 } from 'lucide-react';
 import { Logo } from '@/components/logo';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { LanguageSelector } from '@/components/language-selector';
 import { checkPlan, type PlanSlug } from '@/lib/feature-gate';
+import { useActiveLocationOptional } from '@/lib/active-location-context';
+import { useSubscription } from '@/lib/use-subscription';
+import { WelcomeFlash } from './welcome-flash';
 import { PlanBadge } from './plan-badge';
 import { EstablishmentSelector } from './establishment-selector';
+import { UpdatesModal } from './updates-modal';
 import { useTranslations } from 'next-intl';
 
 function SignOutButton() {
@@ -57,8 +61,8 @@ const navItems: Array<{
   { href: '/dashboard/alerts', icon: Bell, key: 'alerts', minPlan: 'pulse' },
   { href: '/dashboard/growth', icon: TrendingUp, key: 'growth', minPlan: 'zenith' },
   { href: '/dashboard/suggestions', icon: Lightbulb, key: 'suggestions', minPlan: 'pulse' },
+  { href: '/dashboard/updates', icon: Rss, key: 'updates', minPlan: 'vision' },
   { href: '/dashboard/establishments', icon: Building2, key: 'establishments', minPlan: 'vision' },
-  { href: '/dashboard/upgrade', icon: ArrowUpCircle, key: 'upgrade', minPlan: 'vision' },
   { href: '/dashboard/settings', icon: Settings, key: 'settings', minPlan: 'vision' },
 ];
 
@@ -72,8 +76,8 @@ const NAV_LABEL_KEYS = {
   alerts: 'alerts',
   growth: 'growth',
   suggestions: 'suggestions',
+  updates: 'updates',
   settings: 'settings',
-  upgrade: 'upgrade',
 } as const;
 
 type Props = {
@@ -90,6 +94,8 @@ type Props = {
   isTrialing?: boolean;
   hasActiveSubscription?: boolean;
   locale?: string;
+  subscriptionQuantity?: number;
+  updatesNewCount?: number;
   children: React.ReactNode;
 };
 
@@ -101,6 +107,7 @@ const PLAN_TO_SLUG: Record<string, string> = {
 };
 
 export function DashboardShell({
+  firstLogin = true,
   establishmentName = 'Mon établissement',
   fullName = '',
   avatarUrl = null,
@@ -114,6 +121,8 @@ export function DashboardShell({
   isTrialing = false,
   hasActiveSubscription = false,
   locale = 'fr',
+  subscriptionQuantity = 1,
+  updatesNewCount = 0,
   children,
 }: Props) {
   const tSidebar = useTranslations('Dashboard.sidebar');
@@ -122,6 +131,9 @@ export function DashboardShell({
   const router = useRouter();
   const searchParams = useSearchParams();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const activeLocation = useActiveLocationOptional();
+  const subscription = useSubscription();
+  const subscriptionQuantityFromStripe = subscription.isError ? 1 : subscription.quantity;
   const qParam = searchParams?.get('q') ?? '';
   const [searchInput, setSearchInput] = useState(qParam);
   const [showNotificationTrends, setShowNotificationTrends] = useState(false);
@@ -133,7 +145,23 @@ export function DashboardShell({
     trend_severity: number | null;
     week_start?: string;
   } | null>(null);
+  const [updatesModalOpen, setUpdatesModalOpen] = useState(false);
   useEffect(() => { setSearchInput(qParam); }, [qParam]);
+
+  // Retour Stripe (showUpdates=true) : confettis via UpgradeSuccessToast puis modale "Quoi de neuf", nettoyer l'URL
+  useEffect(() => {
+    const showUpdates = searchParams?.get('showUpdates');
+    if (showUpdates !== 'true') return;
+    const params = new URLSearchParams(searchParams?.toString() ?? '');
+    params.delete('status');
+    params.delete('showUpdates');
+    const qs = params.toString();
+    const cleanPath = pathname + (qs ? `?${qs}` : '');
+    window.history.replaceState(null, '', cleanPath);
+    // Court délai pour laisser les confettis (UpgradeSuccessToast) se lancer avant la modale
+    const t = setTimeout(() => setUpdatesModalOpen(true), 400);
+    return () => clearTimeout(t);
+  }, [searchParams, pathname]);
 
   useEffect(() => {
     if (!showNotificationTrends) return;
@@ -242,6 +270,7 @@ export function DashboardShell({
           establishmentName={establishmentName}
           fullName={fullName}
           selectedPlanSlug={selectedPlanSlug}
+          subscriptionQuantity={subscriptionQuantityFromStripe}
           onCloseMobile={() => setSidebarOpen(false)}
         />
 
@@ -261,6 +290,7 @@ export function DashboardShell({
                   : 'text-white/60 hover:text-white hover:bg-white/5 dark:hover:bg-white/5'
               }`;
               const showAlertsBadge = item.key === 'alerts' && toxicAlertsCount !== null && toxicAlertsCount > 0;
+              const showUpdatesNewBadge = item.key === 'updates' && updatesNewCount > 0;
               return (
                 <Link
                   key={item.href}
@@ -274,6 +304,11 @@ export function DashboardShell({
                     {showAlertsBadge && (
                       <span className="inline-flex h-4 min-w-[14px] rounded-full bg-red-500 text-[10px] font-semibold text-white items-center justify-center px-1">
                         {toxicAlertsCount > 9 ? '9+' : toxicAlertsCount}
+                      </span>
+                    )}
+                    {showUpdatesNewBadge && (
+                      <span className="inline-flex px-1.5 py-0 rounded-md bg-emerald-500 text-[10px] font-bold text-white uppercase tracking-wide">
+                        New
                       </span>
                     )}
                   </span>
@@ -292,7 +327,33 @@ export function DashboardShell({
       </aside>
 
       {/* Main content */}
-      <div className="flex flex-1 flex-col min-w-0 lg:ml-60">
+      <div className="flex flex-1 flex-col min-w-0 lg:ml-60 relative">
+        {/* Bannière élégante si Stripe indisponible (Apple-style) */}
+        {subscription.isError && (
+          <div className="absolute top-0 left-0 right-0 z-30 rounded-b-2xl border-b border-amber-200 dark:border-amber-500/40 bg-amber-50 dark:bg-amber-500/10 px-4 py-2 flex items-center justify-center gap-3 text-sm">
+            <span className="text-amber-800 dark:text-amber-200">Impossible de charger l&apos;abonnement.</span>
+            <button
+              type="button"
+              onClick={() => subscription.refetch()}
+              className="font-semibold text-amber-700 dark:text-amber-300 hover:underline"
+            >
+              Réessayer
+            </button>
+          </div>
+        )}
+        {/* Loading overlay (Apple-style) when switching establishment */}
+        {activeLocation?.isSwitching && (
+          <div
+            className="absolute inset-0 z-50 flex items-center justify-center bg-white/60 dark:bg-[#030303]/80 backdrop-blur-md transition-opacity duration-300"
+            aria-live="polite"
+            aria-busy="true"
+          >
+            <div className="flex flex-col items-center gap-3">
+              <Loader2 className="w-8 h-8 animate-spin text-primary" aria-hidden />
+              <span className="text-sm font-medium text-slate-600 dark:text-slate-300">Chargement…</span>
+            </div>
+          </div>
+        )}
         {/* Header */}
         <header className="sticky top-0 z-20 h-14 min-h-[52px] sm:h-16 border-b border-slate-200/80 dark:border-zinc-800/50 bg-white/70 dark:bg-[#09090b]/80 backdrop-blur-md flex items-center justify-between px-4 sm:px-6 safe-area-nav transition-colors duration-300">
                 <button
@@ -411,37 +472,44 @@ export function DashboardShell({
         </header>
 
         <main className="flex-1 min-h-0 bg-slate-50 dark:bg-[#030303] dashboard-main-bg transition-colors duration-200 relative overflow-y-visible" data-dashboard="true">
+          <WelcomeFlash firstLogin={firstLogin} planDisplayName={planDisplayName} />
           {showTrialBanner && !showPaywall && (
             <div
-              className={`border-b px-4 sm:px-6 py-3 transition-colors duration-200 ${
+              className={`border-b transition-colors duration-200 ${
                 isCriticalPhase
-                  ? 'bg-red-50 dark:bg-red-950/40 border-red-200 dark:border-red-900 animate-pulse-slow'
-                  : 'bg-slate-50/80 dark:bg-slate-900/40 border-slate-200 dark:border-slate-700'
+                  ? 'bg-amber-50/90 dark:bg-amber-950/30 border-amber-200 dark:border-amber-900/60'
+                  : 'bg-white dark:bg-zinc-900/90 border-slate-200 dark:border-zinc-800 shadow-sm'
               }`}
             >
-              <div className="max-w-4xl mx-auto flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                <p className={`text-sm ${isCriticalPhase ? 'text-red-900 dark:text-red-100 font-medium' : 'text-slate-600 dark:text-slate-400'}`}>
-                  <span>
-                    {planDisplayName === 'ZENITH' || planDisplayName === 'zenith'
-                      ? `Il vous reste ${trialDaysLeft ?? 0} jour${trialDaysLeft !== 1 ? 's' : ''} d'essai Zénith. Profitez de toutes les fonctions !`
-                      : `Il vous reste ${trialDaysLeft ?? 0} jour${trialDaysLeft !== 1 ? 's' : ''} d'essai. — se termine le ${trialEndDate ?? ''}`}
-                  </span>
-                  {isCriticalPhase && (
-                    <> — expire bientôt !</>
+              <div className="max-w-5xl mx-auto flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 px-4 sm:px-6 py-4">
+                <div className="flex flex-col gap-1">
+                  <p className={`text-sm sm:text-base ${isCriticalPhase ? 'text-amber-900 dark:text-amber-100 font-medium' : 'text-slate-700 dark:text-zinc-300'}`}>
+                    <span>
+                      {planDisplayName === 'ZENITH' || planDisplayName === 'zenith'
+                        ? `Il vous reste ${trialDaysLeft ?? 0} jour${trialDaysLeft !== 1 ? 's' : ''} d'essai Zénith. Profitez de toutes les fonctions !`
+                        : `Il vous reste ${trialDaysLeft ?? 0} jour${trialDaysLeft !== 1 ? 's' : ''} d'essai. — se termine le ${trialEndDate ?? ''}`}
+                    </span>
+                    {isCriticalPhase && (
+                      <span className="ml-1 font-semibold">— expire bientôt !</span>
+                    )}
+                  </p>
+                  {((trialDaysLeft != null && trialDaysLeft <= 3) || searchParams?.get('action') === 'choose_plan') && (
+                    <a
+                      href={`/api/stripe/portal-redirect?locale=${locale}&flow=upgrade`}
+                      className="text-xs font-medium text-[#2563eb] hover:underline dark:text-[#60a5fa]"
+                    >
+                      Satisfait ? Continuez avec Zenith ou choisissez un autre plan ici
+                    </a>
                   )}
-                </p>
-                <Link
-                  href={`/checkout?plan=${planSlug}${isCriticalPhase ? '&trial=0' : ''}`}
-                  className={`shrink-0 inline-flex items-center justify-center min-h-[44px] px-4 py-2.5 rounded-2xl font-semibold text-white text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 active:scale-[0.98] transition-all duration-300 ease-in-out ${
-                    isCriticalPhase
-                      ? 'bg-red-600 hover:bg-red-700 focus:ring-red-500'
-                      : 'bg-primary hover:brightness-110 focus:ring-[#2563eb]'
-                  } ${planDisplayName.toLowerCase() === 'zenith' ? 'shiny-button' : ''}`}
-                >
-                  {isCriticalPhase
-                    ? 'Activer mon abonnement maintenant'
-                    : `Passer en ${planDisplayName}`}
-                </Link>
+                </div>
+                {isCriticalPhase && (
+                  <Link
+                    href={`/checkout?plan=${planSlug}&trial=0`}
+                    className="shrink-0 inline-flex items-center justify-center min-h-[44px] px-5 py-2.5 rounded-xl font-semibold text-white text-sm bg-[#2563eb] hover:brightness-110 focus:outline-none focus:ring-2 focus:ring-[#2563eb] focus:ring-offset-2 dark:focus:ring-offset-zinc-900 active:scale-[0.98] transition-all duration-200"
+                  >
+                    Activer mon abonnement
+                  </Link>
+                )}
               </div>
             </div>
           )}
@@ -450,6 +518,11 @@ export function DashboardShell({
           </div>
         </main>
       </div>
+      <UpdatesModal
+        open={updatesModalOpen}
+        onClose={() => setUpdatesModalOpen(false)}
+        locale={locale}
+      />
     </div>
   );
 }

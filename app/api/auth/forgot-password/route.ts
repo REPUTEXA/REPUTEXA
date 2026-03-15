@@ -54,7 +54,8 @@ export async function POST(request: Request) {
     });
 
     if (error) {
-      if (error.message?.toLowerCase().includes('user not found')) {
+      const msg = error.message?.toLowerCase() ?? '';
+      if (msg.includes('user not found') || msg.includes('email not found') || msg.includes('with this email')) {
         return NextResponse.json({ sent: true });
       }
       console.error('[forgot-password]', error);

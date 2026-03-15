@@ -30,6 +30,7 @@ export async function POST(request: Request) {
     const isTrial = signupMode === 'trial';
     const subscriptionPlan = isTrial ? 'zenith' : (body.subscriptionPlan ?? body.subscription_plan ?? 'zenith');
     const selectedPlan = isTrial ? 'zenith' : (body.selectedPlan ?? body.selected_plan ?? 'zenith');
+    const annual = isTrial ? false : (body.annual === true || body.annual === '1');
 
     const metadata = {
       full_name: body.fullName ?? body.full_name ?? '',
@@ -41,6 +42,7 @@ export async function POST(request: Request) {
       subscription_plan: subscriptionPlan,
       selected_plan: selectedPlan,
       signup_mode: signupMode,
+      signup_annual: annual,
     };
 
     if (!email || !password) {
@@ -98,7 +100,7 @@ export async function POST(request: Request) {
       const baseUrl = getSiteUrl().replace(/\/+$/, '');
       const nextPath =
         signupMode === 'checkout'
-          ? `/checkout?plan=${selectedPlan}&trial=0&auto=1`
+          ? `/checkout?plan=${selectedPlan}&trial=0&annual=${annual ? '1' : '0'}&auto=1`
           : `/checkout?plan=zenith&auto=1`;
       const redirectTo = `${baseUrl}/${locale}/auth/callback?next=${encodeURIComponent(nextPath)}`;
       const { data: linkData } = await admin.auth.admin.generateLink({

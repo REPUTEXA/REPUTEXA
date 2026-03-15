@@ -193,6 +193,29 @@ export function getTrialEndProtectionEmailHtml(params: {
   );
 }
 
+/**
+ * Template TrialEndingSoon — J-3 : essai Zenith se termine dans 3 jours.
+ * Lien CTA = Portail Stripe (subscription_update) pour continuer Zenith ou choisir Vision/Pulse.
+ */
+export function getTrialEndingSoonEmailHtml(params: {
+  firstName: string;
+  daysLeft: number;
+  portalUrl: string;
+}) {
+  const prenom = params.firstName || '';
+  const content = `
+    <p style="margin: 0 0 16px;">Bonjour${prenom ? ` ${prenom}` : ''},</p>
+    <p style="margin: 0 0 24px;">Votre essai gratuit <strong>ZENITH</strong> se termine dans <strong>${params.daysLeft} jour${params.daysLeft > 1 ? 's' : ''}</strong>. Sans action, vous serez prélevé de 179€ pour continuer en ZENITH.</p>
+    <p style="margin: 0 0 24px;">Vous préférez <strong>Vision</strong> ou <strong>Pulse</strong> ? Vous pouvez choisir votre plan ou annuler en un clic depuis votre espace facturation.</p>
+  `.trim();
+  return renderZenithEmail(
+    'Votre essai ZENITH se termine dans 3 jours',
+    content,
+    'Satisfait ? Continuez avec Zenith ou choisissez un autre plan ici',
+    params.portalUrl
+  );
+}
+
 export function getUrgencyEmailHtml(params: {
   establishmentName: string;
   daysLeft: number;

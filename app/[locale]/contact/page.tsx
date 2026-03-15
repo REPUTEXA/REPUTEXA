@@ -1,10 +1,30 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef, useCallback } from 'react';
 import { Link } from '@/i18n/navigation';
 import { Logo } from '@/components/logo';
-import { Loader2, Mail, Send } from 'lucide-react';
+import {
+  Loader2,
+  Mail,
+  Send,
+  Paperclip,
+  X,
+  Mic,
+  Square,
+  Image as ImageIcon,
+  Video,
+} from 'lucide-react';
 import { toast } from 'sonner';
+
+const MAX_FILES = 5;
+const MAX_FILE_SIZE_MB = 25;
+const ALLOWED_IMAGE_EXT = ['.jpg', '.jpeg', '.png', '.webp', '.gif'];
+const ALLOWED_VIDEO_EXT = ['.mp4', '.webm', '.mov', '.avi'];
+
+type FilePreview = {
+  file: File;
+  id: string;
+};
 
 export default function ContactPage() {
   const [name, setName] = useState('');
@@ -12,6 +32,126 @@ export default function ContactPage() {
   const [subject, setSubject] = useState('');
   const [message, setMessage] = useState('');
   const [sending, setSending] = useState(false);
+  const [files, setFiles] = useState<FilePreview[]>([]);
+  const [recording, setRecording] = useState(false);
+  const [transcribing, setTranscribing] = useState(false);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const chunksRef = useRef<Blob[]>([]);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleFileChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const selected = Array.from(e.target.files ?? []);
+    if (selected.length === 0) return;
+
+    const allowed = [...ALLOWED_IMAGE_EXT, ...ALLOWED_VIDEO_EXT];
+    const valid = selected.filter((f) => {
+      const ext = '.' + f.name.split('.').pop()?.toLowerCase();
+      return allowed.includes(ext) && f.size <= MAX_FILE_SIZE_MB * 1024 * 1024;
+    });
+
+    setFiles((prev) => {
+      const next = [...prev];
+      for (const f of valid) {
+        if (next.length >= MAX_FILES) break;
+        if (next.some((p) => p.file === f)) continue;
+        next.push({ file: f, id: crypto.randomUUID() });
+      }
+      return next;
+    });
+    if (fileInputRef.current) fileInputRef.current.value = '';
+  }, []);
+
+  const removeFile = useCallback((id: string) => {
+    setFiles((prev) => prev.filter((p) => p.id !== id));
+  }, []);
+
+  const handleDrop = useCallback(
+    (e: React.DragEvent) => {
+      e.preventDefault();
+      const dropped = Array.from(e.dataTransfer?.files ?? []);
+      if (dropped.length === 0) return;
+      const allowed = [...ALLOWED_IMAGE_EXT, ...ALLOWED_VIDEO_EXT];
+      const valid = dropped.filter((f) => {
+        const ext = '.' + f.name.split('.').pop()?.toLowerCase();
+        return allowed.includes(ext) && f.size <= MAX_FILE_SIZE_MB * 1024 * 1024;
+      });
+      setFiles((prev) => {
+        const next = [...prev];
+        for (const f of valid) {
+          if (next.length >= MAX_FILES) break;
+          if (next.some((p) => p.file.name === f.name && p.file.size === f.size)) continue;
+          next.push({ file: f, id: crypto.randomUUID() });
+        }
+        return next;
+      });
+    },
+    []
+  );
+
+  const handleDragOver = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+  }, []);
+
+  const startRecording = useCallback(async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const mimeType = MediaRecorder.isTypeSupported('audio/webm;codecs=opus')
+        ? 'audio/webm;codecs=opus'
+        : 'audio/webm';
+      const recorder = new MediaRecorder(stream);
+      chunksRef.current = [];
+
+      recorder.ondataavailable = (e) => {
+        if (e.data.size > 0) chunksRef.current.push(e.data);
+      };
+
+      recorder.onstop = async () => {
+        stream.getTracks().forEach((t) => t.stop());
+        const blob = new Blob(chunksRef.current, { type: mimeType });
+        if (blob.size < 1000) return;
+
+        setTranscribing(true);
+        try {
+          const form = new FormData();
+          form.append('audio', blob, 'voix.webm');
+          const res = await fetch('/api/contact/transcribe', {
+            method: 'POST',
+            body: form,
+          });
+          const data = await res.json().catch(() => ({}));
+          if (!res.ok) {
+            toast.error(data.error ?? 'Erreur de transcription');
+            return;
+          }
+          const text = String(data.text ?? '').trim();
+          if (text) {
+            setMessage((prev) => (prev ? `${prev}\n\n${text}` : text));
+            toast.success('Texte transcrit et ajouté au message.');
+          } else {
+            toast.info('Aucun texte détecté dans l\'enregistrement.');
+          }
+        } catch {
+          toast.error('Erreur lors de la transcription.');
+        } finally {
+          setTranscribing(false);
+        }
+      };
+
+      recorder.start();
+      mediaRecorderRef.current = recorder;
+      setRecording(true);
+    } catch {
+      toast.error('Microphone inaccessible. Autorisez l\'accès au micro.');
+    }
+  }, []);
+
+  const stopRecording = useCallback(() => {
+    if (mediaRecorderRef.current?.state === 'recording') {
+      mediaRecorderRef.current.stop();
+      mediaRecorderRef.current = null;
+    }
+    setRecording(false);
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -21,26 +161,30 @@ export default function ContactPage() {
     }
     setSending(true);
     try {
+      const form = new FormData();
+      form.append('name', name.trim());
+      form.append('email', email.trim());
+      form.append('subject', subject.trim());
+      form.append('message', message.trim());
+      files.forEach(({ file }) => form.append('files', file));
+
       const res = await fetch('/api/contact', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: name.trim(),
-          email: email.trim(),
-          subject: subject.trim(),
-          message: message.trim(),
-        }),
+        body: form,
       });
       const data = await res.json().catch(() => ({}));
+
       if (!res.ok) {
         toast.error(data.error ?? 'Une erreur est survenue.');
         return;
       }
+
       toast.success('Votre message a bien été envoyé. Nous vous répondrons rapidement.');
       setName('');
       setEmail('');
       setSubject('');
       setMessage('');
+      setFiles([]);
     } catch {
       toast.error('Erreur réseau. Réessayez ou contactez-nous à contact@reputexa.fr.');
     } finally {
@@ -164,12 +308,33 @@ export default function ContactPage() {
             </div>
 
             <div>
-              <label
-                htmlFor="contact-message"
-                className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5"
-              >
-                Message
-              </label>
+              <div className="flex items-center justify-between mb-1.5">
+                <label
+                  htmlFor="contact-message"
+                  className="block text-sm font-medium text-slate-700 dark:text-slate-300"
+                >
+                  Message
+                </label>
+                <button
+                  type="button"
+                  onClick={recording ? stopRecording : startRecording}
+                  disabled={transcribing}
+                  className={`inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-lg transition-colors ${
+                    recording
+                      ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
+                      : 'bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:hover:bg-slate-700'
+                  }`}
+                >
+                  {transcribing ? (
+                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                  ) : recording ? (
+                    <Square className="w-3.5 h-3.5" />
+                  ) : (
+                    <Mic className="w-3.5 h-3.5" />
+                  )}
+                  {transcribing ? 'Transcription...' : recording ? 'Arrêter' : 'Dictée vocale'}
+                </button>
+              </div>
               <textarea
                 id="contact-message"
                 rows={5}
@@ -179,6 +344,66 @@ export default function ContactPage() {
                 placeholder="Décrivez votre demande..."
                 className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/50 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-[#2563eb]/30 focus:border-[#2563eb] transition-colors resize-none"
               />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
+                Pièces jointes (optionnel)
+              </label>
+              <div
+                onDrop={handleDrop}
+                onDragOver={handleDragOver}
+                className="rounded-xl border-2 border-dashed border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/30 p-4 text-center hover:border-[#2563eb]/50 transition-colors"
+              >
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp,image/gif,video/mp4,video/webm,video/quicktime,video/x-msvideo"
+                  multiple
+                  onChange={handleFileChange}
+                  className="hidden"
+                />
+                <div className="flex flex-wrap items-center justify-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
+                  >
+                    <Paperclip className="w-4 h-4" />
+                    Photos / Vidéos
+                  </button>
+                  <span className="text-xs text-slate-500 dark:text-slate-400">
+                    Glissez-déposez ou cliquez · max {MAX_FILES} fichiers, {MAX_FILE_SIZE_MB} Mo chacun
+                  </span>
+                </div>
+                {files.length > 0 && (
+                  <ul className="mt-3 flex flex-wrap gap-2 justify-center">
+                    {files.map(({ file, id }) => (
+                      <li
+                        key={id}
+                        className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600"
+                      >
+                        {file.type.startsWith('image/') ? (
+                          <ImageIcon className="w-4 h-4 text-sky-500" />
+                        ) : (
+                          <Video className="w-4 h-4 text-emerald-500" />
+                        )}
+                        <span className="text-sm text-slate-700 dark:text-slate-300 truncate max-w-[140px]">
+                          {file.name}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => removeFile(id)}
+                          className="p-0.5 rounded hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-500"
+                          aria-label="Supprimer"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
             </div>
 
             <button

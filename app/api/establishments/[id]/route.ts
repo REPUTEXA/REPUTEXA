@@ -30,6 +30,10 @@ async function getOrCreateAddonPrice(
   return price.id;
 }
 
+/**
+ * Vérification systématique : chaque establishmentId doit appartenir à l'utilisateur (user_id).
+ * Toutes les opérations ci-dessous utilisent .eq('user_id', user.id).
+ */
 export async function PATCH(request: Request, { params }: Params) {
   const { id } = await params;
   const supabase = await createClient();

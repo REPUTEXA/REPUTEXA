@@ -46,6 +46,7 @@ export default function SignupPage() {
 
   const modeParam = searchParams?.get('mode') ?? 'trial';
   const planParam = searchParams?.get('plan');
+  const annualParam = searchParams?.get('annual') === '1';
   const isTrial = modeParam === 'trial';
   const isCheckout = modeParam === 'checkout';
   const plan = planParam && VALID_PLANS.includes(planParam as (typeof VALID_PLANS)[number])
@@ -161,6 +162,7 @@ export default function SignupPage() {
         subscriptionPlan,
         selectedPlan,
         signupMode: isTrial ? 'trial' : 'checkout',
+        annual: isCheckout ? annualParam : undefined,
         locale,
       }),
     });
@@ -219,15 +221,16 @@ export default function SignupPage() {
               </h1>
               {isCheckout ? (
                 <p className="text-sm text-slate-500 mt-1">
-                  Vous avez choisi le plan <strong>{planDisplayName}</strong> — Finalisez votre inscription pour passer au paiement.
+                  Vous avez choisi le plan <strong>{planDisplayName}</strong>
+                  {annualParam ? ' (facturation annuelle -20%)' : ' (facturation mensuelle)'} — Finalisez votre inscription pour passer au paiement.
                 </p>
               ) : (
                 <>
                   <p className="text-sm text-slate-500 mt-1">
-                    Accès ZENITH 14 jours — 0€ aujourd&apos;hui, carte requise
+                    Essai gratuit ZENITH — 0€ aujourd&apos;hui, carte requise
                   </p>
                   <p className="text-sm text-emerald-600 dark:text-emerald-400 mt-2 px-3 py-2 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200/50 dark:border-emerald-800/50">
-                    14 jours gratuits sur le plan ZENITH. Carte bancaire requise pour valider l&apos;accès. Annulation en un clic depuis votre espace client.
+                    Essai gratuit sur le plan ZENITH. Carte bancaire requise pour valider l&apos;accès. Annulation en un clic depuis votre espace client.
                   </p>
                 </>
               )}

@@ -12,6 +12,7 @@ import {
 } from '@/lib/ai/concierge-prompts';
 import { runZenithTripleJudge } from '@/lib/ai/zenith-triple-judge';
 import { getActiveLocationIdFromCookie } from '@/lib/active-location-cookie';
+import { validateEstablishmentId } from '@/lib/validate-establishment';
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -123,7 +124,8 @@ export async function GET(request: Request) {
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   const cookieHeader = request.headers.get('cookie');
-  const activeLocationId = getActiveLocationIdFromCookie(cookieHeader);
+  const rawLocationId = getActiveLocationIdFromCookie(cookieHeader);
+  const activeLocationId = await validateEstablishmentId(supabase, rawLocationId ?? 'profile');
 
   let reviewsQuery = supabase
     .from('reviews')
@@ -134,7 +136,7 @@ export async function GET(request: Request) {
 
   if (activeLocationId === 'profile') {
     reviewsQuery = reviewsQuery.is('establishment_id', null);
-  } else if (activeLocationId && /^[0-9a-f-]{36}$/i.test(activeLocationId)) {
+  } else if (activeLocationId) {
     reviewsQuery = reviewsQuery.eq('establishment_id', activeLocationId);
   }
 

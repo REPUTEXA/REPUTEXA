@@ -1,16 +1,17 @@
 import { NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { canSendEmail, sendEmail } from '@/lib/resend';
-import { getTrialEndProtectionEmailHtml } from '@/lib/emails/templates';
+import { getTrialEndingSoonEmailHtml } from '@/lib/emails/templates';
 
-const APP_URL = process.env.NEXT_PUBLIC_SITE_URL ?? process.env.NEXT_PUBLIC_APP_URL ?? 'https://reputexa.fr';
+const APP_URL = (process.env.NEXT_PUBLIC_SITE_URL ?? process.env.NEXT_PUBLIC_APP_URL ?? 'https://reputexa.fr').replace(/\/+$/, '');
 const CRON_SECRET = process.env.CRON_SECRET;
 const TRIAL_REMINDER_FROM = process.env.RESEND_TRIAL_REMINDER_FROM ?? process.env.RESEND_FROM ?? 'REPUTEXA <contact@reputexa.fr>';
 const TRIAL_DAYS = 14;
 
 /**
- * Cron (1x/jour) : envoie le rappel J-3 aux utilisateurs dont trial_ends_at est dans 3 jours.
- * Ne cible que les profils sans abonnement actif et qui n'ont pas encore reçu le mail.
+ * checkTrialEnd — Cron (1x/jour) : détecte les abonnements en essai finissant dans 3 jours.
+ * Envoie un email via Resend avec le template TrialEndingSoon.
+ * Lien CTA = Portail Stripe (subscription_update) : continuer Zenith ou choisir Vision/Pulse.
  */
 export async function GET(request: Request) {
   const auth = request.headers.get('authorization');
@@ -51,6 +52,8 @@ export async function GET(request: Request) {
     return utc.toISOString().slice(0, 10);
   };
 
+  const portalRedirectUrl = `${APP_URL}/api/stripe/portal-redirect?locale=fr&flow=upgrade`;
+
   let sent = 0;
 
   for (const p of profiles) {
@@ -61,33 +64,18 @@ export async function GET(request: Request) {
         : null;
     if (!trialEnd || trialEnd !== targetDateStr) continue;
 
-    const checkoutUrl = `${APP_URL}/fr/dashboard/settings`;
     const fullName = (p.full_name || p.establishment_name || '') as string;
     const firstName = fullName.split(/\s+/)[0] || '';
 
-    const [{ count: totalCount }, { count: repliedCount }] = await Promise.all([
-      admin.from('reviews').select('id', { count: 'exact', head: true }).eq('user_id', p.id),
-      admin.from('reviews').select('id', { count: 'exact', head: true }).eq('user_id', p.id).not('response_text', 'is', null),
-    ]);
-    const total = (totalCount ?? 0) as number;
-    const replied = (repliedCount ?? 0) as number;
-    const bilanParts: string[] = [];
-    if (total > 0) bilanParts.push(`analysé ${total} avis`);
-    if (replied > 0) bilanParts.push(`répondu à ${replied} avis`);
-    bilanParts.push('boosté votre visibilité Google Maps', 'protégé votre note');
-    const bilanText = bilanParts.length > 0
-      ? `En 11 jours, nous avons ${bilanParts.join(', ')}.`
-      : 'Votre bouclier REPUTEXA est prêt à sécuriser votre e-réputation 24/7.';
-
-    const html = getTrialEndProtectionEmailHtml({
+    const html = getTrialEndingSoonEmailHtml({
       firstName: firstName || '',
-      bilanText,
-      checkoutUrl,
+      daysLeft: 3,
+      portalUrl: portalRedirectUrl,
     });
 
     const result = await sendEmail({
       to: p.email as string,
-      subject: 'Votre essai REPUTEXA se termine bientôt',
+      subject: 'Votre essai ZENITH se termine dans 3 jours — Choisissez votre plan',
       html,
       from: TRIAL_REMINDER_FROM,
     });

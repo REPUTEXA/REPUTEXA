@@ -9,7 +9,7 @@ export async function GET() {
 
   const { data: profile, error } = await supabase
     .from('profiles')
-    .select('establishment_name, establishment_type, full_name, address, phone, website, whatsapp_phone, alert_threshold_stars, seo_keywords, subscription_plan, selected_plan, google_location_id, google_location_name, google_location_address, ai_tone, ai_length, ai_safe_mode, ai_custom_instructions')
+    .select('establishment_name, establishment_type, full_name, address, phone, website, whatsapp_phone, alert_threshold_stars, seo_keywords, subscription_plan, selected_plan, google_location_id, google_location_name, google_location_address, ai_tone, ai_length, ai_safe_mode, ai_custom_instructions, first_login')
     .eq('id', user.id)
     .single();
 
@@ -36,6 +36,7 @@ export async function GET() {
     aiLength: profile?.ai_length ?? 'balanced',
     aiSafeMode: profile?.ai_safe_mode ?? true,
     aiCustomInstructions: profile?.ai_custom_instructions ?? '',
+    firstLogin: profile?.first_login ?? true,
   });
 }
 
@@ -59,10 +60,28 @@ export async function PATCH(request: Request) {
     aiLength,
     aiSafeMode,
     aiCustomInstructions,
+    firstLogin,
+    defaultEstablishmentId,
   } = body;
 
-  const updates: Record<string, string | number | string[] | boolean> = {};
+  const updates: Record<string, string | number | string[] | boolean | null> = {};
   if (typeof establishmentName === 'string') updates.establishment_name = establishmentName.trim();
+  if (defaultEstablishmentId === null || defaultEstablishmentId === '') {
+    updates.default_establishment_id = null;
+  } else if (typeof defaultEstablishmentId === 'string' && defaultEstablishmentId.trim()) {
+    const id = defaultEstablishmentId.trim();
+    if (id === 'profile') {
+      updates.default_establishment_id = null;
+    } else {
+      const { data: establishment } = await supabase
+        .from('establishments')
+        .select('id')
+        .eq('id', id)
+        .eq('user_id', user.id)
+        .single();
+      if (establishment) updates.default_establishment_id = id;
+    }
+  }
   if (typeof establishmentType === 'string') updates.establishment_type = establishmentType.trim();
   if (typeof fullName === 'string') updates.full_name = fullName.trim();
   if (typeof address === 'string') updates.address = address.trim();
@@ -86,6 +105,9 @@ export async function PATCH(request: Request) {
   }
   if (typeof aiCustomInstructions === 'string') {
     updates.ai_custom_instructions = aiCustomInstructions.trim();
+  }
+  if (typeof firstLogin === 'boolean') {
+    updates.first_login = firstLogin;
   }
 
   if (Object.keys(updates).length === 0) {

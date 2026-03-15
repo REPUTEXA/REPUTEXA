@@ -37,6 +37,7 @@ export default function CheckoutPage() {
   const plan: PlanType = isValidPlan(planParam) ? planParam : 'pulse';
   const stripePlan = PLAN_TO_STRIPE[plan] ?? 'manager';
   const skipTrial = searchParams.get('trial') === '0';
+  const annual = searchParams.get('annual') === '1';
   const autoRedirect = searchParams.get('auto') === '1';
 
   const triggerCheckout = useCallback(async () => {
@@ -48,6 +49,7 @@ export default function CheckoutPage() {
         planSlug: plan,
       });
       if (skipTrial) params.set('skipTrial', '1');
+      if (annual) params.set('annual', '1');
       const res = await fetch(`/api/stripe/create-checkout?${params}`, {
         method: 'POST',
         credentials: 'include',
@@ -61,7 +63,7 @@ export default function CheckoutPage() {
     } catch {
       router.replace(`/${locale}/dashboard`);
     }
-  }, [locale, stripePlan, plan, skipTrial, router]);
+  }, [locale, stripePlan, plan, skipTrial, annual, router]);
 
   useEffect(() => {
     if (autoRedirect && hasValidPlan) {

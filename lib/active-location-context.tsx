@@ -8,6 +8,7 @@ import {
   useCallback,
   useMemo,
 } from 'react';
+import { useRouter } from 'next/navigation';
 import { useQueryClient } from '@tanstack/react-query';
 import { ESTABLISHMENT_QUERY_KEYS } from '@/lib/establishment-query-provider';
 
@@ -25,6 +26,7 @@ type ActiveLocationContextValue = {
   setActiveLocationId: (id: string) => void;
   locations: LocationItem[];
   isLoading: boolean;
+  isSwitching: boolean;
   refreshLocations: () => void;
 };
 
@@ -69,12 +71,14 @@ export function ActiveLocationProvider({
   selectedPlanSlug,
 }: Props) {
   void selectedPlanSlug; // Réservé pour usage futur
+  const router = useRouter();
   const queryClient = useQueryClient();
   const [locations, setLocations] = useState<LocationItem[]>([
     { id: 'profile', name: establishmentName || 'Mon établissement', isPrincipal: true },
   ]);
   const [activeLocationId, setActiveLocationIdState] = useState<string>('profile');
   const [isLoading, setIsLoading] = useState(true);
+  const [isSwitching, setIsSwitching] = useState(false);
 
   const refreshLocations = useCallback(async () => {
     try {
@@ -107,7 +111,8 @@ export function ActiveLocationProvider({
       if (saved && validIds.includes(saved)) {
         setActiveLocationIdState(saved);
       } else {
-        setActiveLocationIdState('profile');
+        const principal = list.find((l) => l.isPrincipal);
+        setActiveLocationIdState(principal?.id ?? 'profile');
       }
     } catch {
       setLocations([
@@ -130,21 +135,33 @@ export function ActiveLocationProvider({
   }, [refreshLocations]);
 
   const setActiveLocationId = useCallback(
-    (id: string) => {
+    async (id: string) => {
+      if (id === activeLocationId) return;
       setActiveLocationIdState(id);
       setCookie(ACTIVE_LOCATION_COOKIE, id);
       window.dispatchEvent(new CustomEvent('active-location-changed', { detail: { locationId: id } }));
-      ESTABLISHMENT_QUERY_KEYS.forEach((key) => {
-        queryClient.invalidateQueries({ queryKey: [key] });
-      });
+      setIsSwitching(true);
+      try {
+        await Promise.all(
+          ESTABLISHMENT_QUERY_KEYS.map((key) =>
+            queryClient.refetchQueries({ queryKey: [key] })
+          )
+        );
+        router.refresh();
+      } finally {
+        setTimeout(() => setIsSwitching(false), 320);
+      }
     },
-    [queryClient]
+    [queryClient, router, activeLocationId]
   );
 
   useEffect(() => {
     const saved = getCookie(ACTIVE_LOCATION_COOKIE);
     if (saved && locations.some((l) => l.id === saved)) {
       setActiveLocationIdState(saved);
+    } else if (locations.length > 0) {
+      const principal = locations.find((l) => l.isPrincipal);
+      if (principal) setActiveLocationIdState(principal.id);
     }
   }, [locations]);
 
@@ -154,9 +171,10 @@ export function ActiveLocationProvider({
       setActiveLocationId,
       locations,
       isLoading,
+      isSwitching,
       refreshLocations,
     }),
-    [activeLocationId, setActiveLocationId, locations, isLoading, refreshLocations]
+    [activeLocationId, setActiveLocationId, locations, isLoading, isSwitching, refreshLocations]
   );
 
   return (

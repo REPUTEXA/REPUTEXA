@@ -11,6 +11,7 @@ type Props = {
   establishmentName?: string;
   fullName?: string;
   selectedPlanSlug?: PlanSlug;
+  subscriptionQuantity?: number;
   onCloseMobile?: () => void;
 };
 
@@ -19,16 +20,28 @@ export function EstablishmentSelector({
   establishmentName = 'Mon établissement',
   fullName,
   selectedPlanSlug,
+  subscriptionQuantity,
   onCloseMobile,
 }: Props) {
   const { activeLocationId, setActiveLocationId, locations, isLoading } =
     useActiveLocation();
+  const quantity = subscriptionQuantity ?? locations.length;
+  const visibleLocations = locations.slice(0, quantity);
+  const canAddEstablishment =
+    selectedPlanSlug === 'zenith' && visibleLocations.length < quantity;
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
-  const isZenith = selectedPlanSlug === 'zenith';
-  const currentLocation = locations.find((l) => l.id === activeLocationId);
+  const currentLocation = visibleLocations.find((l) => l.id === activeLocationId) ?? locations.find((l) => l.id === activeLocationId);
   const displayName = currentLocation?.name ?? establishmentName;
+
+  useEffect(() => {
+    if (visibleLocations.length === 0) return;
+    const isActiveVisible = visibleLocations.some((l) => l.id === activeLocationId);
+    if (!isActiveVisible) {
+      setActiveLocationId(visibleLocations[0].id);
+    }
+  }, [visibleLocations, activeLocationId, setActiveLocationId]);
 
   useEffect(() => {
     if (!open) return;
@@ -102,7 +115,7 @@ export function EstablishmentSelector({
       {open && !isLoading && (
         <div className="absolute left-0 right-0 top-full mt-1.5 z-50 rounded-2xl bg-[#0c0c0f]/95 backdrop-blur-xl border border-white/[0.08] shadow-2xl shadow-black/40 overflow-hidden">
           <div className="py-1.5 max-h-64 overflow-y-auto">
-            {locations.map((loc) => (
+            {visibleLocations.map((loc) => (
               <button
                 key={loc.id}
                 type="button"
@@ -123,11 +136,11 @@ export function EstablishmentSelector({
                   )}
                 </div>
                 {loc.id === activeLocationId && (
-                  <Check className="w-4 h-4 shrink-0 text-primary" />
+                  <Check className="w-4 h-4 shrink-0 text-blue-500" aria-hidden />
                 )}
               </button>
             ))}
-            {isZenith && (
+            {canAddEstablishment && (
               <div className="border-t border-white/[0.06] mt-1 pt-1">
                 <Link
                   href="/dashboard/establishments"

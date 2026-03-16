@@ -11,7 +11,7 @@ const TRIAL_DAYS = 14;
 /**
  * checkTrialEnd — Cron (1x/jour) : détecte les abonnements en essai finissant dans 3 jours.
  * Envoie un email via Resend avec le template TrialEndingSoon.
- * Lien CTA = Portail Stripe (subscription_update) : continuer Zenith ou choisir Vision/Pulse.
+ * CTA = page Paramètres / Facturation du dashboard Reputexa (design premium) ; lien annulation en dessous.
  */
 export async function GET(request: Request) {
   const auth = request.headers.get('authorization');
@@ -52,7 +52,10 @@ export async function GET(request: Request) {
     return utc.toISOString().slice(0, 10);
   };
 
-  const portalRedirectUrl = `${APP_URL}/api/stripe/portal-redirect?locale=fr&flow=upgrade`;
+  /** Page Paramètres / Facturation du dashboard (ancre #billing pour la section abonnement). */
+  const dashboardBillingUrl = `${APP_URL}/fr/dashboard/settings#billing`;
+  const planName = 'Zénith';
+  const planPrice = '179€';
 
   let sent = 0;
 
@@ -67,10 +70,29 @@ export async function GET(request: Request) {
     const fullName = (p.full_name || p.establishment_name || '') as string;
     const firstName = fullName.split(/\s+/)[0] || '';
 
+    const trialEndFormatted = new Date(trialEnd + 'T12:00:00Z').toLocaleDateString('fr-FR', {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric',
+    });
+
+    const selectedPlan = (p.selected_plan ?? p.subscription_plan) as string | null;
+    const currentPlanSlug = ['vision', 'pulse', 'zenith'].includes(selectedPlan ?? '')
+      ? (selectedPlan as 'vision' | 'pulse' | 'zenith')
+      : undefined;
+    const planNameBySlug: Record<string, string> = { vision: 'Vision', pulse: 'Pulse', zenith: 'Zénith' };
+    const planPriceBySlug: Record<string, string> = { vision: '59€', pulse: '97€', zenith: '179€' };
+    const effectivePlanName = currentPlanSlug ? planNameBySlug[currentPlanSlug] ?? planName : planName;
+    const effectivePlanPrice = currentPlanSlug ? planPriceBySlug[currentPlanSlug] ?? planPrice : planPrice;
+
     const html = getTrialEndingSoonEmailHtml({
       firstName: firstName || '',
       daysLeft: 3,
-      portalUrl: portalRedirectUrl,
+      dashboardBillingUrl,
+      trialEndDate: trialEndFormatted,
+      planName: effectivePlanName,
+      planPrice: effectivePlanPrice,
+      currentPlanSlug,
     });
 
     const result = await sendEmail({

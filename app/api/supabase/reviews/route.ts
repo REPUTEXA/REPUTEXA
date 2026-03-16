@@ -20,7 +20,8 @@ const openai = new OpenAI({
 
 const AI_PROMPT_BASE = `Tu es un expert en e-réputation. Génère une réponse organique et chaleureuse pour l'avis client.
 ${HUMAN_CHARTER_BASE}
-Détecte la langue de l'avis et réponds dans la MÊME langue. Une seule réponse, pas de JSON.`;
+{LANGUE_RULE}
+Une seule réponse, pas de JSON.`;
 
 const DEFAULT_STYLE = 'Ton professionnel et bienveillant. Longueur équilibrée (2 à 4 phrases). Vouvoiement.';
 
@@ -201,13 +202,19 @@ export async function POST(request: Request) {
     const { data: profileData } = await supabase
       .from('profiles')
       .select(
-        'alert_threshold_stars, seo_keywords, subscription_plan, selected_plan, establishment_name, address, whatsapp_phone'
+        'alert_threshold_stars, seo_keywords, subscription_plan, selected_plan, establishment_name, address, whatsapp_phone, language'
       )
       .eq('id', user.id)
       .single();
 
     const alertThreshold = profileData?.alert_threshold_stars ?? 3;
     const planSlug = toPlanSlug(profileData?.subscription_plan ?? null, profileData?.selected_plan ?? null);
+    const profileLanguage = (profileData?.language as string) ?? 'fr';
+    const businessLanguage = profileLanguage;
+    const isVision = planSlug === 'vision';
+    const languageInstruction = isVision
+      ? `Vous devez répondre dans la langue locale de l'établissement (${businessLanguage}). Cependant, pour rester poli, si l'avis du client est dans une autre langue, commencez votre réponse par une courte phrase de bienvenue ou de remerciement dans la langue du client, puis enchaînez le reste de la réponse exclusivement en ${businessLanguage}.`
+      : 'Détecte la langue de l\'avis et réponds dans la MÊME langue (natif).';
     const seoKeywords = Array.isArray(profileData?.seo_keywords)
       ? profileData.seo_keywords.filter((k): k is string => typeof k === 'string').slice(0, 10)
       : [];
@@ -215,7 +222,7 @@ export async function POST(request: Request) {
     const establishmentName = profileData?.establishment_name?.trim() || 'établissement';
     const businessContext = [seoKeywords[0], profileData?.address?.trim()].filter(Boolean).join(' à ') || establishmentName;
     const aiPrompt =
-      AI_PROMPT_BASE +
+      AI_PROMPT_BASE.replace('{LANGUE_RULE}', languageInstruction) +
       (useSeo
         ? buildZenithSeoInstruction(establishmentName, businessContext, seoKeywords)
         : '');

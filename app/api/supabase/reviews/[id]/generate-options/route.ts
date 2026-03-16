@@ -16,7 +16,7 @@ const openai = new OpenAI({
 const SYSTEM_PROMPT_SINGLE = `Tu es un expert en e-réputation. Génère une seule réponse pour l'avis client, en respectant les préférences de style et de ton fournies.
 ${HUMAN_CHARTER_BASE}
 Réponds UNIQUEMENT en JSON valide : {"content": "Ta réponse ici", "detectedLanguage": "fr"}
-Détecte la langue de l'avis et réponds dans la MÊME langue.`;
+{LANGUE_RULE}`;
 
 export async function POST(
   _request: Request,
@@ -38,11 +38,16 @@ export async function POST(
     }
 
     const [reviewRes, profileRes] = await Promise.all([
-      supabase.from('reviews').select('id, comment, rating, response_text, reviewer_name').eq('id', id).eq('user_id', user.id).single(),
+      supabase
+        .from('reviews')
+        .select('id, comment, rating, response_text, reviewer_name')
+        .eq('id', id)
+        .eq('user_id', user.id)
+        .single(),
       supabase
         .from('profiles')
         .select(
-          'seo_keywords, subscription_plan, selected_plan, establishment_name, address, ai_tone, ai_length, ai_safe_mode, ai_custom_instructions'
+          'seo_keywords, subscription_plan, selected_plan, establishment_name, address, ai_tone, ai_length, ai_safe_mode, ai_custom_instructions, language, payment_status, payment_failed_at, subscription_status'
         )
         .eq('id', user.id)
         .single(),
@@ -58,6 +63,45 @@ export async function POST(
       return NextResponse.json(
         { error: 'Review already has a response' },
         { status: 400 }
+      );
+    }
+
+    // Blocage IA si abonnement résilié (lecture seule uniquement)
+    if ((profile?.subscription_status as string | null) === 'canceled') {
+      return NextResponse.json(
+        {
+          error:
+            'Votre abonnement est résilié. Vous pouvez encore consulter vos anciens avis, mais la génération IA est désactivée.',
+        },
+        { status: 403 }
+      );
+    }
+
+    // Protection : blocage IA si le paiement est en échec AU-DELÀ de la période de grâce
+    if ((profile?.payment_status as string | null) === 'unpaid') {
+      const failedAtRaw = profile?.payment_failed_at as string | null;
+      if (failedAtRaw) {
+        const failedAt = new Date(failedAtRaw);
+        const now = new Date();
+        const diffMs = now.getTime() - failedAt.getTime();
+        const graceMs = 3 * 24 * 60 * 60 * 1000; // 3 jours
+        if (diffMs > graceMs) {
+          return NextResponse.json(
+            {
+              error:
+                'Paiement en attente depuis plus de 3 jours. Veuillez régulariser votre situation pour continuer à utiliser les réponses IA.',
+            },
+            { status: 402 }
+          );
+        }
+      }
+    }
+      return NextResponse.json(
+        {
+          error:
+            'Paiement en attente. Veuillez mettre à jour votre moyen de paiement pour continuer à utiliser les réponses IA.',
+        },
+        { status: 402 }
       );
     }
 
@@ -106,6 +150,11 @@ PRÉFÉRENCES DE STYLE À RESPECTER :
 ${customInstructions ? `- CONSIGNES PRIORITAIRES du restaurateur (à intégrer naturellement) : ${customInstructions}` : ''}`.trim();
 
     const isZenith = planSlug === 'zenith';
+    const businessLanguage = (profile?.language as string) ?? 'fr';
+    const isVision = planSlug === 'vision';
+    const languageRule = isVision
+      ? `Vous devez répondre dans la langue locale de l'établissement (${businessLanguage}). Cependant, pour rester poli, si l'avis du client est dans une autre langue, commencez votre réponse par une courte phrase de bienvenue ou de remerciement dans la langue du client, puis enchaînez le reste de la réponse exclusivement en ${businessLanguage}.`
+      : 'Détecte la langue de l\'avis et réponds dans la MÊME langue (natif).';
 
     if (isZenith) {
       const winner = await runZenithTripleJudge(openai, {
@@ -127,7 +176,7 @@ ${customInstructions ? `- CONSIGNES PRIORITAIRES du restaurateur (à intégrer n
     }
 
     const systemPromptSingle =
-      SYSTEM_PROMPT_SINGLE +
+      SYSTEM_PROMPT_SINGLE.replace('{LANGUE_RULE}', languageRule) +
       '\n\n' +
       styleInstruction +
       (useSeo ? buildZenithSeoInstruction(establishmentName, businessContext, seoKeywords) : '');

@@ -1,37 +1,57 @@
+/**
+ * Webhook Stripe — Délégation au BillingDomainService.
+ * Règle : tout appel Stripe passe par stripeWithRetry (via le service ou stripe-client).
+ * invoice.paid = déclencheur unique : sync profil (pending→active), email "Nouvel établissement configuré", revalidatePath.
+ */
+
 import { NextResponse } from 'next/server';
 import { headers } from 'next/headers';
-import { revalidatePath } from 'next/cache';
 import Stripe from 'stripe';
-import { prisma } from '@/lib/prisma';
+import { stripeWithRetry } from '@/lib/stripe-client';
 import { createAdminClient } from '@/lib/supabase/admin';
-import { canSendEmail, sendEmail, DEFAULT_FROM } from '@/lib/resend';
-import { getUpgradeConfirmationEmailHtml, getWelcomePaidHtml, getWelcomeZenithTrialHtml } from '@/lib/emails/templates';
-import { getPlanSlugFromSubscription, getSubscriptionQuantity } from '@/lib/stripe-subscription';
+import {
+  syncProfileFromSubscription,
+  retrieveSubscription,
+  revalidateDashboardPaths,
+  revalidateFullApp,
+  sendEstablishmentAddedEmail,
+  sendReputexaOnboardingEmail,
+  sendMonthlyInvoiceEmail,
+  sendPaymentFailedEmail,
+  sendPaymentActionRequiredEmail,
+  sendUpgradeConfirmationEmail,
+  sendDowngradeConfirmationEmail,
+  getPlanSlugFromSubscription,
+  getSubscriptionQuantity,
+  getSubscriptionInterval,
+  getTotalPrice,
+  PLAN_DISPLAY,
+  PLAN_SLUG_TO_SUBSCRIPTION,
+  APP_URL,
+} from '@/lib/services/billing-domain';
+import type { PlanSlug } from '@/config/pricing';
+import { PRICE_ID_ENV_KEYS } from '@/config/pricing';
 
-const PLAN_SLUG_TO_SUBSCRIPTION: Record<string, string> = {
-  vision: 'vision',
-  pulse: 'pulse',
-  zenith: 'zenith',
-};
-
-const DASHBOARD_LOCALES = ['fr', 'en', 'es', 'de', 'it'] as const;
-
-function revalidateDashboard() {
-  try {
-    for (const locale of DASHBOARD_LOCALES) {
-      revalidatePath(`/${locale}/dashboard`, 'layout');
-    }
-    revalidatePath('/dashboard', 'layout');
-  } catch (e) {
-    console.error('[stripe/webhook] revalidatePath failed', e);
-  }
+/**
+ * Correspondance slug plan → price_id Stripe (mensuel / annuel).
+ * Utilisé pour l'update de souscription au passage trialing→active (selected_plan en base).
+ */
+function getPlanSlugToStripePriceIds(): Record<PlanSlug, { monthly: string | null; annual: string | null }> {
+  return {
+    vision: {
+      monthly: process.env[PRICE_ID_ENV_KEYS.vision.monthly] ?? null,
+      annual: process.env[PRICE_ID_ENV_KEYS.vision.annual] ?? null,
+    },
+    pulse: {
+      monthly: process.env[PRICE_ID_ENV_KEYS.pulse.monthly] ?? null,
+      annual: process.env[PRICE_ID_ENV_KEYS.pulse.annual] ?? null,
+    },
+    zenith: {
+      monthly: process.env[PRICE_ID_ENV_KEYS.zenith.monthly] ?? null,
+      annual: process.env[PRICE_ID_ENV_KEYS.zenith.annual] ?? null,
+    },
+  };
 }
-
-const PLAN_DISPLAY: Record<string, string> = {
-  vision: 'Vision',
-  pulse: 'Pulse',
-  zenith: 'ZENITH',
-};
 
 /** Ordre de gamme pour trier les abonnements (plus haut = mieux) */
 function getPlanTierRank(planSlug: string | null): number {
@@ -43,25 +63,24 @@ function getPlanTierRank(planSlug: string | null): number {
 
 /**
  * Parmi les abonnements actifs/trialing du client, retourne le "canonical" :
- * le plus haut de gamme, puis le plus récent, pour éviter plusieurs abonnements et garder un seul ref.
+ * le plus haut de gamme, puis le plus récent.
  */
 function pickCanonicalSubscription(subscriptions: Stripe.Subscription[]): Stripe.Subscription | null {
-  const eligible = subscriptions.filter(
-    (s) => s.status === 'active' || s.status === 'trialing'
-  );
+  const eligible = subscriptions.filter((s) => s.status === 'active' || s.status === 'trialing');
   if (eligible.length === 0) return null;
   eligible.sort((a, b) => {
     const planA = getPlanSlugFromSubscription(a);
     const planB = getPlanSlugFromSubscription(b);
     const rankA = getPlanTierRank(planA);
     const rankB = getPlanTierRank(planB);
-    if (rankB !== rankA) return rankB - rankA; // plus haut de gamme d'abord
-    return (b.created ?? 0) - (a.created ?? 0); // puis plus récent
+    if (rankB !== rankA) return rankB - rankA;
+    return (b.created ?? 0) - (a.created ?? 0);
   });
   return eligible[0];
 }
 
 export async function POST(request: Request) {
+  console.log('[stripe/webhook] Request received');
   const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
   const secretKey = process.env.STRIPE_SECRET_KEY;
 
@@ -74,18 +93,19 @@ export async function POST(request: Request) {
   const signature = headersList.get('stripe-signature');
 
   if (!signature) {
+    console.log('[stripe/webhook] No stripe-signature header');
     return NextResponse.json({ error: 'No signature' }, { status: 400 });
   }
 
-  const stripe = new Stripe(secretKey);
-
   let event: Stripe.Event;
   try {
-    event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
+    event = Stripe.webhooks.constructEvent(body, signature, webhookSecret);
   } catch (err) {
     console.error('[stripe/webhook] Signature verification failed', err);
     return NextResponse.json({ error: 'Invalid signature' }, { status: 400 });
   }
+
+  console.log('[stripe/webhook] Event received:', event.type, 'id:', event.id);
 
   try {
     if (event.type === 'checkout.session.completed') {
@@ -93,34 +113,21 @@ export async function POST(request: Request) {
       const customerId = session.customer as string;
       const subscriptionId = session.subscription as string;
       const planSlug = (session.metadata?.planSlug ?? 'pulse') as string;
-      const validPlan = ['vision', 'pulse', 'zenith'].includes(planSlug) ? planSlug : 'pulse';
+      const validPlan = (['vision', 'pulse', 'zenith'].includes(planSlug) ? planSlug : 'pulse') as PlanSlug;
       const subscriptionPlan = PLAN_SLUG_TO_SUBSCRIPTION[validPlan] ?? 'pulse';
 
       if (!subscriptionId) return NextResponse.json({ received: true });
 
-      const subscription = await stripe.subscriptions.retrieve(subscriptionId);
+      const subscription = await stripeWithRetry(
+        (s) => s.subscriptions.retrieve(subscriptionId),
+        secretKey
+      );
       const trialEnd = subscription.trial_end
         ? new Date(subscription.trial_end * 1000)
         : null;
-      const stripeStatus = subscription.status; // 'trialing' | 'active' | 'canceled' | ...
+      const stripeStatus = subscription.status;
       const profileStatus = stripeStatus === 'trialing' ? 'trialing' : stripeStatus === 'active' ? 'active' : 'expired';
 
-      // Prisma
-      const user = await prisma.user.findFirst({
-        where: { stripeCustomerId: customerId },
-      });
-
-      if (user) {
-        await prisma.user.update({
-          where: { id: user.id },
-          data: {
-            stripeSubscriptionId: subscriptionId,
-            trialEndsAt: trialEnd,
-          },
-        });
-      }
-
-      // Supabase: mettre à jour selected_plan pour que le cadenas disparaisse
       const cust = session.customer as { email?: string } | string | null;
       const customerEmail =
         session.customer_details?.email ??
@@ -130,7 +137,7 @@ export async function POST(request: Request) {
 
       if (previousSubscriptionId && isAddEstablishmentFlow) {
         try {
-          await stripe.subscriptions.cancel(previousSubscriptionId);
+          await stripeWithRetry((s) => s.subscriptions.cancel(previousSubscriptionId), secretKey);
         } catch (e) {
           console.error('[stripe/webhook] Cancel previous sub (add-establishment):', e);
         }
@@ -163,44 +170,13 @@ export async function POST(request: Request) {
               })
               .eq('id', profiles[0].id);
 
-            if (!isAddEstablishmentFlow && canSendEmail()) {
-              const establishmentName = (profiles[0].establishment_name as string) ?? '';
-              const planName = PLAN_DISPLAY[validPlan] ?? 'Premium';
-              const appUrl = process.env.NEXT_PUBLIC_SITE_URL ?? process.env.NEXT_PUBLIC_APP_URL ?? 'https://reputexa.fr';
-              const loginUrl = `${appUrl}/fr/dashboard`;
-              const settingsUrl = `${appUrl}/fr/dashboard/settings`;
-              const supportUrl = `${appUrl}/fr/contact`;
-
-              if (profileStatus === 'trialing') {
-                const html = getWelcomeZenithTrialHtml({ loginUrl, settingsUrl, supportUrl });
-                sendEmail({
-                  to: customerEmail,
-                  subject: "🚀 C'est parti ! Tes 14 jours d'accès Total Zénith commencent.",
-                  html,
-                  from: process.env.RESEND_FROM ?? DEFAULT_FROM,
-                }).catch(() => {});
-              } else {
-                const html = getWelcomePaidHtml({
-                  planName,
-                  establishmentName,
-                  loginUrl,
-                  supportUrl,
-                });
-                sendEmail({
-                  to: customerEmail,
-                  subject: 'Merci pour votre confiance ! Votre surveillance 24/7 est activée.',
-                  html,
-                  from: process.env.RESEND_FROM ?? DEFAULT_FROM,
-                }).catch(() => {});
-              }
-            }
+            // Onboarding email : déclenché uniquement sur invoice.paid (pas ici)
           }
         }
       }
-      revalidateDashboard();
+      revalidateDashboardPaths();
     }
 
-    // Abonnement supprimé : current_period_end est passé → on repasse en free
     if (event.type === 'customer.subscription.deleted') {
       const subscription = event.data.object as Stripe.Subscription;
       const subscriptionId = subscription.id;
@@ -216,21 +192,20 @@ export async function POST(request: Request) {
             .update({
               subscription_plan: 'free',
               selected_plan: 'vision',
-              subscription_status: 'expired',
+              subscription_status: 'canceled',
               subscription_quantity: 1,
               subscription_period_end: null,
               trial_ends_at: null,
               stripe_subscription_id: null,
+              payment_status: 'paid',
+              payment_failed_at: null,
             })
             .eq('id', profiles[0].id);
         }
       }
-      revalidateDashboard();
+      revalidateDashboardPaths();
     }
 
-    // customer.subscription.updated : quantité (établissements) et plan mis à jour dans profiles.
-    // Déclenché par create-bulk-expansion (Stripe Expansion Engine) : après paiement de la facture,
-    // subscription_quantity est déjà à jour, les nouveaux slots sont visibles au retour sur le dashboard.
     if (event.type === 'customer.subscription.updated') {
       const subscription = event.data.object as Stripe.Subscription;
       const previousAttributes = (event.data as { previous_attributes?: Record<string, unknown> }).previous_attributes ?? {};
@@ -240,18 +215,58 @@ export async function POST(request: Request) {
       const admin = createAdminClient();
       if (!admin) return NextResponse.json({ received: true });
 
-      // Plusieurs abonnements actifs possibles : on ne garde que le plus récent / haut de gamme
-      const allSubs = await stripe.subscriptions.list({
-        customer: customerId,
-        status: 'all',
-        limit: 20,
-      });
-      const canonical = pickCanonicalSubscription(allSubs.data);
+      let allSubs = await stripeWithRetry(
+        (s) => s.subscriptions.list({ customer: customerId, status: 'all', limit: 20 }),
+        secretKey
+      );
+      let canonical = pickCanonicalSubscription(allSubs.data);
       if (!canonical) return NextResponse.json({ received: true });
 
+      // Passage trialing → active : appliquer selected_plan (vision/pulse) en mettant à jour le prix Stripe si besoin
+      const justBecameActive = previousAttributes.status === 'trialing' && subscription.status === 'active';
+      if (justBecameActive) {
+        let profilesForPlan = await admin
+          .from('profiles')
+          .select('id, selected_plan')
+          .eq('stripe_customer_id', customerId)
+          .limit(1);
+        if (!profilesForPlan.data?.length) {
+          profilesForPlan = await admin
+            .from('profiles')
+            .select('id, selected_plan')
+            .eq('stripe_subscription_id', subscription.id)
+            .limit(1);
+        }
+        const selectedPlan = (profilesForPlan.data?.[0]?.selected_plan as string) ?? 'zenith';
+        const currentPlan = getPlanSlugFromSubscription(subscription);
+        if ((selectedPlan === 'vision' || selectedPlan === 'pulse') && currentPlan !== selectedPlan) {
+          const interval = getSubscriptionInterval(subscription);
+          const planToPriceIds = getPlanSlugToStripePriceIds();
+          const priceIds = planToPriceIds[selectedPlan as PlanSlug];
+          const targetPriceId = interval === 'year' ? priceIds.annual : priceIds.monthly;
+          const firstItem = subscription.items?.data?.[0];
+          if (targetPriceId && firstItem?.id) {
+            try {
+              await stripeWithRetry(
+                (s) => s.subscriptions.update(subscription.id, {
+                  items: [{ id: firstItem.id, price: targetPriceId }],
+                }),
+                secretKey
+              );
+              allSubs = await stripeWithRetry(
+                (s) => s.subscriptions.list({ customer: customerId, status: 'all', limit: 20 }),
+                secretKey
+              );
+              canonical = pickCanonicalSubscription(allSubs.data) ?? canonical;
+            } catch (err) {
+              console.error('[stripe/webhook] Apply selected_plan price failed:', err);
+            }
+          }
+        }
+        // Si selected_plan === 'zenith', on ne fait rien : Stripe prélève le prix Zenith par défaut
+      }
+
       const subscriptionId = canonical.id;
-      // plan_id dérivé du premier item (subscription.items.data[0].price.id) — downgrade OK, Stripe gère le crédit
-      const firstItemPriceId = canonical.items?.data?.[0]?.price?.id ?? null;
       const newPlanSlug = getPlanSlugFromSubscription(canonical);
       const qty = getSubscriptionQuantity(canonical);
       const stripeStatus = canonical.status;
@@ -261,10 +276,9 @@ export async function POST(request: Request) {
         ? new Date(canonical.current_period_end * 1000).toISOString()
         : null;
       const subscriptionPlan = (newPlanSlug && PLAN_SLUG_TO_SUBSCRIPTION[newPlanSlug]) ?? 'pulse';
-      const selectedPlan = newPlanSlug ?? 'vision';
+      const selectedPlan = (newPlanSlug ?? 'vision') as PlanSlug;
       const planChanged = typeof previousAttributes.items !== 'undefined' && newPlanSlug;
 
-      // Trouver le profile par stripe_customer_id (prioritaire) ou par stripe_subscription_id
       let profiles = await admin
         .from('profiles')
         .select('id, selected_plan, subscription_plan, subscription_quantity, establishment_name, email')
@@ -288,94 +302,308 @@ export async function POST(request: Request) {
 
       if (profiles?.length) {
         const profile = profiles[0];
+        const customerEmail = profile.email as string | undefined;
         const oldPlan = (profile.selected_plan ?? profile.subscription_plan) ?? '—';
         const oldQty = (profile.subscription_quantity as number | null) ?? null;
 
-        // Logs clairs pour Vercel / debug
+        const isPlanDowngrade = getPlanTierRank(oldPlan) > getPlanTierRank(selectedPlan);
+        const isQuantityDowngrade = oldQty != null && oldQty > qty;
+        const isDowngrade = isPlanDowngrade || isQuantityDowngrade;
+
         if (oldPlan !== selectedPlan) {
-          console.log('[stripe/webhook] Plan mis à jour :', oldPlan, '->', selectedPlan, '(price_id:', firstItemPriceId ?? '—', ')');
+          console.log('[stripe/webhook] Plan mis à jour :', oldPlan, '->', selectedPlan);
         }
         if (oldQty !== null && oldQty !== qty) {
           console.log('[stripe/webhook] Nouvelle quantité :', oldQty, '->', qty);
         }
-        console.log('[stripe/webhook] customer.subscription.updated', {
-          subscriptionId,
-          customerId,
-          status: stripeStatus,
-          planSlug: newPlanSlug,
-          quantity: qty,
-          totalSubs: allSubs.data.length,
-        });
 
-        // Force sync : quantité et plan mis à jour immédiatement (downgrade = on met à jour, pas de blocage)
-        await admin
-          .from('profiles')
-          .update({
-            stripe_subscription_id: subscriptionId,
-            stripe_customer_id: customerId,
-            subscription_status: profileStatus,
-            subscription_period_end: periodEnd,
-            trial_ends_at: profileStatus === 'trialing' ? trialEnd?.toISOString() ?? null : null,
-            selected_plan: selectedPlan,
-            subscription_plan: subscriptionPlan,
-            subscription_quantity: qty,
-          })
-          .eq('id', profile.id);
+        await syncProfileFromSubscription(canonical, customerEmail ?? null);
+        // Ne jamais supprimer les établissements en trop : seul subscription_quantity est mis à jour (accès limités, données conservées).
 
-        if (planChanged && profile.email && canSendEmail()) {
-          const planName = PLAN_DISPLAY[newPlanSlug ?? ''] ?? 'Premium';
-          const establishmentName = (profile.establishment_name as string) ?? '';
-          const appUrl = process.env.NEXT_PUBLIC_SITE_URL ?? process.env.NEXT_PUBLIC_APP_URL ?? 'https://reputexa.fr';
-          const dashboardUrl = `${appUrl}/fr/dashboard`;
-          const html = getUpgradeConfirmationEmailHtml({
-            planName,
-            establishmentName,
-            dashboardUrl,
-          });
-          sendEmail({
-            to: profile.email as string,
-            subject: 'Confirmation de mise à niveau — REPUTEXA',
-            html,
-            from: process.env.RESEND_FROM ?? DEFAULT_FROM,
-          }).catch(() => {});
+        const dashboardUrl = `${APP_URL}/fr/dashboard`;
+        if (customerEmail) {
+          if (isDowngrade) {
+            sendDowngradeConfirmationEmail({
+              to: customerEmail,
+              quantity: qty,
+              dashboardUrl,
+            }).catch(() => {});
+          } else if (planChanged) {
+            const planName = PLAN_DISPLAY[newPlanSlug ?? ''] ?? 'Premium';
+            const establishmentName = (profile.establishment_name as string) ?? '';
+            sendUpgradeConfirmationEmail({
+              to: customerEmail,
+              planName,
+              establishmentName,
+              dashboardUrl,
+            }).catch(() => {});
+          }
         }
       }
-      revalidateDashboard();
+      revalidateDashboardPaths();
+      revalidateFullApp();
     }
 
-    // Facture payée (ex. après expansion) : synchroniser subscription_quantity pour afficher les nouveaux slots.
+    // Facture payée : déclencheur unique pour pending→active (sync quantity), création des slots "à configurer", email, revalidatePath.
     if (event.type === 'invoice.paid') {
-      const invoice = event.data.object as Stripe.Invoice & { subscription?: string };
+      const invoice = event.data.object as Stripe.Invoice & { subscription?: string; billing_reason?: string };
       const subscriptionId = typeof invoice.subscription === 'string' ? invoice.subscription : null;
-      if (subscriptionId) {
-        const subscription = await stripe.subscriptions.retrieve(subscriptionId);
-        const qty = getSubscriptionQuantity(subscription);
-        const customerId = typeof subscription.customer === 'string' ? subscription.customer : subscription.customer?.id;
-        const admin = createAdminClient();
-        if (admin && customerId) {
-          await admin
-            .from('profiles')
-            .update({ subscription_quantity: qty })
-            .eq('stripe_customer_id', customerId);
-        }
+      if (!subscriptionId) {
+        console.log('[stripe/webhook] invoice.paid: no subscription id, skip');
+        return NextResponse.json({ received: true });
       }
-      revalidateDashboard();
-    }
 
-    // Paiement échoué : passer subscription_status en past_due
-    if (event.type === 'invoice.payment_failed') {
-      const invoice = event.data.object as Stripe.Invoice & { subscription?: string };
-      const subscriptionId = typeof invoice.subscription === 'string' ? invoice.subscription : null;
-      if (subscriptionId) {
-        const admin = createAdminClient();
-        if (admin) {
+      const subscription = await retrieveSubscription(subscriptionId);
+      const customerId = typeof subscription.customer === 'string' ? subscription.customer : subscription.customer?.id;
+      if (!customerId) return NextResponse.json({ received: true });
+
+      const admin = createAdminClient();
+      if (admin) {
+        let profiles = await admin
+          .from('profiles')
+          .select('id, email, establishment_name, subscription_quantity, language, onboarding_paid_sent')
+          .eq('stripe_customer_id', customerId)
+          .limit(1);
+        if (!profiles?.data?.length) {
+          const invoiceEmail = typeof invoice.customer_email === 'string' ? invoice.customer_email : null;
+          if (invoiceEmail) {
+            const { data: byEmail } = await admin
+              .from('profiles')
+              .select('id, email, establishment_name, subscription_quantity, language')
+              .eq('email', invoiceEmail)
+              .limit(1);
+            if (byEmail?.length) {
+              profiles = { data: byEmail };
+              await admin.from('profiles').update({ stripe_customer_id: customerId }).eq('id', byEmail[0].id);
+            }
+          }
+        }
+        const profileRow = profiles?.data?.[0];
+        const oldQuantity = profileRow?.subscription_quantity as number | null;
+        const oldQty = typeof oldQuantity === 'number' && oldQuantity >= 1 ? oldQuantity : null;
+        const customerEmail = profileRow?.email as string | undefined;
+        const userId = profileRow?.id as string | undefined;
+        const onboardingAlreadySent = !!(profileRow as { onboarding_paid_sent?: boolean } | undefined)?.onboarding_paid_sent;
+
+        await syncProfileFromSubscription(subscription, customerEmail ?? null);
+        // Reset du statut de paiement sur toute facture payée
+        if (subscriptionId) {
           await admin
             .from('profiles')
-            .update({ subscription_status: 'past_due' })
+            .update({ subscription_status: 'active', payment_status: 'paid', payment_failed_at: null })
             .eq('stripe_subscription_id', subscriptionId);
         }
+
+        const newQty = getSubscriptionQuantity(subscription);
+        const addCount = newQty - (oldQty ?? 0);
+
+        // Créer un slot "en attente" (needs_configuration) par nouvel emplacement payé
+        if (userId && addCount > 0) {
+          const { data: existing } = await admin
+            .from('establishments')
+            .select('display_order')
+            .eq('user_id', userId)
+            .order('display_order', { ascending: false })
+            .limit(1);
+          let nextOrder = (existing?.[0]?.display_order ?? -1) + 1;
+          for (let i = 0; i < addCount; i++) {
+            await admin.from('establishments').insert({
+              user_id: userId,
+              name: 'Nouvel emplacement en attente',
+              display_order: nextOrder + i,
+              needs_configuration: true,
+            });
+          }
+        }
+
+        const planSlug = getPlanSlugFromSubscription(subscription) ?? 'vision';
+        const establishmentName = (profileRow?.establishment_name as string) ?? 'Votre établissement';
+        const toEmail = customerEmail;
+        if (!toEmail) {
+          console.log('[stripe/webhook] invoice.paid: no profile found for customer', customerId, '(onboarding/facture emails skipped)');
+        }
+
+        if (toEmail && newQty > (oldQty ?? 0)) {
+          const totalNextMonth = getTotalPrice(planSlug as PlanSlug, newQty, false);
+          const dashboardUrl = `${APP_URL}/fr/dashboard/establishments`;
+          sendEstablishmentAddedEmail({
+            to: toEmail,
+            establishmentName,
+            totalNextMonth,
+            dashboardUrl,
+          }).catch((err) => console.error('[stripe/webhook] sendEstablishmentAddedEmail', err));
+        }
+
+        // Onboarding unique : facture de création ou premier paiement après essai
+        const billingReason = invoice.billing_reason;
+        if (toEmail && billingReason === 'subscription_create') {
+          const isTrial = subscription.status === 'trialing';
+          console.log('[stripe/webhook] Sending onboarding email (subscription_create):', { to: toEmail, isTrial, planSlug });
+          const trialEnd = subscription.trial_end
+            ? new Date(subscription.trial_end * 1000)
+            : null;
+          const trialEndDate = trialEnd
+            ? trialEnd.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })
+            : null;
+          const planName = PLAN_DISPLAY[planSlug as PlanSlug] ?? planSlug;
+          const interval = getSubscriptionInterval(subscription);
+          const invoiceUrl = invoice.hosted_invoice_url ?? null;
+          const customerName = (profileRow?.establishment_name as string)?.trim() ?? '';
+          const userLocale = (profileRow?.language as string) || 'fr';
+          await sendReputexaOnboardingEmail({
+            to: toEmail,
+            customerName,
+            planName,
+            planSlug: planSlug as 'vision' | 'pulse' | 'zenith',
+            trialEndDate,
+            invoiceUrl,
+            interval,
+            isTrial,
+            locale: userLocale,
+          }).catch((err) => console.error('[stripe/webhook] sendReputexaOnboardingEmail', err));
+
+          // Si pas d'essai, on considère que l'onboarding payant a été envoyé
+          if (!isTrial && profileRow?.id && !onboardingAlreadySent) {
+            await admin
+              .from('profiles')
+              .update({ onboarding_paid_sent: true })
+              .eq('id', profileRow.id);
+          }
+        }
+
+        // Passage essai → payant : premier invoice.paid "subscription_cycle" après un trial
+        if (toEmail && billingReason === 'subscription_cycle' && !onboardingAlreadySent) {
+          const isTrial = false;
+          console.log('[stripe/webhook] Sending onboarding email (first paid after trial):', { to: toEmail, planSlug });
+          const trialEnd = subscription.trial_end
+            ? new Date(subscription.trial_end * 1000)
+            : null;
+          const trialEndDate = trialEnd
+            ? trialEnd.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })
+            : null;
+          const planName = PLAN_DISPLAY[planSlug as PlanSlug] ?? planSlug;
+          const interval = getSubscriptionInterval(subscription);
+          const invoiceUrl = invoice.hosted_invoice_url ?? null;
+          const customerName = (profileRow?.establishment_name as string)?.trim() ?? '';
+          const userLocale = (profileRow?.language as string) || 'fr';
+          await sendReputexaOnboardingEmail({
+            to: toEmail,
+            customerName,
+            planName,
+            planSlug: planSlug as 'vision' | 'pulse' | 'zenith',
+            trialEndDate,
+            invoiceUrl,
+            interval,
+            isTrial,
+            locale: userLocale,
+          }).catch((err) => console.error('[stripe/webhook] sendReputexaOnboardingEmail', err));
+
+          if (profileRow?.id) {
+            await admin
+              .from('profiles')
+              .update({ onboarding_paid_sent: true })
+              .eq('id', profileRow.id);
+          }
+        }
+
+        // Facture récurrente (mois suivants) : email léger avec lien de téléchargement
+        if (toEmail && billingReason === 'subscription_cycle' && onboardingAlreadySent) {
+          const invoiceUrl = typeof invoice.hosted_invoice_url === 'string' ? invoice.hosted_invoice_url : null;
+          const periodEnd = typeof invoice.period_end === 'number' ? invoice.period_end : null;
+          const monthYear = periodEnd
+            ? new Date(periodEnd * 1000).toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' })
+            : new Date().toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' });
+          if (invoiceUrl) {
+            sendMonthlyInvoiceEmail({
+              to: toEmail,
+              monthYear,
+              invoiceUrl,
+            }).catch((err) => console.error('[stripe/webhook] sendMonthlyInvoiceEmail', err));
+          }
+        }
       }
-      revalidateDashboard();
+      revalidateDashboardPaths();
+    }
+
+    if (event.type === 'invoice.payment_failed') {
+      const invoice = event.data.object as Stripe.Invoice & { subscription?: string | Stripe.Subscription };
+      const subscriptionId = typeof invoice.subscription === 'string'
+        ? invoice.subscription
+        : (invoice.subscription as Stripe.Subscription | undefined)?.id ?? null;
+
+      const admin = createAdminClient();
+      let customerEmail: string | null = null;
+      let customerId: string | null = null;
+
+      if (subscriptionId) {
+        const subscription = await retrieveSubscription(subscriptionId);
+        customerId = typeof subscription.customer === 'string'
+          ? subscription.customer
+          : (subscription.customer as Stripe.Customer | null)?.id ?? null;
+        customerEmail =
+          (typeof subscription.customer === 'object' && (subscription.customer as Stripe.Customer | null)?.email)
+            ? (subscription.customer as Stripe.Customer).email ?? null
+            : (typeof invoice.customer_email === 'string' && invoice.customer_email) ? invoice.customer_email : null;
+
+        if (admin && customerId) {
+          // Statut Stripe côté app : past_due + drapeau de paiement échoué (point de départ de la période de grâce)
+          const failedAt = invoice.created ? new Date(invoice.created * 1000).toISOString() : new Date().toISOString();
+          await admin
+            .from('profiles')
+            .update({ subscription_status: 'past_due', payment_status: 'unpaid', payment_failed_at: failedAt })
+            .eq('stripe_subscription_id', subscriptionId);
+        }
+      } else {
+        customerEmail =
+          (typeof invoice.customer_email === 'string' && invoice.customer_email)
+            ? invoice.customer_email
+            : null;
+      }
+
+      if (customerEmail && customerId) {
+        const dashboardBillingUrl = `${APP_URL}/fr/dashboard/settings#billing`;
+        // Portail Stripe natif : l'utilisateur gère ses moyens de paiement et ses factures
+        const portalBaseUrl = APP_URL.replace(/\/+$/, '');
+        const portalUrl = `${portalBaseUrl}/api/stripe/portal?flow=upgrade`;
+
+        sendPaymentFailedEmail({
+          to: customerEmail,
+          portalUrl,
+          dashboardBillingUrl,
+        }).catch((err) => console.error('[stripe/webhook] sendPaymentFailedEmail', err));
+      }
+
+      revalidateDashboardPaths();
+    }
+
+    if (event.type === 'invoice.payment_action_required') {
+      const invoice = event.data.object as Stripe.Invoice & { subscription?: string | Stripe.Subscription };
+      const subscriptionId = typeof invoice.subscription === 'string'
+        ? invoice.subscription
+        : (invoice.subscription as Stripe.Subscription | undefined)?.id ?? null;
+
+      const admin = createAdminClient();
+      let customerEmail: string | null = null;
+
+      if (subscriptionId) {
+        const subscription = await retrieveSubscription(subscriptionId);
+        customerEmail =
+          typeof subscription.customer === 'object' && (subscription.customer as Stripe.Customer | null)?.email
+            ? (subscription.customer as Stripe.Customer).email ?? null
+            : (typeof invoice.customer_email === 'string' && invoice.customer_email) ? invoice.customer_email : null;
+
+        if (admin && customerEmail) {
+          const invoiceUrl = typeof invoice.hosted_invoice_url === 'string' ? invoice.hosted_invoice_url : null;
+          if (invoiceUrl) {
+            await sendPaymentActionRequiredEmail({
+              to: customerEmail,
+              invoiceUrl,
+            }).catch((err) => console.error('[stripe/webhook] sendPaymentActionRequiredEmail', err));
+          }
+        }
+      }
+
+      return NextResponse.json({ received: true });
     }
 
     return NextResponse.json({ received: true });

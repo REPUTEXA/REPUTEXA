@@ -47,8 +47,11 @@ export default async function DashboardLayout({ children, params }: Props) {
   let showTrialBanner = false;
   let planDisplayName = 'Pulse';
   let selectedPlanSlug: 'vision' | 'pulse' | 'zenith' | 'free' = 'pulse';
+  let selectedPlanFromProfile: string | null = null;
   let isTrialing = false;
   let hasActiveSubscription = false;
+  let showPastDueBanner = false;
+  let hasUnpaidStatus = false;
   let firstLogin = true;
   let subscriptionQuantity = 1;
   let updatesNewCount = 0;
@@ -75,9 +78,12 @@ export default async function DashboardLayout({ children, params }: Props) {
       firstLogin = profile.first_login ?? true;
       avatarUrl = profile.avatar_url || null;
       planDisplayName = PLAN_DISPLAY[profile.subscription_plan] ?? 'Pulse';
-      selectedPlanSlug = toPlanSlug(profile.subscription_plan, profile.selected_plan ?? undefined);
+      // Accès aux fonctionnalités : basé uniquement sur la souscription Stripe actuelle (subscription_plan).
+      // Pendant l'essai = Zénith complet ; selected_plan ne sert que pour le badge "Passage programmé" et le webhook.
+      selectedPlanSlug = toPlanSlug(profile.subscription_plan, undefined);
+      selectedPlanFromProfile = typeof profile.selected_plan === 'string' ? profile.selected_plan : null;
 
-      const status = profile.subscription_status;
+      const status = profile.subscription_status as string | null;
       const trialEnd = profile.trial_ends_at ? new Date(profile.trial_ends_at) : null;
       const periodEnd = profile.subscription_period_end ? new Date(profile.subscription_period_end as string) : null;
       const now = new Date();
@@ -87,6 +93,8 @@ export default async function DashboardLayout({ children, params }: Props) {
       // Accès si trialing, active ou past_due. Grace period : tant que subscription_period_end n'est pas passé.
       hasActiveSubscription = (status === 'active' || status === 'past_due') && !periodEndPassed;
       isTrialing = status === 'trialing' && !!trialInFuture;
+
+      hasUnpaidStatus = (profile.payment_status as string | null) === 'unpaid';
 
       if (periodEndPassed) {
         showPaywall = true;
@@ -99,6 +107,7 @@ export default async function DashboardLayout({ children, params }: Props) {
         trialEndDate = formatTrialEndDate(trialEnd, locale);
         showTrialBanner = true;
       }
+      showPastDueBanner = status === 'past_due' || hasUnpaidStatus;
       subscriptionQuantity = Math.max(1, (profile.subscription_quantity as number | null) ?? 1);
     }
 
@@ -136,6 +145,7 @@ export default async function DashboardLayout({ children, params }: Props) {
         showTrialBanner={showTrialBanner}
         planDisplayName={planDisplayName}
         selectedPlanSlug={selectedPlanSlug}
+        selectedPlanFromProfile={selectedPlanFromProfile}
         isCriticalPhase={isCriticalPhase}
         showPaywall={showPaywall}
         isTrialing={isTrialing}
@@ -143,6 +153,7 @@ export default async function DashboardLayout({ children, params }: Props) {
         locale={locale}
         subscriptionQuantity={subscriptionQuantity}
         updatesNewCount={updatesNewCount}
+        showPastDueBanner={showPastDueBanner}
       >
         <Suspense fallback={null}>
           <StripeSyncOnReturn />

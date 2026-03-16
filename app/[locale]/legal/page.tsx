@@ -1,13 +1,15 @@
 import type { Metadata } from 'next';
+import { Link } from '@/i18n/navigation';
 import { LegalPageShell } from '@/components/legal/legal-page-shell';
 
 const TOC = [
   { id: 'editeur', label: '1. Éditeur du site' },
   { id: 'directeur-publication', label: '2. Directeur de la publication' },
-  { id: 'hebergeur', label: '3. Hébergeur' },
-  { id: 'prop-intel', label: '4. Propriété intellectuelle' },
-  { id: 'liens', label: '5. Liens hypertextes' },
-  { id: 'contact', label: '6. Contact' },
+  { id: 'services-technologies', label: '3. Services et technologies' },
+  { id: 'hebergeur', label: '4. Hébergeur' },
+  { id: 'prop-intel', label: '5. Propriété intellectuelle' },
+  { id: 'liens', label: '6. Liens hypertextes' },
+  { id: 'contact', label: '7. Contact' },
 ];
 
 export async function generateMetadata({
@@ -21,13 +23,13 @@ export async function generateMetadata({
   return {
     title: 'Mentions légales | REPUTEXA',
     description:
-      "Mentions légales du site Reputexa.fr. Éditeur, hébergeur, directeur de la publication, conformité LCEN.",
+      "Mentions légales du site Reputexa.fr. Éditeur, hébergeur, plans Vision Pulse Zenith, conformité LCEN et RGPD.",
     alternates: { canonical: `${baseUrl}${path}` },
     openGraph: {
       title: 'Mentions légales | REPUTEXA',
       description: 'Mentions légales et informations légales du site Reputexa.',
       url: `${baseUrl}${path}`,
-      siteName: 'Reputexa',
+      siteName: 'REPUTEXA',
     },
   };
 }
@@ -66,9 +68,24 @@ export default function LegalPage() {
         </p>
       </section>
 
+      <section id="services-technologies" className="mb-10">
+        <h3 className="text-lg font-display font-semibold text-slate-900 dark:text-slate-100 mb-3">
+          3. Services et technologies
+        </h3>
+        <p className="text-slate-600 dark:text-slate-400 leading-relaxed mb-2">
+          Le site reputexa.fr propose un service d&apos;e-réputation organisé en trois offres d&apos;abonnement :
+          <strong> Vision</strong>, <strong>Pulse</strong> et <strong>Zenith</strong>. Les fonctionnalités (agrégation
+          d&apos;avis, réponses IA, alertes, reporting) et les technologies utilisées (paiements Stripe, hébergement
+          des données Supabase, emails Resend, notifications WhatsApp via Meta) sont détaillées dans les{' '}
+          <Link href="/terms" className="text-[#2563eb] hover:underline">Conditions Générales de Vente</Link>
+          {' '}et la{' '}
+          <Link href="/privacy" className="text-[#2563eb] hover:underline">Politique de confidentialité</Link>.
+        </p>
+      </section>
+
       <section id="hebergeur" className="mb-10">
         <h3 className="text-lg font-display font-semibold text-slate-900 dark:text-slate-100 mb-3">
-          3. Hébergeur
+          4. Hébergeur
         </h3>
         <p className="text-slate-600 dark:text-slate-400 leading-relaxed mb-2">
           Le site reputexa.fr est hébergé par :
@@ -81,7 +98,7 @@ export default function LegalPage() {
 
       <section id="prop-intel" className="mb-10">
         <h3 className="text-lg font-display font-semibold text-slate-900 dark:text-slate-100 mb-3">
-          4. Propriété intellectuelle
+          5. Propriété intellectuelle
         </h3>
         <p className="text-slate-600 dark:text-slate-400 leading-relaxed">
           L&apos;ensemble du contenu du site (textes, graphismes, logos, icônes, bases de données) est protégé
@@ -103,7 +120,7 @@ export default function LegalPage() {
 
       <section id="contact" className="mb-10">
         <h3 className="text-lg font-display font-semibold text-slate-900 dark:text-slate-100 mb-3">
-          6. Contact
+          7. Contact
         </h3>
         <p className="text-slate-600 dark:text-slate-400 leading-relaxed">
           Pour toute question relative aux présentes mentions légales :{' '}

@@ -18,27 +18,27 @@ const SEO_CONFIG: Record<
   }
 > = {
   fr: {
-    title: 'Reputexa | Votre Directeur de la Relation Client 24/7',
+    title: 'REPUTEXA | Votre Directeur de la Relation Client 24/7',
     description:
       "Automatisez vos avis, protégez votre e-réputation et boostez votre chiffre d'affaires grâce à l'IA.",
   },
   en: {
-    title: 'Reputexa | Your 24/7 Customer Relationship Director',
+    title: 'REPUTEXA | Your 24/7 Customer Relationship Director',
     description:
       "Automate reviews, protect your online reputation and grow your revenue with AI.",
   },
   es: {
-    title: 'Reputexa | Su Director de Relación con el Cliente 24/7',
+    title: 'REPUTEXA | Su Director de Relación con el Cliente 24/7',
     description:
       'Automatice sus reseñas, proteja su reputación online y aumente su facturación gracias a la IA.',
   },
   de: {
-    title: 'Reputexa | Ihr Director of Customer Relations 24/7',
+    title: 'REPUTEXA | Ihr Director of Customer Relations 24/7',
     description:
       'Automatisieren Sie Bewertungen, schützen Sie Ihren Online-Ruf und steigern Sie Ihren Umsatz mit KI.',
   },
   it: {
-    title: 'Reputexa | Il tuo Direttore della Relazione Clienti 24/7',
+    title: 'REPUTEXA | Il tuo Direttore della Relazione Clienti 24/7',
     description:
       'Automatizza le recensioni, protegge la tua reputazione online e aumenta il fatturato grazie all’IA.',
   },
@@ -70,7 +70,7 @@ export async function generateMetadata({
       title: seo.title,
       description: seo.description,
       url: `${baseUrl}${localePath}`,
-      siteName: 'Reputexa',
+      siteName: 'REPUTEXA',
     },
   };
 }

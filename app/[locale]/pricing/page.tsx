@@ -217,7 +217,7 @@ export default function PricingPage() {
             aria-label="REPUTEXA"
           >
             <Logo />
-            <span className="font-display font-bold text-lg">REPUTEXA</span>
+            <span className="font-display font-bold text-lg uppercase">REPUTEXA</span>
           </Link>
           {backLinkVisible && (
             <Link

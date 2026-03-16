@@ -13,8 +13,18 @@ import { PhoneInput, isValidPhoneNumber } from '@/components/phone-input';
 import { PasswordField } from '@/components/auth/password-field';
 import { SettingsSkeleton } from '@/components/auth/settings-skeleton';
 import { getAuthErrorMessage } from '@/lib/auth/errors';
+import { getLanguageFromPhone } from '@/lib/language-from-phone';
 import { toast } from 'sonner';
+
 const GOOGLE_BUSINESS_SCOPE = 'https://www.googleapis.com/auth/business.manage';
+
+const LOCALE_NAMES: Record<string, string> = {
+  fr: 'Français',
+  en: 'Anglais',
+  it: 'Italien',
+  es: 'Espagnol',
+  de: 'Allemand',
+};
 
 export default function SettingsPage() {
   const t = useTranslations('Dashboard.settings');
@@ -37,16 +47,24 @@ export default function SettingsPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [whatsappPhone, setWhatsappPhone] = useState('');
   const [alertThresholdStars, setAlertThresholdStars] = useState(3);
-  const [, setSelectedPlan] = useState<'vision' | 'pulse' | 'zenith'>('vision');
+  const [subscriptionStatus, setSubscriptionStatus] = useState<string | null>(null);
+  const [selectedPlan, setSelectedPlan] = useState<'vision' | 'pulse' | 'zenith'>('zenith');
+  const [changePlanLoading, setChangePlanLoading] = useState<'pulse' | 'vision' | 'zenith' | null>(null);
   const [aiTone, setAiTone] = useState<'professional' | 'warm' | 'casual' | 'luxury' | 'humorous'>('professional');
   const [aiLength, setAiLength] = useState<'concise' | 'balanced' | 'detailed'>('balanced');
   const [aiSafeMode, setAiSafeMode] = useState(true);
   const [aiCustomInstructions, setAiCustomInstructions] = useState('');
+  const [profileLanguage, setProfileLanguage] = useState<string>('fr');
+  const [showLanguageModal, setShowLanguageModal] = useState(false);
+  const [suggestedLocale, setSuggestedLocale] = useState<string | null>(null);
+  const pendingProfilePayloadRef = useRef<Record<string, unknown> | null>(null);
   const [loadingProfile, setLoadingProfile] = useState(true);
   const [savingProfile, setSavingProfile] = useState(false);
   const [savingAccount, setSavingAccount] = useState(false);
   const [savingNotifications, setSavingNotifications] = useState(false);
   const [savingAiPreferences, setSavingAiPreferences] = useState(false);
+  const [googleErrorShown, setGoogleErrorShown] = useState(false);
+  const [trialEndsAt, setTrialEndsAt] = useState<string | null>(null);
 
   // Vocal-to-style (ADN IA) state
   const [aiVoiceRecording, setAiVoiceRecording] = useState(false);
@@ -81,10 +99,15 @@ export default function SettingsPage() {
         if (data.whatsappPhone !== undefined) setWhatsappPhone(data.whatsappPhone ?? '');
         if (data.alertThresholdStars !== undefined) setAlertThresholdStars(data.alertThresholdStars ?? 3);
         if (data.selectedPlan) setSelectedPlan(data.selectedPlan);
+        if (data.subscriptionStatus !== undefined) setSubscriptionStatus(data.subscriptionStatus ?? null);
         if (data.aiTone) setAiTone(data.aiTone);
         if (data.aiLength) setAiLength(data.aiLength);
         if (typeof data.aiSafeMode === 'boolean') setAiSafeMode(data.aiSafeMode);
         if (typeof data.aiCustomInstructions === 'string') setAiCustomInstructions(data.aiCustomInstructions);
+        if (typeof data.language === 'string') setProfileLanguage(data.language);
+        if (typeof data.trialEndsAt === 'string' || data.trialEndsAt === null) {
+          setTrialEndsAt(data.trialEndsAt);
+        }
       })
       .catch((err) => toast.error(err instanceof Error ? err.message : 'Impossible de charger le profil'))
       .finally(() => setLoadingProfile(false));
@@ -169,24 +192,21 @@ export default function SettingsPage() {
       );
   };
 
-  const handleSaveProfile = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (phone.trim() && !isValidPhoneNumber(phone)) {
-      toast.error('Numéro de téléphone invalide.');
-      return;
-    }
+  const doSaveProfile = async (payload: { fullName: string; establishmentName: string; establishmentType: string; address: string; phone: string }, languageOverride: string | null) => {
     setSavingProfile(true);
     try {
+      const body: Record<string, string> = {
+        fullName: payload.fullName,
+        establishmentName: payload.establishmentName,
+        establishmentType: payload.establishmentType,
+        address: payload.address,
+        phone: payload.phone,
+      };
+      if (languageOverride) body.language = languageOverride;
       const res = await fetch('/api/profile', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          fullName: fullName.trim(),
-          establishmentName: establishmentName.trim(),
-          establishmentType: establishmentType.trim(),
-          address: address.trim(),
-          phone: phone.trim(),
-        }),
+        body: JSON.stringify(body),
       });
       const data = await res.json();
       if (!res.ok) {
@@ -195,13 +215,41 @@ export default function SettingsPage() {
         return;
       }
       toast.success('Modifications enregistrées ✅');
-      router.refresh();
+      if (languageOverride) {
+        router.replace(`/${languageOverride}/dashboard/settings`);
+      } else {
+        router.refresh();
+      }
+      if (languageOverride) setProfileLanguage(languageOverride);
     } catch (err) {
       const msg = err instanceof Error ? err.message : 'Erreur lors de l\'enregistrement';
       toast.error(msg);
     } finally {
       setSavingProfile(false);
     }
+  };
+
+  const handleSaveProfile = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (phone.trim() && !isValidPhoneNumber(phone)) {
+      toast.error('Numéro de téléphone invalide.');
+      return;
+    }
+    const payload = {
+      fullName: fullName.trim(),
+      establishmentName: establishmentName.trim(),
+      establishmentType: establishmentType.trim(),
+      address: address.trim(),
+      phone: phone.trim(),
+    };
+    const suggestedFromPhone = phone.trim() ? getLanguageFromPhone(phone.trim()) : null;
+    if (suggestedFromPhone && suggestedFromPhone !== profileLanguage) {
+      setSuggestedLocale(suggestedFromPhone);
+      pendingProfilePayloadRef.current = payload;
+      setShowLanguageModal(true);
+      return;
+    }
+    await doSaveProfile(payload, null);
   };
 
   const handleSaveAccount = async (e: React.FormEvent) => {
@@ -236,6 +284,7 @@ export default function SettingsPage() {
         options: {
           redirectTo,
           scopes: `${GOOGLE_BUSINESS_SCOPE} email profile`,
+          queryParams: { access_type: 'offline', prompt: 'consent' },
         },
       });
       if (error) {
@@ -244,7 +293,7 @@ export default function SettingsPage() {
           options: {
             redirectTo,
             scopes: `${GOOGLE_BUSINESS_SCOPE} email profile`,
-            queryParams: { prompt: 'consent' },
+            queryParams: { access_type: 'offline', prompt: 'consent' },
           },
         });
         if (oauthErr) throw oauthErr;
@@ -280,6 +329,14 @@ export default function SettingsPage() {
     }
   };
 
+  const handleFacebookConnect = () => {
+    toast.info('Connexion Facebook bientôt disponible.');
+  };
+
+  const handleTrustpilotConnect = () => {
+    toast.info('Connexion Trustpilot bientôt disponible.');
+  };
+
   useEffect(() => {
     if (searchParams?.get('from') !== 'google') return;
     const run = async () => {
@@ -291,10 +348,13 @@ export default function SettingsPage() {
         setGoogleLocationName(data.googleLocationName);
         setGoogleLocationAddress(data.googleLocationAddress);
         toast.success('Google Business connecté ✅');
+      } catch (err) {
+        // Pas de toast agressif automatique : si la connexion échoue,
+        // on laisse simplement l'état sur "⚪ Non connecté".
+        console.error('[settings] google-business/save failed', err);
+      } finally {
         router.replace(pathname ?? '/dashboard/settings');
         router.refresh();
-      } catch (err) {
-        toast.error(err instanceof Error ? err.message : 'Erreur lors de la sauvegarde');
       }
     };
     run();
@@ -369,6 +429,18 @@ export default function SettingsPage() {
   };
 
   if (loadingProfile) return <SettingsSkeleton />;
+  const isFacebookConnected = false;
+  const isTrustpilotConnected = false;
+  const connectedCount = [isGoogleConnected, isFacebookConnected, isTrustpilotConnected].filter(Boolean).length;
+  const connectionScoreLabel = `${connectedCount}/3 plateformes actives`;
+  const connectionScorePercent = (connectedCount / 3) * 100;
+  const formattedTrialEnd =
+    trialEndsAt
+      ? new Date(trialEndsAt).toLocaleDateString(
+          locale === 'en' ? 'en-US' : 'fr-FR',
+          { day: 'numeric', month: 'long', year: 'numeric' }
+        )
+      : null;
 
   return (
     <div className="px-4 sm:px-6 py-6 space-y-8">
@@ -469,10 +541,137 @@ export default function SettingsPage() {
       </section>
 
       {/* Abonnement et facturation */}
-      <section className="rounded-2xl border border-slate-200 dark:border-zinc-800/50 bg-white dark:bg-zinc-900/95 shadow-sm dark:shadow-none p-6">
+      <section id="billing" className="rounded-2xl border border-slate-200 dark:border-zinc-800/50 bg-white dark:bg-zinc-900/95 shadow-sm dark:shadow-none p-6">
         <h2 className="font-display font-semibold text-lg text-slate-900 dark:text-zinc-100 mb-4">
           Abonnement et facturation
         </h2>
+        {subscriptionStatus === 'trialing' && (
+          <div className="mb-4 p-4 rounded-xl bg-slate-50 dark:bg-zinc-800/50 border border-slate-200 dark:border-zinc-700">
+            <p className="text-sm font-medium text-slate-700 dark:text-zinc-200 mb-3">
+              Changer de plan pendant ton essai
+            </p>
+            <p className="text-sm text-slate-500 dark:text-zinc-400 mb-3">
+              Choisis ton plan définitif. Tu peux changer d&apos;avis autant de fois que tu veux jusqu&apos;à la fin de tes 14 jours d&apos;essai.
+            </p>
+            <div className="flex flex-wrap gap-2">
+              <button
+                type="button"
+                disabled={!!changePlanLoading}
+                onClick={async () => {
+                  setChangePlanLoading('vision');
+                  try {
+                    const res = await fetch('/api/stripe/upgrade-subscription', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({ planSlug: 'vision' }),
+                      credentials: 'include',
+                    });
+                    const data = await res.json().catch(() => ({}));
+                    if (!res.ok) throw new Error(data.error ?? 'Erreur');
+                    toast.success(
+                      formattedTrialEnd
+                        ? `Choix enregistré. Vous profitez de ZÉNITH jusqu'au ${formattedTrialEnd}.`
+                        : 'Choix enregistré. Vous profitez de ZÉNITH jusqu’à la fin de votre essai.',
+                    );
+                    const profileRes = await fetch('/api/profile', { credentials: 'include' });
+                    const profileData = await profileRes.json().catch(() => ({}));
+                    if (profileData.selectedPlan !== undefined) setSelectedPlan(profileData.selectedPlan);
+                    if (profileData.subscriptionStatus !== undefined) setSubscriptionStatus(profileData.subscriptionStatus ?? null);
+                  } catch (err) {
+                    toast.error(err instanceof Error ? err.message : 'Impossible de changer de plan');
+                  } finally {
+                    setChangePlanLoading(null);
+                  }
+                }}
+                className={`inline-flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl text-sm font-semibold text-white disabled:opacity-50 disabled:pointer-events-none transition-all bg-primary hover:brightness-110 ${
+                  selectedPlan === 'vision' ? 'ring-2 ring-emerald-500 ring-offset-2 dark:ring-offset-zinc-900' : ''
+                }`}
+              >
+                {changePlanLoading === 'vision' ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
+                Passer à VISION
+                {selectedPlan === 'vision' && !changePlanLoading && <span className="text-blue-200 text-xs font-medium">— Ton futur plan</span>}
+              </button>
+              <button
+                type="button"
+                disabled={!!changePlanLoading}
+                onClick={async () => {
+                  setChangePlanLoading('pulse');
+                  try {
+                    const res = await fetch('/api/stripe/upgrade-subscription', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({ planSlug: 'pulse' }),
+                      credentials: 'include',
+                    });
+                    const data = await res.json().catch(() => ({}));
+                    if (!res.ok) throw new Error(data.error ?? 'Erreur');
+                    toast.success(
+                      formattedTrialEnd
+                        ? `Choix enregistré. Vous profitez de ZÉNITH jusqu'au ${formattedTrialEnd}.`
+                        : 'Choix enregistré. Vous profitez de ZÉNITH jusqu’à la fin de votre essai.',
+                    );
+                    const profileRes = await fetch('/api/profile', { credentials: 'include' });
+                    const profileData = await profileRes.json().catch(() => ({}));
+                    if (profileData.selectedPlan !== undefined) setSelectedPlan(profileData.selectedPlan);
+                    if (profileData.subscriptionStatus !== undefined) setSubscriptionStatus(profileData.subscriptionStatus ?? null);
+                  } catch (err) {
+                    toast.error(err instanceof Error ? err.message : 'Impossible de changer de plan');
+                  } finally {
+                    setChangePlanLoading(null);
+                  }
+                }}
+                className={`inline-flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl text-sm font-semibold disabled:opacity-50 disabled:pointer-events-none transition-all ${
+                  selectedPlan === 'pulse'
+                    ? 'ring-2 ring-emerald-500 ring-offset-2 dark:ring-offset-zinc-900 text-white bg-slate-700 hover:bg-slate-800'
+                    : 'text-white bg-slate-700 hover:bg-slate-800'
+                }`}
+              >
+                {changePlanLoading === 'pulse' ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
+                Passer à PULSE
+                {selectedPlan === 'pulse' && !changePlanLoading && <span className="text-emerald-300 text-xs font-medium">— Ton futur plan</span>}
+              </button>
+              <button
+                type="button"
+                disabled={!!changePlanLoading}
+                onClick={async () => {
+                  setChangePlanLoading('zenith');
+                  try {
+                    const res = await fetch('/api/stripe/upgrade-subscription', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({ planSlug: 'zenith' }),
+                      credentials: 'include',
+                    });
+                    const data = await res.json().catch(() => ({}));
+                    if (!res.ok) throw new Error(data.error ?? 'Erreur');
+                    toast.success(
+                      formattedTrialEnd
+                        ? `Choix enregistré. Vous profitez de ZÉNITH jusqu'au ${formattedTrialEnd}.`
+                        : 'Choix enregistré. Vous profitez de ZÉNITH jusqu’à la fin de votre essai.',
+                    );
+                    const profileRes = await fetch('/api/profile', { credentials: 'include' });
+                    const profileData = await profileRes.json().catch(() => ({}));
+                    if (profileData.selectedPlan !== undefined) setSelectedPlan(profileData.selectedPlan);
+                    if (profileData.subscriptionStatus !== undefined) setSubscriptionStatus(profileData.subscriptionStatus ?? null);
+                  } catch (err) {
+                    toast.error(err instanceof Error ? err.message : 'Impossible de changer de plan');
+                  } finally {
+                    setChangePlanLoading(null);
+                  }
+                }}
+                className={`inline-flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl text-sm font-semibold disabled:opacity-50 disabled:pointer-events-none transition-all ${
+                  selectedPlan === 'zenith'
+                    ? 'ring-2 ring-emerald-500 ring-offset-2 dark:ring-offset-zinc-900 text-white bg-amber-600 hover:bg-amber-700'
+                    : 'text-white bg-amber-600 hover:bg-amber-700'
+                }`}
+              >
+                {changePlanLoading === 'zenith' ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
+                Rester sur ZENITH
+                {selectedPlan === 'zenith' && !changePlanLoading && <span className="text-amber-200 text-xs font-medium">— Ton futur plan</span>}
+              </button>
+            </div>
+          </div>
+        )}
         <p className="text-sm text-slate-500 dark:text-zinc-400 mb-4">
           Gérez votre abonnement, vos moyens de paiement et consultez vos factures sur Stripe.
         </p>
@@ -482,35 +681,76 @@ export default function SettingsPage() {
         />
       </section>
 
-      {/* Connexion aux Plateformes */}
+      {/* Gestion des Plateformes */}
       <section className="rounded-2xl border border-slate-200 dark:border-zinc-800/50 bg-white dark:bg-zinc-900/95 shadow-sm dark:shadow-none p-6">
-        <h2 className="font-display font-semibold text-lg text-slate-900 dark:text-zinc-100 mb-4">
-          Connexion aux Plateformes
-        </h2>
-        <div className="flex flex-col sm:flex-row gap-4">
-          <div className="flex-1 rounded-xl border border-slate-200 dark:border-zinc-800/50 bg-slate-50/50 dark:bg-zinc-800/30 p-4 flex flex-col sm:flex-row items-start sm:items-center gap-4">
-            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-white dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 shadow-sm dark:shadow-none">
-              <svg className="h-6 w-6" viewBox="0 0 24 24" aria-hidden>
+        <div className="flex items-start justify-between gap-4 mb-4">
+          <div>
+            <h2 className="font-display font-semibold text-lg text-slate-900 dark:text-zinc-100">
+              Gestion des Plateformes
+            </h2>
+            <p className="mt-1 text-sm text-slate-500 dark:text-zinc-400">
+              Connectez vos comptes pour activer l&apos;IA sur tous vos canaux.
+            </p>
+          </div>
+          <div className="hidden sm:flex flex-col items-end gap-1">
+            <p className="text-xs font-medium text-slate-500 dark:text-zinc-400">
+              Score de connexion&nbsp;: {connectionScoreLabel}
+            </p>
+            <div className="w-40 h-2 rounded-full bg-slate-100 dark:bg-zinc-800 overflow-hidden">
+              <div
+                className="h-full rounded-full bg-gradient-to-r from-emerald-400 to-blue-500 transition-all"
+                style={{ width: `${connectionScorePercent}%` }}
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Barre de progression visible aussi sur mobile */}
+        <div className="sm:hidden mb-4">
+          <p className="text-xs font-medium text-slate-500 dark:text-zinc-400 mb-1">
+            Score de connexion&nbsp;: {connectionScoreLabel}
+          </p>
+          <div className="w-full h-2 rounded-full bg-slate-100 dark:bg-zinc-800 overflow-hidden">
+            <div
+              className="h-full rounded-full bg-gradient-to-r from-emerald-400 to-blue-500 transition-all"
+              style={{ width: `${connectionScorePercent}%` }}
+            />
+          </div>
+        </div>
+
+        <div className="space-y-3">
+          {/* Google */}
+          <div className="flex items-center gap-4 rounded-xl border border-slate-200 dark:border-zinc-800/60 bg-slate-50 dark:bg-zinc-900/80 px-4 py-3">
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-white dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 p-1">
+              <svg className="h-full w-full" viewBox="0 0 24 24" aria-hidden>
                 <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
                 <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
                 <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
                 <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
               </svg>
             </div>
-            <div className="min-w-0 flex-1">
-              <p className="font-semibold text-slate-900 dark:text-zinc-100">Google Business Profile</p>
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2">
+                <p className="font-semibold text-slate-900 dark:text-zinc-100">
+                  Google Business Profile
+                </p>
+              </div>
               {isGoogleConnected ? (
                 <>
-                  <p className="text-sm text-emerald-600 font-medium flex items-center gap-1.5 mt-0.5">
+                  <p className="text-xs sm:text-sm text-emerald-600 dark:text-emerald-400 font-medium flex items-center gap-1.5 mt-0.5">
                     <span className="w-2 h-2 rounded-full bg-emerald-500" aria-hidden />
-                    Connecté · {googleLocationName ?? establishmentName}
+                    🟢 Connecté · {googleLocationName ?? establishmentName}
                   </p>
                   {googleLocationAddress && (
-                    <p className="text-xs text-slate-500 dark:text-zinc-400 mt-1">{googleLocationAddress}</p>
+                    <p className="text-xs text-slate-500 dark:text-zinc-400 mt-1 truncate">
+                      {googleLocationAddress}
+                    </p>
                   )}
                 </>
               ) : (
-                <p className="text-sm text-slate-500 dark:text-zinc-400 mt-0.5">Non connecté</p>
+                <p className="text-xs sm:text-sm text-slate-500 dark:text-zinc-400 mt-0.5">
+                  ⚪ Non connecté
+                </p>
               )}
             </div>
             <div className="flex shrink-0">
@@ -519,26 +759,94 @@ export default function SettingsPage() {
                   type="button"
                   onClick={handleGoogleDisconnect}
                   disabled={googleDisconnecting}
-                  className="px-4 py-2 rounded-xl text-sm font-medium text-slate-600 dark:text-zinc-400 dark:hover:bg-zinc-700 dark:hover:text-zinc-200 hover:bg-slate-200/80 hover:text-slate-800 transition-colors disabled:opacity-50 active:scale-[0.98]"
+                  className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold text-slate-700 bg-white border border-slate-200 hover:bg-slate-50 active:scale-[0.98] disabled:opacity-50"
                 >
-                  {googleDisconnecting ? '...' : 'Déconnecter'}
+                  {googleDisconnecting ? '...' : 'Gérer'}
                 </button>
               ) : (
                 <button
                   type="button"
                   onClick={handleGoogleConnect}
                   disabled={googleConnecting}
-                  className="px-5 py-2.5 rounded-xl text-sm font-semibold text-white bg-gradient-to-r from-[#4285F4] to-[#34A853] hover:opacity-90 shadow-sm transition-opacity disabled:opacity-50 active:scale-[0.98] flex items-center gap-2"
+                  className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold text-white active:scale-[0.98] disabled:opacity-50"
+                  style={{ backgroundColor: '#2563eb' }}
                 >
-                  {googleConnecting ? (
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                  ) : null}
-                  Connecter mon établissement
+                  {googleConnecting ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
+                  <span>Connecter mon compte</span>
                 </button>
               )}
             </div>
           </div>
+
+          {/* Facebook */}
+          <div className="flex items-center gap-4 rounded-xl border border-slate-200 dark:border-zinc-800/60 bg-slate-50 dark:bg-zinc-900/80 px-4 py-3">
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-white dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 p-1">
+              <svg viewBox="0 0 24 24" aria-hidden className="h-full w-full">
+                <path
+                  fill="#1877F2"
+                  d="M22.675 0H1.325C.593 0 0 .593 0 1.325v21.351C0 23.407.593 24 1.325 24h11.495v-9.294H9.691V11.01h3.129V8.413c0-3.1 1.893-4.788 4.659-4.788 1.325 0 2.463.099 2.794.143v3.24h-1.918c-1.504 0-1.796.715-1.796 1.763v2.313h3.59l-.467 3.696h-3.123V24h6.116C23.407 24 24 23.407 24 22.676V1.325C24 .593 23.407 0 22.675 0z"
+                />
+              </svg>
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2 flex-wrap">
+                <p className="font-semibold text-slate-900 dark:text-zinc-100">
+                  Facebook
+                </p>
+              </div>
+              <p className="text-xs sm:text-sm text-slate-500 dark:text-zinc-400 mt-0.5">
+                ⚪ Non connecté
+              </p>
+            </div>
+            <div className="flex shrink-0">
+              <button
+                type="button"
+                onClick={handleFacebookConnect}
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold text-white"
+                style={{ backgroundColor: '#1877F2' }}
+              >
+                Connecter mon compte
+              </button>
+            </div>
+          </div>
+
+          {/* Trustpilot */}
+          <div className="flex items-center gap-4 rounded-xl border border-slate-200 dark:border-zinc-800/60 bg-slate-50 dark:bg-zinc-900/80 px-4 py-3">
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-white dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 p-1">
+              <svg viewBox="0 0 24 24" aria-hidden className="h-full w-full">
+                <path
+                  fill="#00B67A"
+                  d="M21.852 9.246H14.86L12 2.25l-2.86 6.996H2.148L8.04 13.11 5.18 20.25 12 16.139l6.82 4.111L15.96 13.11l5.892-3.864z"
+                />
+                <path
+                  fill="#005128"
+                  d="M17.021 15.22 15.96 13.11 12 15.6z"
+                />
+              </svg>
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2 flex-wrap">
+                <p className="font-semibold text-slate-900 dark:text-zinc-100">
+                  Trustpilot
+                </p>
+              </div>
+              <p className="text-xs sm:text-sm text-slate-500 dark:text-zinc-400 mt-0.5">
+                ⚪ Non connecté
+              </p>
+            </div>
+            <div className="flex shrink-0">
+              <button
+                type="button"
+                onClick={handleTrustpilotConnect}
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold text-white"
+                style={{ backgroundColor: '#00B67A' }}
+              >
+                Connecter mon compte
+              </button>
+            </div>
+          </div>
         </div>
+
         <p className="text-xs text-slate-500 dark:text-zinc-400 mt-4">
           Vos données sont sécurisées. Nous ne publions rien sans votre accord.
         </p>
@@ -818,6 +1126,59 @@ export default function SettingsPage() {
           </button>
         </form>
       </section>
+
+      {/* Modale changement de pays (indicatif téléphone) */}
+      {showLanguageModal && suggestedLocale && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="language-modal-title"
+        >
+          <div className="rounded-2xl bg-white dark:bg-zinc-900 shadow-xl border border-slate-200 dark:border-zinc-700 p-6 max-w-md w-full">
+            <h3 id="language-modal-title" className="font-semibold text-lg text-slate-900 dark:text-zinc-100 mb-2">
+              Changement de pays détecté
+            </h3>
+            <p className="text-sm text-slate-600 dark:text-zinc-400 mb-4">
+              Nous avons détecté un changement de pays. Souhaitez-vous également passer l&apos;interface de Reputexa en {LOCALE_NAMES[suggestedLocale] ?? suggestedLocale} ?
+            </p>
+            <div className="flex gap-3 justify-end">
+              <button
+                type="button"
+                onClick={() => {
+                  setShowLanguageModal(false);
+                  const payload = pendingProfilePayloadRef.current;
+                  pendingProfilePayloadRef.current = null;
+                  setSuggestedLocale(null);
+                  if (payload && typeof payload.fullName === 'string' && typeof payload.establishmentName === 'string' && typeof payload.establishmentType === 'string' && typeof payload.address === 'string' && typeof payload.phone === 'string') {
+                    doSaveProfile(payload, null);
+                  }
+                }}
+                className="px-4 py-2 rounded-xl text-sm font-medium text-slate-700 dark:text-zinc-300 hover:bg-slate-100 dark:hover:bg-zinc-800 transition-colors"
+              >
+                Non
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setShowLanguageModal(false);
+                  const payload = pendingProfilePayloadRef.current;
+                  pendingProfilePayloadRef.current = null;
+                  const loc = suggestedLocale;
+                  setSuggestedLocale(null);
+                  if (payload && typeof payload.fullName === 'string' && typeof payload.establishmentName === 'string' && typeof payload.establishmentType === 'string' && typeof payload.address === 'string' && typeof payload.phone === 'string' && loc) {
+                    doSaveProfile(payload, loc);
+                  }
+                }}
+                disabled={savingProfile}
+                className="px-4 py-2 rounded-xl text-sm font-semibold text-white bg-primary hover:brightness-110 disabled:opacity-50 transition-colors"
+              >
+                Oui
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

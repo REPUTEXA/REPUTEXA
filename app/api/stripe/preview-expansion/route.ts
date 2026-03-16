@@ -1,13 +1,15 @@
 /**
  * Aperçu du prorata d'expansion sans modifier l'abonnement.
- * Retourne le montant dû (Stripe) pour +N établissements.
- * Zéro risque : aucun changement côté Stripe.
+ * Retourne le montant dû (Stripe) pour +N établissements. Zéro risque : aucun changement côté Stripe.
+ * Tous les appels Stripe passent par stripeWithRetry. Email utilisateur validé avant tout appel.
  */
 
 import { NextResponse } from 'next/server';
-import Stripe from 'stripe';
+import type Stripe from 'stripe';
 import { createClient } from '@/lib/supabase/server';
 import { getSubscriptionInterval } from '@/lib/stripe-subscription';
+import { stripeWithRetry } from '@/lib/stripe-client';
+import { findCustomerIdByEmail, findActiveSubscriptionForCustomer } from '@/lib/services/billing-domain';
 
 export async function GET(request: Request) {
   try {
@@ -22,7 +24,7 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
     const expansionAddCount = Math.min(
       15,
-      Math.max(1, Math.floor(Number(searchParams.get('expansionAddCount')) || 0)
+      Math.max(1, Math.floor(Number(searchParams.get('expansionAddCount'))) || 0)
     );
     if (expansionAddCount < 1) {
       return NextResponse.json(
@@ -33,16 +35,12 @@ export async function GET(request: Request) {
 
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
-    if (!user?.email) {
+    if (!user?.email?.trim()) {
       return NextResponse.json({ error: 'Non authentifié' }, { status: 401 });
     }
 
-    const stripe = new Stripe(secretKey);
-    const customers = await stripe.customers.list({
-      email: user.email,
-      limit: 1,
-    });
-    const customerId = customers.data[0]?.id;
+    const email = user.email.trim().toLowerCase();
+    const customerId = await findCustomerIdByEmail(email);
     if (!customerId) {
       return NextResponse.json(
         { error: 'Aucun compte Stripe trouvé' },
@@ -50,14 +48,7 @@ export async function GET(request: Request) {
       );
     }
 
-    const subscriptions = await stripe.subscriptions.list({
-      customer: customerId,
-      status: 'all',
-      limit: 10,
-    });
-    const active = subscriptions.data.find(
-      (s) => s.status === 'active' || s.status === 'trialing'
-    );
+    const active = await findActiveSubscriptionForCustomer(customerId);
     if (!active) {
       return NextResponse.json(
         { error: 'Aucun abonnement actif' },
@@ -83,11 +74,15 @@ export async function GET(request: Request) {
 
     let upcoming: Stripe.Invoice;
     try {
-      upcoming = await stripe.invoices.retrieveUpcoming({
-        customer: customerId,
-        subscription: active.id,
-        subscription_items: [{ id: item.id, quantity: newQty }],
-      } as Stripe.InvoiceRetrieveUpcomingParams);
+      upcoming = await stripeWithRetry(
+        (s) =>
+          s.invoices.retrieveUpcoming({
+            customer: customerId,
+            subscription: active.id,
+            subscription_items: [{ id: item.id, quantity: newQty }],
+          } as Stripe.InvoiceRetrieveUpcomingParams),
+        secretKey
+      );
     } catch (previewErr) {
       console.warn('[stripe/preview-expansion] retrieveUpcoming failed', previewErr);
       return NextResponse.json({

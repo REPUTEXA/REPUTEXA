@@ -89,6 +89,7 @@ type Props = {
   showTrialBanner?: boolean;
   planDisplayName?: string;
   selectedPlanSlug?: PlanSlug;
+  selectedPlanFromProfile?: string | null;
   isCriticalPhase?: boolean;
   showPaywall?: boolean;
   isTrialing?: boolean;
@@ -96,6 +97,7 @@ type Props = {
   locale?: string;
   subscriptionQuantity?: number;
   updatesNewCount?: number;
+  showPastDueBanner?: boolean;
   children: React.ReactNode;
 };
 
@@ -116,6 +118,7 @@ export function DashboardShell({
   showTrialBanner = false,
   planDisplayName = 'Pulse',
   selectedPlanSlug = 'pulse',
+  selectedPlanFromProfile = null,
   isCriticalPhase = false,
   showPaywall = false,
   isTrialing = false,
@@ -123,6 +126,7 @@ export function DashboardShell({
   locale = 'fr',
   subscriptionQuantity = 1,
   updatesNewCount = 0,
+  showPastDueBanner = false,
   children,
 }: Props) {
   const tSidebar = useTranslations('Dashboard.sidebar');
@@ -148,20 +152,18 @@ export function DashboardShell({
   const [updatesModalOpen, setUpdatesModalOpen] = useState(false);
   useEffect(() => { setSearchInput(qParam); }, [qParam]);
 
-  // Retour Stripe (showUpdates=true) : confettis via UpgradeSuccessToast puis modale "Quoi de neuf", nettoyer l'URL
+  // Modale "Quoi de neuf" : déclenchée par UpgradeSuccessToast via événement (URL déjà nettoyée par le toast)
   useEffect(() => {
-    const showUpdates = searchParams?.get('showUpdates');
-    if (showUpdates !== 'true') return;
-    const params = new URLSearchParams(searchParams?.toString() ?? '');
-    params.delete('status');
-    params.delete('showUpdates');
-    const qs = params.toString();
-    const cleanPath = pathname + (qs ? `?${qs}` : '');
-    window.history.replaceState(null, '', cleanPath);
-    // Court délai pour laisser les confettis (UpgradeSuccessToast) se lancer avant la modale
-    const t = setTimeout(() => setUpdatesModalOpen(true), 400);
-    return () => clearTimeout(t);
-  }, [searchParams, pathname]);
+    let timeoutId: ReturnType<typeof setTimeout> | null = null;
+    const handler = () => {
+      timeoutId = setTimeout(() => setUpdatesModalOpen(true), 400);
+    };
+    window.addEventListener('dashboard-show-updates-modal', handler);
+    return () => {
+      window.removeEventListener('dashboard-show-updates-modal', handler);
+      if (timeoutId) clearTimeout(timeoutId);
+    };
+  }, []);
 
   useEffect(() => {
     if (!showNotificationTrends) return;
@@ -250,7 +252,7 @@ export function DashboardShell({
         <div className="flex h-16 items-center justify-between border-b border-white/10 dark:border-zinc-800/50 px-4 lg:justify-start">
           <Link href="/" className="flex items-center gap-2.5" aria-label="REPUTEXA">
             <Logo size="sm" />
-            <span className="font-display font-bold text-lg tracking-[0.18em]">
+            <span className="font-display font-bold text-lg tracking-[0.18em] uppercase">
               REPUTEXA
             </span>
           </Link>
@@ -319,6 +321,7 @@ export function DashboardShell({
         <PlanBadge
           planSlug={selectedPlanSlug}
           planDisplayName={planDisplayName}
+          selectedPlanFromProfile={selectedPlanFromProfile}
           isTrialing={isTrialing}
           trialDaysLeft={trialDaysLeft}
           hasActiveSubscription={hasActiveSubscription}
@@ -473,43 +476,42 @@ export function DashboardShell({
 
         <main className="flex-1 min-h-0 bg-slate-50 dark:bg-[#030303] dashboard-main-bg transition-colors duration-200 relative overflow-y-visible" data-dashboard="true">
           <WelcomeFlash firstLogin={firstLogin} planDisplayName={planDisplayName} />
+          {showPastDueBanner && (
+            <div className="bg-red-50 dark:bg-red-950/40 border-b border-red-200 dark:border-red-900/60">
+              <div className="max-w-5xl mx-auto flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 px-4 sm:px-6 py-4">
+                <p className="text-sm sm:text-base text-red-900 dark:text-red-100 font-medium">
+                  Votre dernier paiement a échoué. Mettez à jour votre moyen de paiement pour éviter toute interruption de service.
+                </p>
+                <Link
+                  href="/dashboard/settings"
+                  className="shrink-0 inline-flex items-center justify-center min-h-[44px] px-5 py-2.5 rounded-xl font-semibold text-white text-sm bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 dark:focus:ring-offset-zinc-900 active:scale-[0.98] transition-all duration-200"
+                >
+                  Mettre à jour ma carte
+                </Link>
+              </div>
+            </div>
+          )}
           {showTrialBanner && !showPaywall && (
             <div
               className={`border-b transition-colors duration-200 ${
                 isCriticalPhase
                   ? 'bg-amber-50/90 dark:bg-amber-950/30 border-amber-200 dark:border-amber-900/60'
-                  : 'bg-white dark:bg-zinc-900/90 border-slate-200 dark:border-zinc-800 shadow-sm'
+                  : 'bg-white dark:bg-zinc-900/95 border-slate-200/80 dark:border-zinc-800/80'
               }`}
             >
-              <div className="max-w-5xl mx-auto flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 px-4 sm:px-6 py-4">
-                <div className="flex flex-col gap-1">
-                  <p className={`text-sm sm:text-base ${isCriticalPhase ? 'text-amber-900 dark:text-amber-100 font-medium' : 'text-slate-700 dark:text-zinc-300'}`}>
-                    <span>
-                      {planDisplayName === 'ZENITH' || planDisplayName === 'zenith'
-                        ? `Il vous reste ${trialDaysLeft ?? 0} jour${trialDaysLeft !== 1 ? 's' : ''} d'essai Zénith. Profitez de toutes les fonctions !`
-                        : `Il vous reste ${trialDaysLeft ?? 0} jour${trialDaysLeft !== 1 ? 's' : ''} d'essai. — se termine le ${trialEndDate ?? ''}`}
-                    </span>
-                    {isCriticalPhase && (
-                      <span className="ml-1 font-semibold">— expire bientôt !</span>
-                    )}
-                  </p>
-                  {((trialDaysLeft != null && trialDaysLeft <= 3) || searchParams?.get('action') === 'choose_plan') && (
-                    <a
-                      href={`/api/stripe/portal-redirect?locale=${locale}&flow=upgrade`}
-                      className="text-xs font-medium text-[#2563eb] hover:underline dark:text-[#60a5fa]"
-                    >
-                      Satisfait ? Continuez avec Zenith ou choisissez un autre plan ici
-                    </a>
+              <div className="max-w-5xl mx-auto flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 px-4 sm:px-6 py-3.5">
+                <p className={`text-sm sm:text-base ${isCriticalPhase ? 'text-amber-900 dark:text-amber-100 font-medium' : 'text-slate-800 dark:text-zinc-200'}`}>
+                  🚀 Essai Zénith : plus que {trialDaysLeft ?? 0} jour{(trialDaysLeft ?? 0) !== 1 ? 's' : ''}.
+                  {isCriticalPhase && (
+                    <span className="ml-1 font-semibold">— expire bientôt !</span>
                   )}
-                </div>
-                {isCriticalPhase && (
-                  <Link
-                    href={`/checkout?plan=${planSlug}&trial=0`}
-                    className="shrink-0 inline-flex items-center justify-center min-h-[44px] px-5 py-2.5 rounded-xl font-semibold text-white text-sm bg-[#2563eb] hover:brightness-110 focus:outline-none focus:ring-2 focus:ring-[#2563eb] focus:ring-offset-2 dark:focus:ring-offset-zinc-900 active:scale-[0.98] transition-all duration-200"
-                  >
-                    Activer mon abonnement
-                  </Link>
-                )}
+                </p>
+                <Link
+                  href="/dashboard/settings#billing"
+                  className="shrink-0 inline-flex items-center justify-center min-h-[44px] px-5 py-2.5 rounded-2xl font-semibold text-sm bg-[#2563eb] text-white hover:brightness-110 focus:outline-none focus:ring-2 focus:ring-[#2563eb] focus:ring-offset-2 dark:focus:ring-offset-zinc-900 active:scale-[0.98] transition-all duration-200"
+                >
+                  Choisir mon futur plan
+                </Link>
               </div>
             </div>
           )}

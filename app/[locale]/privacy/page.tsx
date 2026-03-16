@@ -35,7 +35,7 @@ export async function generateMetadata({
       description:
         "Politique de confidentialité et protection des données personnelles. Conformité RGPD, Stripe, Google Business.",
       url: `${baseUrl}${path}`,
-      siteName: 'Reputexa',
+      siteName: 'REPUTEXA',
     },
   };
 }
@@ -139,9 +139,11 @@ export default function PrivacyPage() {
         </h3>
         <p className="text-slate-600 dark:text-slate-400 leading-relaxed mb-2">
           Les avis collectés sont traités par des modèles d&apos;intelligence artificielle (fournisseurs tels que
-          OpenAI, Google ou équivalents) afin de générer des suggestions de réponses personnalisées. Ces
-          traitements sont réalisés dans le cadre strict de la prestation de service et dans le respect des
-          conditions d&apos;utilisation des API des fournisseurs d&apos;IA.
+          OpenAI, Google ou équivalents) afin de générer des suggestions de réponses personnalisées, pour le compte
+          exclusif de l&apos;utilisateur et dans le cadre strict de la prestation REPUTEXA.
+        </p>
+        <p className="text-slate-600 dark:text-slate-400 leading-relaxed">
+          <strong>REPUTEXA ne revend, ne partage ni ne monétise les données d&apos;avis ou les contenus traités par l&apos;IA</strong> à des fins autres que la fourniture du service. L&apos;IA traite les avis uniquement pour permettre au client de répondre à ses avis et d&apos;améliorer sa e-réputation ; aucun usage secondaire (publicité ciblée, revente de données, profilage tiers) n&apos;est effectué.
         </p>
       </section>
 
@@ -151,9 +153,9 @@ export default function PrivacyPage() {
         </h3>
         <p className="text-slate-600 dark:text-slate-400 leading-relaxed mb-2">
           Les données de facturation et de paiement sont transmises à <strong>Stripe</strong> (Stripe, Inc.),
-          prestataire certifié PCI-DSS, pour le traitement des abonnements, la tokenisation des cartes
-          bancaires et la délivrance des factures. Les données bancaires sensibles ne transitent jamais par nos
-          serveurs. Politique Stripe :{' '}
+          prestataire certifié PCI-DSS, pour le traitement des abonnements (plans Vision, Pulse, Zenith), la
+          tokenisation des cartes bancaires et la délivrance des factures. Les données bancaires sensibles ne
+          transitent jamais par nos serveurs. Politique Stripe :{' '}
           <a
             href="https://stripe.com/fr/privacy"
             target="_blank"
@@ -176,16 +178,17 @@ export default function PrivacyPage() {
           propres à chaque prestataire :
         </p>
         <ul className="list-disc list-inside space-y-1.5 text-slate-600 dark:text-slate-400 ml-2 mb-3">
-          <li><strong>Stripe</strong> – Paiements et facturation</li>
-          <li><strong>OpenAI</strong> – Traitement par IA pour les suggestions de réponses aux avis</li>
+          <li><strong>Stripe</strong> – Paiements, facturation et gestion des abonnements (cartes, prorata, crédits)</li>
+          <li><strong>Resend</strong> – Envoi d&apos;emails transactionnels (confirmation, alertes, notifications de compte)</li>
+          <li><strong>WhatsApp API (Meta)</strong> – Envoi de notifications et alertes (avis négatifs, rappels) lorsque vous avez activé cette option sur votre plan</li>
+          <li><strong>Supabase</strong> – Hébergement des données (base de données, authentification) ; les données peuvent être hébergées dans l&apos;Union européenne selon la configuration</li>
+          <li><strong>OpenAI / fournisseurs d&apos;IA</strong> – Traitement des avis pour la génération de suggestions de réponses (cf. section 5)</li>
+          <li><strong>Google</strong> – Connexion OAuth et API Google Business Profile (avis, fiches établissement)</li>
           <li><strong>Vercel</strong> – Hébergement du site et de l&apos;application</li>
-          <li><strong>Supabase</strong> – Base de données et authentification</li>
-          <li><strong>Google</strong> – Connexion OAuth et API Google Business Profile</li>
-          <li><strong>Resend</strong> – Envoi d&apos;emails transactionnels</li>
         </ul>
         <p className="text-slate-600 dark:text-slate-400 leading-relaxed">
           Ces prestataires sont soumis à des obligations contractuelles conformes au RGPD. Vous pouvez consulter
-          leurs politiques de confidentialité respectives (Stripe, OpenAI, Vercel, etc.) sur leurs sites officiels.
+          leurs politiques de confidentialité respectives (Stripe, Resend, Meta/WhatsApp, Supabase, etc.) sur leurs sites officiels.
         </p>
       </section>
 

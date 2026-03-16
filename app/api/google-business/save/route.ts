@@ -23,6 +23,12 @@ export async function POST() {
       );
     }
 
+    const sessionWithProvider = session as { provider_refresh_token?: string };
+    const tokenUpdates: Record<string, string | null> = {
+      google_access_token: providerToken,
+      google_refresh_token: sessionWithProvider.provider_refresh_token ?? null,
+    };
+
     // 1. Lister les comptes Google Business
     const accountsRes = await fetch('https://mybusinessaccountmanagement.googleapis.com/v1/accounts', {
       headers: { Authorization: `Bearer ${providerToken}` },
@@ -89,6 +95,7 @@ export async function POST() {
         google_location_name: title,
         google_location_address: addressStr || null,
         google_connected_at: new Date().toISOString(),
+        ...tokenUpdates,
       })
       .eq('id', session.user.id);
 

@@ -306,7 +306,7 @@
       "form": { "name": "Name", "email": "Email", "phone": "Phone", "message": "Message", "submit": "Schedule a Demo" }
     },
     "cta": { "title": "Your Reputation Deserves a 24/7 Director.", "subtitle": "Join restaurant owners who've stopped worrying about reviews.", "button": "Start free trial" },
-    "footer": { "rights": "© 2026 REPUTEXA. All rights reserved.", "privacy": "Privacy Policy", "terms": "Terms of Service" }
+    "footer": { "rights": "© 2026 REPUTEXA. All rights reserved.", "legal": "Legal Notice", "privacy": "Privacy Policy", "terms": "Terms of Use", "contact": "Contact" }
   },
   "Auth": {
     "login": "Log in",
@@ -349,7 +349,7 @@
     "overview": { "title": "Overview", "stats": { "avgRating": "Average Rating", "reviewsProcessed": "Reviews Processed", "securityAlerts": "Security Alerts", "timeSaved": "Time Saved" }, "reviewsTitle": "Real-Time Review Feed", "reviewsEmpty": "No reviews yet. Simulate one below.", "simulateTitle": "Simulate Review", "chartTitle": "Rating Trend" },
     "prospects": { "title": "Prospects (Sniper)", "subtitle": "{{count}} prospect to contact", "subtitle_plural": "{{count}} prospects to contact", "empty": "No prospects. Run the Sniper script to find some.", "generatePitch": "Generate Pitch", "contact": "Contact", "copyPitch": "Copy pitch", "copied": "Copied!", "pitchTitle": "Custom pitch", "noPitch": "No pitch generated yet." },
     "establishments": { "title": "My Establishments", "description": "Connect your establishments to manage their reviews", "comingSoon": "Coming soon.", "addEstablishment": "Add establishment" },
-    "settings": { "title": "Settings", "description": "Manage your account and preferences", "comingSoon": "Coming soon." },
+    "settings": { "title": "Settings", "description": "Manage your account and preferences", "comingSoon": "Coming soon.", "language": "Interface language", "languageDescription": "Personalize your experience by choosing your preferred interface language." },
     "form": { "review": "Review", "rating": "Rating", "establishment": "Establishment", "city": "City", "simulate": "Simulate", "placeholder": { "review": "Great restaurant!", "establishment": "Le Bistro", "city": "Paris" }, "error": "Error sending" }
   },
   "Growth": {
@@ -580,6 +580,99 @@
   "Share": {
     "whatsappMessage": "Check out my Reputexa score! My average rating: {rating}/5 — Managed by AI 🚀",
     "shareOnWhatsApp": "Share on WhatsApp"
+  },
+  "Legal": {
+    "nav": { "mentions": "Legal Notice", "privacy": "Privacy", "terms": "Terms", "contact": "Contact", "toc": "Table of contents" },
+    "mentionsLegales": {
+      "title": "Legal Notice",
+      "metaTitle": "Legal Notice | REPUTEXA",
+      "metaDescription": "Legal notice and Impressum. Publisher, hosting in the EU, French law.",
+      "intro": "In accordance with applicable regulations and the General Data Protection Regulation (GDPR), this legal notice identifies the parties responsible for the creation and operation of reputexa.fr.",
+      "toc": [
+        { "id": "editeur", "label": "1. Publisher" },
+        { "id": "impressum", "label": "2. Impressum" },
+        { "id": "directeur", "label": "3. Publication director" },
+        { "id": "hebergeur", "label": "4. Hosting (EU)" },
+        { "id": "droit", "label": "5. Applicable law" },
+        { "id": "prop-intel", "label": "6. Intellectual property" },
+        { "id": "liens", "label": "7. Hyperlinks" },
+        { "id": "contact", "label": "8. Contact" }
+      ],
+      "editeur_title": "1. Publisher",
+      "editeur_content": "The site reputexa.fr is published by REPUTEXA, headquartered in France. Company name, full address, registration number and VAT number are available on request at contact@reputexa.fr.",
+      "impressum_title": "2. Impressum",
+      "impressum_content": "In accordance with German (Teledienstgesetz, § 5 TMG) and EU requirements, the publisher information (Impressum) is as follows: website publisher REPUTEXA, headquarters in France. Contact: contact@reputexa.fr. This notice serves as the Impressum for all users, including those in Germany.",
+      "directeur_title": "3. Publication director",
+      "directeur_content": "The publication director is the founder of REPUTEXA.",
+      "hebergeur_title": "4. Hosting — Servers in the European Union",
+      "hebergeur_content": "The application and data are hosted on infrastructure located within the European Union: Vercel (application hosting, EU regions) and Supabase (database and authentication, EU regions). These providers ensure GDPR compliance and data location in the EU.",
+      "droit_title": "5. Applicable law",
+      "droit_content": "French law applies. Without prejudice to mandatory provisions in the user's country of residence within the European Union, this notice and the site are governed by French law. Users who are consumers in the EU retain the rights granted by the mandatory provisions of their country of residence.",
+      "prop_intel_title": "6. Intellectual property",
+      "prop_intel_content": "All site content (texts, graphics, logos, databases) is protected by copyright and trademark law. Any unauthorised reproduction or use may constitute infringement and be subject to legal action.",
+      "liens_title": "7. Hyperlinks",
+      "liens_content": "The site may contain links to third-party sites. REPUTEXA has no control over these sites and disclaims all responsibility for their content. Creating links to reputexa.fr requires prior approval from the publisher.",
+      "contact_title": "8. Contact",
+      "contact_content": "For any questions regarding this legal notice: contact@reputexa.fr."
+    },
+    "confidentialite": {
+      "title": "Privacy Policy",
+      "metaTitle": "Privacy Policy | REPUTEXA",
+      "metaDescription": "Privacy policy and data protection. GDPR, sub-processors, AI, data hosted in the EU.",
+      "intro": "Last updated: March 2026. This policy describes how REPUTEXA collects, uses and protects your personal data in accordance with the General Data Protection Regulation (GDPR) and applicable EU law.",
+      "toc": [
+        { "id": "responsable", "label": "1. Data controller" },
+        { "id": "donnees", "label": "2. Data collected" },
+        { "id": "locale", "label": "3. Language detection (phone prefix)" },
+        { "id": "finalites", "label": "4. Purposes and legal bases" },
+        { "id": "sous-traitants", "label": "5. Sub-processors (Data Processors)" },
+        { "id": "ia", "label": "6. AI guarantee — Data not used for training" },
+        { "id": "droits", "label": "7. Your rights" },
+        { "id": "contact", "label": "8. Contact us" }
+      ],
+      "responsable_title": "1. Data controller",
+      "responsable_content": "The data controller is REPUTEXA, publisher of reputexa.fr, headquartered in France. We process your data lawfully, fairly and transparently in accordance with the GDPR.",
+      "donnees_title": "2. Data collected",
+      "donnees_content": "We collect in particular: professional email for account and authentication; billing and payment data transmitted to Stripe; review content and Google Business Profile data (Google API); name, phone, establishment name, address; language preference; technical data (IP, logs, technical cookies).",
+      "locale_title": "3. Language detection (phone prefix)",
+      "locale_content": "To improve your experience and offer interface, communications and support in your language, we may infer a language preference from your phone number prefix (e.g. +33 France, +39 Italy, +34 Spain, +49 Germany). This is used only to personalise interface language, emails and the payment portal. You can change the language at any time in your account settings.",
+      "finalites_title": "4. Purposes and legal bases",
+      "finalites_content": "Data is processed for: contract performance (account, subscription, service); legitimate interest (service improvement, fraud prevention); consent (newsletter, marketing, withdrawable); legal obligation (invoice retention, tax compliance).",
+      "sous_traitants_title": "5. Sub-processors (Data Processors)",
+      "sous_traitants_content": "Your data may be processed by the following sub-processors, strictly for their assigned tasks and in compliance with the GDPR: Stripe (payments, billing, subscriptions); Resend (transactional emails: confirmation, alerts, notifications); OpenAI and/or Anthropic (AI processing for generating review response suggestions); Supabase (data hosting and authentication, EU); Vercel (application hosting, EU); Google (OAuth, Google Business Profile API); Meta/WhatsApp (alerts and notifications if enabled). These providers are bound by GDPR-compliant contractual obligations.",
+      "ia_title": "6. AI guarantee — Data not used for training",
+      "ia_content": "Data you provide to REPUTEXA for generating review responses (review content, establishment context) is processed by AI providers (OpenAI, Anthropic or equivalent) only to produce these suggestions. We guarantee that this data is not used to train the providers' AI models: it remains confidential and is used solely for service delivery. The confidentiality of your business data and your customers' reviews is thus protected.",
+      "droits_title": "7. Your rights",
+      "droits_content": "Under the GDPR you have the right of access, rectification, erasure, restriction of processing, portability and objection. To exercise these rights: contact@reputexa.fr. You may lodge a complaint with the CNIL (cnil.fr) or the supervisory authority in your country of residence.",
+      "contact_title": "8. Contact us",
+      "contact_content": "For any questions regarding the protection of your data: contact@reputexa.fr."
+    },
+    "cgu": {
+      "title": "Terms of Use",
+      "metaTitle": "Terms of Use | REPUTEXA",
+      "metaDescription": "REPUTEXA terms of use. Vision, Pulse, Zenith plans. Language differentiation, VAT, Stripe, French law.",
+      "intro": "Last updated: March 2026. These Terms of Use govern the use of the REPUTEXA service and apply to any subscription taken out on reputexa.fr.",
+      "toc": [
+        { "id": "objet", "label": "1. Object and acceptance" },
+        { "id": "plans", "label": "2. Plans and service differentiation" },
+        { "id": "langue", "label": "3. Differentiation clause — Language of AI responses" },
+        { "id": "facturation", "label": "4. Billing, VAT and Stripe" },
+        { "id": "droit", "label": "5. Applicable law and jurisdiction" },
+        { "id": "contact", "label": "6. Contact" }
+      ],
+      "objet_title": "1. Object and acceptance",
+      "objet_content": "These Terms define the terms of access to and use of the REPUTEXA SaaS e-reputation platform. By creating an account or subscribing, you accept these terms without reservation.",
+      "plans_title": "2. Plans and service differentiation",
+      "plans_content": "REPUTEXA offers three subscription plans: Vision, Pulse and Zenith. Features (review aggregation, AI responses, alerts, reporting) vary by plan. Full offer descriptions are on the Pricing page.",
+      "langue_title": "3. Differentiation clause — Language of AI responses",
+      "langue_content": "By contract, the language of AI-generated responses is differentiated by plan: Vision plan: responses to reviews are generated exclusively in the establishment's language (user profile language). The service does not provide responses in other languages. Pulse and Zenith plans: the service is polyglot; responses are generated natively in the language of the customer review (automatic detection and reply in that same language). This clause is an integral part of the service conditions and may only be changed by changing plan.",
+      "facturation_title": "4. Billing, VAT and Stripe",
+      "facturation_content": "Prices displayed are excluding tax. VAT is calculated and applied automatically by Stripe according to the buyer's country and applicable rules (EU VAT, local rates, etc.). Payment is collected by Stripe (cards, SEPA, local methods). Subscription is recurring (monthly or annual). Any started month is due in full; on termination, no refund for remaining days. Invoices are available in your account and via the Stripe portal.",
+      "droit_title": "5. Applicable law and jurisdiction",
+      "droit_content": "These Terms are governed by French law. Failing amicable agreement, exclusive jurisdiction is assigned to the Paris Commercial Court for any dispute. Consumer customers in the EU may bring proceedings in the courts of their place of residence under Regulation (EU) No 1215/2012 (Brussels I bis).",
+      "contact_title": "6. Contact",
+      "contact_content": "For any questions regarding these Terms: contact@reputexa.fr."
+    }
   },
   "common": { "loading": "Loading...", "error": "An error occurred" }
 }

@@ -17,6 +17,7 @@ export async function POST(request: Request) {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
+    const { data: { session } } = await supabase.auth.getSession();
     const admin = createAdminClient();
     if (!admin) return NextResponse.json({ ok: true });
 
@@ -27,7 +28,7 @@ export async function POST(request: Request) {
       .single();
 
     const meta = user.user_metadata ?? {};
-    const updates: Record<string, string> = {};
+    const updates: Record<string, string | null> = {};
     if (!profile?.full_name?.trim() && (meta.full_name || meta.name)) {
       updates.full_name = String(meta.full_name ?? meta.name ?? '').trim();
     }
@@ -36,6 +37,12 @@ export async function POST(request: Request) {
     }
     if (!profile?.email?.trim() && user.email) {
       updates.email = user.email;
+    }
+    // Persister les tokens Google (scope business.manage, access_type=offline) pour usage API hors session
+    const sessionWithProvider = session as { provider_token?: string; provider_refresh_token?: string } | null;
+    if (sessionWithProvider?.provider_token) {
+      updates.google_access_token = sessionWithProvider.provider_token;
+      updates.google_refresh_token = sessionWithProvider.provider_refresh_token ?? null;
     }
     if (Object.keys(updates).length === 0) return NextResponse.json({ ok: true });
 

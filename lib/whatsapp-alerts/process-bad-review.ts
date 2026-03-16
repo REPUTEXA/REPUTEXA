@@ -1,7 +1,7 @@
 import { createAdminClient } from '@/lib/supabase/admin';
 import { generateSuggestedResponse } from './generate-ai-response';
 import { sendWhatsAppAlert } from './send-whatsapp-alert';
-import type { GoogleReviewWebhookPayload } from './types';
+import type { GoogleReviewWebhookPayload, ReviewPlatform, StandardReview } from './types';
 
 /**
  * Traite un avis négatif : génère une réponse IA et envoie l'alerte WhatsApp.
@@ -16,6 +16,15 @@ export async function processBadReview(
   error?: string;
 }> {
   const { userId, reviewerName, rating, comment, source, reviewId } = payload;
+
+  const platform: ReviewPlatform = source ?? 'google';
+  const standardReview: StandardReview = {
+    author: reviewerName,
+    rating,
+    text: comment,
+    platform,
+    externalId: reviewId ?? null,
+  };
 
   const supabase = createAdminClient();
   if (!supabase) {
@@ -42,11 +51,12 @@ export async function processBadReview(
     };
   }
 
-  // Générer la réponse IA suggérée
+  // Générer la réponse IA suggérée (adaptée à la plateforme)
   const suggestedReply = await generateSuggestedResponse({
-    comment,
-    rating,
+    comment: standardReview.text,
+    rating: standardReview.rating,
     establishmentName: profile.establishment_name ?? undefined,
+    platform,
   });
 
   // Créer ou mettre à jour la review si on a un reviewId
@@ -56,10 +66,10 @@ export async function processBadReview(
       .from('reviews')
       .insert({
         user_id: userId,
-        reviewer_name: reviewerName,
-        rating,
-        comment,
-        source: source ?? 'google',
+        reviewer_name: standardReview.author,
+        rating: standardReview.rating,
+        comment: standardReview.text,
+        source: platform,
         status: 'pending',
         ai_response: suggestedReply,
         whatsapp_sent: false,
@@ -84,11 +94,12 @@ export async function processBadReview(
   const result = await sendWhatsAppAlert({
     to: whatsappPhone,
     reviewId: finalReviewId!,
-    reviewerName,
-    rating,
-    comment,
+    reviewerName: standardReview.author,
+    rating: standardReview.rating,
+    comment: standardReview.text,
     suggestedReply,
     establishmentName: profile.establishment_name ?? undefined,
+    platform,
   });
 
   if (result.success) {

@@ -18,7 +18,15 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Invalid locale' }, { status: 400 });
     }
 
-    // Préférence de langue stockée en cookie (next-intl) - Supabase profiles n'a pas de colonne locale pour l'instant
+    const { error } = await supabase
+      .from('profiles')
+      .update({ language: locale, preferred_language: locale })
+      .eq('id', user.id);
+
+    if (error) {
+      console.error('[api/user/locale] profile update', error);
+    }
+
     return NextResponse.json({ ok: true, locale });
   } catch (error) {
     console.error('[api/user/locale]', error);

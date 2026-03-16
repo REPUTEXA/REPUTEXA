@@ -81,7 +81,7 @@ export default function ResetPasswordPage() {
         <header className="flex items-center justify-between px-4 sm:px-6 h-14 border-b border-white/5">
           <Link href="/" className="flex items-center gap-2 text-white" aria-label="REPUTEXA">
             <Logo />
-            <span className="font-display font-bold text-lg tracking-heading text-white">REPUTEXA</span>
+            <span className="font-display font-bold text-lg tracking-heading text-white uppercase">REPUTEXA</span>
           </Link>
         </header>
         <main className="flex-1 flex items-center justify-center px-4 py-10">
@@ -107,7 +107,7 @@ export default function ResetPasswordPage() {
       <header className="flex items-center justify-between px-4 sm:px-6 h-14 border-b border-white/5">
         <Link href="/" className="flex items-center gap-2 text-white" aria-label="REPUTEXA">
           <Logo />
-          <span className="font-display font-bold text-lg tracking-heading text-white">REPUTEXA</span>
+          <span className="font-display font-bold text-lg tracking-heading text-white uppercase">REPUTEXA</span>
         </Link>
         <Link href="/login" className="text-sm text-white/70 hover:text-white font-medium transition-colors">
           Connexion

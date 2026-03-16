@@ -29,7 +29,7 @@ export default function ChoosePlanPage() {
       <header className="flex items-center justify-between px-4 sm:px-6 h-14 border-b border-slate-200/80 bg-white/70 backdrop-blur-sm">
         <Link href="/" className="flex items-center gap-2 text-slate-800" aria-label="REPUTEXA">
           <Logo />
-          <span className="font-display font-bold text-lg tracking-heading">REPUTEXA</span>
+          <span className="font-display font-bold text-lg tracking-heading uppercase">REPUTEXA</span>
         </Link>
         <Link href="/dashboard" className="text-sm text-slate-600 hover:text-slate-900 font-medium">
           Mon dashboard

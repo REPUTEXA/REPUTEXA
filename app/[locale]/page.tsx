@@ -46,7 +46,7 @@ export default function HomePage() {
         <div className="max-w-6xl mx-auto px-4 sm:px-6 h-full flex items-center justify-between gap-2 safe-area-nav">
           <Link href="/" className="flex items-center gap-2 sm:gap-2.5 shrink-0" aria-label="REPUTEXA">
             <Logo />
-            <span className="font-display font-bold text-white text-base sm:text-lg tracking-heading">REPUTEXA</span>
+            <span className="font-display font-bold text-white text-base sm:text-lg tracking-heading uppercase">REPUTEXA</span>
           </Link>
           <div className="hidden md:flex items-center gap-6">
             <a
@@ -357,20 +357,20 @@ export default function HomePage() {
         <div className="max-w-6xl mx-auto px-4 sm:px-6 flex flex-col md:flex-row items-center justify-between gap-4">
           <Link href="/" className="flex items-center gap-2" aria-label="REPUTEXA">
             <Logo size="sm" />
-            <span className="font-display font-bold text-white">REPUTEXA</span>
+            <span className="font-display font-bold text-white uppercase">REPUTEXA</span>
           </Link>
           <nav className="flex flex-wrap items-center justify-center gap-4 md:gap-6" aria-label="Pied de page">
-            <Link href="/legal" className="text-sm text-white/50 hover:text-white transition-colors">
-              Mentions légales
+            <Link href="/legal/mentions-legales" className="text-sm text-white/50 hover:text-white transition-colors">
+              {t('footer.legal')}
             </Link>
-            <Link href="/privacy" className="text-sm text-white/50 hover:text-white transition-colors">
+            <Link href="/legal/confidentialite" className="text-sm text-white/50 hover:text-white transition-colors">
               {t('footer.privacy')}
             </Link>
-            <Link href="/terms" className="text-sm text-white/50 hover:text-white transition-colors">
+            <Link href="/legal/cgu" className="text-sm text-white/50 hover:text-white transition-colors">
               {t('footer.terms')}
             </Link>
             <Link href="/contact" className="text-sm text-white/50 hover:text-white transition-colors">
-              Contact
+              {t('footer.contact')}
             </Link>
           </nav>
           <p className="text-sm text-white/30">{t('footer.rights')}</p>

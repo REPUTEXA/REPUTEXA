@@ -1,18 +1,15 @@
 /**
  * Passage Mensuel → Annuel (Upsell) uniquement.
- *
- * Règle métier : on ne propose PAS de passage Annuel → Mensuel en self-service.
- * Raison : Stripe ne rembourse pas automatiquement la différence sur la carte en cas
- * de downgrade immédiat ; le prorata serait complexe (remboursement partiel). Un passage
- * au mensuel doit se faire via validation manuelle ou support (changement en fin de période
- * ou traitement au cas par cas). Il n'existe donc pas de route "switch-to-monthly".
+ * Règle métier : pas de passage Annuel → Mensuel en self-service (Stripe ne rembourse pas la différence automatiquement).
+ * Tous les appels Stripe passent par stripeWithRetry. Email utilisateur validé avant tout appel.
  */
 
 import { NextResponse } from 'next/server';
-import Stripe from 'stripe';
 import { createClient } from '@/lib/supabase/server';
 import { getPlanSlugFromSubscription, getSubscriptionInterval } from '@/lib/stripe-subscription';
 import { getStripePriceId } from '@/config/pricing';
+import { stripeWithRetry } from '@/lib/stripe-client';
+import { findCustomerIdByEmail, findActiveSubscriptionForCustomer } from '@/lib/services/billing-domain';
 import type { PlanSlug } from '@/config/pricing';
 
 export async function POST(request: Request) {
@@ -27,16 +24,12 @@ export async function POST(request: Request) {
 
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
-    if (!user?.email) {
+    if (!user?.email?.trim()) {
       return NextResponse.json({ error: 'Non authentifié' }, { status: 401 });
     }
 
-    const stripe = new Stripe(secretKey);
-    const customers = await stripe.customers.list({
-      email: user.email,
-      limit: 1,
-    });
-    const customerId = customers.data[0]?.id;
+    const email = user.email.trim().toLowerCase();
+    const customerId = await findCustomerIdByEmail(email);
     if (!customerId) {
       return NextResponse.json(
         { error: 'Aucun compte Stripe trouvé' },
@@ -44,14 +37,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const subscriptions = await stripe.subscriptions.list({
-      customer: customerId,
-      status: 'all',
-      limit: 10,
-    });
-    const active = subscriptions.data.find(
-      (s) => s.status === 'active' || s.status === 'trialing'
-    );
+    const active = await findActiveSubscriptionForCustomer(customerId);
     if (!active) {
       return NextResponse.json(
         { error: 'Aucun abonnement actif' },
@@ -92,11 +78,15 @@ export async function POST(request: Request) {
 
     const quantity = typeof item.quantity === 'number' && item.quantity >= 1 ? item.quantity : 1;
 
-    const updated = await stripe.subscriptions.update(active.id, {
-      items: [{ id: item.id, price: annualPriceId, quantity }],
-      proration_behavior: 'always_invoice',
-      payment_behavior: 'pending_if_incomplete',
-    });
+    const updated = await stripeWithRetry(
+      (s) =>
+        s.subscriptions.update(active.id, {
+          items: [{ id: item.id, price: annualPriceId, quantity }],
+          proration_behavior: 'always_invoice',
+          payment_behavior: 'pending_if_incomplete',
+        }),
+      secretKey
+    );
 
     const latestInvoiceId =
       typeof updated.latest_invoice === 'string'
@@ -107,7 +97,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ url: null, message: 'Mise à jour effectuée.' });
     }
 
-    const invoice = await stripe.invoices.retrieve(latestInvoiceId);
+    const invoice = await stripeWithRetry((s) => s.invoices.retrieve(latestInvoiceId), secretKey);
     if (invoice.status === 'paid') {
       return NextResponse.json({ url: null, message: 'Déjà réglé.' });
     }

@@ -38,6 +38,7 @@ export default function AuthCallbackPage() {
       console.log('[auth/callback] Redirection vers :', target);
 
       if (!isRecovery) {
+        // Sync full_name, avatar_url, email from Google (ou autre OAuth). Nouveaux utilisateurs : le trigger handle_new_user a déjà créé la ligne profiles ; on complète avec les métadonnées OAuth.
         await fetch('/api/auth/sync-oauth-profile', { method: 'POST' }).catch(() => {});
       }
       router.replace(target);

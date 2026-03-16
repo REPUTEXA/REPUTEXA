@@ -15,7 +15,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       title: 'Support & Contact | REPUTEXA',
       description: 'Contactez REPUTEXA : support, facturation, partenariats. contact@reputexa.fr',
       url: `${baseUrl}${path}`,
-      siteName: 'Reputexa',
+      siteName: 'REPUTEXA',
     },
   };
 }

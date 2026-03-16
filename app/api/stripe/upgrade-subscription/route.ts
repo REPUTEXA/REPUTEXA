@@ -1,44 +1,25 @@
+/**
+ * Choix du futur plan pendant l'essai ZÉNITH : flag en base uniquement (plus de Subscription Schedules).
+ * Met à jour profiles.selected_plan (pulse, vision ou zenith) et envoie l'email de confirmation.
+ * Au passage trialing → active, le webhook appliquera le bon prix Stripe selon selected_plan.
+ */
+
 import { NextResponse } from 'next/server';
-import Stripe from 'stripe';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
-import { getSiteUrl } from '@/lib/site-url';
-
-const PLAN_TO_PRICE_ENV: Record<string, string> = {
-  vision: 'STRIPE_PRICE_ID_VISION',
-  pulse: 'STRIPE_PRICE_ID_PULSE',
-  zenith: 'STRIPE_PRICE_ID_ZENITH',
-};
-
-const PLAN_SLUG_TO_SUBSCRIPTION: Record<string, string> = {
-  vision: 'vision',
-  pulse: 'pulse',
-  zenith: 'zenith',
-};
+import { PLAN_BASE_PRICES_EUR, type PlanSlug } from '@/config/pricing';
+import {
+  sendPlanSelectionConfirmationEmail,
+  PLAN_DISPLAY,
+} from '@/lib/services/billing-domain';
 
 export async function POST(request: Request) {
   try {
-    const secretKey = process.env.STRIPE_SECRET_KEY;
-    if (!secretKey) {
-      return NextResponse.json(
-        { error: 'STRIPE_SECRET_KEY not configured' },
-        { status: 500 }
-      );
-    }
-
     const body = await request.json().catch(() => ({}));
-    const planSlug = typeof body.planSlug === 'string' ? body.planSlug.trim() : '';
+    const planSlug = typeof body.planSlug === 'string' ? body.planSlug.trim().toLowerCase() : '';
 
-    if (!['vision', 'pulse', 'zenith'].includes(planSlug)) {
-      return NextResponse.json({ error: 'Plan invalide' }, { status: 400 });
-    }
-
-    const priceId = process.env[PLAN_TO_PRICE_ENV[planSlug]];
-    if (!priceId) {
-      return NextResponse.json(
-        { error: 'Configuration Stripe incomplète' },
-        { status: 500 }
-      );
+    if (planSlug !== 'pulse' && planSlug !== 'vision' && planSlug !== 'zenith') {
+      return NextResponse.json({ error: 'Plan invalide (attendu: pulse, vision ou zenith)' }, { status: 400 });
     }
 
     const supabase = await createClient();
@@ -47,73 +28,60 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Non authentifié' }, { status: 401 });
     }
 
-    const stripe = new Stripe(secretKey);
-    const customers = await stripe.customers.list({
-      email: user.email,
-      limit: 1,
-    });
-    const customerId = customers.data[0]?.id;
-
-    if (!customerId) {
-      return NextResponse.json(
-        {
-          needsCheckout: true,
-          url: `${getSiteUrl()}/${request.headers.get('x-next-intl-locale') || 'fr'}/checkout?plan=${planSlug}&trial=0`,
-        },
-        { status: 200 }
-      );
-    }
-
-    const subscriptions = await stripe.subscriptions.list({
-      customer: customerId,
-      status: 'active',
-      limit: 1,
-    });
-
-    const subscription = subscriptions.data[0];
-
-    if (!subscription) {
-      return NextResponse.json(
-        {
-          needsCheckout: true,
-          url: `${getSiteUrl()}/${request.headers.get('x-next-intl-locale') || 'fr'}/checkout?plan=${planSlug}&trial=0`,
-        },
-        { status: 200 }
-      );
-    }
-
-    const itemId = subscription.items.data[0]?.id;
-    if (!itemId) {
-      return NextResponse.json({ error: 'Abonnement invalide' }, { status: 400 });
-    }
-
-    await stripe.subscriptions.update(subscription.id, {
-      items: [{ id: itemId, price: priceId }],
-      proration_behavior: 'create_prorations',
-      payment_behavior: 'pending_if_incomplete',
-      metadata: { planSlug },
-    });
-
-    const subscriptionPlan = PLAN_SLUG_TO_SUBSCRIPTION[planSlug] ?? 'pulse';
+    let profileLocale = 'fr';
     const admin = createAdminClient();
-    if (admin) {
-      const { data: profiles } = await admin
-        .from('profiles')
-        .select('id')
-        .eq('email', user.email)
-        .limit(1);
-
-      if (profiles?.length) {
-        await admin
-          .from('profiles')
-          .update({
-            selected_plan: planSlug,
-            subscription_plan: subscriptionPlan,
-            subscription_status: 'active',
-          })
-          .eq('id', profiles[0].id);
-      }
+    if (!admin) {
+      return NextResponse.json({ error: 'Service indisponible' }, { status: 500 });
     }
+
+    const { data: profiles } = await admin
+      .from('profiles')
+      .select('id, language, trial_ends_at')
+      .eq('email', user.email)
+      .limit(1);
+
+    if (!profiles?.length) {
+      return NextResponse.json({ error: 'Profil introuvable' }, { status: 404 });
+    }
+
+    const profile = profiles[0];
+    profileLocale = (profile.language as string) ?? 'fr';
+
+    // Si l'utilisateur clique sur "Rester sur ZÉNITH", on considère que
+    // aucun plan futur spécifique n'est choisi : on remet selected_plan à null
+    // (le webhook utilisera alors le plan ZENITH par défaut) et on ne
+    // déclenche PAS l'email de confirmation de changement de plan.
+    if (planSlug === 'zenith') {
+      await admin
+        .from('profiles')
+        .update({ selected_plan: null })
+        .eq('id', profile.id);
+      return NextResponse.json({ ok: true });
+    }
+
+    await admin
+      .from('profiles')
+      .update({ selected_plan: planSlug })
+      .eq('id', profile.id);
+
+    const planName = PLAN_DISPLAY[planSlug as PlanSlug] ?? planSlug;
+    const trialEndDateFormatted = profile.trial_ends_at
+      ? new Date(profile.trial_ends_at as string).toLocaleDateString('fr-FR', {
+          day: 'numeric',
+          month: 'long',
+          year: 'numeric',
+        })
+      : '';
+    const basePriceEur = PLAN_BASE_PRICES_EUR[planSlug as PlanSlug] ?? 0;
+    const planPrice = `${basePriceEur} €/mois`;
+
+    sendPlanSelectionConfirmationEmail({
+      to: user.email,
+      planName,
+      planPrice,
+      trialEndDate: trialEndDateFormatted,
+      locale: profileLocale,
+    }).catch((err) => console.error('[stripe/upgrade-subscription] sendPlanSelectionConfirmationEmail', err));
 
     return NextResponse.json({ ok: true });
   } catch (error) {

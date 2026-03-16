@@ -46,9 +46,11 @@ export async function PATCH(request: Request, { params }: Params) {
   const name = typeof body.name === 'string' ? body.name.trim() : undefined;
   const address = typeof body.address === 'string' ? body.address.trim() : undefined;
 
-  const updates: Record<string, string | null> = {};
+  const updates: Record<string, string | null | boolean> = {};
   if (name !== undefined) updates.name = name;
   if (address !== undefined) updates.address = address || null;
+  // Quand l'utilisateur enregistre nom/adresse sur un slot "à configurer", on marque comme configuré
+  if (name !== undefined || address !== undefined) updates.needs_configuration = false;
 
   if (Object.keys(updates).length === 0) {
     return NextResponse.json({ error: 'Aucune modification' }, { status: 400 });

@@ -1,9 +1,16 @@
 'use client';
 
 import { useState } from 'react';
-import { Eye, Zap, Crown, Loader2 } from 'lucide-react';
+import { Eye, Zap, Crown, Loader2, Calendar } from 'lucide-react';
 import { type PlanSlug } from '@/lib/feature-gate';
 import { toast } from 'sonner';
+
+/** Nom d'affichage du plan pour la ligne "Passage sur X programmé" */
+const FUTURE_PLAN_DISPLAY: Record<string, string> = {
+  vision: 'VISION',
+  pulse: 'PULSE',
+  zenith: 'ZENITH',
+};
 
 const PLAN_ICONS: Record<PlanSlug, typeof Eye> = {
   free: Eye,
@@ -39,6 +46,7 @@ const PLAN_STYLES: Record<PlanSlug, { bg: string; border: string; icon: string; 
 type Props = {
   planSlug: PlanSlug;
   planDisplayName: string;
+  selectedPlanFromProfile?: string | null;
   isTrialing: boolean;
   trialDaysLeft: number | null;
   hasActiveSubscription: boolean;
@@ -59,6 +67,7 @@ async function openStripePortal(locale: string): Promise<string | null> {
 export function PlanBadge({
   planSlug,
   planDisplayName,
+  selectedPlanFromProfile = null,
   isTrialing,
   trialDaysLeft,
   hasActiveSubscription,
@@ -67,6 +76,11 @@ export function PlanBadge({
   const [loading, setLoading] = useState(false);
   const Icon = PLAN_ICONS[planSlug];
   const styles = PLAN_STYLES[planSlug];
+
+  const futurePlanName = selectedPlanFromProfile
+    ? FUTURE_PLAN_DISPLAY[selectedPlanFromProfile.toLowerCase()] ?? selectedPlanFromProfile.toUpperCase()
+    : null;
+  const showFuturePlanLine = isTrialing && !!futurePlanName;
 
   const label = isTrialing
     ? `Essai ${planDisplayName}${trialDaysLeft != null ? ` — ${trialDaysLeft} jour${trialDaysLeft !== 1 ? 's' : ''} restant${trialDaysLeft !== 1 ? 's' : ''}` : ''}`
@@ -104,6 +118,12 @@ export function PlanBadge({
           {label}
         </span>
       </div>
+      {showFuturePlanLine && (
+        <p className="text-xs opacity-80 text-white/80 flex items-center gap-1.5 mt-0.5">
+          <Calendar className="h-3.5 w-3.5 flex-shrink-0" aria-hidden />
+          <span>✨ Passage sur {futurePlanName} programmé</span>
+        </p>
+      )}
       {!isTrialing && (
         <button
           type="button"

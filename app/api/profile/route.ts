@@ -1,6 +1,9 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { toPlanSlug } from '@/lib/feature-gate';
+import { routing } from '@/i18n/routing';
+
+const VALID_LOCALES = routing.locales as readonly string[];
 
 export async function GET() {
   const supabase = await createClient();
@@ -9,14 +12,16 @@ export async function GET() {
 
   const { data: profile, error } = await supabase
     .from('profiles')
-    .select('establishment_name, establishment_type, full_name, address, phone, website, whatsapp_phone, alert_threshold_stars, seo_keywords, subscription_plan, selected_plan, google_location_id, google_location_name, google_location_address, ai_tone, ai_length, ai_safe_mode, ai_custom_instructions, first_login')
+    .select('establishment_name, establishment_type, full_name, address, phone, website, whatsapp_phone, alert_threshold_stars, seo_keywords, subscription_plan, selected_plan, subscription_status, trial_ends_at, google_location_id, google_location_name, google_location_address, ai_tone, ai_length, ai_safe_mode, ai_custom_instructions, first_login, language')
     .eq('id', user.id)
     .single();
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
-  const planSlug = toPlanSlug(profile?.subscription_plan ?? null, profile?.selected_plan ?? null);
+  // Plan actuel pour l'accès = souscription Stripe uniquement (trialing = Zénith). selected_plan = intention pour après l'essai.
+  const subscriptionPlanSlug = toPlanSlug(profile?.subscription_plan ?? null, undefined);
+  const selectedPlanFromDb = typeof profile?.selected_plan === 'string' ? profile.selected_plan : null;
   return NextResponse.json({
     establishmentName: profile?.establishment_name ?? '',
     establishmentType: profile?.establishment_type ?? '',
@@ -27,7 +32,8 @@ export async function GET() {
     whatsappPhone: profile?.whatsapp_phone ?? '',
     alertThresholdStars: profile?.alert_threshold_stars ?? 3,
     seoKeywords: Array.isArray(profile?.seo_keywords) ? profile.seo_keywords.filter((k): k is string => typeof k === 'string') : [],
-    selectedPlan: planSlug,
+    subscriptionPlanSlug,
+    selectedPlan: selectedPlanFromDb ?? subscriptionPlanSlug,
     email: user.email ?? '',
     googleLocationId: profile?.google_location_id ?? null,
     googleLocationName: profile?.google_location_name ?? null,
@@ -37,6 +43,9 @@ export async function GET() {
     aiSafeMode: profile?.ai_safe_mode ?? true,
     aiCustomInstructions: profile?.ai_custom_instructions ?? '',
     firstLogin: profile?.first_login ?? true,
+    subscriptionStatus: profile?.subscription_status ?? null,
+    trialEndsAt: profile?.trial_ends_at ? new Date(profile.trial_ends_at as string).toISOString() : null,
+    language: (profile?.language as string) ?? 'fr',
   });
 }
 
@@ -62,6 +71,7 @@ export async function PATCH(request: Request) {
     aiCustomInstructions,
     firstLogin,
     defaultEstablishmentId,
+    language: bodyLanguage,
   } = body;
 
   const updates: Record<string, string | number | string[] | boolean | null> = {};
@@ -85,9 +95,16 @@ export async function PATCH(request: Request) {
   if (typeof establishmentType === 'string') updates.establishment_type = establishmentType.trim();
   if (typeof fullName === 'string') updates.full_name = fullName.trim();
   if (typeof address === 'string') updates.address = address.trim();
-  if (typeof phone === 'string') updates.phone = phone.trim();
+  if (typeof phone === 'string') {
+    updates.phone = phone.trim();
+  }
+  if (typeof whatsappPhone === 'string') {
+    updates.whatsapp_phone = whatsappPhone.trim();
+  }
+  if (typeof bodyLanguage === 'string' && VALID_LOCALES.includes(bodyLanguage)) {
+    updates.language = bodyLanguage;
+  }
   if (typeof website === 'string') updates.website = website.trim();
-  if (typeof whatsappPhone === 'string') updates.whatsapp_phone = whatsappPhone.trim();
   if (typeof alertThresholdStars === 'number' && alertThresholdStars >= 1 && alertThresholdStars <= 5) {
     updates.alert_threshold_stars = alertThresholdStars;
   }

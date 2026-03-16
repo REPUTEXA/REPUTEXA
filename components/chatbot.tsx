@@ -112,7 +112,7 @@ export function Chatbot() {
             <span className="text-sm font-bold text-indigo-400">R</span>
           </div>
           <div className="min-w-0">
-            <p className="font-semibold text-white">REPUTEXA</p>
+            <p className="font-semibold text-white uppercase">REPUTEXA</p>
             <p className="text-xs font-medium text-indigo-400/90">Expert REPUTEXA</p>
           </div>
         </div>

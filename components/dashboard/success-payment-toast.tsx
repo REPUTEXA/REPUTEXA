@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from 'react';
 import { useSearchParams } from 'next/navigation';
+import { useRouter, usePathname } from '@/i18n/navigation';
 import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { SUBSCRIPTION_QUERY_KEY } from '@/lib/use-subscription';
@@ -36,27 +37,36 @@ function fireConfetti() {
   }).catch(() => {});
 }
 
-/** Retour d'un paiement réussi : confettis immédiats + toast bienvenue + invalidation abo pour afficher tout de suite le bon intervalle (€/an ou €/mois). */
+/** Une seule célébration : ref pour éviter tout doublon même si re-render. */
+const hasShownRef = { current: false };
+
+/** Retour d'un paiement réussi (status=success) : confettis + toast bienvenue une seule fois, puis URL nettoyée. */
 export function SuccessPaymentToast() {
   const searchParams = useSearchParams();
+  const pathname = usePathname();
+  const router = useRouter();
   const queryClient = useQueryClient();
-  const shownRef = useRef(false);
 
   useEffect(() => {
     const status = searchParams?.get('status');
     const plan = searchParams?.get('plan');
-    if ((status !== 'success' && status !== 'trial_started') || shownRef.current) return;
+    if (status !== 'success' && status !== 'trial_started') return;
 
-    shownRef.current = true;
+    if (hasShownRef.current) return;
+    hasShownRef.current = true;
+
+    const planName = plan ? (PLAN_DISPLAY[plan] ?? plan) : 'Vision';
     clearCheckoutIntent();
     queryClient.invalidateQueries({ queryKey: SUBSCRIPTION_QUERY_KEY });
     fireConfetti();
-    const planName = plan ? (PLAN_DISPLAY[plan] ?? plan) : 'Vision';
     toast.success(`Bienvenue ! Votre plan ${planName} est activé. 🎉`, {
       duration: 5000,
       className: 'border-[#2563eb]/30 shadow-lg',
     });
-  }, [searchParams]);
+    fetch('/api/profile/update-first-login', { method: 'POST' }).catch(() => {});
+
+    router.replace(pathname, { scroll: false });
+  }, [searchParams, pathname, router, queryClient]);
 
   return null;
 }

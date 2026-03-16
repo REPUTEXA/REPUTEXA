@@ -13,13 +13,23 @@ export type CallbackAction =
   | (typeof CALLBACK_ACTIONS)['APPROVE_REPLY']
   | (typeof CALLBACK_ACTIONS)['EDIT_REPLY'];
 
-/** Payload received by /api/webhooks/google-reviews */
+export type ReviewPlatform = 'google' | 'facebook' | 'trustpilot';
+
+export interface StandardReview {
+  author: string;
+  rating: number;
+  text: string;
+  platform: ReviewPlatform;
+  externalId?: string | null;
+}
+
+/** Payload received by /api/webhooks/google-reviews (et plateformes unifiées) */
 export interface GoogleReviewWebhookPayload {
   userId: string;
   reviewerName: string;
   rating: number;
   comment: string;
-  source?: string;
+  source?: ReviewPlatform;
   placeId?: string;
   reviewId?: string;
 }
@@ -33,6 +43,7 @@ export interface WhatsAppAlertPayload {
   comment: string;
   suggestedReply: string;
   establishmentName?: string;
+  platform?: ReviewPlatform;
 }
 
 /** Twilio / Meta callback payload (when user taps a button) */

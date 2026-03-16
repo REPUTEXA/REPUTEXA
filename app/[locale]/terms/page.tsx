@@ -35,7 +35,7 @@ export async function generateMetadata({
       description:
         'CGV REPUTEXA : abonnement, facturation, rétractation, responsabilité limitée, droit français.',
       url: `${baseUrl}${path}`,
-      siteName: 'Reputexa',
+      siteName: 'REPUTEXA',
     },
   };
 }
@@ -65,11 +65,57 @@ export default function TermsPage() {
         <h3 className="text-lg font-display font-semibold text-slate-900 dark:text-slate-100 mb-3">
           2. Description des services
         </h3>
-        <p className="text-slate-600 dark:text-slate-400 leading-relaxed mb-2">
+        <p className="text-slate-600 dark:text-slate-400 leading-relaxed mb-3">
           REPUTEXA propose un service d&apos;agrégation des avis Google, de suggestions de réponses par
           intelligence artificielle, d&apos;alertes en cas d&apos;avis négatifs et de reporting. Les fonctionnalités
-          varient selon le plan choisi (Vision, Pulse, Zenith). La description détaillée des offres est
-          disponible sur la page Tarifs.
+          varient selon le plan choisi : <strong>Vision</strong>, <strong>Pulse</strong> et <strong>Zenith</strong>. La description détaillée des offres est disponible sur la page Tarifs.
+        </p>
+        <h4 className="text-base font-semibold text-slate-800 dark:text-slate-200 mt-4 mb-2">
+          2.1 Réponses automatisées
+        </h4>
+        <p className="text-slate-600 dark:text-slate-400 leading-relaxed mb-2">
+          L&apos;utilisateur reconnaît et accepte que le service REPUTEXA puisse être configuré pour publier des
+          réponses de manière automatisée.
+        </p>
+        <p className="text-slate-600 dark:text-slate-400 leading-relaxed mb-2">
+          <strong>Responsabilité :</strong> L&apos;utilisateur demeure seul responsable des contenus publiés sur
+          ses fiches d&apos;établissement. Il lui appartient de configurer les filtres et les tons de l&apos;IA de
+          manière appropriée.
+        </p>
+        <p className="text-slate-600 dark:text-slate-400 leading-relaxed mb-2">
+          <strong>Droit de modification :</strong> L&apos;utilisateur peut à tout moment modifier ou supprimer une
+          réponse publiée via son tableau de bord ou directement sur la plateforme concernée (Google).
+        </p>
+        <p className="text-slate-600 dark:text-slate-400 leading-relaxed mb-3">
+          <strong>Cas des avis négatifs :</strong> Pour les avis jugés « négatifs » (selon les critères du plan
+          choisi), le système peut être configuré pour suspendre l&apos;automatisation et requérir une validation
+          manuelle.
+        </p>
+        <h4 className="text-base font-semibold text-slate-800 dark:text-slate-200 mt-4 mb-2">
+          Réponses IA (suggestions)
+        </h4>
+        <p className="text-slate-600 dark:text-slate-400 leading-relaxed mb-3">
+          Les réponses proposées par l&apos;IA sont des <strong>suggestions</strong>. L&apos;utilisateur est tenu de
+          <strong> valider, adapter ou modifier</strong> tout contenu avant publication sur les plateformes d&apos;avis.
+          Aucune réponse ne peut être publiée automatiquement sans action explicite de validation du client.
+        </p>
+        <h4 className="text-base font-semibold text-slate-800 dark:text-slate-200 mt-4 mb-2">
+          Alertes WhatsApp
+        </h4>
+        <p className="text-slate-600 dark:text-slate-400 leading-relaxed mb-3">
+          Les alertes par WhatsApp (notifications en cas d&apos;avis négatif ou de signalement) sont fournies via
+          l&apos;API <strong>WhatsApp (Meta)</strong>. Leur disponibilité et leur bon fonctionnement dépendent des
+          conditions d&apos;utilisation et des politiques de Meta. REPUTEXA n&apos;est pas le fournisseur du service
+          WhatsApp.
+        </p>
+        <h4 className="text-base font-semibold text-slate-800 dark:text-slate-200 mt-4 mb-2">
+          Suppression d&apos;avis
+        </h4>
+        <p className="text-slate-600 dark:text-slate-400 leading-relaxed">
+          La demande de suppression ou de modération d&apos;un avis auprès des plateformes (notamment Google) relève
+          des politiques et des processus de ces <strong>tiers</strong>. REPUTEXA peut fournir des outils ou des
+          suggestions (arguments juridiques, formulaires) pour vous accompagner, mais ne garantit aucun résultat :
+          la décision finale appartient à Google ou à l&apos;opérateur concerné.
         </p>
       </section>
 
@@ -105,17 +151,35 @@ export default function TermsPage() {
 
       <section id="multi-etablissements" className="mb-10">
         <h3 className="text-lg font-display font-semibold text-slate-900 dark:text-slate-100 mb-3">
-          5. Multi-établissements et prorata
+          5. Multi-établissements, prix dégressifs et gestion des crédits
         </h3>
         <p className="text-slate-600 dark:text-slate-400 leading-relaxed mb-3">
-          Lorsqu&apos;un abonnement prévoit plusieurs établissements (plans Pulse, Zenith) et qu&apos;un client ajoute
-          un établissement supplémentaire en cours de période de facturation :
+          Les plans permettant plusieurs établissements (Pulse, Zenith) appliquent une <strong>politique de prix dégressifs</strong> :
+          plus le nombre d&apos;emplacements souscrits est élevé, plus le prix unitaire par établissement diminue
+          (remises progressives selon les paliers, détaillées sur la page Tarifs).
         </p>
-        <ul className="list-disc list-inside space-y-1.5 text-slate-600 dark:text-slate-400 ml-2">
-          <li><strong>Un prorata immédiat est appliqué</strong> au prorata temporis pour les jours restants jusqu&apos;à la prochaine échéance</li>
-          <li>Le complément est facturé et prélevé immédiatement lors de l&apos;ajout de l&apos;établissement</li>
-          <li>Le client accepte cette facturation immédiate en validant l&apos;ajout de l&apos;établissement</li>
+        <h4 className="text-base font-semibold text-slate-800 dark:text-slate-200 mt-4 mb-2">
+          Ajout d&apos;établissements (prorata)
+        </h4>
+        <p className="text-slate-600 dark:text-slate-400 leading-relaxed mb-3">
+          Lorsqu&apos;un client ajoute un ou plusieurs établissements en cours de période de facturation :
+        </p>
+        <ul className="list-disc list-inside space-y-1.5 text-slate-600 dark:text-slate-400 ml-2 mb-3">
+          <li><strong>Un prorata immédiat est appliqué</strong> au prorata temporis pour les jours restants jusqu&apos;à la prochaine échéance, en tenant compte du barème dégressif</li>
+          <li>Le complément est facturé et prélevé immédiatement lors de l&apos;ajout</li>
+          <li>Le client accepte cette facturation en validant l&apos;ajout d&apos;établissement(s)</li>
         </ul>
+        <h4 className="text-base font-semibold text-slate-800 dark:text-slate-200 mt-4 mb-2">
+          Passage à un plan inférieur ou réduction du nombre d&apos;emplacements (downgrade)
+        </h4>
+        <p className="text-slate-600 dark:text-slate-400 leading-relaxed mb-2">
+          En cas de passage à un plan moins cher ou de réduction du nombre d&apos;établissements souscrits, la gestion
+          financière est assurée par <strong>Stripe</strong> : une <strong>note de crédit</strong> est générée sur le
+          compte client pour la partie non utilisée de la période en cours, crédit qui sera déduit des prochaines factures.
+          Les données et établissements déjà créés sont <strong>conservés</strong> ; seuls les accès sont limités au
+          nouveau quota (les emplacements au-delà du quota sont désactivés jusqu&apos;à un nouvel upgrade). Aucune
+          suppression de données n&apos;est effectuée du fait d&apos;un downgrade.
+        </p>
       </section>
 
       <section id="retractation" className="mb-10">
@@ -193,16 +257,17 @@ export default function TermsPage() {
         </p>
 
         <h4 className="text-base font-semibold text-slate-800 dark:text-slate-200 mt-4 mb-2">
-          8.3 Indépendance de Google
+          8.3 Indépendance de Google et suppression d&apos;avis
         </h4>
         <p className="text-slate-600 dark:text-slate-400 leading-relaxed mb-2">
           REPUTEXA est une entreprise indépendante de Google LLC, Google Ireland Limited et de toute entité du
           groupe Google. REPUTEXA n&apos;exerce aucun contrôle sur les services, API, politiques ou conditions
-          d&apos;utilisation de Google. Tout changement apporté par Google à ses API, à ses règles de modération,
-          à la suppression d&apos;avis, à la suspension ou la suppression d&apos;une fiche Google Business Profile, ou
-          à toute autre modification de ses services, ne peut donner lieu à un remboursement, une indemnisation
-          ou une réduction tarifaire de la part de REPUTEXA. Le client assume l&apos;ensemble des risques liés à
-          l&apos;utilisation des services Google.
+          d&apos;utilisation de Google. La <strong>suppression ou la modération d&apos;avis</strong> dépend exclusivement
+          des tiers (Google et autres plateformes) ; REPUTEXA fournit un accompagnement (arguments, formulaires) mais
+          ne peut garantir aucun résultat. Tout changement apporté par Google à ses API, à ses règles de modération,
+          à la suspension ou la suppression d&apos;une fiche Google Business Profile, ou à toute autre modification
+          de ses services, ne peut donner lieu à un remboursement, une indemnisation ou une réduction tarifaire de
+          la part de REPUTEXA. Le client assume l&apos;ensemble des risques liés à l&apos;utilisation des services Google.
         </p>
 
         <h4 className="text-base font-semibold text-slate-800 dark:text-slate-200 mt-4 mb-2">

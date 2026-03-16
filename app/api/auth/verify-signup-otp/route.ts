@@ -4,6 +4,7 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { checkAuthRateLimit } from '@/lib/rate-limit';
 import { getSiteUrl } from '@/lib/site-url';
 import { getStripePriceId, type PlanSlug } from '@/config/pricing';
+import { getLanguageFromPhone } from '@/lib/language-from-phone';
 
 const TRIAL_DAYS = 14;
 
@@ -101,8 +102,13 @@ export async function POST(request: Request) {
 
     // FORCER extraction depuis user_metadata (source de vérité à l'inscription)
     const { data: authUser } = await admin.auth.admin.getUserById(otpRow.user_id);
-    const meta = (authUser?.user?.user_metadata ?? {}) as { signup_mode?: string; selected_plan?: string; signup_annual?: boolean };
+    const meta = (authUser?.user?.user_metadata ?? {}) as { signup_mode?: string; selected_plan?: string; signup_annual?: boolean; phone?: string };
     const signupMode: 'trial' | 'checkout' = meta?.signup_mode === 'checkout' ? 'checkout' : 'trial';
+
+    if (typeof meta?.phone === 'string' && meta.phone.trim()) {
+      const inferredLanguage = getLanguageFromPhone(meta.phone.trim());
+      await admin.from('profiles').update({ language: inferredLanguage }).eq('id', otpRow.user_id);
+    }
     const metaPlan = meta?.selected_plan;
     const selectedPlan = (metaPlan && ['vision', 'pulse', 'zenith'].includes(metaPlan))
       ? metaPlan
@@ -140,8 +146,7 @@ export async function POST(request: Request) {
     try {
       const stripe = new Stripe(secretKey);
       const baseUrl = getSiteUrl().replace(/\/+$/, '');
-      const statusParam = skipTrial ? 'success' : 'trial_started';
-      const successUrl = `${baseUrl}/api/stripe/checkout-success?session_id={CHECKOUT_SESSION_ID}&locale=${locale}&plan=${plan}&status=${statusParam}`;
+      const successUrl = `${baseUrl}/api/stripe/sync-profile?session_id={CHECKOUT_SESSION_ID}&locale=${locale}`;
       const cancelUrl = `${baseUrl}/${locale}/pricing?plan=${plan}&annual=${annual ? '1' : '0'}&status=cancelled`;
 
       let customerId: string | null = null;

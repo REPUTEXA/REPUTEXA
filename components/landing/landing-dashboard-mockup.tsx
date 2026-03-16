@@ -77,7 +77,7 @@ export function LandingDashboardMockup() {
               L&apos;Atelier Gourmet
             </h1>
             <p className="text-xs sm:text-sm text-slate-500 mt-0.5 capitalize" suppressHydrationWarning>
-              {dateStr} · Dashboard Reputexa
+              {dateStr} · Dashboard REPUTEXA
             </p>
           </div>
 

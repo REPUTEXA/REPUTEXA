@@ -301,20 +301,20 @@
       "headline": "Questions fréquentes",
       "items": {
         "googleMaps": {
-          "q": "Est-ce que l'IA peut vraiment me faire monter sur Google Maps ?",
-          "a": "Oui. Google favorise les établissements qui répondent vite et qui utilisent des mots-clés pertinents. Notre plan ZENITH injecte stratégiquement ces mots-clés dans vos réponses pour signaler à l'algorithme que vous êtes le meilleur choix local."
+          "q": "Est-ce que l'IA peut vraiment me faire monter sur Google ?",
+          "a": "Oui. Google (le moteur de recherche et les cartes) favorise les établissements qui répondent vite et avec précision. Notre IA assure une réactivité 24h/7j. Pour le plan ZENITH, elle injecte stratégiquement des mots-clés SEO dans vos réponses pour signaler à l'algorithme que vous êtes la référence dans votre secteur. Plus vous répondez intelligemment, plus Google vous met en avant face à vos concurrents."
         },
         "iaDetectable": {
-          "q": "Est-ce que mes clients vont capter que c'est une IA ?",
-          "a": "Absolument pas. Nos modèles sont entraînés sur des milliers de réponses réelles de restaurateurs et commerçants. Le ton est chaleureux, professionnel et indiscernable d'une réponse humaine. On appelle ça le test de Turing réussi."
+          "q": "Mes clients vont-ils capter que c'est une IA ?",
+          "a": "Absolument pas. Nos modèles sont entraînés sur des milliers de réponses réelles de commerçants. Le ton est chaleureux, professionnel et indiscernable d'une réponse humaine. Pour le plan ZENITH, la \"Triple Vérification\" compare trois variantes de réponse et ne publie que la meilleure. Vos clients se sentiront écoutés par un humain, le gain de temps en plus."
         },
         "installTime": {
           "q": "Combien de temps ça prend à installer ?",
-          "a": "Moins de 2 minutes. Vous connectez votre compte Google Business, et l'IA commence à analyser vos avis immédiatement. Il n'y a aucun logiciel à installer, tout se passe sur votre dashboard Reputexa."
+          "a": "Moins de 2 minutes. Vous connectez votre compte Google Business, et l'IA commence à analyser vos avis immédiatement. Il n'y a aucun logiciel à installer, tout se passe sur votre dashboard Reputexa ou directement sur WhatsApp pour les alertes."
         },
         "gratuit14j": {
-          "q": "C'est vraiment gratuit pendant 14 jours ? Sans carte bleue ?",
-          "a": "Oui. On est tellement sûrs de l'impact sur votre chiffre d'affaires qu'on vous offre l'accès complet sans vous demander vos coordonnées bancaires. Si vous n'êtes pas bluffé par les résultats, vous n'avez rien à faire."
+          "q": "C'est vraiment gratuit pendant 14 jours ?",
+          "a": "Oui, totalement. Vous profitez de la puissance de Reputexa sans débourser un centime pendant deux semaines. Bien que nous passions par Stripe pour sécuriser l'accès, aucun montant n'est prélevé avant la fin de votre période d'essai. Vous pouvez annuler en un clic si vous n'êtes pas bluffé par les résultats. C'est l'occasion de tester l'impact sur votre réputation sans aucun risque."
         }
       }
     },
@@ -337,8 +337,10 @@
     },
     "footer": {
       "rights": "© 2026 REPUTEXA. Tous droits réservés.",
+      "legal": "Mentions légales",
       "privacy": "Politique de confidentialité",
-      "terms": "Conditions d'utilisation"
+      "terms": "CGU",
+      "contact": "Contact"
     }
   },
   "Auth": {
@@ -413,7 +415,9 @@
     "settings": {
       "title": "Paramètres",
       "description": "Gérez votre compte et vos préférences",
-      "comingSoon": "Bientôt disponible."
+      "comingSoon": "Bientôt disponible.",
+      "language": "Langue d'interface",
+      "languageDescription": "Personnalisez votre expérience en choisissant votre langue d'interface préférée."
     },
     "form": {
       "review": "Avis",
@@ -656,6 +660,105 @@
   "Share": {
     "whatsappMessage": "Regardez mon score Reputexa ! Ma note moyenne : {rating}/5 — Géré par l'IA 🚀",
     "shareOnWhatsApp": "Partager sur WhatsApp"
+  },
+  "Legal": {
+    "nav": {
+      "mentions": "Mentions légales",
+      "privacy": "Confidentialité",
+      "terms": "CGU",
+      "contact": "Contact",
+      "toc": "Table des matières"
+    },
+    "mentionsLegales": {
+      "title": "Mentions légales",
+      "metaTitle": "Mentions légales | REPUTEXA",
+      "metaDescription": "Mentions légales du site Reputexa. Éditeur, hébergeur, Impressum, conformité LCEN et RGPD.",
+      "intro": "Conformément à la loi n° 2004-575 du 21 juin 2004 pour la confiance dans l'économie numérique (LCEN) et au Règlement général sur la protection des données (RGPD), les présentes mentions légales précisent l'identité des différents intervenants dans le cadre de la création et du suivi du site reputexa.fr.",
+      "toc": [
+        { "id": "editeur", "label": "1. Éditeur du site" },
+        { "id": "impressum", "label": "2. Impressum (informations légales)" },
+        { "id": "directeur", "label": "3. Directeur de la publication" },
+        { "id": "hebergeur", "label": "4. Hébergement (UE)" },
+        { "id": "droit", "label": "5. Droit applicable" },
+        { "id": "prop-intel", "label": "6. Propriété intellectuelle" },
+        { "id": "liens", "label": "7. Liens hypertextes" },
+        { "id": "contact", "label": "8. Contact" }
+      ],
+      "editeur_title": "1. Éditeur du site",
+      "editeur_content": "Le site reputexa.fr est édité par REPUTEXA, dont le siège social est établi en France. Raison sociale, adresse complète du siège, numéro SIRET et numéro de TVA intracommunautaire sont disponibles sur demande à contact@reputexa.fr.",
+      "impressum_title": "2. Impressum (informations légales)",
+      "impressum_content": "Conformément aux exigences applicables en Allemagne (Teledienstgesetz, § 5 TMG) et dans l'Union européenne, les informations de l'éditeur (Impressum) sont les suivantes : éditeur du site REPUTEXA, siège en France. Contact : contact@reputexa.fr. Les présentes mentions constituent l'Impressum du site pour l'ensemble des utilisateurs, notamment ceux situés en Allemagne.",
+      "directeur_title": "3. Directeur de la publication",
+      "directeur_content": "Le directeur de la publication est le fondateur de REPUTEXA.",
+      "hebergeur_title": "4. Hébergement — Serveurs en Union européenne",
+      "hebergeur_content": "L'application et les données sont hébergées sur des infrastructures situées au sein de l'Union européenne : Vercel (hébergement de l'application, régions UE) et Supabase (base de données et authentification, régions UE). Ces prestataires garantissent la conformité au RGPD et la localisation des données dans l'UE.",
+      "droit_title": "5. Droit applicable",
+      "droit_content": "Le droit applicable est le droit français. Sans préjudice des dispositions impératives du pays de résidence de l'utilisateur dans l'Union européenne, les présentes mentions et le site sont régis par le droit français. Les utilisateurs consommateurs résidant dans l'UE conservent les droits que leur accordent les dispositions impératives de leur État de résidence.",
+      "prop_intel_title": "6. Propriété intellectuelle",
+      "prop_intel_content": "L'ensemble du contenu du site (textes, graphismes, logos, bases de données) est protégé par le droit d'auteur et le droit des marques. Toute reproduction ou exploitation non autorisée constitue une contrefaçon passible de poursuites.",
+      "liens_title": "7. Liens hypertextes",
+      "liens_content": "Le site peut contenir des liens vers des sites tiers. REPUTEXA n'exerce aucun contrôle sur ces sites et décline toute responsabilité quant à leur contenu. La création de liens vers reputexa.fr est soumise à l'accord préalable de l'éditeur.",
+      "contact_title": "8. Contact",
+      "contact_content": "Pour toute question relative aux présentes mentions légales : contact@reputexa.fr."
+    },
+    "confidentialite": {
+      "title": "Politique de confidentialité",
+      "metaTitle": "Politique de confidentialité | REPUTEXA",
+      "metaDescription": "Politique de confidentialité et protection des données. RGPD, sous-traitants, IA, données hébergées en UE.",
+      "intro": "Dernière mise à jour : mars 2026. Cette politique définit comment REPUTEXA collecte, utilise et protège vos données personnelles conformément au Règlement général sur la protection des données (RGPD) et aux lois applicables dans l'Union européenne.",
+      "toc": [
+        { "id": "responsable", "label": "1. Responsable du traitement" },
+        { "id": "donnees", "label": "2. Données collectées" },
+        { "id": "locale", "label": "3. Détection de la langue (indicatif téléphonique)" },
+        { "id": "finalites", "label": "4. Finalités et bases légales" },
+        { "id": "sous-traitants", "label": "5. Sous-traitants (Data Processors)" },
+        { "id": "ia", "label": "6. Garantie IA — Données non utilisées pour l'entraînement" },
+        { "id": "droits", "label": "7. Vos droits" },
+        { "id": "contact", "label": "8. Nous contacter" }
+      ],
+      "responsable_title": "1. Responsable du traitement",
+      "responsable_content": "Le responsable du traitement des données personnelles est REPUTEXA, éditeur du site reputexa.fr, dont le siège est établi en France. Nous traitons vos données de manière licite, loyale et transparente, conformément au RGPD.",
+      "donnees_title": "2. Données collectées",
+      "donnees_content": "Nous collectons notamment : adresse email professionnelle pour le compte et l'authentification ; données de facturation et paiement transmises à Stripe ; contenu des avis et données de votre fiche Google Business Profile (API Google) ; nom, prénom, téléphone, nom de l'établissement, adresse ; préférence de langue ; données techniques (IP, logs, cookies techniques).",
+      "locale_title": "3. Détection de la langue (indicatif téléphonique)",
+      "locale_content": "Afin d'améliorer votre expérience utilisateur et de vous proposer une interface, des communications et un support dans votre langue, nous pouvons déduire une préférence de langue à partir de l'indicatif de votre numéro de téléphone (par exemple +33 pour la France, +39 pour l'Italie, +34 pour l'Espagne, +49 pour l'Allemagne). Cette information est utilisée uniquement pour personnaliser la langue de l'interface, des e-mails et du portail de paiement. Vous pouvez à tout moment modifier la langue dans les paramètres de votre compte.",
+      "finalites_title": "4. Finalités et bases légales",
+      "finalites_content": "Les données sont traitées pour : exécution du contrat (compte, abonnement, service) ; intérêt légitime (amélioration du service, prévention des fraudes) ; consentement (newsletter, marketing, révocable) ; obligation légale (conservation des factures, conformité fiscale).",
+      "sous_traitants_title": "5. Sous-traitants (Data Processors)",
+      "sous_traitants_content": "Vos données peuvent être traitées par les sous-traitants suivants, dans le strict cadre de leur mission et conformément au RGPD : Stripe (paiements, facturation, abonnements) ; Resend (envoi d'e-mails transactionnels : confirmation, alertes, notifications) ; OpenAI et/ou Anthropic (traitement par intelligence artificielle pour la génération de suggestions de réponses aux avis) ; Supabase (hébergement des données et authentification, UE) ; Vercel (hébergement de l'application, UE) ; Google (OAuth, API Google Business Profile) ; Meta/WhatsApp (alertes et notifications si activées). Ces prestataires sont soumis à des obligations contractuelles conformes au RGPD.",
+      "ia_title": "6. Garantie IA — Données non utilisées pour l'entraînement",
+      "ia_content": "Les données que vous transmettez à REPUTEXA pour la génération de réponses aux avis (contenu des avis, contexte de votre établissement) sont traitées par des fournisseurs d'IA (OpenAI, Anthropic ou équivalents) uniquement pour produire ces suggestions. Nous garantissons que ces données ne sont pas utilisées pour l'entraînement des modèles d'IA des fournisseurs : elles restent confidentielles et ne servent qu'à la fourniture du service. La confidentialité de vos données commerciales et des avis de vos clients est ainsi protégée.",
+      "droits_title": "7. Vos droits",
+      "droits_content": "Conformément au RGPD, vous disposez du droit d'accès, de rectification, d'effacement, à la limitation du traitement, à la portabilité et d'opposition. Pour exercer ces droits : contact@reputexa.fr. Vous pouvez introduire une réclamation auprès de la CNIL (cnil.fr) ou de l'autorité de contrôle de votre pays de résidence.",
+      "contact_title": "8. Nous contacter",
+      "contact_content": "Pour toute question relative à la protection de vos données : contact@reputexa.fr."
+    },
+    "cgu": {
+      "title": "Conditions générales d'utilisation",
+      "metaTitle": "Conditions générales d'utilisation | REPUTEXA",
+      "metaDescription": "CGU REPUTEXA. Plans Vision, Pulse, Zenith. Différenciation linguistique, TVA, Stripe, droit français.",
+      "intro": "Dernière mise à jour : mars 2026. Les présentes Conditions générales d'utilisation (CGU) régissent l'utilisation du service REPUTEXA et s'appliquent à tout abonnement souscrit sur reputexa.fr.",
+      "toc": [
+        { "id": "objet", "label": "1. Objet et acceptation" },
+        { "id": "plans", "label": "2. Plans et différenciation du service" },
+        { "id": "langue", "label": "3. Clause de différenciation — Langue des réponses IA" },
+        { "id": "facturation", "label": "4. Facturation, TVA et Stripe" },
+        { "id": "droit", "label": "5. Droit applicable et juridiction" },
+        { "id": "contact", "label": "6. Contact" }
+      ],
+      "objet_title": "1. Objet et acceptation",
+      "objet_content": "Les présentes CGU définissent les modalités d'accès et d'utilisation du service REPUTEXA, plateforme SaaS d'e-réputation. En créant un compte ou en souscrivant à un abonnement, vous acceptez sans réserve les présentes conditions.",
+      "plans_title": "2. Plans et différenciation du service",
+      "plans_content": "REPUTEXA propose trois offres d'abonnement : Vision, Pulse et Zenith. Les fonctionnalités (agrégation d'avis, réponses IA, alertes, reporting) varient selon le plan. La description détaillée des offres est disponible sur la page Tarifs.",
+      "langue_title": "3. Clause de différenciation — Langue des réponses IA",
+      "langue_content": "Par disposition contractuelle, la langue des réponses générées par l'IA est différenciée selon le plan souscrit : Plan Vision : les réponses aux avis sont générées exclusivement dans la langue de l'établissement (langue du profil utilisateur). Le service ne propose pas de réponses dans d'autres langues. Plans Pulse et Zénith : le service est polyglotte ; les réponses sont générées de manière native dans la langue de l'avis du client (détection automatique de la langue de l'avis et réponse dans cette même langue). Cette clause fait partie intégrante des conditions du service et ne peut être modifiée qu'en cas de changement de plan.",
+      "facturation_title": "4. Facturation, TVA et Stripe",
+      "facturation_content": "Les prix affichés sont indiqués hors taxes (HT). La TVA est calculée et appliquée automatiquement par Stripe selon le pays de l'acheteur et les règles en vigueur (TVA intracommunautaire, taux local, etc.). Le paiement est collecté par Stripe (cartes, SEPA, moyens locaux). L'abonnement est récurrent (mensuel ou annuel). Tout mois entamé est dû ; en cas de résiliation, aucun remboursement au prorata des jours restants. Les factures sont disponibles dans l'espace client et via le portail Stripe.",
+      "droit_title": "5. Droit applicable et juridiction",
+      "droit_content": "Les présentes CGU sont soumises au droit français. À défaut d'accord amiable, il est attribué compétence exclusive au Tribunal de Commerce de Paris pour tout litige. Le client consommateur résidant dans l'Union européenne conserve la faculté de saisir les tribunaux de son lieu de résidence, conformément au Règlement (UE) n° 1215/2012 (Bruxelles I bis).",
+      "contact_title": "6. Contact",
+      "contact_content": "Pour toute question relative aux présentes CGU : contact@reputexa.fr."
+    }
   },
   "common": {
     "loading": "Chargement...",

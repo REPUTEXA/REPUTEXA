@@ -198,7 +198,7 @@ export default function ContactPage() {
         <div className="max-w-6xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2 text-slate-800 dark:text-slate-100" aria-label="REPUTEXA">
             <Logo />
-            <span className="font-display font-bold text-lg">REPUTEXA</span>
+            <span className="font-display font-bold text-lg uppercase">REPUTEXA</span>
           </Link>
           <div className="flex items-center gap-4">
             <Link
@@ -432,7 +432,7 @@ export default function ContactPage() {
         <div className="max-w-6xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
           <Link href="/" className="flex items-center gap-2 text-slate-700 dark:text-slate-200" aria-label="REPUTEXA">
             <Logo size="sm" />
-            <span className="font-display font-bold">REPUTEXA</span>
+            <span className="font-display font-bold uppercase">REPUTEXA</span>
           </Link>
           <p className="text-sm text-slate-500 dark:text-slate-400">
             © {new Date().getFullYear()} REPUTEXA. Tous droits réservés.

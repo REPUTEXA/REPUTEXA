@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { toast } from 'sonner';
 
 function fireConfetti() {
@@ -31,20 +32,26 @@ type Props = {
   planDisplayName: string;
 };
 
-/** Première connexion ou retour paiement : confettis immédiats + toast bienvenue avec nom du plan. */
+/** Première connexion : confettis + toast bienvenue. Ne pas afficher le toast si l'URL a status=success ou trial_started (SuccessPaymentToast s'en charge, évite le doublon). */
 export function WelcomeFlash({ firstLogin, planDisplayName }: Props) {
   const firedRef = useRef(false);
+  const searchParams = useSearchParams();
+  const status = searchParams?.get('status');
+  const isReturnFromCheckout = status === 'success' || status === 'trial_started';
 
   useEffect(() => {
     if (!firstLogin || firedRef.current) return;
     firedRef.current = true;
-    fireConfetti();
-    const planName = planDisplayName?.trim() || 'Vision';
-    toast.success(`Bienvenue ! Votre plan ${planName} est activé. 🎉`, {
-      duration: 5000,
-      className: 'border-[#2563eb]/30 shadow-lg',
-    });
-  }, [firstLogin, planDisplayName]);
+    if (!isReturnFromCheckout) {
+      fireConfetti();
+      const planName = planDisplayName?.trim() || 'Vision';
+      toast.success(`Bienvenue ! Votre plan ${planName} est activé. 🎉`, {
+        duration: 5000,
+        className: 'border-[#2563eb]/30 shadow-lg',
+      });
+      fetch('/api/profile/update-first-login', { method: 'POST' }).catch(() => {});
+    }
+  }, [firstLogin, planDisplayName, isReturnFromCheckout]);
 
   return null;
 }

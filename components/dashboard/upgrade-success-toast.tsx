@@ -1,10 +1,21 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useRouter, usePathname } from '@/i18n/navigation';
+import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { createClient } from '@/lib/supabase/client';
+import { SUBSCRIPTION_QUERY_KEY } from '@/lib/use-subscription';
+
+const PLAN_DISPLAY: Record<string, string> = {
+  vision: 'Vision',
+  pulse: 'Pulse',
+  zenith: 'ZENITH',
+};
+
+/** Une seule célébration par visite : même si le composant re-render, on ne rejoue pas. */
+const hasShownRef = { current: false };
 
 function fireConfetti() {
   void import('canvas-confetti').then((mod) => {
@@ -31,48 +42,47 @@ function fireConfetti() {
 async function forceRefreshSessionAndData(router: { refresh: () => void }) {
   const supabase = createClient();
   await supabase.auth.refreshSession();
-  await supabase.auth.getUser(); // Force la mise à jour de la session locale côté client
-  router.refresh(); // Revalide Server Components et données du Dashboard (limites, plan, etc.)
+  await supabase.auth.getUser();
+  router.refresh();
 }
 
+/** Retour après upgrade (status=upgraded) : confettis + toast une seule fois, URL nettoyée immédiatement. */
 export function UpgradeSuccessToast() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const pathname = usePathname();
-  const [isMounted, setIsMounted] = useState(false);
-  const shownRef = useRef(false);
+  const queryClient = useQueryClient();
 
   useEffect(() => {
-    setIsMounted(true);
-  }, []);
-
-  useEffect(() => {
-    if (!isMounted) return;
     const status = searchParams?.get('status');
-    if (status !== 'upgraded' || shownRef.current) return;
+    if (status !== 'upgraded') return;
+    if (hasShownRef.current) return;
 
-    shownRef.current = true;
+    hasShownRef.current = true;
+
+    const plan = searchParams?.get('plan');
+    const planName = plan ? (PLAN_DISPLAY[plan] ?? plan) : 'votre plan supérieur';
+
+    queryClient.invalidateQueries({ queryKey: SUBSCRIPTION_QUERY_KEY });
     fireConfetti();
-    toast.success('Félicitations ! Votre abonnement a été mis à jour avec succès. Profitez de vos nouveaux avantages ! 🚀', {
+    toast.success(`Félicitations ! Votre passage au plan ${planName} est validé. 🚀`, {
       duration: 6000,
       className: 'border-[#2563eb]/30 shadow-lg',
     });
-    void forceRefreshSessionAndData(router).then(() => {
-      // Données et session à jour : l'utilisateur voit immédiatement ses nouvelles limites (ex. sites ZENITH).
-    });
+
+    if (searchParams?.get('showUpdates') === 'true') {
+      window.dispatchEvent(new CustomEvent('dashboard-show-updates-modal'));
+    }
+    router.replace(pathname, { scroll: false });
+
+    void forceRefreshSessionAndData(router).then(() => {});
     const t1 = setTimeout(() => router.refresh(), 500);
     const t2 = setTimeout(() => router.refresh(), 1500);
-    const params = new URLSearchParams(searchParams?.toString() ?? '');
-    params.delete('status');
-    const qs = params.toString();
-    const cleanUrl = pathname + (qs ? `?${qs}` : '');
-    const t3 = setTimeout(() => router.replace(cleanUrl, { scroll: false }), 600);
     return () => {
       clearTimeout(t1);
       clearTimeout(t2);
-      clearTimeout(t3);
     };
-  }, [isMounted, searchParams, router, pathname]);
+  }, [searchParams, router, pathname, queryClient]);
 
   return null;
 }

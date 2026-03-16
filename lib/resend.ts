@@ -2,8 +2,8 @@ import { Resend } from 'resend';
 
 const apiKey = process.env.RESEND_API_KEY;
 
-/** Format strict : "REPUTEXA <email@reputexa.fr>". Override via RESEND_FROM. */
-export const DEFAULT_FROM = 'REPUTEXA <noreply@reputexa.fr>';
+/** Par défaut : domaine Resend (sans domaine vérifié). Avec domaine vérifié, définir RESEND_FROM (ex: REPUTEXA <noreply@reputexa.fr>). */
+export const DEFAULT_FROM = 'REPUTEXA <onboarding@resend.dev>';
 const from = process.env.RESEND_FROM ?? DEFAULT_FROM;
 
 export const resend = apiKey ? new Resend(apiKey) : null;
@@ -49,5 +49,6 @@ export async function sendEmail(params: {
     console.error('[Resend]', error);
     return { success: false, error };
   }
+  console.log('[Resend] Email sent to', params.to, 'subject:', params.subject);
   return { success: true, data };
 }

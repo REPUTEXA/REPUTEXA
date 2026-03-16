@@ -1,5 +1,5 @@
 import twilio from 'twilio';
-import type { WhatsAppAlertPayload } from './types';
+import type { WhatsAppAlertPayload, ReviewPlatform } from './types';
 import { CALLBACK_ACTIONS } from './types';
 import { createAdminClient } from '../supabase/admin';
 
@@ -65,6 +65,7 @@ export async function sendWhatsAppAlert(
     comment,
     suggestedReply,
     establishmentName,
+    platform,
   } = payload;
 
   const locale = await getPreferredLocale(to);
@@ -92,6 +93,7 @@ export async function sendWhatsAppAlert(
     authorName,
     reviewText,
     suggestedReply: suggestedReplyForTemplate,
+    platform: platform ?? 'google',
   });
 
   const accountSid = process.env.TWILIO_ACCOUNT_SID;
@@ -122,6 +124,13 @@ export async function sendWhatsAppAlert(
   try {
     const client = twilio(accountSid, authToken);
 
+    const platformEmojiMap: Record<ReviewPlatform, string> = {
+      google: '🔵',
+      facebook: '🟦',
+      trustpilot: '🟩',
+    };
+    const emojiPrefix = platformEmojiMap[platform ?? 'google'];
+
     if (contentSid) {
       const message = await client.messages.create({
         from: fromWhatsApp,
@@ -136,11 +145,12 @@ export async function sendWhatsAppAlert(
       return { success: true, messageId: message.sid };
     }
 
-    const title =
+    const titleCore =
       alerts.title ??
       (locale === 'fr'
-        ? '🚨 *ALERTE NOUVEL AVIS NÉGATIF*'
-        : '🚨 *NEW NEGATIVE REVIEW ALERT*');
+        ? '*ALERTE NOUVEL AVIS NÉGATIF*'
+        : '*NEW NEGATIVE REVIEW ALERT*');
+    const title = `${emojiPrefix} ${titleCore}`;
     const reviewLabel =
       alerts.reviewLabel ??
       (locale === 'fr' ? '📝 *Avis client :*' : '📝 *Customer review:*');

@@ -21,6 +21,7 @@ import {
   Store,
   CreditCard,
   Sparkles,
+  Cog,
 } from 'lucide-react';
 import {
   getPriceAfterDiscount,
@@ -35,6 +36,7 @@ import {
 import { PLAN_DISPLAY, type PlanSlug } from '@/lib/feature-gate';
 import { useActiveLocationOptional } from '@/lib/active-location-context';
 import { useSubscription, SUBSCRIPTION_QUERY_KEY } from '@/lib/use-subscription';
+import { SubscriptionSkeleton } from '@/components/dashboard/subscription-skeleton';
 import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 
@@ -52,6 +54,7 @@ type Establishment = {
   discountPercent: number;
   index: number;
   isPrincipal: boolean;
+  needsConfiguration?: boolean;
 };
 
 type ApiResponse = {
@@ -95,7 +98,21 @@ export default function EstablishmentsPage() {
   const [expansionPreviewAmount, setExpansionPreviewAmount] = useState<number | null>(null);
   const [expansionPreviewLoading, setExpansionPreviewLoading] = useState(false);
   const [settingDefaultId, setSettingDefaultId] = useState<string | null>(null);
+  const [expansionRedirecting, setExpansionRedirecting] = useState(false);
   const upgradedWithOpenConfigRef = useRef(false);
+  const toastShownRef = useRef<Set<string>>(new Set());
+  const TOAST_SUPPRESS_MS = 15000;
+  const shouldShowToastOnce = useCallback((key: string) => {
+    if (toastShownRef.current.has(key)) return false;
+    if (typeof window !== 'undefined') {
+      const raw = sessionStorage.getItem(`toast_${key}`);
+      const last = raw ? parseInt(raw, 10) : 0;
+      if (last && Date.now() - last < TOAST_SUPPRESS_MS) return false;
+    }
+    toastShownRef.current.add(key);
+    if (typeof window !== 'undefined') sessionStorage.setItem(`toast_${key}`, String(Date.now()));
+    return true;
+  }, []);
 
   const activeLocation = useActiveLocationOptional();
   const subscription = useSubscription();
@@ -126,7 +143,7 @@ export default function EstablishmentsPage() {
     }).catch(() => {});
   }
 
-  const fetchEstablishments = useCallback(async () => {
+  const fetchEstablishments = useCallback(async (): Promise<ApiResponse | null> => {
     try {
       const res = await fetch('/api/establishments');
       if (!res.ok) {
@@ -135,9 +152,11 @@ export default function EstablishmentsPage() {
       }
       const json: ApiResponse = await res.json();
       setData(json);
+      return json;
     } catch (err) {
       toast.error(err instanceof Error ? err.message : 'Erreur');
       setData(null);
+      return null;
     } finally {
       setLoading(false);
     }
@@ -147,16 +166,18 @@ export default function EstablishmentsPage() {
     fetchEstablishments();
   }, [fetchEstablishments]);
 
-  // Retour Stripe : revalidation, confetti si upgraded, ouverture config premier slot si openConfig=1
+  // Retour Stripe : revalidation, confetti si upgraded, ouverture config premier slot si openConfig=1 (chaque toast une seule fois)
   useEffect(() => {
     const status = searchParams?.get('status');
     const returnFlow = searchParams?.get('return_flow');
     const openConfig = searchParams?.get('openConfig') === '1';
     if (returnFlow === 'reduce') {
-      toast.info('La réduction de prix sera effective à la prochaine date de facturation.', {
-        duration: 6000,
-        className: 'border-slate-300 dark:border-slate-600',
-      });
+      if (shouldShowToastOnce('establishments_reduce')) {
+        toast.info('La réduction de prix sera effective à la prochaine date de facturation.', {
+          duration: 6000,
+          className: 'border-slate-300 dark:border-slate-600',
+        });
+      }
       queryClient.invalidateQueries({ queryKey: SUBSCRIPTION_QUERY_KEY });
       router.replace('/dashboard/establishments', { scroll: false });
       fetchEstablishments();
@@ -164,27 +185,32 @@ export default function EstablishmentsPage() {
     }
     if (status !== 'upgraded' && status !== 'establishment_added') return;
     if (status === 'upgraded') {
-      fireConfetti();
-      toast.success('Emplacements débloqués ! Configurez vos nouveaux établissements.', {
-        duration: 5000,
-        className: 'border-emerald-500/30',
-      });
+      if (shouldShowToastOnce('establishments_upgraded')) {
+        fireConfetti();
+        toast.success('Emplacements débloqués ! Configurez vos nouveaux établissements.', {
+          duration: 5000,
+          className: 'border-emerald-500/30',
+        });
+      }
       queryClient.invalidateQueries({ queryKey: SUBSCRIPTION_QUERY_KEY });
     }
-    if (status === 'establishment_added') {
+    if (status === 'establishment_added' && shouldShowToastOnce('establishments_added')) {
       toast.success('Félicitations ! Votre nouvel établissement a été ajouté avec sa remise dégressive.', {
         duration: 6000,
         className: 'border-emerald-500/30',
       });
     }
     router.refresh();
-    fetchEstablishments().then(() => {
-      if (status === 'upgraded' && openConfig && !upgradedWithOpenConfigRef.current) {
+    fetchEstablishments().then((json) => {
+      if (status === 'upgraded' && openConfig && !upgradedWithOpenConfigRef.current && json?.establishments) {
         upgradedWithOpenConfigRef.current = true;
-        setTimeout(() => setModalAddOpen(true), 400);
+        const toConfigure = json.establishments.find((e) => e.needsConfiguration);
+        if (toConfigure) {
+          setTimeout(() => openEdit(toConfigure), 400);
+        }
       }
     });
-  }, [searchParams, router, fetchEstablishments]);
+  }, [searchParams, router, fetchEstablishments, queryClient, shouldShowToastOnce]);
 
   // Quand on ouvre la modale expansion, initialiser à +1
   useEffect(() => {
@@ -347,9 +373,10 @@ export default function EstablishmentsPage() {
     }
   };
 
+  /** Ouvre la modale d’ÉDITION (PATCH) pour un établissement déjà en base (id réel). Jamais de création. */
   const openEdit = (e: Establishment) => {
     setEditingItem(e);
-    setEditName(e.name);
+    setEditName(e.needsConfiguration ? '' : e.name);
     setEditEstablishmentType(e.establishmentType ?? '');
     setEditAddress(e.address || '');
     setModalEditOpen(true);
@@ -377,6 +404,7 @@ export default function EstablishmentsPage() {
         const json = await res.json().catch(() => ({}));
         if (!res.ok) throw new Error(json.error ?? 'Erreur');
       } else {
+        // Mise à jour de la ligne existante (créée par le webhook ou précédemment) — jamais de POST
         const res = await fetch(`/api/establishments/${editingItem.id}`, {
           method: 'PATCH',
           headers: { 'Content-Type': 'application/json' },
@@ -541,11 +569,9 @@ export default function EstablishmentsPage() {
                 Plan {planDisplayName}
               </span>
             </div>
-            <p className="text-sm text-slate-500 dark:text-slate-400 mt-1.5">
+            <p className="text-sm text-slate-500 dark:text-slate-400 mt-1.5 min-h-[1.25rem] flex items-center">
               {subscription.isLoading ? (
-                <span className="inline-flex items-center gap-2">
-                  <span className="h-4 w-24 rounded bg-slate-200 dark:bg-slate-700 animate-pulse" aria-hidden />
-                </span>
+                <SubscriptionSkeleton />
               ) : (
                 <>
                   Nombre d&apos;établissements : <span className="font-semibold text-slate-800 dark:text-slate-200 tabular-nums">{visibleEstablishments.length}</span>
@@ -620,21 +646,36 @@ export default function EstablishmentsPage() {
         </div>
       </header>
 
-      {/* Grille : Configurées (visible) | Emplacement disponible | Upsell */}
+      {/* Grille : Configurées (visible) | Emplacement disponible | Upsell — AnimatePresence pour transition fluide à l'ajout d'un slot */}
       <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {visibleEstablishments.map((e) => (
-          <motion.div
-            key={e.id}
-            layout
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            className={`group rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md transition-all duration-300 p-5 flex flex-col ${
-              addSuccessId === e.id ? 'ring-2 ring-emerald-500/60' : ''
-            }`}
-          >
-            <div className="flex flex-col flex-1 min-w-0">
+        <AnimatePresence mode="popLayout" initial={false}>
+          {visibleEstablishments.map((e) => (
+            <motion.div
+              key={e.id}
+              layout
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.98 }}
+              transition={{ type: 'spring', damping: 24, stiffness: 400 }}
+              className={`group rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md transition-all duration-300 p-5 flex flex-col ${
+                addSuccessId === e.id ? 'ring-2 ring-emerald-500/60' : ''
+              } ${e.needsConfiguration ? 'border-amber-300 dark:border-amber-500/50 bg-amber-50/30 dark:bg-amber-500/5' : ''}`}
+            >
+            <div
+              className={`flex flex-col flex-1 min-w-0 ${e.needsConfiguration ? 'cursor-pointer' : 'cursor-default'}`}
+              role={e.needsConfiguration ? 'button' : undefined}
+              onClick={e.needsConfiguration ? () => openEdit(e) : undefined}
+              tabIndex={e.needsConfiguration ? 0 : undefined}
+              onKeyDown={e.needsConfiguration ? (ev) => { if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); openEdit(e); } } : undefined}
+            >
               <div className="flex flex-wrap items-center gap-2 mb-2">
                 <h3 className="font-semibold text-slate-900 dark:text-slate-100 truncate">{e.name}</h3>
+                {e.needsConfiguration && (
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-semibold uppercase tracking-wide bg-amber-100 dark:bg-amber-500/20 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-500/40">
+                    <Cog className="w-3 h-3" />
+                    À configurer
+                  </span>
+                )}
                 {e.isPrincipal && (
                   <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-semibold uppercase tracking-wide bg-amber-100 dark:bg-amber-500/20 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-500/40">
                     PRINCIPAL
@@ -674,6 +715,16 @@ export default function EstablishmentsPage() {
                   Économie : {(basePrice - e.priceAfterDiscount).toFixed(2)}€/mois
                 </p>
               )}
+              {e.needsConfiguration && (
+                <button
+                  type="button"
+                  onClick={(ev) => { ev.stopPropagation(); openEdit(e); }}
+                  className="mt-4 w-full py-3 px-4 rounded-xl font-semibold text-sm bg-amber-500 text-white hover:bg-amber-600 dark:bg-amber-500 dark:hover:bg-amber-600 shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2"
+                >
+                  <span aria-hidden>⚙️</span>
+                  Configurer mon emplacement
+                </button>
+              )}
             </div>
             <div className="flex flex-wrap items-center gap-2 mt-4 pt-4 border-t border-slate-100 dark:border-slate-800">
               {!e.isPrincipal && (
@@ -706,43 +757,105 @@ export default function EstablishmentsPage() {
               </button>
             </div>
           </motion.div>
-        ))}
+          ))}
 
-        {/* Slots vides : Configurer */}
-        {Array.from({ length: emptySlotsCount }, (_, i) => (
-          <motion.button
-            key={`empty-${i}`}
-            type="button"
-            layout
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            onClick={openAddModal}
-            className="rounded-2xl border-2 border-dashed border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-900/50 hover:bg-slate-100 dark:hover:bg-slate-800/50 hover:border-emerald-300 dark:hover:border-emerald-500/50 transition-all duration-300 p-6 flex flex-col items-center justify-center gap-2 text-slate-500 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 min-h-[180px]"
-          >
-            <Store className="w-8 h-8 opacity-70" />
-            <span className="font-medium text-sm">Emplacement disponible</span>
-            <span className="text-xs">Configurer</span>
-          </motion.button>
-        ))}
+          {/* Slots en attente (webhook pas encore passé) : pas de formulaire, pas de création libre */}
+          {Array.from({ length: emptySlotsCount }, (_, i) => (
+            <motion.div
+              key={`pending-${i}`}
+              layout
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.98 }}
+              transition={{ type: 'spring', damping: 24, stiffness: 400 }}
+              className="rounded-2xl border-2 border-dashed border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-900/50 p-6 flex flex-col items-center justify-center gap-2 text-slate-500 dark:text-slate-400 min-h-[180px]"
+            >
+              <Loader2 className="w-8 h-8 opacity-60 animate-pulse" />
+              <span className="font-medium text-sm">Emplacement en cours d&apos;activation</span>
+              <span className="text-xs">Rechargez la page dans un instant</span>
+            </motion.div>
+          ))}
 
-        {/* Carte Ajouter un nouvel emplacement (quand limite atteinte) — promo = palier dégressif du prochain */}
-        {atLimit && (
-          <motion.button
-            type="button"
-            layout
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            onClick={() => setLimitReachedModalOpen(true)}
-            className="rounded-2xl border-2 border-dashed border-emerald-300 dark:border-emerald-500/50 bg-emerald-50/50 dark:bg-emerald-500/10 hover:bg-emerald-100/80 dark:hover:bg-emerald-500/20 transition-all duration-300 p-6 flex flex-col items-center justify-center gap-2 text-emerald-700 dark:text-emerald-300 min-h-[180px] group"
-          >
-            <Sparkles className="w-8 h-8 group-hover:scale-110 transition-transform" />
-            <span className="font-semibold">Ajouter un nouvel emplacement</span>
-            <span className="inline-flex items-center px-3 py-1 rounded-lg text-xs font-bold uppercase tracking-wide bg-emerald-500/20 text-emerald-700 dark:text-emerald-200 border border-emerald-400/50">
-              PROMO -{getDiscountForIndex(subscriptionQuantity)}%
-            </span>
-          </motion.button>
-        )}
+          {/* Carte Ajouter un nouvel emplacement (quand limite atteinte) — paiement direct Stripe, pas de formulaire */}
+          {atLimit && (
+            <motion.button
+              key="upsell-slot"
+              type="button"
+              layout
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.98 }}
+              transition={{ type: 'spring', damping: 24, stiffness: 400 }}
+              onClick={async () => {
+                setExpansionRedirecting(true);
+                try {
+                  const locale = typeof window !== 'undefined' ? (window.navigator.language?.startsWith('en') ? 'en' : 'fr') : 'fr';
+                  const res = await fetch(`/api/stripe/create-bulk-expansion?locale=${locale}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify({ expansionAddCount: 1 }),
+                  });
+                  const json = await res.json().catch(() => ({}));
+                  if (json.url) window.location.href = json.url;
+                  else throw new Error(json.error ?? 'Erreur');
+                } catch (err) {
+                  toast.error(err instanceof Error ? err.message : 'Erreur ouverture du paiement');
+                } finally {
+                  setExpansionRedirecting(false);
+                }
+              }}
+              disabled={expansionRedirecting}
+              className="rounded-2xl border-2 border-dashed border-emerald-300 dark:border-emerald-500/50 bg-emerald-50/50 dark:bg-emerald-500/10 hover:bg-emerald-100/80 dark:hover:bg-emerald-500/20 transition-all duration-300 p-6 flex flex-col items-center justify-center gap-2 text-emerald-700 dark:text-emerald-300 min-h-[180px] group disabled:opacity-70 disabled:cursor-wait"
+            >
+              {expansionRedirecting ? (
+                <Loader2 className="w-8 h-8 animate-spin" />
+              ) : (
+                <Sparkles className="w-8 h-8 group-hover:scale-110 transition-transform" />
+              )}
+              <span className="font-semibold">
+                {expansionRedirecting ? 'Redirection vers le paiement…' : 'Ajouter un nouvel emplacement'}
+              </span>
+              {!expansionRedirecting && (
+                <span className="inline-flex items-center px-3 py-1 rounded-lg text-xs font-bold uppercase tracking-wide bg-emerald-500/20 text-emerald-700 dark:text-emerald-200 border border-emerald-400/50">
+                  PROMO -{getDiscountForIndex(subscriptionQuantity)}%
+                </span>
+              )}
+            </motion.button>
+          )}
+        </AnimatePresence>
       </section>
+
+      {/* Emplacements désactivés (suite à un downgrade) : données conservées, accès limités au quota */}
+      {!subscription.isLoading && archivedCount > 0 && (
+        <section className="rounded-2xl border border-amber-200 dark:border-amber-500/40 bg-amber-50/50 dark:bg-amber-500/10 p-4 sm:p-5">
+          <h2 className="text-sm font-semibold text-amber-800 dark:text-amber-200 mb-2">
+            Emplacements désactivés ({archivedCount})
+          </h2>
+          <p className="text-sm text-amber-700 dark:text-amber-300/90 mb-3">
+            {archivedCount === 1
+              ? 'Cet emplacement est temporairement désactivé suite à votre changement de forfait.'
+              : 'Ces emplacements sont temporairement désactivés suite à votre changement de forfait.'}
+            {' '}Vos données sont conservées et seront à nouveau accessibles si vous augmentez votre quota.
+          </p>
+          <ul className="space-y-2">
+            {allEstablishments.slice(subscriptionQuantity).map((e) => (
+              <li
+                key={e.id}
+                className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400"
+              >
+                <Building2 className="w-4 h-4 shrink-0 text-amber-500 dark:text-amber-400" />
+                <span className="font-medium text-slate-700 dark:text-slate-300">{e.name}</span>
+                {e.address && (
+                  <span className="truncate text-slate-500 dark:text-slate-400 hidden sm:inline">
+                    — {e.address}
+                  </span>
+                )}
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
 
       {/* Modal Ajouter — style light visible */}
       {modalAddOpen && (
@@ -1012,7 +1125,9 @@ export default function EstablishmentsPage() {
               onClick={(e) => e.stopPropagation()}
             >
               <div className="flex items-center justify-between p-5 border-b border-slate-200 dark:border-slate-800 shrink-0">
-                <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-100">Modifier l&apos;établissement</h2>
+                <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
+                  {editingItem.needsConfiguration ? 'Configurer l\'établissement' : 'Modifier l\'établissement'}
+                </h2>
                 <button
                   type="button"
                   onClick={() => !savingEdit && setModalEditOpen(false)}

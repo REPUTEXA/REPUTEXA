@@ -20,14 +20,14 @@ const geistMono = localFont({
 export const metadata: Metadata = {
   metadataBase: new URL('https://reputexa.fr'),
   icons: { icon: '/logo.png' },
-  title: 'Reputexa | Votre Directeur de la Relation Client 24/7',
+  title: 'REPUTEXA | Votre Directeur de la Relation Client 24/7',
   description:
     "Automatisez vos avis, protégez votre e-réputation et boostez votre chiffre d'affaires grâce à l'IA.",
   openGraph: {
-    title: 'Reputexa | Votre Directeur de la Relation Client 24/7',
+    title: 'REPUTEXA | Votre Directeur de la Relation Client 24/7',
     description:
       "Automatisez vos avis, protégez votre e-réputation et boostez votre chiffre d'affaires grâce à l'IA.",
-    siteName: 'Reputexa',
+    siteName: 'REPUTEXA',
     url: 'https://reputexa.fr',
   },
 };
@@ -46,7 +46,7 @@ export default async function RootLayout({
   const organizationSchema = {
     '@context': 'https://schema.org',
     '@type': 'Organization',
-    name: 'Reputexa',
+    name: 'REPUTEXA',
     url: baseUrl,
     logo: `${baseUrl}/logo.png`,
     description:
@@ -68,7 +68,7 @@ export default async function RootLayout({
   const webSiteSchema = {
     '@context': 'https://schema.org',
     '@type': 'WebSite',
-    name: 'Reputexa',
+    name: 'REPUTEXA',
     url: baseUrl,
     potentialAction: {
       '@type': 'SearchAction',

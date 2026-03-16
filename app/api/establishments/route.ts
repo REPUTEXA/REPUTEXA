@@ -31,7 +31,7 @@ export async function GET() {
 
   const { data: establishments, error } = await supabase
     .from('establishments')
-    .select('id, name, address, google_location_id, google_location_name, google_connected_at, display_order, created_at')
+    .select('id, name, address, google_location_id, google_location_name, google_connected_at, display_order, created_at, needs_configuration')
     .eq('user_id', user.id)
     .order('display_order', { ascending: true })
     .order('created_at', { ascending: true });
@@ -98,7 +98,7 @@ export async function GET() {
     const discount = idx === 1 ? 20 : idx === 2 ? 30 : idx === 3 ? 40 : 50;
     return {
       id: e.id,
-      name: e.name || 'Sans nom',
+      name: e.name || (e.needs_configuration ? 'À configurer' : 'Sans nom'),
       address: e.address ?? null,
       googleStatus: (e.google_location_id ? 'connected' : 'disconnected') as 'connected' | 'disconnected',
       googleLocationName: e.google_location_name ?? null,
@@ -107,6 +107,7 @@ export async function GET() {
       discountPercent: discount,
       index: idx,
       isPrincipal: e.id === defaultEstablishmentId,
+      needsConfiguration: Boolean((e as { needs_configuration?: boolean }).needs_configuration),
     };
   });
 
@@ -138,26 +139,17 @@ export async function GET() {
   }
 }
 
+/**
+ * Création d'établissement désactivée (flux Stripe-First).
+ * Les nouveaux emplacements sont créés uniquement par le webhook invoice.paid après paiement.
+ * Pour ajouter un emplacement : bouton "Ajouter un nouvel emplacement" → Stripe Checkout.
+ */
 export async function POST(request: Request) {
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-
-  const body = await request.json().catch(() => ({}));
-  const name = typeof body.name === 'string' ? body.name.trim() : '';
-  const address = typeof body.address === 'string' ? body.address.trim() : undefined;
-  const googleLocationId = typeof body.googleLocationId === 'string' ? body.googleLocationId.trim() : undefined;
-  const googleLocationName = typeof body.googleLocationName === 'string' ? body.googleLocationName.trim() : undefined;
-  const googleLocationAddress = typeof body.googleLocationAddress === 'string' ? body.googleLocationAddress.trim() : undefined;
-
-  if (!name || name.length < 2) {
-    return NextResponse.json(
-      { error: 'Le nom de l\'établissement est requis (min. 2 caractères)' },
-      { status: 400 }
-    );
-  }
 
   const { data: profile } = await supabase
     .from('profiles')
@@ -173,10 +165,11 @@ export async function POST(request: Request) {
 
   const establishmentCount = count ?? 0;
   const totalSlots = 1 + establishmentCount;
+
   if (totalSlots >= subscriptionQuantity) {
     return NextResponse.json(
       {
-        error: 'Limite d\'établissements atteinte. Mettez à jour votre abonnement pour en ajouter.',
+        error: 'Quota atteint. Veuillez augmenter votre abonnement.',
         limitReached: true,
         subscriptionQuantity,
         billingPortalPath: '/api/stripe/portal',
@@ -185,26 +178,12 @@ export async function POST(request: Request) {
     );
   }
 
-  const displayOrder = establishmentCount;
-
-  const { data: inserted, error } = await supabase
-    .from('establishments')
-    .insert({
-      user_id: user.id,
-      name,
-      address: address || googleLocationAddress || null,
-      google_location_id: googleLocationId || null,
-      google_location_name: googleLocationName || null,
-      google_location_address: googleLocationAddress || null,
-      google_connected_at: googleLocationId ? new Date().toISOString() : null,
-      display_order: displayOrder,
-    })
-    .select('id, name, address, display_order, created_at')
-    .single();
-
-  if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
-  }
-
-  return NextResponse.json({ ok: true, establishment: inserted });
+  return NextResponse.json(
+    {
+      error: 'Pour ajouter un emplacement, augmentez votre abonnement depuis le tableau de bord (paiement Stripe).',
+      limitReached: false,
+      subscriptionQuantity,
+    },
+    { status: 403 }
+  );
 }

@@ -1,19 +1,71 @@
-import { NextResponse } from 'next/server';
-import { createAdminClient } from '@/lib/supabase/admin';
-import { syncProfileBodySchema } from '@/lib/validations/stripe';
-import { getSubscriptionQuantity } from '@/lib/stripe-subscription';
-import { stripeWithRetry } from '@/lib/stripe-client';
-
-const PLAN_SLUG_TO_SUBSCRIPTION: Record<string, string> = {
-  vision: 'vision',
-  pulse: 'pulse',
-  zenith: 'zenith',
-};
-
 /**
- * Après retour Stripe : aligne le profil Supabase sur la session (Stripe = source de vérité).
- * Inclut subscription_quantity et subscription_period_end pour zéro désync.
+ * sync-profile : point d'entrée unique après succès Checkout Stripe.
+ *
+ * GET (redirection Stripe) : récupère la session, sync le profil via BillingDomainService,
+ * puis redirige vers /dashboard?status=success (ou trial_started) pour afficher le SuccessPaymentToast.
+ * POST : idem pour appels programmatiques (body JSON session_id).
  */
+
+import { NextResponse } from 'next/server';
+import { getSiteUrl } from '@/lib/site-url';
+import { syncProfileBodySchema } from '@/lib/validations/stripe';
+import { stripeWithRetry } from '@/lib/stripe-client';
+import { syncProfileFromSubscription, retrieveSubscription, revalidateDashboardPaths, revalidateFullApp } from '@/lib/services/billing-domain';
+
+async function syncProfileFromSessionId(sessionId: string): Promise<{ planSlug?: string; status: 'success' | 'trial_started' }> {
+  const secretKey = process.env.STRIPE_SECRET_KEY;
+  if (!secretKey) throw new Error('Stripe not configured');
+
+  const session = await stripeWithRetry(
+    (s) => s.checkout.sessions.retrieve(sessionId, { expand: ['customer', 'subscription'] }),
+    secretKey
+  );
+
+  const customer = session.customer as { id?: string; email?: string } | null;
+  const customerEmail =
+    (typeof customer === 'object' && customer?.email) ||
+    session.customer_details?.email?.trim() ||
+    '';
+  const subscriptionId =
+    typeof session.subscription === 'string' ? session.subscription : session.subscription?.id ?? null;
+
+  if (!customerEmail) throw new Error('No customer email');
+  if (!subscriptionId) throw new Error('No subscription on session');
+
+  const subscription = await retrieveSubscription(subscriptionId);
+  await syncProfileFromSubscription(subscription, customerEmail);
+  revalidateDashboardPaths();
+  revalidateFullApp();
+
+  const planSlug = (session.metadata?.planSlug ?? 'pulse') as string;
+  const status = subscription.status === 'trialing' ? 'trial_started' : 'success';
+  return { planSlug, status };
+}
+
+/** GET : redirection post-paiement Stripe → sync puis redirect /dashboard?status=success */
+export async function GET(request: Request) {
+  const baseUrl = getSiteUrl().replace(/\/+$/, '');
+  const { searchParams } = new URL(request.url);
+  const sessionId = searchParams.get('session_id')?.trim() ?? '';
+  const locale = searchParams.get('locale') ?? 'fr';
+
+  const dashboardUrl = `${baseUrl}/${locale}/dashboard`;
+
+  if (!sessionId) {
+    return NextResponse.redirect(dashboardUrl);
+  }
+
+  try {
+    const { planSlug, status } = await syncProfileFromSessionId(sessionId);
+    const redirectUrl = `${dashboardUrl}?status=${status}${planSlug ? `&plan=${planSlug}` : ''}`;
+    return NextResponse.redirect(redirectUrl);
+  } catch (error) {
+    console.error('[stripe/sync-profile GET]', error);
+    return NextResponse.redirect(dashboardUrl);
+  }
+}
+
+/** POST : sync depuis un session_id (body JSON), pour appels programmatiques */
 export async function POST(request: Request) {
   try {
     const secretKey = process.env.STRIPE_SECRET_KEY;
@@ -28,73 +80,10 @@ export async function POST(request: Request) {
     }
     const { session_id: sessionId } = parsed.data;
 
-    const session = await stripeWithRetry(
-      (s) => s.checkout.sessions.retrieve(sessionId, { expand: ['customer', 'subscription'] }),
-      secretKey
-    );
-
-    const customer = session.customer as { id?: string; email?: string } | null;
-    const stripeCustomerId = typeof session.customer === 'string' ? session.customer : customer?.id ?? null;
-    const customerEmail =
-      (typeof customer === 'object' && customer?.email) ||
-      (session.customer_details?.email ?? '');
-    const planSlug = String(session.metadata?.planSlug ?? '');
-    const subscriptionId = session.subscription as string | null;
-
-    if (!customerEmail) {
-      return NextResponse.json({ ok: false, error: 'No customer email' }, { status: 400 });
-    }
-
-    const validPlan = ['vision', 'pulse', 'zenith'].includes(planSlug) ? planSlug : 'pulse';
-    const subscriptionPlan = PLAN_SLUG_TO_SUBSCRIPTION[validPlan] ?? 'pulse';
-
-    let subscriptionStatus = 'active';
-    let trialEndsAt: string | null = null;
-    let subscriptionQuantity = 1;
-    let subscriptionPeriodEnd: string | null = null;
-
-    if (subscriptionId) {
-      const subscription = typeof session.subscription === 'object' && session.subscription
-        ? (session.subscription as { status?: string; trial_end?: number; current_period_end?: number; items?: { data?: { quantity?: number }[] } })
-        : await stripeWithRetry((s) => s.subscriptions.retrieve(subscriptionId), secretKey);
-      subscriptionStatus = subscription.status === 'trialing' ? 'trialing' : subscription.status === 'active' ? 'active' : 'expired';
-      trialEndsAt = subscription.trial_end ? new Date(subscription.trial_end * 1000).toISOString() : null;
-      subscriptionQuantity = getSubscriptionQuantity(subscription as import('stripe').Stripe.Subscription);
-      subscriptionPeriodEnd = subscription.current_period_end
-        ? new Date(subscription.current_period_end * 1000).toISOString()
-        : null;
-    }
-
-    const admin = createAdminClient();
-    if (!admin) {
-      return NextResponse.json({ ok: false, error: 'Supabase admin not configured' }, { status: 500 });
-    }
-
-    const { data: profiles } = await admin
-      .from('profiles')
-      .select('id')
-      .eq('email', customerEmail)
-      .limit(1);
-
-    if (profiles?.length) {
-      await admin
-        .from('profiles')
-        .update({
-          selected_plan: validPlan,
-          subscription_plan: subscriptionPlan,
-          subscription_status: subscriptionStatus,
-          subscription_quantity: subscriptionQuantity,
-          subscription_period_end: subscriptionPeriodEnd,
-          trial_ends_at: subscriptionStatus === 'trialing' ? trialEndsAt : null,
-          stripe_subscription_id: subscriptionId,
-          ...(stripeCustomerId ? { stripe_customer_id: stripeCustomerId } : {}),
-        })
-        .eq('id', profiles[0].id);
-    }
-
+    await syncProfileFromSessionId(sessionId);
     return NextResponse.json({ ok: true });
   } catch (error) {
-    console.error('[stripe/sync-profile]', error);
+    console.error('[stripe/sync-profile POST]', error);
     return NextResponse.json(
       { ok: false, error: error instanceof Error ? error.message : 'Sync failed' },
       { status: 500 }

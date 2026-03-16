@@ -55,7 +55,7 @@ export function UpdatesModal({ open, onClose, locale }: Props) {
         <div className="flex items-center justify-between p-5 border-b border-slate-200 dark:border-zinc-800">
           <h2 className="text-lg font-semibold text-slate-900 dark:text-zinc-100 flex items-center gap-2">
             <Sparkles className="w-5 h-5 text-amber-500" />
-            Quoi de neuf sur Reputexa ?
+            Quoi de neuf sur REPUTEXA ?
           </h2>
           <button
             type="button"

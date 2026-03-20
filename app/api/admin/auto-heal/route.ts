@@ -78,20 +78,13 @@ type HealResult = {
 
 // ── GitHub helpers ──────────────────────────────────────────────────────────
 
-async function fetchGitHubFile(path: string): Promise<GithubFile | null> {
-  if (!GITHUB_TOKEN || !GITHUB_REPO) return null;
-  try {
-    const res = await fetch(
-      `https://api.github.com/repos/${GITHUB_REPO}/contents/${path}?ref=${GITHUB_BRANCH}`,
-      { headers: { Authorization: `Bearer ${GITHUB_TOKEN}`, Accept: 'application/vnd.github.v3+json' } }
-    );
-    if (!res.ok) return null;
-    const data = await res.json() as { content: string; sha: string };
-    const content = Buffer.from(data.content.replace(/\n/g, ''), 'base64').toString('utf-8');
-    return { path, content, sha: data.sha };
-  } catch {
-    return null;
-  }
+/**
+ * Adaptateur : la fonction importée renvoie { content, sha },
+ * mais le pipeline standard a besoin du champ `path` pour les logs et les lookups.
+ */
+async function fetchGitHubFileWithPath(path: string): Promise<GithubFile | null> {
+  const info = await fetchGitHubFile(path);
+  return info ? { path, content: info.content, sha: info.sha } : null;
 }
 
 async function commitFix(filePath: string, newContent: string, service: string, sha: string): Promise<void> {
@@ -407,7 +400,7 @@ async function healService(
   }
 
   const filePaths = SERVICE_FILES[service] ?? [];
-  const sourceFiles = (await Promise.all(filePaths.map(fetchGitHubFile))).filter(Boolean) as GithubFile[];
+  const sourceFiles = (await Promise.all(filePaths.map(fetchGitHubFileWithPath))).filter(Boolean) as GithubFile[];
 
   const diagnosis = await askClaude(service, errorMessage, latency, sourceFiles);
   if (!diagnosis) {

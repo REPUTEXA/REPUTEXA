@@ -144,7 +144,7 @@ export async function GET() {
  * Les nouveaux emplacements sont créés uniquement par le webhook invoice.paid après paiement.
  * Pour ajouter un emplacement : bouton "Ajouter un nouvel emplacement" → Stripe Checkout.
  */
-export async function POST(request: Request) {
+export async function POST(_request: Request) {
   const supabase = await createClient();
   const {
     data: { user },

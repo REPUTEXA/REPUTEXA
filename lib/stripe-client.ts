@@ -14,7 +14,7 @@ function isRetryable(err: unknown): boolean {
     const code = (err as { code?: string }).code;
     if (code === 'StripeConnectionError' || code === 'StripeAPIError') return true;
     const statusCode = (err as { statusCode?: number }).statusCode;
-    if (statusCode === 408 || statusCode === 429 || statusCode >= 500) return true;
+    if (statusCode !== undefined && (statusCode === 408 || statusCode === 429 || statusCode >= 500)) return true;
   }
   const message = err instanceof Error ? err.message : String(err);
   return (

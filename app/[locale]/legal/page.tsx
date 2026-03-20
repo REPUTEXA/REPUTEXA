@@ -77,9 +77,9 @@ export default function LegalPage() {
           <strong> Vision</strong>, <strong>Pulse</strong> et <strong>Zenith</strong>. Les fonctionnalités (agrégation
           d&apos;avis, réponses IA, alertes, reporting) et les technologies utilisées (paiements Stripe, hébergement
           des données Supabase, emails Resend, notifications WhatsApp via Meta) sont détaillées dans les{' '}
-          <Link href="/terms" className="text-[#2563eb] hover:underline">Conditions Générales de Vente</Link>
+          <Link href="/legal/cgu" target="_blank" rel="noopener noreferrer" className="text-[#2563eb] hover:underline">Conditions Générales d&apos;Utilisation</Link>
           {' '}et la{' '}
-          <Link href="/privacy" className="text-[#2563eb] hover:underline">Politique de confidentialité</Link>.
+          <Link href="/legal/confidentialite" target="_blank" rel="noopener noreferrer" className="text-[#2563eb] hover:underline">Politique de confidentialité</Link>.
         </p>
       </section>
 

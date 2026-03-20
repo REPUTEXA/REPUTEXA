@@ -1,8 +1,9 @@
 /**
  * Workflow Triple Rédaction + Juge (exclusif Zenith)
- * Génère 3 variantes (empathie, storytelling, expertise) puis GPT-4o sélectionne la meilleure.
+ * Génère 3 variantes (empathie, storytelling, expertise) puis juge sélectionne la meilleure.
+ * Utilise le moteur central ai-service (Claude principal, OpenAI fallback).
  */
-import OpenAI from 'openai';
+import { generateText } from '@/lib/ai-service';
 import {
   HUMAN_CHARTER_BASE,
   ZENITH_CONCIERGE_ADDON,
@@ -72,9 +73,7 @@ function cleanOutput(text: string): string {
     .trim();
 }
 
-export async function runZenithTripleJudge(
-  openai: OpenAI,
-  context: {
+export async function runZenithTripleJudge(context: {
     reviewComment: string;
     reviewerName: string;
     rating: number;
@@ -108,22 +107,17 @@ export async function runZenithTripleJudge(
     seoBlock;
 
   const userContent = `Avis: "${reviewComment}" | Client: ${reviewerName} | Note: ${rating}/5 | Établissement: ${context.establishmentName}.
-Génère 3 variantes en JSON. Chaque option = texte brut uniquement.`;
+Génère 3 variantes en JSON. Chaque option = texte brut uniquement. Réponds UNIQUEMENT en JSON valide.`;
 
-  const completion = await openai.chat.completions.create({
-    model: 'gpt-4o-mini',
+  const raw = await generateText({
+    systemPrompt: systemPrompt + '\n\nRéponds UNIQUEMENT en JSON : {"options": ["Var1","Var2","Var3"], "detectedLanguage": "fr"}',
+    userContent,
     temperature: 0.8,
-    messages: [
-      { role: 'system', content: systemPrompt },
-      { role: 'user', content: userContent },
-    ],
-    response_format: { type: 'json_object' },
   });
-
-  const raw = completion.choices[0]?.message?.content ?? '{}';
+  const parsedRaw = raw?.trim() ?? '{}';
   let parsed: { options?: string[]; detectedLanguage?: string } = {};
   try {
-    parsed = JSON.parse(raw);
+    parsed = JSON.parse(parsedRaw);
   } catch {
     parsed = {};
   }
@@ -140,23 +134,13 @@ Génère 3 variantes en JSON. Chaque option = texte brut uniquement.`;
     aiCustomInstructions: context.aiCustomInstructions,
   });
 
-  // Juge (GPT-4o)
-  const judgeCompletion = await openai.chat.completions.create({
-    model: 'gpt-4o',
-    temperature: 0.3,
-    messages: [
-      { role: 'system', content: judgeSystem },
-      {
-        role: 'user',
-        content:
-          `Variante 1 (empathie): ${options[0]}\n\nVariante 2 (storytelling): ${options[1]}\n\nVariante 3 (expertise): ${options[2]}\n\n` +
-          'Quelle variante choisir (1, 2 ou 3) ? Réponds en JSON.',
-      },
-    ],
-    response_format: { type: 'json_object' },
-  });
+  const judgeUser = `Variante 1 (empathie): ${options[0]}\n\nVariante 2 (storytelling): ${options[1]}\n\nVariante 3 (expertise): ${options[2]}\n\nQuelle variante choisir (1, 2 ou 3) ? Réponds en JSON.`;
 
-  const judgeRaw = judgeCompletion.choices[0]?.message?.content ?? '{}';
+  const judgeRaw = await generateText({
+    systemPrompt: judgeSystem,
+    userContent: judgeUser,
+    temperature: 0.3,
+  });
   let judgeParsed: { winner?: number; reason?: string } = {};
   try {
     judgeParsed = JSON.parse(judgeRaw);

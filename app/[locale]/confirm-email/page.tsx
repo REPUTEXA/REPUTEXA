@@ -6,11 +6,13 @@ import { useLocale } from 'next-intl';
 import { Link } from '@/i18n/navigation';
 import { Logo } from '@/components/logo';
 import { OtpInput } from '@/components/auth/otp-input';
-import { KeyRound } from 'lucide-react';
+import { KeyRound, ShieldCheck, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { createClient } from '@/lib/supabase/client';
 import { consumeSignupPending } from '@/lib/auth/signup-pending';
 import { motion } from 'framer-motion';
+
+type Step = 'verify' | 'consent' | 'redirecting';
 
 function normalizeOtpCode(raw: string): string {
   return String(raw)
@@ -22,7 +24,7 @@ function normalizeOtpCode(raw: string): string {
 
 /**
  * Page de vérification email — OTP 6 chiffres.
- * Une seule requête. Verrou requestSent. Pas d'effets sur le code ou la session.
+ * Après validation, insert une étape de consentement RGPD avant la redirection Stripe.
  */
 export default function ConfirmEmailPage() {
   const locale = useLocale();
@@ -35,19 +37,56 @@ export default function ConfirmEmailPage() {
   const [resendLoading, setResendLoading] = useState(false);
   const [resendCooldown, setResendCooldown] = useState(0);
 
+  // Étape de consentement RGPD
+  const [step, setStep] = useState<Step>('verify');
+  const [pendingStripeUrl, setPendingStripeUrl] = useState('');
+  const [pendingPlanSlug, setPendingPlanSlug] = useState('');
+  const [acceptedCgu, setAcceptedCgu] = useState(false);
+  const [acceptedZenith, setAcceptedZenith] = useState(false);
+  const [isSavingConsent, setIsSavingConsent] = useState(false);
+
   const requestSent = useRef(false);
   const formRef = useRef<HTMLFormElement>(null);
 
+  // Pré-remplir l'email depuis l'URL
   useEffect(() => {
     if (emailFromQuery) {
       setEmail(decodeURIComponent(emailFromQuery).trim().toLowerCase());
     }
   }, [emailFromQuery]);
 
+  // Auto-remplir depuis ?code= et auto-soumettre dès que l'email est prêt
+  useEffect(() => {
+    const codeFromUrl = normalizeOtpCode(searchParams?.get('code') ?? '');
+    if (codeFromUrl.length !== 6) return;
+
+    setCode(codeFromUrl);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Dès que code + email sont tous les deux prêts (cas lien email), déclencher auto-submit
+  useEffect(() => {
+    const codeFromUrl = normalizeOtpCode(searchParams?.get('code') ?? '');
+    if (codeFromUrl.length !== 6) return;     // pas venu du lien email
+    if (!email) return;                        // attendre que l'email soit dans le state
+    if (requestSent.current) return;
+
+    const timer = setTimeout(() => {
+      if (!requestSent.current) {
+        formRef.current?.requestSubmit();
+      }
+    }, 150);
+
+    return () => clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [email]); // re-run quand l'email arrive
+
   const handleCodeChange = useCallback(
     (v: string) => {
       setCode(v);
       if (normalizeOtpCode(v).length === 6 && !requestSent.current) {
+        // Afficher le spinner immédiatement pour retour visuel instantané
+        setIsLoading(true);
         formRef.current?.requestSubmit();
       }
     },
@@ -68,7 +107,6 @@ export default function ConfirmEmailPage() {
       setIsLoading(true);
 
       try {
-        console.log('REQUÊTE ENVOYÉE');
         const res = await fetch('/api/auth/verify-signup-otp', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -96,6 +134,7 @@ export default function ConfirmEmailPage() {
           return;
         }
 
+        // Authentifier l'utilisateur côté client
         const pending = consumeSignupPending(trimmedEmail);
         if (pending?.password) {
           const supabase = createClient();
@@ -110,11 +149,19 @@ export default function ConfirmEmailPage() {
 
         const stripeUrl = json.stripeUrl as string | undefined;
         const redirectTo = json.redirectTo as string | undefined;
+        const planSlug = typeof json.planSlug === 'string' ? json.planSlug : '';
 
+        // Si Stripe → étape de consentement RGPD avant paiement
         if (stripeUrl && typeof stripeUrl === 'string' && stripeUrl.startsWith('http')) {
-          window.location.assign(stripeUrl);
+          setPendingStripeUrl(stripeUrl);
+          setPendingPlanSlug(planSlug);
+          setIsLoading(false);
+          requestSent.current = false;
+          setStep('consent');
           return;
         }
+
+        // Redirection non-Stripe (ex: dashboard pour essai déjà actif)
         if (redirectTo?.startsWith('/')) {
           window.location.assign(`/${locale}${redirectTo}`);
           return;
@@ -132,45 +179,35 @@ export default function ConfirmEmailPage() {
     [email, code, locale]
   );
 
-  const handleResend = useCallback(async () => {
-    const trimmedEmail = email.trim().toLowerCase();
-    if (!trimmedEmail) return;
-    setResendLoading(true);
+  const handleProceedToPayment = useCallback(async () => {
+    setIsSavingConsent(true);
     try {
-      const res = await fetch('/api/auth/resend-signup-otp', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: trimmedEmail }),
-      });
-      const json = await res.json().catch(() => ({}));
-      if (res.status === 429) {
-        toast.error('Sécurité activée : Patientez 60 secondes.');
-        setResendLoading(false);
-        return;
+      const supabase = createClient();
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user?.id) {
+        const updates: Record<string, boolean> = { accepted_terms: true };
+        if (pendingPlanSlug === 'zenith') {
+          updates.accepted_zenith_terms = true;
+        }
+        const { error } = await supabase
+          .from('profiles')
+          .update(updates)
+          .eq('id', user.id);
+        if (error) {
+          console.warn('[confirm-email] profile update terms:', error.message);
+        }
       }
-      if (!res.ok) {
-        toast.error(json.error ?? 'Impossible de renvoyer.');
-        setResendLoading(false);
-        return;
-      }
-      toast.success('Un nouveau code a été envoyé.');
-      setResendCooldown(60);
-      const interval = setInterval(() => {
-        setResendCooldown((prev) => {
-          if (prev <= 1) {
-            clearInterval(interval);
-            return 0;
-          }
-          return prev - 1;
-        });
-      }, 1000);
-    } catch {
-      toast.error('Erreur réseau.');
-    } finally {
-      setResendLoading(false);
+    } catch (err) {
+      console.warn('[confirm-email] terms update failed:', err);
     }
-  }, [email]);
+    setStep('redirecting');
+    window.location.assign(pendingStripeUrl);
+  }, [pendingStripeUrl, pendingPlanSlug]);
 
+  const isZenith = pendingPlanSlug === 'zenith';
+  const consentReady = acceptedCgu && (!isZenith || acceptedZenith);
+
+  // Écran de chargement pendant vérification OTP
   if (isLoading) {
     return (
       <div className="min-h-screen bg-black flex flex-col items-center justify-center">
@@ -186,6 +223,152 @@ export default function ConfirmEmailPage() {
     );
   }
 
+  // Écran de chargement pendant redirection Stripe
+  if (step === 'redirecting') {
+    return (
+      <div className="min-h-screen bg-black flex flex-col items-center justify-center">
+        <motion.div
+          animate={{ opacity: [0.6, 1, 0.6] }}
+          transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
+          className="flex flex-col items-center"
+        >
+          <Logo size="lg" />
+        </motion.div>
+        <p className="mt-6 text-zinc-500 text-sm">Redirection vers le paiement...</p>
+      </div>
+    );
+  }
+
+  // ── Écran de consentement RGPD ──────────────────────────────────────────────
+  if (step === 'consent') {
+    return (
+      <div className="min-h-screen flex flex-col bg-gradient-to-br from-slate-900/95 via-slate-800/90 to-slate-950/80">
+        <header className="flex items-center justify-between px-4 sm:px-6 h-14 border-b border-white/5">
+          <Link href="/" className="flex items-center gap-2 text-white" aria-label="REPUTEXA">
+            <Logo />
+            <span className="font-display font-bold text-lg tracking-heading text-white uppercase">REPUTEXA</span>
+          </Link>
+        </header>
+
+        <main className="flex-1 flex items-center justify-center px-4 py-10 sm:py-14">
+          <div className="w-full max-w-md rounded-[24px] border border-[#2563eb]/20 bg-white/95 backdrop-blur-sm p-8 sm:p-10 shadow-2xl shadow-black/20">
+
+            {/* Icône + titre */}
+            <div className="flex justify-center mb-6">
+              <div className="rounded-full bg-emerald-50 p-4">
+                <ShieldCheck className="w-12 h-12 text-emerald-600" aria-hidden />
+              </div>
+            </div>
+            <h1 className="font-display text-2xl font-bold text-slate-900 tracking-tight text-center">
+              Dernière étape avant le paiement
+            </h1>
+            <p className="text-slate-500 mt-2 text-center text-sm leading-relaxed">
+              Votre email est confirmé. Validez les éléments suivants pour accéder au paiement sécurisé.
+            </p>
+
+            {/* Badge plan sélectionné */}
+            {pendingPlanSlug && (
+              <div className="mt-4 flex justify-center">
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-[#2563eb]/10 text-[#2563eb] border border-[#2563eb]/20 uppercase tracking-wide">
+                  Plan {pendingPlanSlug}
+                </span>
+              </div>
+            )}
+
+            {/* Bloc consentements */}
+            <div className="mt-6 rounded-xl border border-slate-200 bg-slate-50/80 px-5 py-4 space-y-4">
+              <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
+                Validation légale requise
+              </p>
+
+              {/* Checkbox 1 — tous les plans */}
+              <label className="flex items-start gap-3 cursor-pointer group">
+                <input
+                  id="consent-cgu"
+                  type="checkbox"
+                  checked={acceptedCgu}
+                  onChange={(e) => setAcceptedCgu(e.target.checked)}
+                  className="mt-0.5 h-4 w-4 shrink-0 rounded border-slate-300 accent-[#2563eb] cursor-pointer"
+                />
+                <span className="text-sm leading-relaxed text-slate-600 group-hover:text-slate-800 transition-colors">
+                  J&apos;accepte les{' '}
+                  <a
+                    href={`/${locale}/legal/cgu`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-[#2563eb] underline underline-offset-2 hover:text-[#1d4ed8] transition-colors"
+                  >
+                    CGU
+                  </a>
+                  {' '}et la{' '}
+                  <a
+                    href={`/${locale}/legal/confidentialite`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-[#2563eb] underline underline-offset-2 hover:text-[#1d4ed8] transition-colors"
+                  >
+                    Politique de Confidentialité
+                  </a>
+                  {' '}de Reputexa.
+                </span>
+              </label>
+
+              {/* Checkbox 2 — Plan Zenith uniquement */}
+              {isZenith && (
+                <label className="flex items-start gap-3 cursor-pointer group">
+                  <input
+                    id="consent-zenith"
+                    type="checkbox"
+                    checked={acceptedZenith}
+                    onChange={(e) => setAcceptedZenith(e.target.checked)}
+                    className="mt-0.5 h-4 w-4 shrink-0 rounded border-slate-300 accent-[#2563eb] cursor-pointer"
+                  />
+                  <span className="text-sm leading-relaxed text-slate-600 group-hover:text-slate-800 transition-colors">
+                    Je confirme avoir informé mes clients de la transmission de leurs données à Reputexa pour la sollicitation d&apos;avis, conformément au RGPD.
+                  </span>
+                </label>
+              )}
+            </div>
+
+            {/* Message d'aide si cases non cochées */}
+            {!consentReady && (
+              <p className="mt-3 text-xs text-amber-600 flex items-center gap-1.5 pl-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-amber-500 shrink-0" />
+                {!acceptedCgu
+                  ? 'Cochez la case CGU pour continuer.'
+                  : 'Cochez la confirmation RGPD Zenith pour continuer.'}
+              </p>
+            )}
+
+            {/* Bouton de validation */}
+            <button
+              type="button"
+              onClick={handleProceedToPayment}
+              disabled={!consentReady || isSavingConsent}
+              className="mt-6 w-full py-3 rounded-xl font-semibold text-white bg-[#2563eb] hover:bg-[#1d4ed8] focus:outline-none focus:ring-2 focus:ring-[#2563eb] focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2"
+            >
+              {isSavingConsent ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : null}
+              {isSavingConsent ? 'Enregistrement...' : 'Procéder au paiement →'}
+            </button>
+
+            <p className="text-center mt-4 text-xs text-slate-400">
+              Paiement sécurisé via Stripe. Aucune donnée bancaire n&apos;est stockée par Reputexa.
+            </p>
+          </div>
+        </main>
+
+        <footer className="py-4 text-center">
+          <Link href="/" className="text-sm text-white/50 hover:text-white/80 transition-colors inline-flex gap-1">
+            ← Retour à l&apos;accueil
+          </Link>
+        </footer>
+      </div>
+    );
+  }
+
+  // ── Formulaire OTP (étape initiale) ────────────────────────────────────────
   const isCodeComplete = normalizeOtpCode(code).length === 6;
 
   return (
@@ -278,4 +461,39 @@ export default function ConfirmEmailPage() {
       </footer>
     </div>
   );
+
+  function handleResend() {
+    const trimmedEmail = email.trim().toLowerCase();
+    if (!trimmedEmail) return;
+    setResendLoading(true);
+    fetch('/api/auth/resend-signup-otp', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: trimmedEmail }),
+    })
+      .then((res) => res.json().then((json) => ({ res, json })))
+      .then(({ res, json }) => {
+        if (res.status === 429) {
+          toast.error('Sécurité activée : Patientez 60 secondes.');
+          return;
+        }
+        if (!res.ok) {
+          toast.error(json.error ?? 'Impossible de renvoyer.');
+          return;
+        }
+        toast.success('Un nouveau code a été envoyé.');
+        setResendCooldown(60);
+        const interval = setInterval(() => {
+          setResendCooldown((prev) => {
+            if (prev <= 1) {
+              clearInterval(interval);
+              return 0;
+            }
+            return prev - 1;
+          });
+        }, 1000);
+      })
+      .catch(() => toast.error('Erreur réseau.'))
+      .finally(() => setResendLoading(false));
+  }
 }

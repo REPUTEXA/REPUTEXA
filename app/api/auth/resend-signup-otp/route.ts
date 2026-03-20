@@ -91,7 +91,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ ok: true, message: 'Code renvoyé (dev): ' + otpCode });
     }
 
-    const html = getVerifyEmailHtml({ otpCode });
+    const html = getVerifyEmailHtml({ otpCode, email });
     const result = await sendEmail({
       to: email,
       subject: 'Nouveau code de vérification REPUTEXA',

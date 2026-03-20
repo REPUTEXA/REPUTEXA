@@ -29,7 +29,7 @@ export async function POST(request: Request) {
       rating,
       comment,
       reviewId,
-      rawEmail,
+      rawEmail: _rawEmail,
     } = body as Partial<GoogleReviewWebhookPayload> & {
       rawEmail?: string;
     };

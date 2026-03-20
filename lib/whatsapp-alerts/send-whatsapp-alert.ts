@@ -128,6 +128,7 @@ export async function sendWhatsAppAlert(
       google: '🔵',
       facebook: '🟦',
       trustpilot: '🟩',
+      tripadvisor: '🟢',
     };
     const emojiPrefix = platformEmojiMap[platform ?? 'google'];
 

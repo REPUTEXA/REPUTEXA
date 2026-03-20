@@ -12,6 +12,7 @@
     "perEstablishments": "pour {count} établissements",
     "savings": "Économisez {amount}",
     "savingsBadge": "Économisez {amount}",
+    "savingsPerYear": "Vous économisez {amount} / an",
     "backToDashboard": "Retour au dashboard",
     "ctaChoose": "Choisir ce plan",
     "ctaSubscribe": "Essai gratuit",
@@ -205,6 +206,29 @@
     },
     "perMonth": "/mois",
     "pricingTrial": "Essai gratuit — Sans carte bancaire",
+    "googleFlywheel": {
+      "badge": "Algorithme Google",
+      "headline": "Pourquoi votre réputation est votre meilleur moteur de recherche",
+      "subtitle": "Ce n'est pas une opinion — c'est le fonctionnement documenté de l'algorithme Google My Business.",
+      "step1": {
+        "trigger": "Plus d'Avis",
+        "title": "Crédibilité client",
+        "result": "Vous gagnez en crédibilité et en confiance auprès des clients potentiels qui comparent les établissements."
+      },
+      "step2": {
+        "trigger": "Réponses Systématiques",
+        "title": "Signal positif Google",
+        "result": "Google détecte une activité humaine et un service client réactif — deux signaux qui améliorent votre score."
+      },
+      "step3": {
+        "trigger": "Référencement Boosté",
+        "title": "Top des résultats",
+        "result": "Votre établissement remonte naturellement dans les premiers résultats Google, sans payer de publicité."
+      },
+      "equation": "L'équation est simple : Plus vous avez d'avis et plus vous y répondez, mieux Google vous référence.",
+      "equationSource": "Basé sur les directives officielles de Google My Business",
+      "cta": "Dominer mon classement Google"
+    },
     "pricing": {
       "headline": "Tarifs simples et transparents",
       "subtitle": "Commencez gratuitement, évoluez à votre rythme.",
@@ -233,6 +257,7 @@
         "cta": "S'abonner maintenant"
       },
       "paymentCancelledMessage": "Paiement annulé. Vous pouvez réessayer en sélectionnant un plan ci-dessous.",
+      "savingsPerYear": "Vous économisez {amount} / an",
       "comparison": {
         "reponses_avis": "Réponses aux avis",
         "reponses_avis_val": "Automatique & illimité",
@@ -272,7 +297,6 @@
         "card_triple": "Triple Vérification IA (Choisit la meilleure réponse)",
         "card_boost_seo": "Boost SEO (Mots-clés IA)",
         "card_ai_capture": "IA de capture (WhatsApp 30 min après visite)",
-        "card_consultant": "Consultant Stratégique 24h/7j",
         "card_langues_autres": "Toutes langues (Natif)"
       }
     },
@@ -370,16 +394,39 @@
       "overview": "Vue d'ensemble",
       "aiResponses": "Réponses IA",
       "statistics": "Statistiques",
-      "consultant": "Consultant IA",
       "establishments": "Mes Établissements",
       "prospects": "Prospects (Sniper)",
       "alerts": "Alertes",
-      "growth": "Croissance Zenith",
+      "collecteAvis": "Collecte d'Avis",
       "suggestions": "Suggestions",
       "updates": "Mises à jour",
+      "support": "Support IA",
       "settings": "Paramètres",
       "upgrade": "Upgrader",
       "unlockCta": "Débloquez les réponses illimitées"
+    },
+    "support": {
+      "metaTitle": "Support IA | REPUTEXA",
+      "title": "Conciergerie technique REPUTEXA",
+      "subtitle": "Conseiller expert — réponses fondées sur notre code et notre mémoire interne",
+      "newTicket": "Nouveau dossier",
+      "openLabel": "En cours",
+      "archivedLabel": "Archivés",
+      "emptyOpen": "Aucun dossier ouvert",
+      "emptyArchived": "Aucun dossier archivé",
+      "ticketTitle": "Dossier du {date}",
+      "archive": "Archiver le dossier",
+      "archivedToast": "Dossier archivé — nous en extrayons un enseignement pour l'équipe.",
+      "newTicketToast": "Nouveau dossier créé",
+      "pickOrCreate": "Créez un dossier ou sélectionnez-en un dans l'historique.",
+      "placeholder": "Décrivez votre question ou votre blocage…",
+      "send": "Envoyer",
+      "thinking": "Votre conseiller rédige une réponse…",
+      "readOnlyArchived": "Conversation archivée — lecture seule. Ouvrez un nouveau dossier pour poser une autre question.",
+      "loadError": "Impossible de charger le support.",
+      "sendError": "Envoi impossible. Réessayez.",
+      "newTicketError": "Création du dossier impossible.",
+      "archiveError": "Archivage impossible."
     },
     "overview": {
       "title": "Vue d'ensemble",
@@ -432,20 +479,6 @@
       },
       "error": "Erreur lors de l'envoi"
     }
-  },
-  "Growth": {
-    "title": "Agent de Croissance Zenith",
-    "intro": "Statistiques du flux de capture d'avis WhatsApp (Zenith Intelligence) et suggestions d'amélioration.",
-    "stats": {
-      "sollicitations": "Sollicitations envoyées",
-      "optIn": "Opt-in (Oui)",
-      "optInRate": "Taux d'opt-in"
-    },
-    "suggestions": {
-      "title": "Lab d'amélioration",
-      "empty": "Aucune suggestion privée pour le moment."
-    },
-    "error": "Impossible de charger les statistiques."
   },
   "Suggestions": {
     "page": {
@@ -712,9 +745,11 @@
         { "id": "locale", "label": "3. Détection de la langue (indicatif téléphonique)" },
         { "id": "finalites", "label": "4. Finalités et bases légales" },
         { "id": "sous-traitants", "label": "5. Sous-traitants (Data Processors)" },
-        { "id": "ia", "label": "6. Garantie IA — Données non utilisées pour l'entraînement" },
-        { "id": "droits", "label": "7. Vos droits" },
-        { "id": "contact", "label": "8. Nous contacter" }
+        { "id": "zenith-captation", "label": "6. Plan Zenith — Collecte d'avis et données clients finaux" },
+        { "id": "ia", "label": "7. Garantie IA — Données non utilisées pour l'entraînement" },
+        { "id": "securite", "label": "8. Sécurité et Localisation des Données" },
+        { "id": "droits", "label": "9. Vos droits" },
+        { "id": "contact", "label": "10. Nous contacter" }
       ],
       "responsable_title": "1. Responsable du traitement",
       "responsable_content": "Le responsable du traitement des données personnelles est REPUTEXA, éditeur du site reputexa.fr, dont le siège est établi en France. Nous traitons vos données de manière licite, loyale et transparente, conformément au RGPD.",
@@ -726,17 +761,21 @@
       "finalites_content": "Les données sont traitées pour : exécution du contrat (compte, abonnement, service) ; intérêt légitime (amélioration du service, prévention des fraudes) ; consentement (newsletter, marketing, révocable) ; obligation légale (conservation des factures, conformité fiscale).",
       "sous_traitants_title": "5. Sous-traitants (Data Processors)",
       "sous_traitants_content": "Vos données peuvent être traitées par les sous-traitants suivants, dans le strict cadre de leur mission et conformément au RGPD : Stripe (paiements, facturation, abonnements) ; Resend (envoi d'e-mails transactionnels : confirmation, alertes, notifications) ; OpenAI et/ou Anthropic (traitement par intelligence artificielle pour la génération de suggestions de réponses aux avis) ; Supabase (hébergement des données et authentification, UE) ; Vercel (hébergement de l'application, UE) ; Google (OAuth, API Google Business Profile) ; Meta/WhatsApp (alertes et notifications si activées). Ces prestataires sont soumis à des obligations contractuelles conformes au RGPD.",
-      "ia_title": "6. Garantie IA — Données non utilisées pour l'entraînement",
+      "zenith_captation_title": "6. Plan Zenith — Collecte d'avis et données clients finaux",
+      "zenith_captation_content": "Le plan Zenith inclut une fonctionnalité de collecte automatisée d'avis (« IA de Capture ») qui contacte les clients finaux des Commerçants par WhatsApp dans les 30 minutes suivant une transaction enregistrée en caisse. Dans ce cadre, REPUTEXA agit en qualité de sous-traitant (au sens de l'article 28 du RGPD) pour le compte du Commerçant, lequel demeure responsable du traitement des données de ses propres clients. Les numéros de téléphone des clients finaux collectés dans ce cadre sont conservés pendant une durée maximale de 90 jours à compter de la transaction, puis supprimés automatiquement de nos systèmes. Tout client final peut s'opposer à toute sollicitation future en répondant « STOP » à l'un des messages WhatsApp reçus via REPUTEXA. Ce mot-clé déclenche immédiatement et automatiquement l'inscription sur liste noire (blacklist), interrompant de façon définitive l'envoi de tout message de la part du Commerçant concerné via notre plateforme.",
+      "ia_title": "7. Garantie IA — Données non utilisées pour l'entraînement",
       "ia_content": "Les données que vous transmettez à REPUTEXA pour la génération de réponses aux avis (contenu des avis, contexte de votre établissement) sont traitées par des fournisseurs d'IA (OpenAI, Anthropic ou équivalents) uniquement pour produire ces suggestions. Nous garantissons que ces données ne sont pas utilisées pour l'entraînement des modèles d'IA des fournisseurs : elles restent confidentielles et ne servent qu'à la fourniture du service. La confidentialité de vos données commerciales et des avis de vos clients est ainsi protégée.",
-      "droits_title": "7. Vos droits",
+      "securite_title": "8. Sécurité et Localisation des Données",
+      "securite_content": "Toutes les données traitées par REPUTEXA sont chiffrées au repos (AES-256) et en transit (SSL/TLS 1.2+). L'ensemble de notre infrastructure (base de données Supabase, application Vercel) est hébergé au sein de l'Union Européenne, garantissant la conformité avec les exigences du RGPD relatives à la localisation et au transfert de données. Dans le cadre du Plan Zenith, le traitement des numéros de téléphone des clients finaux est intégralement automatisé : aucun employé ni collaborateur de REPUTEXA n'a accès aux données personnelles des clients finaux des Commerçants. Ce processus 100 % automatisé garantit la stricte confidentialité de ces données. Pour consulter notre Registre complet des Activités de Traitement (conformité Article 30 RGPD), rendez-vous sur /docs/registre-rgpd-reputexa.html.",
+      "droits_title": "9. Vos droits",
       "droits_content": "Conformément au RGPD, vous disposez du droit d'accès, de rectification, d'effacement, à la limitation du traitement, à la portabilité et d'opposition. Pour exercer ces droits : contact@reputexa.fr. Vous pouvez introduire une réclamation auprès de la CNIL (cnil.fr) ou de l'autorité de contrôle de votre pays de résidence.",
-      "contact_title": "8. Nous contacter",
+      "contact_title": "10. Nous contacter",
       "contact_content": "Pour toute question relative à la protection de vos données : contact@reputexa.fr."
     },
     "cgu": {
       "title": "Conditions générales d'utilisation",
       "metaTitle": "Conditions générales d'utilisation | REPUTEXA",
-      "metaDescription": "CGU REPUTEXA. Plans Vision, Pulse, Zenith. Différenciation linguistique, TVA, Stripe, droit français.",
+      "metaDescription": "CGU REPUTEXA. Plans Vision, Pulse, Zenith. Collecte d'avis automatisée, obligations du commerçant, TVA, Stripe, droit français.",
       "intro": "Dernière mise à jour : mars 2026. Les présentes Conditions générales d'utilisation (CGU) régissent l'utilisation du service REPUTEXA et s'appliquent à tout abonnement souscrit sur reputexa.fr.",
       "toc": [
         { "id": "objet", "label": "1. Objet et acceptation" },
@@ -744,7 +783,8 @@
         { "id": "langue", "label": "3. Clause de différenciation — Langue des réponses IA" },
         { "id": "facturation", "label": "4. Facturation, TVA et Stripe" },
         { "id": "droit", "label": "5. Droit applicable et juridiction" },
-        { "id": "contact", "label": "6. Contact" }
+        { "id": "zenith_obligations", "label": "6. Plan Zenith — Obligations du Commerçant et limitation de responsabilité" },
+        { "id": "contact", "label": "7. Contact" }
       ],
       "objet_title": "1. Objet et acceptation",
       "objet_content": "Les présentes CGU définissent les modalités d'accès et d'utilisation du service REPUTEXA, plateforme SaaS d'e-réputation. En créant un compte ou en souscrivant à un abonnement, vous acceptez sans réserve les présentes conditions.",
@@ -756,7 +796,9 @@
       "facturation_content": "Les prix affichés sont indiqués hors taxes (HT). La TVA est calculée et appliquée automatiquement par Stripe selon le pays de l'acheteur et les règles en vigueur (TVA intracommunautaire, taux local, etc.). Le paiement est collecté par Stripe (cartes, SEPA, moyens locaux). L'abonnement est récurrent (mensuel ou annuel). Tout mois entamé est dû ; en cas de résiliation, aucun remboursement au prorata des jours restants. Les factures sont disponibles dans l'espace client et via le portail Stripe.",
       "droit_title": "5. Droit applicable et juridiction",
       "droit_content": "Les présentes CGU sont soumises au droit français. À défaut d'accord amiable, il est attribué compétence exclusive au Tribunal de Commerce de Paris pour tout litige. Le client consommateur résidant dans l'Union européenne conserve la faculté de saisir les tribunaux de son lieu de résidence, conformément au Règlement (UE) n° 1215/2012 (Bruxelles I bis).",
-      "contact_title": "6. Contact",
+      "zenith_obligations_title": "6. Plan Zenith — Obligations du Commerçant et limitation de responsabilité",
+      "zenith_obligations_content": "L'activation du plan Zenith et l'utilisation de la fonctionnalité de collecte automatisée d'avis via WhatsApp (« IA de Capture ») imposent au Commerçant une obligation d'information préalable envers ses clients finaux. Conformément aux articles 13 et 14 du RGPD et à la réglementation relative à la prospection commerciale par voie électronique (article L.34-5 du Code des postes et des communications électroniques), le Commerçant doit informer ses clients, au moment de la transaction (en caisse ou lors du règlement), de : (1) la collecte de leur numéro de téléphone mobile ; (2) la finalité de cette collecte (sollicitation d'un avis via WhatsApp par REPUTEXA, prestataire tiers) ; (3) leur droit d'opposition à tout moment en répondant « STOP ». Cette obligation d'information incombe exclusivement au Commerçant, en sa qualité de responsable du traitement des données de ses propres clients. REPUTEXA, agissant en qualité de sous-traitant, ne saurait être tenu responsable : des conséquences directes ou indirectes d'un manquement du Commerçant à cette obligation d'information ; de toute plainte déposée par un client final, de toute sanction prononcée par la CNIL ou toute autre autorité de contrôle compétente ; ou de tout préjudice résultant d'une utilisation non conforme de la fonctionnalité de capture par le Commerçant.",
+      "contact_title": "7. Contact",
       "contact_content": "Pour toute question relative aux présentes CGU : contact@reputexa.fr."
     }
   },

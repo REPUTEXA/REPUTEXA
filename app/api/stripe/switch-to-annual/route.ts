@@ -12,7 +12,7 @@ import { stripeWithRetry } from '@/lib/stripe-client';
 import { findCustomerIdByEmail, findActiveSubscriptionForCustomer } from '@/lib/services/billing-domain';
 import type { PlanSlug } from '@/config/pricing';
 
-export async function POST(request: Request) {
+export async function POST(_request: Request) {
   try {
     const secretKey = process.env.STRIPE_SECRET_KEY;
     if (!secretKey) {

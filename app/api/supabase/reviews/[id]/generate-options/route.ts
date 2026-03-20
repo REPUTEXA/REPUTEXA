@@ -1,22 +1,8 @@
 import { NextResponse } from 'next/server';
-import OpenAI from 'openai';
 import { createClient } from '@/lib/supabase/server';
 import { FEATURES, hasFeature, toPlanSlug } from '@/lib/feature-gate';
-import {
-  HUMAN_CHARTER_BASE,
-  buildZenithSeoInstruction,
-  HUMAN_FALLBACKS,
-} from '@/lib/ai/concierge-prompts';
 import { runZenithTripleJudge } from '@/lib/ai/zenith-triple-judge';
-
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
-
-const SYSTEM_PROMPT_SINGLE = `Tu es un expert en e-réputation. Génère une seule réponse pour l'avis client, en respectant les préférences de style et de ton fournies.
-${HUMAN_CHARTER_BASE}
-Réponds UNIQUEMENT en JSON valide : {"content": "Ta réponse ici", "detectedLanguage": "fr"}
-{LANGUE_RULE}`;
+import { generateReviewResponse, hasAiConfigured } from '@/lib/ai-service';
 
 export async function POST(
   _request: Request,
@@ -24,9 +10,9 @@ export async function POST(
 ) {
   try {
     const { id } = await params;
-    if (!process.env.OPENAI_API_KEY) {
+    if (!hasAiConfigured()) {
       return NextResponse.json(
-        { error: 'OPENAI_API_KEY is not configured' },
+        { error: 'Aucune clé API IA configurée (ANTHROPIC_API_KEY ou OPENAI_API_KEY)' },
         { status: 500 }
       );
     }
@@ -47,7 +33,7 @@ export async function POST(
       supabase
         .from('profiles')
         .select(
-          'seo_keywords, subscription_plan, selected_plan, establishment_name, address, ai_tone, ai_length, ai_safe_mode, ai_custom_instructions, language, payment_status, payment_failed_at, subscription_status'
+          'seo_keywords, subscription_plan, selected_plan, establishment_name, address, ai_tone, ai_length, ai_safe_mode, ai_custom_instructions, language, payment_status, payment_failed_at, subscription_status, phone, email'
         )
         .eq('id', user.id)
         .single(),
@@ -95,7 +81,6 @@ export async function POST(
           );
         }
       }
-    }
       return NextResponse.json(
         {
           error:
@@ -109,7 +94,7 @@ export async function POST(
     const seoKeywords = Array.isArray(profile?.seo_keywords)
       ? profile.seo_keywords.filter((k): k is string => typeof k === 'string').slice(0, 10)
       : [];
-    const useSeo = hasFeature(planSlug, FEATURES.SEO_BOOST);
+    const _useSeo = hasFeature(planSlug, FEATURES.SEO_BOOST);
     const establishmentName = profile?.establishment_name?.trim() || 'client';
     const businessContext = [seoKeywords[0], profile?.address?.trim()].filter(Boolean).join(' à ') || establishmentName;
 
@@ -156,15 +141,30 @@ ${customInstructions ? `- CONSIGNES PRIORITAIRES du restaurateur (à intégrer n
       ? `Vous devez répondre dans la langue locale de l'établissement (${businessLanguage}). Cependant, pour rester poli, si l'avis du client est dans une autre langue, commencez votre réponse par une courte phrase de bienvenue ou de remerciement dans la langue du client, puis enchaînez le reste de la réponse exclusivement en ${businessLanguage}.`
       : 'Détecte la langue de l\'avis et réponds dans la MÊME langue (natif).';
 
+    const profilePhone = (profile?.phone as string)?.trim() ?? '';
+    const profileEmail = (profile?.email as string)?.trim() ?? '';
+    const isNegativeReview = typeof review.rating === 'number' && review.rating <= 3;
+
+    // Bloc contact pour les avis négatifs (Zenith utilise styleInstruction)
+    const contactParts = [
+      profilePhone ? `au ${profilePhone}` : null,
+      profileEmail ? `par email à ${profileEmail}` : null,
+    ].filter(Boolean).join(' ou ');
+
+    const negativeContactInstruction =
+      isNegativeReview && contactParts
+        ? `\n\nAVIS NÉGATIF — RÈGLE OBLIGATOIRE : Après ta réponse, ajoute un paragraphe de réconciliation (séparé par une ligne vide) : "Nous aimerions échanger avec vous pour comprendre ce qu'il s'est passé. N'hésitez pas à nous contacter directement ${contactParts}."`
+        : '';
+
     if (isZenith) {
-      const winner = await runZenithTripleJudge(openai, {
+      const winner = await runZenithTripleJudge({
         reviewComment: review.comment,
         reviewerName: review.reviewer_name ?? 'Client',
         rating: review.rating,
         establishmentName: profile?.establishment_name ?? establishmentName,
         businessContext,
         seoKeywords,
-        styleInstruction,
+        styleInstruction: styleInstruction + negativeContactInstruction,
         aiTon: profile?.ai_tone ?? undefined,
         aiLength: profile?.ai_length ?? undefined,
         aiCustomInstructions: customInstructions || undefined,
@@ -175,35 +175,22 @@ ${customInstructions ? `- CONSIGNES PRIORITAIRES du restaurateur (à intégrer n
       });
     }
 
-    const systemPromptSingle =
-      SYSTEM_PROMPT_SINGLE.replace('{LANGUE_RULE}', languageRule) +
-      '\n\n' +
-      styleInstruction +
-      (useSeo ? buildZenithSeoInstruction(establishmentName, businessContext, seoKeywords) : '');
-
-    const completionSingle = await openai.chat.completions.create({
-      model: 'gpt-4o-mini',
-      temperature: 0.8,
-      messages: [
-        { role: 'system', content: systemPromptSingle },
-        {
-          role: 'user',
-          content: `Avis: "${review.comment}" | Client: ${review.reviewer_name ?? 'Client'} | Note: ${review.rating}/5 | Établissement: ${profile?.establishment_name || 'client'}. Génère une réponse en JSON. La clé "content" doit contenir uniquement le texte brut.`,
-        },
-      ],
-      response_format: { type: 'json_object' },
+    const { content: singleResponse } = await generateReviewResponse({
+      avis: review.comment,
+      reviewerName: review.reviewer_name ?? 'Client',
+      rating: review.rating,
+      establishmentName,
+      ton: profile?.ai_tone ?? undefined,
+      longueur: profile?.ai_length ?? undefined,
+      instructions: customInstructions || undefined,
+      languageRule,
+      phone: profilePhone || undefined,
+      email: profileEmail || undefined,
     });
-
-    const contentSingle = completionSingle.choices[0]?.message?.content;
-    if (!contentSingle) throw new Error('No response from OpenAI');
-
-    const parsedSingle = JSON.parse(contentSingle) as { content?: string; detectedLanguage?: string };
-    let singleResponse = (parsedSingle.content ?? HUMAN_FALLBACKS.genericThanks).trim();
-    singleResponse = singleResponse.replace(/^["']|["']$/g, '').replace(/^Voici la réponse\s*:?\s*/i, '');
 
     return NextResponse.json({
       options: [singleResponse],
-      detectedLanguage: parsedSingle.detectedLanguage ?? 'fr',
+      detectedLanguage: 'fr',
     });
   } catch (error) {
     console.error('[supabase/reviews/generate-options]', error);

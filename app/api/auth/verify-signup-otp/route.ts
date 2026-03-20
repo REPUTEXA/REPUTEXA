@@ -113,7 +113,7 @@ export async function POST(request: Request) {
     const selectedPlan = (metaPlan && ['vision', 'pulse', 'zenith'].includes(metaPlan))
       ? metaPlan
       : (profile?.selected_plan ?? 'zenith');
-    const annual = signupMode === 'checkout' && (meta?.signup_annual === true || meta?.signup_annual === 'true');
+    const annual = signupMode === 'checkout' && (meta?.signup_annual === true || (typeof meta?.signup_annual === 'string' && meta.signup_annual === 'true'));
 
     const isTrialing = profile?.subscription_status === 'trialing';
 
@@ -178,7 +178,7 @@ export async function POST(request: Request) {
       if (!session.url) {
         throw new Error('Stripe n\'a pas renvoyé d\'URL de checkout');
       }
-      return NextResponse.json({ ok: true, stripeUrl: session.url });
+      return NextResponse.json({ ok: true, stripeUrl: session.url, planSlug: plan });
     } catch (error) {
       console.error('ERREUR STRIPE COMPLETE:', error);
       console.error('[verify-signup-otp] Stripe session:', error);

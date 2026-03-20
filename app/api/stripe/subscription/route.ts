@@ -25,7 +25,7 @@ export async function GET() {
       return NextResponse.json({ error: 'Non authentifié' }, { status: 401 });
     }
 
-    const email = user.email.trim().toLowerCase();
+    const _email = user.email.trim().toLowerCase();
     const { data: profile } = await supabase
       .from('profiles')
       .select('stripe_customer_id, stripe_subscription_id, subscription_quantity')
@@ -64,7 +64,7 @@ export async function GET() {
     const quantityToWrite = await getQuantitySafeToSync(subscription, dbQuantity);
     const planSlug = (getPlanSlugFromSubscription(subscription) ?? 'vision') as PlanSlug;
     const interval = getSubscriptionInterval(subscription);
-    const subscriptionPlan = PLAN_SLUG_TO_SUBSCRIPTION[planSlug] ?? 'pulse';
+    const subscriptionPlan = (PLAN_SLUG_TO_SUBSCRIPTION as Record<string, string>)[planSlug] ?? 'pulse';
     const payload = buildProfileSyncFromSubscription(subscription);
     const status = payload.subscription_status;
     const periodEnd = payload.subscription_period_end;

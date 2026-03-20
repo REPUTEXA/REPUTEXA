@@ -7,7 +7,7 @@ import { useSearchParams } from 'next/navigation';
 import { useLocale } from 'next-intl';
 import { createClient } from '@/lib/supabase/client';
 import { getSiteUrl } from '@/lib/site-url';
-import { Loader2, Mic } from 'lucide-react';
+import { Loader2, Mic, Mail, Lock, Pencil, Info, ShieldCheck } from 'lucide-react';
 import { StripePortalButton } from '@/components/dashboard/stripe-portal-button';
 import { PhoneInput, isValidPhoneNumber } from '@/components/phone-input';
 import { PasswordField } from '@/components/auth/password-field';
@@ -17,6 +17,17 @@ import { getLanguageFromPhone } from '@/lib/language-from-phone';
 import { toast } from 'sonner';
 
 const GOOGLE_BUSINESS_SCOPE = 'https://www.googleapis.com/auth/business.manage';
+
+// Exemples d'avis variés, définis hors du composant pour stabilité
+const EXEMPLES_AVIS = [
+  'Je suis très déçu, commande arrivée froide et 45 minutes de retard. Première et dernière fois chez vous.',
+  'Incroyable expérience ! Service adorable, plats délicieux, on reviendra souvent !',
+  'Le burger était bon mais un peu trop salé, et l\'attente était longue. Vous pouvez faire mieux.',
+  'Pouvez-vous me dire si vous avez des options végétariennes disponibles le soir ?',
+  'Lieu sympa mais musique trop forte, difficile de discuter avec mes amis.',
+  'Le chien est-il admis en terrasse ? On adorerait venir avec notre golden retriever.',
+  'Le dessert au chocolat était absolument divin. Bravo au chef !',
+];
 
 const LOCALE_NAMES: Record<string, string> = {
   fr: 'Français',
@@ -44,7 +55,17 @@ export default function SettingsPage() {
   const [googleConnecting, setGoogleConnecting] = useState(false);
   const [googleDisconnecting, setGoogleDisconnecting] = useState(false);
   const [newPassword, setNewPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
+  // Email change
+  const [showEmailEdit, setShowEmailEdit] = useState(false);
+  const [newEmail, setNewEmail] = useState('');
+  const [confirmEmail, setConfirmEmail] = useState('');
+  const [savingEmail, setSavingEmail] = useState(false);
+  // Password (3-field)
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [confirmNewPassword, setConfirmNewPassword] = useState('');
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [whatsappPhone, setWhatsappPhone] = useState('');
   const [alertThresholdStars, setAlertThresholdStars] = useState(3);
   const [subscriptionStatus, setSubscriptionStatus] = useState<string | null>(null);
@@ -63,7 +84,7 @@ export default function SettingsPage() {
   const [savingAccount, setSavingAccount] = useState(false);
   const [savingNotifications, setSavingNotifications] = useState(false);
   const [savingAiPreferences, setSavingAiPreferences] = useState(false);
-  const [googleErrorShown, setGoogleErrorShown] = useState(false);
+  const [_googleErrorShown, _setGoogleErrorShown] = useState(false);
   const [trialEndsAt, setTrialEndsAt] = useState<string | null>(null);
 
   // Vocal-to-style (ADN IA) state
@@ -73,9 +94,15 @@ export default function SettingsPage() {
   const aiStreamRef = useRef<MediaStream | null>(null);
   const aiChunksRef = useRef<Blob[]>([]);
 
-  // Aperçu "Ghostwriter" en direct
-  const [previewText, setPreviewText] = useState('');
-  const [animatedPreview, setAnimatedPreview] = useState('');
+  // Simulation ADN IA en temps réel
+  const [avisExempleIndex, setAvisExempleIndex] = useState(0);
+  const avisExemple = EXEMPLES_AVIS[avisExempleIndex];
+  const [simulationResponse, setSimulationResponse] = useState('');
+  const [streamedSimulation, setStreamedSimulation] = useState('');
+  const [isSimulating, setIsSimulating] = useState(false);
+  const streamingTimeoutsRef = useRef<number[]>([]);
+  const simulateDebounceRef = useRef<number | null>(null);
+  const avisIndexRef = useRef(0);
 
   useEffect(() => {
     fetch('/api/profile')
@@ -170,7 +197,7 @@ export default function SettingsPage() {
             if (typeof prefJson.aiCustomInstructions === 'string') {
               setAiCustomInstructions(prefJson.aiCustomInstructions);
             }
-            toast.success('Préférences IA mises à jour depuis votre voix ✅');
+            toast.success('Préférences IA mises à jour depuis votre voix !');
           } catch (err) {
             toast.error(
               err instanceof Error
@@ -214,7 +241,7 @@ export default function SettingsPage() {
         toast.error(msg);
         return;
       }
-      toast.success('Modifications enregistrées ✅');
+      toast.success('Modifications enregistrées !');
       if (languageOverride) {
         router.replace(`/${languageOverride}/dashboard/settings`);
       } else {
@@ -252,20 +279,72 @@ export default function SettingsPage() {
     await doSaveProfile(payload, null);
   };
 
-  const handleSaveAccount = async (e: React.FormEvent) => {
+  const handleSaveEmail = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newPassword || newPassword.length < 6) return;
+    if (!newEmail.trim()) return;
+    if (newEmail.trim() !== confirmEmail.trim()) {
+      toast.error('Les adresses email ne correspondent pas.');
+      return;
+    }
+    setSavingEmail(true);
+    try {
+      const res = await fetch('/api/auth/email-change', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ newEmail: newEmail.trim(), locale }),
+      });
+      const json = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        throw new Error(
+          typeof json.error === 'string'
+            ? json.error
+            : 'Erreur lors de la mise à jour de l\'email',
+        );
+      }
+      toast.success('Un email de confirmation sécurisé vous a été envoyé. Veuillez vérifier votre nouvelle boîte mail.');
+      setShowEmailEdit(false);
+      setNewEmail('');
+      setConfirmEmail('');
+    } catch (err) {
+      const msg =
+        err instanceof Error
+          ? err.message
+          : 'Erreur lors de la mise à jour de l\'email';
+      toast.error(msg);
+    } finally {
+      setSavingEmail(false);
+    }
+  };
+
+  const handleSavePassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!currentPassword || !newPassword || newPassword.length < 6) return;
+    if (newPassword !== confirmNewPassword) {
+      toast.error('Les nouveaux mots de passe ne correspondent pas.');
+      return;
+    }
     setSavingAccount(true);
     try {
       const supabase = createClient();
-      const { error } = await supabase.auth.updateUser({ password: newPassword });
-      if (error) throw error;
+      const { data: { user }, error: userError } = await supabase.auth.getUser();
+      if (userError || !user?.email) throw new Error('Session expirée. Reconnectez-vous.');
+      // Vérification de l'ancien mot de passe
+      const { error: signInError } = await supabase.auth.signInWithPassword({
+        email: user.email,
+        password: currentPassword,
+      });
+      if (signInError) throw new Error('Mot de passe actuel incorrect.');
+      // Mise à jour du mot de passe
+      const { error: updateError } = await supabase.auth.updateUser({ password: newPassword });
+      if (updateError) throw updateError;
+      setCurrentPassword('');
       setNewPassword('');
-      toast.success('Mot de passe mis à jour ✅');
+      setConfirmNewPassword('');
+      toast.success('Mot de passe mis à jour avec succès !');
     } catch (err) {
-      const msg = err && typeof err === 'object' && 'message' in err
-        ? getAuthErrorMessage(err as { message?: string })
-        : 'Erreur lors de la mise à jour';
+      const msg = err instanceof Error
+        ? err.message
+        : getAuthErrorMessage(err as { message?: string });
       toast.error(msg);
     } finally {
       setSavingAccount(false);
@@ -347,10 +426,10 @@ export default function SettingsPage() {
         setGoogleLocationId(data.googleLocationId);
         setGoogleLocationName(data.googleLocationName);
         setGoogleLocationAddress(data.googleLocationAddress);
-        toast.success('Google Business connecté ✅');
+        toast.success('Google Business connecté !');
       } catch (err) {
         // Pas de toast agressif automatique : si la connexion échoue,
-        // on laisse simplement l'état sur "⚪ Non connecté".
+        // on laisse simplement l'état sur "Non connecté".
         console.error('[settings] google-business/save failed', err);
       } finally {
         router.replace(pathname ?? '/dashboard/settings');
@@ -360,43 +439,93 @@ export default function SettingsPage() {
     run();
   }, [searchParams, router, pathname]);
 
-  // Aperçu Ghostwriter: construit le texte et anime la frappe
-  const previewExample =
-    aiTone === 'warm'
-      ? `Merci beaucoup pour votre avis et d'avoir pris le temps de partager votre ressenti. Même si tout n'a pas été parfait cette fois-ci, votre retour nous aide vraiment à nous améliorer.`
-      : aiTone === 'casual'
-        ? `Merci pour votre message. Nous sommes vraiment désolés que l'expérience n'ait pas été au niveau. Nous allons regarder ça de près pour que votre prochaine visite soit au top.`
-        : aiTone === 'luxury'
-          ? `Nous vous remercions sincèrement pour votre retour et sommes navrés que votre expérience n’ait pas été à la hauteur de nos standards. Votre commentaire a été partagé avec l’équipe afin de corriger ces points sans délai.`
-          : aiTone === 'humorous'
-            ? `Ouch, ce service n’était clairement pas digne de notre meilleure soirée ! Merci de nous l’avoir signalé, nous allons corriger le tir pour que votre prochaine visite soit une vraie réussite.`
-            : `Merci d’avoir pris le temps de partager votre avis. Nous sommes désolés que votre expérience n’ait pas été pleinement satisfaisante et nous allons analyser votre retour pour nous améliorer.`;
+  // Fonction de simulation - appelee par debounce et par handleSaveAIConfig
+  const runSimulation = useCallback(async (ton: string, longueur: string, instructions: string) => {
+    streamingTimeoutsRef.current.forEach((id) => window.clearTimeout(id));
+    streamingTimeoutsRef.current = [];
+    setIsSimulating(true);
+    setStreamedSimulation(``);
+    setSimulationResponse(``);
 
-  const enrichedPreviewExample = aiCustomInstructions.trim()
-    ? `${previewExample}\n\n[Consignes : ${aiCustomInstructions.trim()}]`
-    : previewExample;
-
-  useEffect(() => {
-    setPreviewText(enrichedPreviewExample);
-  }, [enrichedPreviewExample]);
-
-  useEffect(() => {
-    if (!previewText) {
-      setAnimatedPreview('');
-      return;
+    let next = Math.floor(Math.random() * EXEMPLES_AVIS.length);
+    if (EXEMPLES_AVIS.length > 1 && next === avisIndexRef.current) {
+      next = (next + 1) % EXEMPLES_AVIS.length;
     }
-    let index = 0;
-    setAnimatedPreview('');
-    const chars = Array.from(previewText);
-    const interval = window.setInterval(() => {
-      index += 3;
-      setAnimatedPreview(chars.slice(0, index).join(''));
-      if (index >= chars.length) {
-        window.clearInterval(interval);
+    avisIndexRef.current = next;
+    setAvisExempleIndex(next);
+
+    try {
+      const res = await fetch('/api/ai/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ton, longueur, instructions, avis: EXEMPLES_AVIS[next] }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error ?? 'Erreur simulation');
+
+      const content = String(data.content ?? '')
+        .replace(/\[Consignes\s*:.*?\]/gi, '')
+        .replace(/reputexa/gi, "l\u2019\u00e9tablissement")
+        // Préserver les sauts de ligne ? ne collapper que les espaces horizontaux
+        .replace(/[^\S\n]+/g, ' ')
+        .replace(/\n{3,}/g, '\n\n')
+        .trim();
+
+      setSimulationResponse(content);
+      const chars = Array.from(content);
+      let currentText = '';
+      chars.forEach((char, index) => {
+        const id = window.setTimeout(() => {
+          currentText += char;
+          setStreamedSimulation(currentText);
+          if (index === chars.length - 1) setIsSimulating(false);
+        }, index * 15) as unknown as number;
+        streamingTimeoutsRef.current.push(id);
+      });
+    } catch {
+      setIsSimulating(false);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Debounce 700ms : se déclenche à chaque changement de Ton / Longueur / Instructions
+  useEffect(() => {
+    if (simulateDebounceRef.current !== null) window.clearTimeout(simulateDebounceRef.current);
+    simulateDebounceRef.current = window.setTimeout(() => {
+      runSimulation(aiTone, aiLength, aiCustomInstructions);
+    }, 700) as unknown as number;
+    return () => {
+      if (simulateDebounceRef.current !== null) window.clearTimeout(simulateDebounceRef.current);
+    };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [aiTone, aiLength, aiCustomInstructions]);
+
+  const handleSaveAIConfig = async () => {
+    // Annuler le debounce en cours pour éviter un double-appel
+    if (simulateDebounceRef.current !== null) {
+      window.clearTimeout(simulateDebounceRef.current);
+      simulateDebounceRef.current = null;
+    }
+    setSavingAiPreferences(true);
+    try {
+      const resSave = await fetch('/api/profile', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ aiTone, aiLength, aiSafeMode, aiCustomInstructions: aiCustomInstructions.trim() }),
+      });
+      if (!resSave.ok) {
+        const errData = await resSave.json().catch(() => ({}));
+        throw new Error(errData.error ?? 'Erreur sauvegarde');
       }
-    }, 20);
-    return () => window.clearInterval(interval);
-  }, [previewText]);
+      toast.success('Configuration enregistrée');
+      runSimulation(aiTone, aiLength, aiCustomInstructions);
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Erreur lors de la mise à jour');
+      setIsSimulating(false);
+    } finally {
+      setSavingAiPreferences(false);
+    }
+  };
 
   const handleSaveNotifications = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -419,7 +548,7 @@ export default function SettingsPage() {
         toast.error(data?.error ?? 'Erreur lors de l\'enregistrement des notifications');
         return;
       }
-      toast.success('Notifications enregistrées ✅');
+      toast.success('Notifications enregistrées !');
       router.refresh();
     } catch (err) {
       toast.error(err instanceof Error ? err.message : 'Erreur réseau');
@@ -571,7 +700,7 @@ export default function SettingsPage() {
                     toast.success(
                       formattedTrialEnd
                         ? `Choix enregistré. Vous profitez de ZÉNITH jusqu'au ${formattedTrialEnd}.`
-                        : 'Choix enregistré. Vous profitez de ZÉNITH jusqu’à la fin de votre essai.',
+                        : "Choix enregistré. Vous profitez de ZÉNITH jusqu'à la fin de votre essai.",
                     );
                     const profileRes = await fetch('/api/profile', { credentials: 'include' });
                     const profileData = await profileRes.json().catch(() => ({}));
@@ -589,7 +718,7 @@ export default function SettingsPage() {
               >
                 {changePlanLoading === 'vision' ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
                 Passer à VISION
-                {selectedPlan === 'vision' && !changePlanLoading && <span className="text-blue-200 text-xs font-medium">— Ton futur plan</span>}
+                {selectedPlan === 'vision' && !changePlanLoading && <span className="text-blue-200 text-xs font-medium">? Ton futur plan</span>}
               </button>
               <button
                 type="button"
@@ -608,7 +737,7 @@ export default function SettingsPage() {
                     toast.success(
                       formattedTrialEnd
                         ? `Choix enregistré. Vous profitez de ZÉNITH jusqu'au ${formattedTrialEnd}.`
-                        : 'Choix enregistré. Vous profitez de ZÉNITH jusqu’à la fin de votre essai.',
+                        : "Choix enregistré. Vous profitez de ZÉNITH jusqu'à la fin de votre essai.",
                     );
                     const profileRes = await fetch('/api/profile', { credentials: 'include' });
                     const profileData = await profileRes.json().catch(() => ({}));
@@ -628,7 +757,7 @@ export default function SettingsPage() {
               >
                 {changePlanLoading === 'pulse' ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
                 Passer à PULSE
-                {selectedPlan === 'pulse' && !changePlanLoading && <span className="text-emerald-300 text-xs font-medium">— Ton futur plan</span>}
+                {selectedPlan === 'pulse' && !changePlanLoading && <span className="text-emerald-300 text-xs font-medium">? Ton futur plan</span>}
               </button>
               <button
                 type="button"
@@ -647,7 +776,7 @@ export default function SettingsPage() {
                     toast.success(
                       formattedTrialEnd
                         ? `Choix enregistré. Vous profitez de ZÉNITH jusqu'au ${formattedTrialEnd}.`
-                        : 'Choix enregistré. Vous profitez de ZÉNITH jusqu’à la fin de votre essai.',
+                        : "Choix enregistré. Vous profitez de ZÉNITH jusqu'à la fin de votre essai.",
                     );
                     const profileRes = await fetch('/api/profile', { credentials: 'include' });
                     const profileData = await profileRes.json().catch(() => ({}));
@@ -667,7 +796,7 @@ export default function SettingsPage() {
               >
                 {changePlanLoading === 'zenith' ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
                 Rester sur ZENITH
-                {selectedPlan === 'zenith' && !changePlanLoading && <span className="text-amber-200 text-xs font-medium">— Ton futur plan</span>}
+                {selectedPlan === 'zenith' && !changePlanLoading && <span className="text-amber-200 text-xs font-medium">? Ton futur plan</span>}
               </button>
             </div>
           </div>
@@ -739,7 +868,7 @@ export default function SettingsPage() {
                 <>
                   <p className="text-xs sm:text-sm text-emerald-600 dark:text-emerald-400 font-medium flex items-center gap-1.5 mt-0.5">
                     <span className="w-2 h-2 rounded-full bg-emerald-500" aria-hidden />
-                    🟢 Connecté · {googleLocationName ?? establishmentName}
+                    Connecté à {googleLocationName ?? establishmentName}
                   </p>
                   {googleLocationAddress && (
                     <p className="text-xs text-slate-500 dark:text-zinc-400 mt-1 truncate">
@@ -749,7 +878,7 @@ export default function SettingsPage() {
                 </>
               ) : (
                 <p className="text-xs sm:text-sm text-slate-500 dark:text-zinc-400 mt-0.5">
-                  ⚪ Non connecté
+                  Non connecté
                 </p>
               )}
             </div>
@@ -795,7 +924,7 @@ export default function SettingsPage() {
                 </p>
               </div>
               <p className="text-xs sm:text-sm text-slate-500 dark:text-zinc-400 mt-0.5">
-                ⚪ Non connecté
+                Non connecté
               </p>
             </div>
             <div className="flex shrink-0">
@@ -831,7 +960,7 @@ export default function SettingsPage() {
                 </p>
               </div>
               <p className="text-xs sm:text-sm text-slate-500 dark:text-zinc-400 mt-0.5">
-                ⚪ Non connecté
+                Non connecté
               </p>
             </div>
             <div className="flex shrink-0">
@@ -856,31 +985,9 @@ export default function SettingsPage() {
       <section className="rounded-2xl border border-slate-200 dark:border-zinc-800/50 bg-white dark:bg-zinc-900/95 shadow-sm dark:shadow-none p-6">
         <div className="flex flex-col lg:flex-row gap-6">
           <form
-            onSubmit={async (e) => {
+            onSubmit={(e) => {
               e.preventDefault();
-              setSavingAiPreferences(true);
-              try {
-                const res = await fetch('/api/profile', {
-                  method: 'PATCH',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify({
-                    aiTone,
-                    aiLength,
-                    aiSafeMode,
-                    aiCustomInstructions: aiCustomInstructions.trim(),
-                  }),
-                });
-                const data = await res.json().catch(() => ({}));
-                if (!res.ok) {
-                  toast.error(data?.error ?? 'Erreur lors de la sauvegarde des préférences IA');
-                  return;
-                }
-                toast.success('Stratégie de marque mise à jour.');
-              } catch (err) {
-                toast.error(err instanceof Error ? err.message : 'Erreur réseau');
-              } finally {
-                setSavingAiPreferences(false);
-              }
+              handleSaveAIConfig();
             }}
             className="flex-1 space-y-4"
           >
@@ -985,43 +1092,53 @@ export default function SettingsPage() {
             </button>
           </form>
 
-          {/* Aperçu en direct - Ghostwriter */}
-          <div className="flex-1 rounded-2xl border border-slate-200 dark:border-zinc-800/50 bg-slate-50 dark:bg-zinc-900/50 p-5 space-y-3 shadow-[4px_6px_0_rgba(0,0,0,0.04)] dark:shadow-[4px_6px_0_rgba(0,0,0,0.5)]">
+          {/* Aperçu en direct - Simulation ADN IA */}
+          <div className="flex-1 lg:sticky lg:top-6 lg:self-start rounded-2xl border border-slate-200 dark:border-zinc-800/50 bg-slate-50 dark:bg-zinc-900/50 p-5 space-y-3 shadow-[4px_6px_0_rgba(0,0,0,0.04)] dark:shadow-[4px_6px_0_rgba(0,0,0,0.5)]">
             <div className="flex items-center justify-between gap-2">
               <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500 dark:text-zinc-400">
                 Aperçu en direct
               </p>
-              <span className="inline-flex items-center gap-1 rounded-full border border-indigo-500/30 dark:border-indigo-400/30 bg-indigo-500/10 dark:bg-indigo-500/20 px-2 py-0.5 text-[10px] font-semibold text-indigo-500 dark:text-indigo-400">
-                <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-pulse" />
-                Simulation
+              <span
+                className={`inline-flex items-center gap-1 rounded-full border border-emerald-500/30 dark:border-emerald-400/30 bg-emerald-500/10 dark:bg-emerald-500/20 px-2 py-0.5 text-[10px] font-semibold text-emerald-600 dark:text-emerald-300 transition-all ${
+                  isSimulating ? 'animate-pulse scale-105' : ''
+                }`}
+              >
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                Simulé en temps réel
               </span>
             </div>
-            <div className="rounded-xl border border-slate-200 dark:border-zinc-800 bg-white/90 dark:bg-zinc-800/50 px-4 py-3 text-xs text-slate-600 dark:text-zinc-300">
-              <p className="font-semibold text-slate-800 dark:text-slate-100 mb-1">
-                Exemple d&apos;avis négatif
+            <div className="rounded-xl border border-slate-200 dark:border-zinc-800 bg-white/90 dark:bg-zinc-800/50 px-4 py-3 text-xs text-slate-600 dark:text-zinc-300 space-y-1">
+              <p className="font-semibold text-slate-800 dark:text-slate-100">
+                Exemple d&apos;avis client
               </p>
-              <p>
-                &quot;Service très lent et plat arrivé tiède. Je suis déçu de mon dîner hier
-                soir.&quot;
+              <p className="italic">
+                « {avisExemple} »
               </p>
             </div>
-            <div className="rounded-xl border border-slate-200 dark:border-zinc-800 bg-white/95 dark:bg-zinc-800/50 px-4 py-3 text-sm text-slate-700 dark:text-zinc-100 shadow-sm dark:shadow-none relative overflow-hidden">
+            <div
+              className={`rounded-xl border border-slate-200 dark:border-zinc-800 bg-white/95 dark:bg-zinc-800/50 px-4 py-3 text-sm text-slate-700 dark:text-zinc-100 shadow-sm dark:shadow-none relative overflow-hidden transition-all ${
+                isSimulating ? 'opacity-90 blur-[0.5px]' : ''
+              }`}
+            >
               <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">
-                Réponse IA (aperçu dynamique)
+                Réponse IA simulée
               </p>
               <p className="whitespace-pre-line font-normal">
-                {animatedPreview || enrichedPreviewExample}
+                {streamedSimulation || simulationResponse || (
+                  <span className="text-xs text-slate-400 dark:text-slate-500">
+                    Modifiez le ton, la longueur ou les instructions pour voir la simulation se mettre à jour automatiquement.
+                  </span>
+                )}
               </p>
-              {animatedPreview && animatedPreview.length < enrichedPreviewExample.length && (
+              {isSimulating && (
                 <span className="absolute bottom-3 right-4 inline-flex items-center gap-1 text-[10px] text-slate-400">
                   <span className="w-1 h-1 bg-slate-400 rounded-full animate-pulse" />
-                  IA en train d&apos;ajuster le ton...
+                  Génération de la réponse IA...
                 </span>
               )}
             </div>
             <p className="text-xs text-slate-500 dark:text-slate-400">
-              Chaque changement de ton, longueur ou instruction met instantanément à jour cette
-              simulation, pour refléter la manière dont l&apos;IA répondra à vos futurs avis.
+              La simulation se met à jour automatiquement (700ms après chaque modification) et également à chaque clic sur Enregistrer.
             </p>
           </div>
         </div>
@@ -1077,52 +1194,218 @@ export default function SettingsPage() {
         </form>
       </section>
 
-      {/* Compte */}
+      {/* ── Identité — Email ── */}
       <section className="rounded-2xl border border-slate-200 dark:border-zinc-800/50 bg-white dark:bg-zinc-900/95 shadow-sm dark:shadow-none p-6">
-        <h2 className="font-display font-semibold text-lg text-slate-900 dark:text-zinc-100 mb-4">Compte</h2>
-        <form onSubmit={handleSaveAccount} className="space-y-4 max-w-xl">
-          <div>
-            <label htmlFor="settings-email" className="block text-sm font-medium text-slate-700 dark:text-zinc-300 mb-1.5">
-              Email
-            </label>
-            <input
-              id="settings-email"
-              type="email"
-              value={email}
-              readOnly
-              className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-zinc-700 text-slate-600 dark:text-zinc-400 bg-slate-50 dark:bg-zinc-800/50"
-            />
-            <p className="text-xs text-slate-500 mt-1">L&apos;email ne peut pas être modifié ici.</p>
+        <div className="flex items-center gap-3 mb-5">
+          <div className="w-9 h-9 rounded-xl bg-blue-50 dark:bg-blue-500/10 border border-blue-100 dark:border-blue-500/20 flex items-center justify-center flex-shrink-0">
+            <Mail className="w-4 h-4 text-blue-600 dark:text-blue-400" />
           </div>
           <div>
-            <label htmlFor="settings-password" className="block text-sm font-medium text-slate-700 dark:text-zinc-300 mb-1.5">
+            <h2 className="font-display font-semibold text-lg text-slate-900 dark:text-zinc-100 leading-tight">
+              Identité
+            </h2>
+            <p className="text-xs text-slate-500 dark:text-zinc-500 mt-0.5">Adresse email associée à votre compte</p>
+          </div>
+        </div>
+
+        <div className="space-y-4 max-w-xl">
+          {/* Email actuel */}
+          <div>
+            <label className="block text-sm font-medium text-slate-700 dark:text-zinc-300 mb-1.5">
+              Adresse email actuelle
+            </label>
+            <div className="flex items-center gap-3">
+              <input
+                type="email"
+                value={email}
+                readOnly
+                tabIndex={-1}
+                className="flex-1 px-4 py-2.5 rounded-xl border border-slate-200 dark:border-zinc-700/60 text-slate-500 dark:text-zinc-400 bg-slate-50 dark:bg-zinc-800/30 cursor-not-allowed select-none"
+              />
+              {!showEmailEdit && (
+                <button
+                  type="button"
+                  onClick={() => setShowEmailEdit(true)}
+                  className="flex-shrink-0 flex items-center gap-1.5 px-4 py-2.5 rounded-xl border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-800/60 text-sm font-medium text-slate-700 dark:text-zinc-200 hover:bg-slate-50 dark:hover:bg-zinc-700/60 active:scale-[0.98] transition-all duration-200"
+                >
+                  <Pencil className="w-3.5 h-3.5" />
+                  Modifier
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* Formulaire changement email */}
+          {showEmailEdit && (
+            <form onSubmit={handleSaveEmail} className="space-y-4 rounded-xl border border-blue-100 dark:border-blue-900/40 bg-blue-50/40 dark:bg-blue-950/20 p-4">
+              {/* Message info */}
+              <div className="flex items-start gap-2.5 rounded-lg border border-blue-200 dark:border-blue-800/60 bg-blue-50 dark:bg-blue-950/40 px-3.5 py-3">
+                <Info className="w-4 h-4 text-blue-500 dark:text-blue-400 mt-0.5 flex-shrink-0" />
+                <p className="text-xs text-blue-700 dark:text-blue-300 leading-relaxed">
+                  Un lien de confirmation sera envoyé à votre{' '}
+                  <strong>ancienne ET nouvelle adresse</strong>. Le changement ne sera effectif
+                  qu&apos;après validation des deux.
+                </p>
+              </div>
+
+              <div>
+                <label htmlFor="new-email" className="block text-sm font-medium text-slate-700 dark:text-zinc-300 mb-1.5">
+                  Nouvel email
+                </label>
+                <input
+                  id="new-email"
+                  type="email"
+                  value={newEmail}
+                  onChange={(e) => setNewEmail(e.target.value)}
+                  required
+                  autoComplete="email"
+                  placeholder="nouvelle@adresse.com"
+                  className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-800/60 text-slate-900 dark:text-zinc-100 placeholder:text-slate-400 dark:placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-[#2563eb]/30 dark:focus:ring-blue-500/30 focus:border-primary transition-all duration-200"
+                />
+              </div>
+
+              <div>
+                <label htmlFor="confirm-email" className="block text-sm font-medium text-slate-700 dark:text-zinc-300 mb-1.5">
+                  Confirmer le nouvel email
+                </label>
+                <input
+                  id="confirm-email"
+                  type="email"
+                  value={confirmEmail}
+                  onChange={(e) => setConfirmEmail(e.target.value)}
+                  required
+                  autoComplete="email"
+                  placeholder="nouvelle@adresse.com"
+                  className={`w-full px-4 py-2.5 rounded-xl border bg-white dark:bg-zinc-800/60 text-slate-900 dark:text-zinc-100 placeholder:text-slate-400 dark:placeholder:text-zinc-500 focus:outline-none focus:ring-2 transition-all duration-200 ${
+                    confirmEmail && confirmEmail !== newEmail
+                      ? 'border-red-400 dark:border-red-500 focus:ring-red-300/30'
+                      : 'border-slate-200 dark:border-zinc-700 focus:ring-[#2563eb]/30 dark:focus:ring-blue-500/30 focus:border-primary'
+                  }`}
+                />
+                {confirmEmail && confirmEmail !== newEmail && (
+                  <p className="text-xs text-red-500 dark:text-red-400 mt-1">
+                    Les adresses ne correspondent pas.
+                  </p>
+                )}
+              </div>
+
+              <div className="flex items-center gap-3 pt-1">
+                <button
+                  type="submit"
+                  disabled={savingEmail || !newEmail || newEmail !== confirmEmail}
+                  className="flex items-center gap-2 py-2.5 px-5 rounded-xl font-semibold text-sm text-white bg-primary hover:brightness-110 focus:outline-none focus:ring-2 focus:ring-[#2563eb] focus:ring-offset-2 dark:focus:ring-offset-zinc-900 disabled:opacity-50 disabled:pointer-events-none active:scale-[0.98] transition-all duration-200"
+                >
+                  {savingEmail ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <Mail className="w-4 h-4" />
+                  )}
+                  Envoyer les liens de confirmation
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowEmailEdit(false);
+                    setNewEmail('');
+                    setConfirmEmail('');
+                  }}
+                  className="py-2.5 px-4 rounded-xl text-sm font-medium text-slate-600 dark:text-zinc-400 hover:bg-slate-100 dark:hover:bg-zinc-800 transition-colors"
+                >
+                  Annuler
+                </button>
+              </div>
+            </form>
+          )}
+        </div>
+      </section>
+
+      {/* ── Sécurité — Mot de passe ── */}
+      <section className="rounded-2xl border border-slate-200 dark:border-zinc-800/50 bg-white dark:bg-zinc-900/95 shadow-sm dark:shadow-none p-6">
+        <div className="flex items-center gap-3 mb-5">
+          <div className="w-9 h-9 rounded-xl bg-slate-50 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 flex items-center justify-center flex-shrink-0">
+            <Lock className="w-4 h-4 text-slate-500 dark:text-zinc-400" />
+          </div>
+          <div>
+            <h2 className="font-display font-semibold text-lg text-slate-900 dark:text-zinc-100 leading-tight">
+              Sécurité
+            </h2>
+            <p className="text-xs text-slate-500 dark:text-zinc-500 mt-0.5">Changement de mot de passe</p>
+          </div>
+        </div>
+
+        <form onSubmit={handleSavePassword} className="space-y-4 max-w-xl">
+          {/* Mot de passe actuel */}
+          <div>
+            <label htmlFor="current-password" className="block text-sm font-medium text-slate-700 dark:text-zinc-300 mb-1.5">
+              Mot de passe actuel
+            </label>
+            <PasswordField
+              id="current-password"
+              value={currentPassword}
+              onChange={setCurrentPassword}
+              showPassword={showCurrentPassword}
+              onToggleVisibility={() => setShowCurrentPassword((v) => !v)}
+              placeholder="••••••••"
+              autoComplete="current-password"
+            />
+          </div>
+
+          {/* Nouveau mot de passe */}
+          <div>
+            <label htmlFor="settings-new-password" className="block text-sm font-medium text-slate-700 dark:text-zinc-300 mb-1.5">
               Nouveau mot de passe
             </label>
             <PasswordField
-              id="settings-password"
+              id="settings-new-password"
               value={newPassword}
               onChange={setNewPassword}
-              showPassword={showPassword}
-              onToggleVisibility={() => setShowPassword((v) => !v)}
+              showPassword={showNewPassword}
+              onToggleVisibility={() => setShowNewPassword((v) => !v)}
               minLength={6}
               placeholder="••••••••"
               autoComplete="new-password"
             />
-            <p className="text-xs text-slate-500 mt-1">Minimum 6 caractères. Laissez vide pour ne pas changer.</p>
+            <p className="text-xs text-slate-500 dark:text-zinc-500 mt-1">Minimum 6 caractères.</p>
           </div>
+
+          {/* Confirmation */}
+          <div>
+            <label htmlFor="confirm-password" className="block text-sm font-medium text-slate-700 dark:text-zinc-300 mb-1.5">
+              Confirmer le nouveau mot de passe
+            </label>
+            <PasswordField
+              id="confirm-password"
+              value={confirmNewPassword}
+              onChange={setConfirmNewPassword}
+              showPassword={showConfirmPassword}
+              onToggleVisibility={() => setShowConfirmPassword((v) => !v)}
+              placeholder="••••••••"
+              autoComplete="new-password"
+              error={
+                confirmNewPassword && confirmNewPassword !== newPassword
+                  ? 'Les mots de passe ne correspondent pas.'
+                  : undefined
+              }
+            />
+          </div>
+
           <button
             type="submit"
-            disabled={savingAccount || !newPassword || newPassword.length < 6}
-            className="py-3 px-6 rounded-xl font-semibold text-white bg-primary hover:brightness-110 focus:outline-none focus:ring-2 focus:ring-[#2563eb] focus:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none active:scale-[0.98] transition-all duration-300 flex items-center justify-center gap-2"
+            disabled={
+              savingAccount ||
+              !currentPassword ||
+              !newPassword ||
+              newPassword.length < 6 ||
+              newPassword !== confirmNewPassword
+            }
+            className="flex items-center gap-2 py-3 px-6 rounded-xl font-semibold text-sm text-white bg-primary hover:brightness-110 focus:outline-none focus:ring-2 focus:ring-[#2563eb] focus:ring-offset-2 dark:focus:ring-offset-zinc-900 disabled:opacity-50 disabled:pointer-events-none active:scale-[0.98] transition-all duration-200"
           >
             {savingAccount ? (
-              <>
-                <Loader2 className="w-4 h-4 animate-spin" />
-                Mise à jour...
-              </>
+              <Loader2 className="w-4 h-4 animate-spin" />
             ) : (
-              'Changer le mot de passe'
+              <ShieldCheck className="w-4 h-4" />
             )}
+            {savingAccount ? 'Mise à jour…' : 'Mettre à jour le mot de passe'}
           </button>
         </form>
       </section>
@@ -1151,7 +1434,7 @@ export default function SettingsPage() {
                   pendingProfilePayloadRef.current = null;
                   setSuggestedLocale(null);
                   if (payload && typeof payload.fullName === 'string' && typeof payload.establishmentName === 'string' && typeof payload.establishmentType === 'string' && typeof payload.address === 'string' && typeof payload.phone === 'string') {
-                    doSaveProfile(payload, null);
+                    doSaveProfile(payload as { fullName: string; establishmentName: string; establishmentType: string; address: string; phone: string }, null);
                   }
                 }}
                 className="px-4 py-2 rounded-xl text-sm font-medium text-slate-700 dark:text-zinc-300 hover:bg-slate-100 dark:hover:bg-zinc-800 transition-colors"
@@ -1167,7 +1450,7 @@ export default function SettingsPage() {
                   const loc = suggestedLocale;
                   setSuggestedLocale(null);
                   if (payload && typeof payload.fullName === 'string' && typeof payload.establishmentName === 'string' && typeof payload.establishmentType === 'string' && typeof payload.address === 'string' && typeof payload.phone === 'string' && loc) {
-                    doSaveProfile(payload, loc);
+                    doSaveProfile(payload as { fullName: string; establishmentName: string; establishmentType: string; address: string; phone: string }, loc);
                   }
                 }}
                 disabled={savingProfile}

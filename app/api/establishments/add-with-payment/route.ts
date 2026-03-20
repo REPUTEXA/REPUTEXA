@@ -6,7 +6,7 @@ import { createClient } from '@/lib/supabase/server';
  * Les nouveaux emplacements sont créés uniquement par le webhook invoice.paid après paiement.
  * Utiliser le bouton "Ajouter un nouvel emplacement" sur le tableau de bord → redirection Stripe.
  */
-export async function POST(request: Request) {
+export async function POST(_request: Request) {
   try {
     const supabase = await createClient();
     const {

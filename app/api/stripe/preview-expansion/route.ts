@@ -76,11 +76,11 @@ export async function GET(request: Request) {
     try {
       upcoming = await stripeWithRetry(
         (s) =>
-          s.invoices.retrieveUpcoming({
+          (s.invoices as unknown as { retrieveUpcoming: (params: Record<string, unknown>) => Promise<Stripe.Invoice> }).retrieveUpcoming({
             customer: customerId,
             subscription: active.id,
             subscription_items: [{ id: item.id, quantity: newQty }],
-          } as Stripe.InvoiceRetrieveUpcomingParams),
+          }),
         secretKey
       );
     } catch (previewErr) {

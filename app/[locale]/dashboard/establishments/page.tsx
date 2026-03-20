@@ -92,13 +92,14 @@ export default function EstablishmentsPage() {
   const [limitReachedModalOpen, setLimitReachedModalOpen] = useState(false);
   const [portalLoading, setPortalLoading] = useState(false);
   const [reducePortalLoading, setReducePortalLoading] = useState(false);
-  const [switchToAnnualLoading, setSwitchToAnnualLoading] = useState(false);
-  const [bulkTargetQuantity, setBulkTargetQuantity] = useState(1);
+  const [_switchToAnnualLoading, _setSwitchToAnnualLoading] = useState(false);
+  const [singleExpansionLoading, setSingleExpansionLoading] = useState(false);
+  const [_bulkTargetQuantity, setBulkTargetQuantity] = useState(1);
   const [expansionAddCount, setExpansionAddCount] = useState(1);
   const [expansionPreviewAmount, setExpansionPreviewAmount] = useState<number | null>(null);
   const [expansionPreviewLoading, setExpansionPreviewLoading] = useState(false);
   const [settingDefaultId, setSettingDefaultId] = useState<string | null>(null);
-  const [expansionRedirecting, setExpansionRedirecting] = useState(false);
+  const [_expansionRedirecting, _setExpansionRedirecting] = useState(false);
   const upgradedWithOpenConfigRef = useRef(false);
   const toastShownRef = useRef<Set<string>>(new Set());
   const TOAST_SUPPRESS_MS = 15000;
@@ -252,7 +253,7 @@ export default function EstablishmentsPage() {
     }
   }, []);
 
-  const openAddModal = useCallback(() => {
+  const _openAddModal = useCallback(() => {
     const subsQty = subscription.quantity;
     const visibleCount = Math.min(subsQty, (data?.establishments ?? []).length);
     if (visibleCount >= subsQty) {
@@ -265,6 +266,7 @@ export default function EstablishmentsPage() {
     setSelectedGoogleLoc(null);
     setModalAddOpen(true);
     fetchGoogleLocations();
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- data?.establishments intentionally omitted to avoid unnecessary re-creations
   }, [fetchGoogleLocations, subscription.quantity, data?.establishments?.length]);
 
   const closeAddModal = useCallback(() => {
@@ -444,7 +446,7 @@ export default function EstablishmentsPage() {
     }
   };
 
-  const openBulkCheckout = async (targetQuantity: number) => {
+  const _openBulkCheckout = async (targetQuantity: number) => {
     setPortalLoading(true);
     try {
       const locale = typeof window !== 'undefined' ? (window.navigator.language?.startsWith('en') ? 'en' : 'fr') : 'fr';
@@ -525,11 +527,11 @@ export default function EstablishmentsPage() {
   // Stripe = master : on n'affiche que les N premiers (N = quota payé). Les autres sont archivés.
   const visibleEstablishments = allEstablishments.slice(0, subscriptionQuantity);
   const archivedCount = Math.max(0, allEstablishments.length - subscriptionQuantity);
-  const atLimit = visibleEstablishments.length >= subscriptionQuantity;
+  const _atLimit = visibleEstablishments.length >= subscriptionQuantity;
   const planSlug = (data?.planSlug ?? subscription.planSlug) as PlanSlug;
   const basePrice = data?.basePrice ?? PLAN_PRICES[planSlug];
   const totalSavings = data?.totalSavings ?? 0;
-  const totalMonthlyPrice = getTotalMonthlyPrice(planSlug, visibleEstablishments.length);
+  const _totalMonthlyPrice = getTotalMonthlyPrice(planSlug, visibleEstablishments.length);
   const nextIndex = visibleEstablishments.length;
   const nextDiscount = getDiscountForIndex(nextIndex);
   const nextPrice = getPriceAfterDiscount(basePrice, nextIndex);
@@ -574,7 +576,7 @@ export default function EstablishmentsPage() {
                 <SubscriptionSkeleton />
               ) : (
                 <>
-                  Nombre d&apos;établissements : <span className="font-semibold text-slate-800 dark:text-slate-200 tabular-nums">{visibleEstablishments.length}</span>
+                  Établissements : <span className="font-semibold text-slate-800 dark:text-slate-200 tabular-nums">{visibleEstablishments.length}</span>
                   <span className="text-slate-400"> / </span>
                   <span className="font-semibold text-slate-800 dark:text-slate-200 tabular-nums">{subscriptionQuantity}</span>
                 </>
@@ -590,33 +592,37 @@ export default function EstablishmentsPage() {
                 </span>
               )}
             </p>
-            {/* Passage Mensuel → Annuel uniquement ; pas de bouton Annuel → Mensuel (voir switch-to-annual). */}
+            {/* Ancien bouton de passage en annuel supprimé */}
             <div className="flex flex-wrap items-center gap-3 mt-2">
-              {!subscription.isError && !subscription.isLoading && subscription.interval === 'month' && (
+              {!subscription.isLoading && !subscription.isError && (
                 <button
                   type="button"
                   onClick={async () => {
-                    setSwitchToAnnualLoading(true);
+                    setSingleExpansionLoading(true);
                     try {
-                      const res = await fetch('/api/stripe/switch-to-annual', { method: 'POST' });
+                      const locale = window.location.pathname.split('/')[1] || 'fr';
+                      const res = await fetch(`/api/stripe/create-expansion-session?locale=${locale}`, {
+                        method: 'POST',
+                        credentials: 'include',
+                      });
                       const json = await res.json().catch(() => ({}));
                       if (!res.ok) throw new Error(json.error ?? 'Erreur');
-                      if (json.url) window.location.href = json.url;
-                      else {
-                        toast.success(json.message ?? 'Mis à jour.');
-                        queryClient.invalidateQueries({ queryKey: SUBSCRIPTION_QUERY_KEY });
+                      if (json.url) {
+                        window.location.href = json.url as string;
+                      } else {
+                        toast.error(json.error ?? 'Impossible d’ouvrir la page Stripe.');
                       }
-                    } catch (e) {
-                      toast.error(e instanceof Error ? e.message : 'Erreur');
+                    } catch (err) {
+                      toast.error(err instanceof Error ? err.message : 'Erreur lors de l’ajout d’un emplacement.');
                     } finally {
-                      setSwitchToAnnualLoading(false);
+                      setSingleExpansionLoading(false);
                     }
                   }}
-                  disabled={switchToAnnualLoading}
-                  className="text-xs font-medium text-emerald-600 dark:text-emerald-400 hover:underline underline-offset-2 disabled:opacity-50 flex items-center gap-1.5"
+                  disabled={singleExpansionLoading}
+                  className="inline-flex items-center gap-1.5 rounded-lg border border-emerald-500 px-3 py-1.5 text-xs font-semibold text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/40 disabled:opacity-50"
                 >
-                  {switchToAnnualLoading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : null}
-                  Passer en annuel (-20%)
+                  {singleExpansionLoading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : null}
+                  Ajouter un emplacement
                 </button>
               )}
               {!subscription.isLoading && (subscriptionQuantity > visibleEstablishments.length || visibleEstablishments.length > 0) && (
@@ -776,53 +782,7 @@ export default function EstablishmentsPage() {
             </motion.div>
           ))}
 
-          {/* Carte Ajouter un nouvel emplacement (quand limite atteinte) — paiement direct Stripe, pas de formulaire */}
-          {atLimit && (
-            <motion.button
-              key="upsell-slot"
-              type="button"
-              layout
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.98 }}
-              transition={{ type: 'spring', damping: 24, stiffness: 400 }}
-              onClick={async () => {
-                setExpansionRedirecting(true);
-                try {
-                  const locale = typeof window !== 'undefined' ? (window.navigator.language?.startsWith('en') ? 'en' : 'fr') : 'fr';
-                  const res = await fetch(`/api/stripe/create-bulk-expansion?locale=${locale}`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    credentials: 'include',
-                    body: JSON.stringify({ expansionAddCount: 1 }),
-                  });
-                  const json = await res.json().catch(() => ({}));
-                  if (json.url) window.location.href = json.url;
-                  else throw new Error(json.error ?? 'Erreur');
-                } catch (err) {
-                  toast.error(err instanceof Error ? err.message : 'Erreur ouverture du paiement');
-                } finally {
-                  setExpansionRedirecting(false);
-                }
-              }}
-              disabled={expansionRedirecting}
-              className="rounded-2xl border-2 border-dashed border-emerald-300 dark:border-emerald-500/50 bg-emerald-50/50 dark:bg-emerald-500/10 hover:bg-emerald-100/80 dark:hover:bg-emerald-500/20 transition-all duration-300 p-6 flex flex-col items-center justify-center gap-2 text-emerald-700 dark:text-emerald-300 min-h-[180px] group disabled:opacity-70 disabled:cursor-wait"
-            >
-              {expansionRedirecting ? (
-                <Loader2 className="w-8 h-8 animate-spin" />
-              ) : (
-                <Sparkles className="w-8 h-8 group-hover:scale-110 transition-transform" />
-              )}
-              <span className="font-semibold">
-                {expansionRedirecting ? 'Redirection vers le paiement…' : 'Ajouter un nouvel emplacement'}
-              </span>
-              {!expansionRedirecting && (
-                <span className="inline-flex items-center px-3 py-1 rounded-lg text-xs font-bold uppercase tracking-wide bg-emerald-500/20 text-emerald-700 dark:text-emerald-200 border border-emerald-400/50">
-                  PROMO -{getDiscountForIndex(subscriptionQuantity)}%
-                </span>
-              )}
-            </motion.button>
-          )}
+          {/* Carte promotionnelle "Ajouter un nouvel emplacement" désactivée */}
         </AnimatePresence>
       </section>
 

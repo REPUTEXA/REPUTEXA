@@ -13,7 +13,7 @@ export type CallbackAction =
   | (typeof CALLBACK_ACTIONS)['APPROVE_REPLY']
   | (typeof CALLBACK_ACTIONS)['EDIT_REPLY'];
 
-export type ReviewPlatform = 'google' | 'facebook' | 'trustpilot';
+export type ReviewPlatform = 'google' | 'facebook' | 'trustpilot' | 'tripadvisor';
 
 export interface StandardReview {
   author: string;

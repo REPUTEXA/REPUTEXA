@@ -27,7 +27,7 @@ const PUBLIC_PATTERNS = [
   /^\/(fr|en|es|de|it)\/choose-plan$/,
   /^\/(fr|en|es|de|it)\/pricing$/,
   /^\/(fr|en|es|de|it)\/contact$/,
-  /^\/(fr|en|es|de|it)\/legal$/,
+  /^\/(fr|en|es|de|it)\/legal(\/.*)?$/,
   /^\/(fr|en|es|de|it)\/privacy$/,
   /^\/(fr|en|es|de|it)\/terms$/,
   /^\/sign-up(\/.*)?$/,

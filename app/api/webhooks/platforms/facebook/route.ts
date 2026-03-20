@@ -26,10 +26,12 @@ export async function POST(request: Request) {
       fbComment?: string;
     };
 
+    type FbBody = { fbUserName?: string; fbRating?: number; fbComment?: string };
+    const fb = body as FbBody;
     const standard: StandardReview = {
-      author: (reviewerName ?? (body as any).fbUserName ?? '').trim(),
-      rating: Number(rating ?? (body as any).fbRating),
-      text: (comment ?? (body as any).fbComment ?? '').trim(),
+      author: (reviewerName ?? fb.fbUserName ?? '').trim(),
+      rating: Number(rating ?? fb.fbRating),
+      text: (comment ?? fb.fbComment ?? '').trim(),
       platform: 'facebook',
       externalId: reviewId ?? null,
     };

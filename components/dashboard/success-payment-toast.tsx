@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useRouter, usePathname } from '@/i18n/navigation';
 import { useQueryClient } from '@tanstack/react-query';
@@ -55,11 +55,11 @@ export function SuccessPaymentToast() {
     if (hasShownRef.current) return;
     hasShownRef.current = true;
 
-    const planName = plan ? (PLAN_DISPLAY[plan] ?? plan) : 'Vision';
+    const planName = plan ? (PLAN_DISPLAY[plan] ?? plan) : 'votre plan';
     clearCheckoutIntent();
     queryClient.invalidateQueries({ queryKey: SUBSCRIPTION_QUERY_KEY });
     fireConfetti();
-    toast.success(`Bienvenue ! Votre plan ${planName} est activé. 🎉`, {
+    toast.success(`Bienvenue dans le plan ${planName} ! 🎉`, {
       duration: 5000,
       className: 'border-[#2563eb]/30 shadow-lg',
     });

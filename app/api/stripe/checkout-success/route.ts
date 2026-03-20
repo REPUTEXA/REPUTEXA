@@ -90,9 +90,10 @@ export async function GET(request: Request) {
           subscription?.items?.data?.[0]?.quantity != null
             ? Math.max(1, Number(subscription.items.data[0].quantity))
             : 1;
+        const subPeriodEnd = (subscription as { current_period_end?: number })?.current_period_end;
         const periodEnd =
-          subscription?.current_period_end != null
-            ? new Date(subscription.current_period_end * 1000).toISOString()
+          subPeriodEnd != null
+            ? new Date(subPeriodEnd * 1000).toISOString()
             : null;
 
         await admin

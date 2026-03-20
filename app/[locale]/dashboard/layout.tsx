@@ -55,6 +55,11 @@ export default async function DashboardLayout({ children, params }: Props) {
   let firstLogin = true;
   let subscriptionQuantity = 1;
   let updatesNewCount = 0;
+  let needsLegalConsent = false;
+  let currentLegalVersion = 0;
+  let legalSummary = '';
+  let legalEffectiveDate = '';
+  let isAdmin = false;
 
   try {
     const supabase = await createClient();
@@ -64,7 +69,7 @@ export default async function DashboardLayout({ children, params }: Props) {
   if (user) {
     const { data: profile, error: profileError } = await supabase
       .from('profiles')
-      .select('establishment_name, full_name, avatar_url, subscription_plan, trial_started_at, trial_ends_at, subscription_status, selected_plan, first_login, subscription_period_end, subscription_quantity')
+      .select('establishment_name, full_name, avatar_url, subscription_plan, trial_started_at, trial_ends_at, subscription_status, selected_plan, first_login, subscription_period_end, subscription_quantity, payment_status, last_legal_agreement_version, role')
       .eq('id', user.id)
       .single();
 
@@ -78,6 +83,7 @@ export default async function DashboardLayout({ children, params }: Props) {
       firstLogin = profile.first_login ?? true;
       avatarUrl = profile.avatar_url || null;
       planDisplayName = PLAN_DISPLAY[profile.subscription_plan] ?? 'Pulse';
+      isAdmin = (profile as Record<string, unknown>)?.role === 'admin';
       // Accès aux fonctionnalités : basé uniquement sur la souscription Stripe actuelle (subscription_plan).
       // Pendant l'essai = Zénith complet ; selected_plan ne sert que pour le badge "Passage programmé" et le webhook.
       selectedPlanSlug = toPlanSlug(profile.subscription_plan, undefined);
@@ -118,6 +124,31 @@ export default async function DashboardLayout({ children, params }: Props) {
       .not('completed_at', 'is', null)
       .gte('completed_at', new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString());
     updatesNewCount = count ?? 0;
+
+    // — Vérification du consentement légal —
+    const { data: latestLegal } = await supabase
+      .from('legal_versioning')
+      .select('version, summary_of_changes, effective_date')
+      .order('version', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    if (latestLegal) {
+      currentLegalVersion = latestLegal.version;
+      const userVersion = (profile as Record<string, unknown> | null)?.last_legal_agreement_version as number | null ?? 0;
+      needsLegalConsent = currentLegalVersion > userVersion;
+      if (needsLegalConsent) {
+        legalSummary = latestLegal.summary_of_changes ?? '';
+        legalEffectiveDate = latestLegal.effective_date
+          ? new Date(latestLegal.effective_date).toLocaleDateString('fr-FR', {
+              day: 'numeric',
+              month: 'long',
+              year: 'numeric',
+              timeZone: 'UTC',
+            })
+          : '';
+      }
+    }
   }
   } catch (e) {
     console.error('[dashboard layout]', e);
@@ -154,6 +185,11 @@ export default async function DashboardLayout({ children, params }: Props) {
         subscriptionQuantity={subscriptionQuantity}
         updatesNewCount={updatesNewCount}
         showPastDueBanner={showPastDueBanner}
+        needsLegalConsent={needsLegalConsent}
+        currentLegalVersion={currentLegalVersion}
+        legalSummary={legalSummary}
+        legalEffectiveDate={legalEffectiveDate}
+        isAdmin={isAdmin}
       >
         <Suspense fallback={null}>
           <StripeSyncOnReturn />

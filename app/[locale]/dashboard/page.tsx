@@ -1,6 +1,5 @@
 import { setRequestLocale } from 'next-intl/server';
 import { cookies } from 'next/headers';
-import { Suspense } from 'react';
 import { getTranslations } from 'next-intl/server';
 import { startOfDay, endOfDay, subDays, subMonths } from 'date-fns';
 import { prisma } from '@/lib/prisma';

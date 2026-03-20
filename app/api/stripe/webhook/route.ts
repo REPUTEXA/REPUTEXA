@@ -153,8 +153,9 @@ export async function POST(request: Request) {
             .limit(1);
           if (profiles?.length) {
             const qty = getSubscriptionQuantity(subscription);
-            const periodEnd = subscription.current_period_end
-              ? new Date(subscription.current_period_end * 1000).toISOString()
+            const subPeriodEnd = (subscription as { current_period_end?: number }).current_period_end;
+            const periodEnd = subPeriodEnd
+              ? new Date(subPeriodEnd * 1000).toISOString()
               : null;
             await admin
               .from('profiles')
@@ -270,26 +271,30 @@ export async function POST(request: Request) {
       const newPlanSlug = getPlanSlugFromSubscription(canonical);
       const qty = getSubscriptionQuantity(canonical);
       const stripeStatus = canonical.status;
-      const profileStatus = stripeStatus === 'trialing' ? 'trialing' : stripeStatus === 'active' ? 'active' : stripeStatus === 'past_due' ? 'past_due' : 'expired';
-      const trialEnd = canonical.trial_end ? new Date(canonical.trial_end * 1000) : null;
-      const periodEnd = canonical.current_period_end
-        ? new Date(canonical.current_period_end * 1000).toISOString()
+      const _profileStatus = stripeStatus === 'trialing' ? 'trialing' : stripeStatus === 'active' ? 'active' : stripeStatus === 'past_due' ? 'past_due' : 'expired';
+      type SubWithPeriod = { trial_end?: number; current_period_end?: number };
+      const subExt = canonical as SubWithPeriod;
+      const _trialEnd = subExt.trial_end ? new Date(subExt.trial_end * 1000) : null;
+      const _periodEnd = subExt.current_period_end
+        ? new Date(subExt.current_period_end * 1000).toISOString()
         : null;
-      const subscriptionPlan = (newPlanSlug && PLAN_SLUG_TO_SUBSCRIPTION[newPlanSlug]) ?? 'pulse';
+      const _subscriptionPlan = (newPlanSlug && PLAN_SLUG_TO_SUBSCRIPTION[newPlanSlug]) ?? 'pulse';
       const selectedPlan = (newPlanSlug ?? 'vision') as PlanSlug;
       const planChanged = typeof previousAttributes.items !== 'undefined' && newPlanSlug;
 
-      let profiles = await admin
+      let profilesRes = await admin
         .from('profiles')
         .select('id, selected_plan, subscription_plan, subscription_quantity, establishment_name, email')
         .eq('stripe_customer_id', customerId)
         .limit(1);
+      let profiles = Array.isArray(profilesRes?.data) ? profilesRes.data : null;
       if (!profiles?.length) {
-        profiles = await admin
+        profilesRes = await admin
           .from('profiles')
           .select('id, selected_plan, subscription_plan, subscription_quantity, establishment_name, email')
           .eq('stripe_subscription_id', subscriptionId)
           .limit(1);
+        profiles = Array.isArray(profilesRes?.data) ? profilesRes.data : null;
       }
       if (!profiles?.length) {
         const { data: bySub } = await admin
@@ -297,7 +302,7 @@ export async function POST(request: Request) {
           .select('id, selected_plan, subscription_plan, subscription_quantity, establishment_name, email')
           .eq('stripe_subscription_id', subscription.id)
           .limit(1);
-        if (bySub?.length) profiles = bySub;
+        if (Array.isArray(bySub) && bySub.length) profiles = bySub;
       }
 
       if (profiles?.length) {
@@ -369,11 +374,11 @@ export async function POST(request: Request) {
           if (invoiceEmail) {
             const { data: byEmail } = await admin
               .from('profiles')
-              .select('id, email, establishment_name, subscription_quantity, language')
+              .select('id, email, establishment_name, subscription_quantity, language, onboarding_paid_sent')
               .eq('email', invoiceEmail)
               .limit(1);
             if (byEmail?.length) {
-              profiles = { data: byEmail };
+              profiles = { data: byEmail } as typeof profiles;
               await admin.from('profiles').update({ stripe_customer_id: customerId }).eq('id', byEmail[0].id);
             }
           }
@@ -405,7 +410,7 @@ export async function POST(request: Request) {
             .eq('user_id', userId)
             .order('display_order', { ascending: false })
             .limit(1);
-          let nextOrder = (existing?.[0]?.display_order ?? -1) + 1;
+          const nextOrder = (existing?.[0]?.display_order ?? -1) + 1;
           for (let i = 0; i < addCount; i++) {
             await admin.from('establishments').insert({
               user_id: userId,

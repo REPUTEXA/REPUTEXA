@@ -3,17 +3,17 @@
 import { useTranslations, useLocale } from 'next-intl';
 import { Link } from '@/i18n/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Check } from 'lucide-react';
+import { Check, Sparkles } from 'lucide-react';
 import { BillingToggle } from '@/components/billing/billing-toggle';
 import { useBillingCycleOptional } from '@/lib/billing-cycle-context';
 import { saveCheckoutIntent } from '@/lib/checkout-intent';
-import { calculatePrice, PLAN_BASE_PRICES_EUR, PLAN_BASE_PRICES_USD } from '@/config/pricing';
+import { calculatePrice, calculateAnnualSavings, PLAN_BASE_PRICES_EUR, PLAN_BASE_PRICES_USD } from '@/config/pricing';
 import type { PlanSlug } from '@/config/pricing';
 
 const PLANS: { slug: PlanSlug; nameKey: string; forKey: string; priceKey: string; features: string[]; pulseStyle?: boolean }[] = [
   { slug: 'vision', nameKey: 'pricing.vision.name', forKey: 'pricing.vision.for', priceKey: 'pricing.vision.price', features: ['pricing.comparison.card_reponses', 'pricing.comparison.card_reporting_vision', 'pricing.comparison.card_ia_tests', 'pricing.comparison.card_langues_vision'] },
   { slug: 'pulse', nameKey: 'pricing.pulse.name', forKey: 'pricing.pulse.for', priceKey: 'pricing.pulse.price', features: ['pricing.comparison.card_reponses', 'pricing.comparison.card_alertes', 'pricing.comparison.card_reporting_pulse', 'pricing.comparison.card_suppression', 'pricing.comparison.card_ia_tests', 'pricing.comparison.card_langues_autres'], pulseStyle: true },
-  { slug: 'zenith', nameKey: 'pricing.zenith.name', forKey: 'pricing.zenith.for', priceKey: 'pricing.zenith.price', features: ['pricing.comparison.card_reponses', 'pricing.comparison.card_triple', 'pricing.comparison.card_alertes', 'pricing.comparison.card_reporting_pulse', 'pricing.comparison.card_boost_seo', 'pricing.comparison.card_suppression', 'pricing.comparison.card_ai_capture', 'pricing.comparison.card_consultant', 'pricing.comparison.card_langues_autres'] },
+  { slug: 'zenith', nameKey: 'pricing.zenith.name', forKey: 'pricing.zenith.for', priceKey: 'pricing.zenith.price', features: ['pricing.comparison.card_reponses', 'pricing.comparison.card_triple', 'pricing.comparison.card_alertes', 'pricing.comparison.card_reporting_pulse', 'pricing.comparison.card_boost_seo', 'pricing.comparison.card_suppression', 'pricing.comparison.card_ai_capture', 'pricing.comparison.card_langues_autres'] },
 ];
 
 export function LandingPricingSection() {
@@ -44,7 +44,7 @@ export function LandingPricingSection() {
   const annualSuffix = locale === 'en' ? 'billed annually' : 'Facturé annuellement';
 
   return (
-    <section id="tarifs" className="py-16 sm:py-20 bg-white dark:bg-white">
+    <section id="pricing" className="scroll-mt-20 py-16 sm:py-20 bg-muted/40">
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
         <div className="text-center mb-12">
           <h2 className="font-display text-4xl font-bold text-foreground mb-3">
@@ -105,9 +105,24 @@ export function LandingPricingSection() {
                     </motion.span>
                   </AnimatePresence>
                   {isAnnual && totalAnnual != null && (
-                    <p className={`text-xs mt-0.5 ${isPulse ? 'text-white/70' : 'text-muted-foreground'}`}>
-                      {annualSuffix} · {formatAmount(totalAnnual)}
-                    </p>
+                    <>
+                      <p className={`text-xs mt-0.5 ${isPulse ? 'text-white/70' : 'text-muted-foreground'}`}>
+                        {annualSuffix} · {formatAmount(totalAnnual)}
+                      </p>
+                      {(() => {
+                        const savings = calculateAnnualSavings(getBasePrice(plan.slug), 1);
+                        if (savings <= 0) return null;
+                        return (
+                          <p
+                            className={`inline-flex items-center gap-1.5 mt-1.5 text-sm font-semibold ${isPulse ? 'text-emerald-200' : 'text-green-600 dark:text-green-400'}`}
+                            role="status"
+                          >
+                            <Sparkles className="w-4 h-4 shrink-0" aria-hidden />
+                            {t('pricing.savingsPerYear', { amount: formatAmount(savings) })}
+                          </p>
+                        );
+                      })()}
+                    </>
                   )}
                 </div>
                 <ul className="space-y-2.5 mb-6 flex-1">

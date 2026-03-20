@@ -13,4 +13,4 @@ export {
   type CallbackAction,
   type WhatsAppCallbackPayload,
 } from './callbacks';
-export type { GoogleReviewWebhookPayload, WhatsAppAlertPayload } from './types';
+export type { GoogleReviewWebhookPayload, WhatsAppAlertPayload, StandardReview } from './types';

@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "npm run support:index-codebase && next build",
     "start": "next start",
     "lint": "next lint",
     "db:generate": "prisma generate",
@@ -12,9 +12,12 @@
     "db:migrate": "prisma migrate dev",
     "db:studio": "prisma studio",
     "sniper": "tsx scripts/sniper.ts",
+    "support:index-codebase": "tsx scripts/index-support-codebase.ts",
+    "support:watch-kb": "python scripts/watch_support_vectorizer.py",
     "stripe:listen": "stripe listen --forward-to localhost:3000/api/stripe/webhook"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.79.0",
     "@react-email/components": "^1.0.8",
     "@react-pdf/renderer": "^4.3.2",
     "@stripe/stripe-js": "^8.8.0",
@@ -24,11 +27,12 @@
     "canvas-confetti": "^1.9.4",
     "date-fns": "^4.1.0",
     "framer-motion": "^12.34.5",
+    "jspdf": "^4.2.1",
     "lucide-react": "^0.575.0",
     "next": "14.2.35",
     "next-intl": "^3.26.5",
     "next-themes": "^0.4.6",
-    "openai": "^6.25.0",
+    "openai": "^6.32.0",
     "react": "^18",
     "react-dom": "^18",
     "react-email": "^5.2.9",
@@ -44,6 +48,7 @@
     "zod": "^4.3.6"
   },
   "devDependencies": {
+    "@langchain/textsplitters": "^1.0.1",
     "@prisma/client": "^6.8.0",
     "@resvg/resvg-js": "^2.6.2",
     "@types/canvas-confetti": "^1.9.0",

@@ -292,16 +292,18 @@ export function buildProfileSyncFromSubscription(subscription: Stripe.Subscripti
   const planSlug = (getPlanSlugFromSubscription(subscription) ?? 'vision') as PlanSlug;
   const quantity = getSubscriptionQuantity(subscription);
   const status = subscription.status === 'trialing' ? 'trialing' : subscription.status === 'active' ? 'active' : 'expired';
-  const periodEnd = subscription.current_period_end
-    ? new Date(subscription.current_period_end * 1000).toISOString()
+  const subPeriodEnd = (subscription as { current_period_end?: number }).current_period_end;
+  const periodEnd = subPeriodEnd
+    ? new Date(subPeriodEnd * 1000).toISOString()
     : null;
   const trialEndsAt = status === 'trialing' && subscription.trial_end
     ? new Date(subscription.trial_end * 1000).toISOString()
     : null;
   const customerId = typeof subscription.customer === 'string' ? subscription.customer : (subscription.customer as Stripe.Customer)?.id ?? null;
+  const cust = subscription.customer as Stripe.Customer | undefined;
   const customerEmail =
-    typeof subscription.customer === 'object' && subscription.customer?.email
-      ? (subscription.customer as Stripe.Customer).email
+    typeof subscription.customer === 'object' && cust?.email
+      ? cust.email
       : null;
 
   return {
@@ -340,7 +342,7 @@ export async function syncProfileFromSubscription(
 
   if (!profiles?.length) return;
 
-  const { customerEmail: _, ...update } = payload;
+  const { customerEmail: _customerEmail, ...update } = payload;
   await admin.from('profiles').update(update).eq('id', profiles[0].id);
 }
 

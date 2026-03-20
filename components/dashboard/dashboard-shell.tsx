@@ -6,7 +6,7 @@ import { useSearchParams, useParams } from 'next/navigation';
 import { Link } from '@/i18n/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { getSiteUrl } from '@/lib/site-url';
-import { LogOut, LayoutDashboard, BarChart2, Bell, Lightbulb, Settings, Menu, X, Search, Building2, CheckCircle2, TrendingUp, FileText, Sparkles, Rss, Loader2 } from 'lucide-react';
+import { LogOut, LayoutDashboard, BarChart2, Bell, Lightbulb, Settings, Menu, X, Search, Building2, CheckCircle2, FileText, Rss, Loader2, MessageCircle, ShieldCheck, Headphones } from 'lucide-react';
 import { Logo } from '@/components/logo';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { LanguageSelector } from '@/components/language-selector';
@@ -17,6 +17,7 @@ import { WelcomeFlash } from './welcome-flash';
 import { PlanBadge } from './plan-badge';
 import { EstablishmentSelector } from './establishment-selector';
 import { UpdatesModal } from './updates-modal';
+import { LegalConsentModal } from './legal-consent-modal';
 import { useTranslations } from 'next-intl';
 
 function SignOutButton() {
@@ -57,12 +58,12 @@ const navItems: Array<{
   { href: '/dashboard', icon: LayoutDashboard, key: 'overview', minPlan: 'vision' },
   { href: '/dashboard/reviews', icon: StarNavIcon, key: 'aiResponses', minPlan: 'vision' },
   { href: '/dashboard/statistics', icon: BarChart2, key: 'statistics', minPlan: 'vision' },
-  { href: '/dashboard/consultant', icon: Sparkles, key: 'consultant', minPlan: 'zenith' },
   { href: '/dashboard/alerts', icon: Bell, key: 'alerts', minPlan: 'pulse' },
-  { href: '/dashboard/growth', icon: TrendingUp, key: 'growth', minPlan: 'zenith' },
+  { href: '/dashboard/collecte-avis', icon: MessageCircle, key: 'collecteAvis', minPlan: 'zenith' },
   { href: '/dashboard/suggestions', icon: Lightbulb, key: 'suggestions', minPlan: 'pulse' },
   { href: '/dashboard/updates', icon: Rss, key: 'updates', minPlan: 'vision' },
   { href: '/dashboard/establishments', icon: Building2, key: 'establishments', minPlan: 'vision' },
+  { href: '/dashboard/support', icon: Headphones, key: 'support', minPlan: 'free' },
   { href: '/dashboard/settings', icon: Settings, key: 'settings', minPlan: 'vision' },
 ];
 
@@ -70,17 +71,18 @@ const NAV_LABEL_KEYS = {
   overview: 'overview',
   aiResponses: 'aiResponses',
   statistics: 'statistics',
-  consultant: 'consultant',
   establishments: 'establishments',
   prospects: 'prospects',
   alerts: 'alerts',
-  growth: 'growth',
+  collecteAvis: 'collecteAvis',
   suggestions: 'suggestions',
   updates: 'updates',
+  support: 'support',
   settings: 'settings',
 } as const;
 
 type Props = {
+  firstLogin?: boolean;
   establishmentName?: string;
   fullName?: string;
   avatarUrl?: string | null;
@@ -98,6 +100,11 @@ type Props = {
   subscriptionQuantity?: number;
   updatesNewCount?: number;
   showPastDueBanner?: boolean;
+  needsLegalConsent?: boolean;
+  currentLegalVersion?: number;
+  legalSummary?: string;
+  legalEffectiveDate?: string;
+  isAdmin?: boolean;
   children: React.ReactNode;
 };
 
@@ -114,7 +121,7 @@ export function DashboardShell({
   fullName = '',
   avatarUrl = null,
   trialDaysLeft = null,
-  trialEndDate = null,
+  trialEndDate: _trialEndDate = null,
   showTrialBanner = false,
   planDisplayName = 'Pulse',
   selectedPlanSlug = 'pulse',
@@ -124,13 +131,18 @@ export function DashboardShell({
   isTrialing = false,
   hasActiveSubscription = false,
   locale = 'fr',
-  subscriptionQuantity = 1,
+  subscriptionQuantity: _subscriptionQuantity = 1,
   updatesNewCount = 0,
   showPastDueBanner = false,
+  needsLegalConsent = false,
+  currentLegalVersion = 0,
+  legalSummary = '',
+  legalEffectiveDate = '',
+  isAdmin = false,
   children,
 }: Props) {
   const tSidebar = useTranslations('Dashboard.sidebar');
-  const planSlug = PLAN_TO_SLUG[planDisplayName] ?? 'pulse';
+  const _planSlug = PLAN_TO_SLUG[planDisplayName] ?? 'pulse';
   const pathname = usePathname();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -150,6 +162,7 @@ export function DashboardShell({
     week_start?: string;
   } | null>(null);
   const [updatesModalOpen, setUpdatesModalOpen] = useState(false);
+  const [legalModalOpen, setLegalModalOpen] = useState(needsLegalConsent);
   useEffect(() => { setSearchInput(qParam); }, [qParam]);
 
   // Modale "Quoi de neuf" : déclenchée par UpgradeSuccessToast via événement (URL déjà nettoyée par le toast)
@@ -318,6 +331,22 @@ export function DashboardShell({
               );
             })}
         </nav>
+        {isAdmin && (
+          <div className="px-2 py-2 border-t border-white/10 dark:border-zinc-800/50">
+            <Link
+              href="/dashboard/admin"
+              onClick={() => setSidebarOpen(false)}
+              className={`flex items-center gap-3 px-3 py-2.5 min-h-[44px] rounded-xl text-sm font-medium transition-all duration-300 ease-in-out ${
+                pathname?.startsWith('/dashboard/admin')
+                  ? 'bg-blue-600/20 text-blue-400 border border-blue-600/30'
+                  : 'text-zinc-500 hover:text-blue-400 hover:bg-blue-600/10 border border-transparent'
+              }`}
+            >
+              <ShieldCheck className="w-4 h-4 flex-shrink-0" />
+              <span>Admin Panel</span>
+            </Link>
+          </div>
+        )}
         <PlanBadge
           planSlug={selectedPlanSlug}
           planDisplayName={planDisplayName}
@@ -524,6 +553,13 @@ export function DashboardShell({
         open={updatesModalOpen}
         onClose={() => setUpdatesModalOpen(false)}
         locale={locale}
+      />
+      <LegalConsentModal
+        open={legalModalOpen}
+        currentVersion={currentLegalVersion}
+        summaryOfChanges={legalSummary}
+        effectiveDateFormatted={legalEffectiveDate}
+        onAccepted={() => setLegalModalOpen(false)}
       />
     </div>
   );

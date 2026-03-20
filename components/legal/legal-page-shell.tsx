@@ -87,9 +87,19 @@ export function LegalPageShell({ title, toc, children, navLinks = DEFAULT_NAV, t
             <Logo size="sm" />
             <span className="font-display font-bold uppercase">REPUTEXA</span>
           </Link>
-          <p className="text-sm text-slate-500 dark:text-slate-400">
-            © {new Date().getFullYear()} REPUTEXA. Tous droits réservés.
-          </p>
+          <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-6">
+            <a
+              href="/docs/registre-rgpd-reputexa.html"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-xs text-slate-400 dark:text-slate-500 hover:text-[#2563eb] dark:hover:text-[#2563eb] underline underline-offset-2 transition-colors"
+            >
+              Registre RGPD (Art. 30)
+            </a>
+            <p className="text-sm text-slate-500 dark:text-slate-400">
+              © {new Date().getFullYear()} REPUTEXA. Tous droits réservés.
+            </p>
+          </div>
         </div>
       </footer>
     </div>

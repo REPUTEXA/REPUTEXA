@@ -12,6 +12,7 @@
     "perEstablishments": "for {count} establishments",
     "savings": "Save {amount}",
     "savingsBadge": "Save {amount}",
+    "savingsPerYear": "You save {amount} / year",
     "backToDashboard": "Back to dashboard",
     "ctaChoose": "Choose this plan",
     "ctaSubscribe": "Subscribe now",
@@ -210,6 +211,29 @@
       }
     },
     "pricingTrial": "14-day free trial - No credit card required",
+    "googleFlywheel": {
+      "badge": "Google Algorithm",
+      "headline": "Why Your Reputation Is Your Best Search Engine",
+      "subtitle": "This is not an opinion — it is the documented behaviour of the Google My Business algorithm.",
+      "step1": {
+        "trigger": "More Reviews",
+        "title": "Customer credibility",
+        "result": "You build credibility and trust with potential customers who compare businesses before choosing."
+      },
+      "step2": {
+        "trigger": "Systematic Responses",
+        "title": "Positive Google signal",
+        "result": "Google detects human activity and responsive customer service — two strong positive signals for your score."
+      },
+      "step3": {
+        "trigger": "Boosted Ranking",
+        "title": "Top of search results",
+        "result": "Your business naturally climbs to the top of Google results without paying for ads."
+      },
+      "equation": "The equation is simple: the more reviews you have and the more you reply, the better Google ranks you.",
+      "equationSource": "Based on official Google My Business guidelines",
+      "cta": "Dominate my Google ranking"
+    },
     "pricing": {
       "headline": "Invest in Your Reputation. Not Just a Tool—Your 24/7 Digital Director.",
       "subtitle": "Three plans. One mission: protect and grow your reputation.",
@@ -238,6 +262,7 @@
         "cta": "Try for Free"
       },
       "paymentCancelledMessage": "Payment cancelled. You can try again by selecting a plan below.",
+      "savingsPerYear": "You save {amount} / year",
       "comparison": {
         "reponses_avis": "Review replies",
         "reponses_avis_val": "Automatic & unlimited",
@@ -277,7 +302,6 @@
         "card_triple": "Triple AI Verification (Picks the best response)",
         "card_boost_seo": "SEO Boost (AI keywords)",
         "card_ai_capture": "AI capture (WhatsApp 30 min after visit)",
-        "card_consultant": "24/7 Strategic Consultant",
         "card_langues_autres": "All languages (Native)"
       }
     },
@@ -335,16 +359,39 @@
       "overview": "Overview",
       "aiResponses": "AI Responses",
       "statistics": "Statistics",
-      "consultant": "AI Consultant",
       "establishments": "My Establishments",
       "prospects": "Prospects (Sniper)",
       "alerts": "Alerts",
       "growth": "Zenith Growth",
       "suggestions": "Suggestions",
       "updates": "Updates",
+      "support": "AI Support",
       "settings": "Settings",
       "upgrade": "Upgrade",
       "unlockCta": "Unlock unlimited responses"
+    },
+    "support": {
+      "metaTitle": "AI Support | REPUTEXA",
+      "title": "REPUTEXA technical concierge",
+      "subtitle": "Expert guidance — answers grounded in our codebase and institutional memory",
+      "newTicket": "New case",
+      "openLabel": "Open",
+      "archivedLabel": "Archived",
+      "emptyOpen": "No open cases",
+      "emptyArchived": "No archived cases",
+      "ticketTitle": "Case {date}",
+      "archive": "Archive case",
+      "archivedToast": "Case archived — we're capturing a lesson for the team.",
+      "newTicketToast": "New case created",
+      "pickOrCreate": "Create a case or pick one from the history.",
+      "placeholder": "Describe your question or blocker…",
+      "send": "Send",
+      "thinking": "Your advisor is writing a reply…",
+      "readOnlyArchived": "Archived conversation — read-only. Open a new case for another question.",
+      "loadError": "Could not load support.",
+      "sendError": "Could not send. Please try again.",
+      "newTicketError": "Could not create the case.",
+      "archiveError": "Could not archive."
     },
     "overview": { "title": "Overview", "stats": { "avgRating": "Average Rating", "reviewsProcessed": "Reviews Processed", "securityAlerts": "Security Alerts", "timeSaved": "Time Saved" }, "reviewsTitle": "Real-Time Review Feed", "reviewsEmpty": "No reviews yet. Simulate one below.", "simulateTitle": "Simulate Review", "chartTitle": "Rating Trend" },
     "prospects": { "title": "Prospects (Sniper)", "subtitle": "{{count}} prospect to contact", "subtitle_plural": "{{count}} prospects to contact", "empty": "No prospects. Run the Sniper script to find some.", "generatePitch": "Generate Pitch", "contact": "Contact", "copyPitch": "Copy pitch", "copied": "Copied!", "pitchTitle": "Custom pitch", "noPitch": "No pitch generated yet." },

@@ -25,10 +25,12 @@ export async function POST(request: Request) {
       tpComment?: string;
     };
 
+    type TpBody = { tpUserName?: string; tpRating?: number; tpComment?: string };
+    const tp = body as TpBody;
     const standard: StandardReview = {
-      author: (reviewerName ?? (body as any).tpUserName ?? '').trim(),
-      rating: Number(rating ?? (body as any).tpRating),
-      text: (comment ?? (body as any).tpComment ?? '').trim(),
+      author: (reviewerName ?? tp.tpUserName ?? '').trim(),
+      rating: Number(rating ?? tp.tpRating),
+      text: (comment ?? tp.tpComment ?? '').trim(),
       platform: 'trustpilot',
       externalId: reviewId ?? null,
     };

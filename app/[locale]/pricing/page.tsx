@@ -10,7 +10,7 @@ import { Logo } from '@/components/logo';
 import { BillingToggle } from '@/components/billing/billing-toggle';
 import { useBillingCycle } from '@/lib/billing-cycle-context';
 import { createClient } from '@/lib/supabase/client';
-import { Check, Loader2, Building2 } from 'lucide-react';
+import { Check, Loader2, Building2, Sparkles } from 'lucide-react';
 import { toast } from 'sonner';
 import { saveCheckoutIntent, getCheckoutIntent } from '@/lib/checkout-intent';
 import {
@@ -64,6 +64,8 @@ export default function PricingPage() {
   const [session, setSession] = useState<{ user: { id: string } } | null>(null);
   const [sessionLoading, setSessionLoading] = useState(true);
   const [checkoutLoading, setCheckoutLoading] = useState<string | null>(null);
+  const [acceptedCgu, setAcceptedCgu] = useState(false);
+  const [acceptedZenith, setAcceptedZenith] = useState(false);
   const useUsd = locale === 'en';
 
   useEffect(() => {
@@ -110,27 +112,28 @@ export default function PricingPage() {
   useEffect(() => {
     if (statusCancelled || resumeHandledRef.current) return;
     try {
-      const raw = typeof window !== 'undefined' ? window.localStorage.getItem(CHECKOUT_INTENT_KEY) : null;
-      if (!raw) return;
-      const data = JSON.parse(raw) as { plan?: string; annual?: boolean; quantity?: number; timestamp?: number };
-      if (!data?.plan || !data.timestamp || Date.now() - data.timestamp > INTENT_MAX_AGE_MS) return;
+      const data = getCheckoutIntent();
+      if (!data) return;
       resumeHandledRef.current = true;
       if (data.annual === true) setBillingCycle('year');
       else if (data.annual === false) setBillingCycle('month');
       if (typeof data.quantity === 'number' && data.quantity >= 1 && data.quantity <= 15) {
-      setQuantityClamped(data.quantity);
-    }
-    const plan = ['vision', 'pulse', 'zenith'].includes(data.plan) ? data.plan : null;
-    if (plan) {
-      requestAnimationFrame(() => {
+        setQuantityClamped(data.quantity);
+      }
+      const plan = ['vision', 'pulse', 'zenith'].includes(data.plan) ? data.plan : null;
+      if (plan) {
         requestAnimationFrame(() => {
-          document.getElementById(`plan-card-${plan}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          requestAnimationFrame(() => {
+            document.getElementById(`plan-card-${plan}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          });
         });
-      });
-      toast.info(t('resumeCheckoutToast'), {
-        duration: 6000,
-        className: 'border-slate-200 dark:border-slate-700 shadow-lg',
-      });
+        toast.info(t('resumeCheckoutToast'), {
+          duration: 6000,
+          className: 'border-slate-200 dark:border-slate-700 shadow-lg',
+        });
+      }
+    } catch (error) {
+      console.error('[pricing] resume checkout intent', error);
     }
   }, [statusCancelled, setBillingCycle, t]);
 
@@ -138,8 +141,6 @@ export default function PricingPage() {
     (useUsd ? PLAN_BASE_PRICES_USD : PLAN_BASE_PRICES_EUR)[planKey as PlanSlug] ?? 0;
   const getSavingsAmount = (planKey: string) =>
     calculateSavings(getBasePrice(planKey), quantity);
-  const getAnnualSavingsAmount = (planKey: string) =>
-    calculateAnnualSavings(getBasePrice(planKey), quantity);
 
   const currencyFmt = (amount: number) =>
     new Intl.NumberFormat(locale === 'en' ? 'en-US' : 'fr-FR', {
@@ -362,6 +363,19 @@ export default function PricingPage() {
                       <p className="mt-0.5 text-sm text-slate-500 dark:text-slate-400">
                         {t('billedAnnually', { amount: currencyFmt(totalAnnual) })}
                       </p>
+                      {(() => {
+                        const planSavings = calculateAnnualSavings(getBasePrice(slug), quantity);
+                        if (planSavings <= 0) return null;
+                        return (
+                          <p
+                            className="inline-flex items-center gap-1.5 mt-2 text-sm font-semibold text-green-600 dark:text-green-400"
+                            role="status"
+                          >
+                            <Sparkles className="w-4 h-4 shrink-0" aria-hidden />
+                            {t('savingsPerYear', { amount: currencyFmt(planSavings) })}
+                          </p>
+                        );
+                      })()}
                     </>
                   ) : (
                     <AnimatePresence mode="wait">
@@ -397,6 +411,22 @@ export default function PricingPage() {
                     </li>
                   ))}
                 </ul>
+                {slug === 'zenith' && (
+                  <div className="mt-5 pt-4 border-t border-slate-100 dark:border-slate-800">
+                    <label className="flex items-start gap-2.5 cursor-pointer group">
+                      <input
+                        id="checkbox-zenith-rgpd"
+                        type="checkbox"
+                        checked={acceptedZenith}
+                        onChange={(e) => setAcceptedZenith(e.target.checked)}
+                        className="mt-0.5 h-4 w-4 shrink-0 rounded border-slate-300 dark:border-slate-600 accent-[#2563eb] cursor-pointer"
+                      />
+                      <span className="text-xs leading-relaxed text-slate-500 dark:text-slate-400 group-hover:text-slate-700 dark:group-hover:text-slate-300 transition-colors">
+                        Je confirme avoir informé mes clients de la transmission de leurs coordonnées à Reputexa pour la sollicitation d&apos;avis, conformément au RGPD.
+                      </span>
+                    </label>
+                  </div>
+                )}
                 <PlanButton
                   planKey={slug}
                   loading={checkoutLoading === slug}
@@ -405,10 +435,57 @@ export default function PricingPage() {
                   trialHref="/signup?mode=trial"
                   t={t}
                   primary={plan.primary}
+                  legalBlocked={!acceptedCgu || (slug === 'zenith' && !acceptedZenith)}
                 />
               </div>
             );
           })}
+        </div>
+
+        {/* Validation légale — obligatoire avant tout paiement Stripe */}
+        <div className="mt-10 max-w-xl mx-auto rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm px-6 py-5 space-y-4">
+          <p className="text-xs font-semibold uppercase tracking-wide text-slate-400 dark:text-slate-500">
+            Validation légale requise
+          </p>
+
+          {/* Checkbox 1 — tous les plans */}
+          <label className="flex items-start gap-3 cursor-pointer group">
+            <input
+              id="checkbox-cgu"
+              type="checkbox"
+              checked={acceptedCgu}
+              onChange={(e) => setAcceptedCgu(e.target.checked)}
+              className="mt-0.5 h-4 w-4 shrink-0 rounded border-slate-300 dark:border-slate-600 accent-[#2563eb] cursor-pointer"
+            />
+            <span className="text-sm leading-relaxed text-slate-600 dark:text-slate-400 group-hover:text-slate-800 dark:group-hover:text-slate-200 transition-colors">
+              J&apos;accepte les{' '}
+              <Link
+                href="/legal/cgu"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline underline-offset-2 text-[#2563eb] hover:text-[#1d4ed8] transition-colors"
+              >
+                Conditions Générales d&apos;Utilisation
+              </Link>
+              {' '}et la{' '}
+              <Link
+                href="/legal/confidentialite"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline underline-offset-2 text-[#2563eb] hover:text-[#1d4ed8] transition-colors"
+              >
+                Politique de Confidentialité
+              </Link>
+              {' '}de Reputexa.
+            </span>
+          </label>
+
+          {!acceptedCgu && (
+            <p className="text-xs text-amber-600 dark:text-amber-400 flex items-center gap-1.5 pl-7">
+              <span className="w-1.5 h-1.5 rounded-full bg-amber-500 shrink-0" />
+              Cochez cette case pour débloquer les boutons de paiement.
+            </p>
+          )}
         </div>
 
         <p className="text-center text-sm text-slate-500 dark:text-slate-400 mt-8">
@@ -430,6 +507,7 @@ function PlanButton({
   trialHref,
   t,
   primary,
+  legalBlocked = false,
 }: {
   planKey: string;
   loading: boolean;
@@ -438,17 +516,20 @@ function PlanButton({
   trialHref: string;
   t: (k: string) => string;
   primary?: boolean;
+  legalBlocked?: boolean;
 }) {
-  const baseClass = 'mt-6 block w-full py-3 rounded-xl text-center font-semibold transition-colors disabled:opacity-60 flex items-center justify-center gap-2';
-  const primaryClass = 'bg-[#2563eb] text-white hover:bg-[#1d4ed8]';
-  const secondaryClass = 'bg-slate-800 dark:bg-slate-100 text-white dark:text-slate-900 hover:bg-slate-700 dark:hover:bg-slate-200';
+  const isDisabled = sessionLoading || loading || legalBlocked;
+  const baseClass = 'mt-6 block w-full py-3 rounded-xl text-center font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2';
+  const primaryClass = 'bg-[#2563eb] text-white hover:bg-[#1d4ed8] disabled:hover:bg-[#2563eb]';
+  const secondaryClass = 'bg-slate-800 dark:bg-slate-100 text-white dark:text-slate-900 hover:bg-slate-700 dark:hover:bg-slate-200 disabled:hover:bg-slate-800 dark:disabled:hover:bg-slate-100';
 
   return (
     <div className="space-y-2" data-plan={planKey}>
       <button
         type="button"
         onClick={onSubscribe}
-        disabled={sessionLoading || loading}
+        disabled={isDisabled}
+        aria-describedby={legalBlocked ? `legal-hint-${planKey}` : undefined}
         className={`${baseClass} ${primary ? primaryClass : secondaryClass}`}
       >
         {loading ? (
@@ -456,6 +537,16 @@ function PlanButton({
         ) : null}
         {t('ctaSubscribe')}
       </button>
+      {legalBlocked && (
+        <p
+          id={`legal-hint-${planKey}`}
+          className="text-center text-xs text-amber-600 dark:text-amber-400"
+        >
+          {planKey === 'zenith'
+            ? 'Acceptez les deux cases légales pour continuer.'
+            : 'Acceptez les conditions légales pour continuer.'}
+        </p>
+      )}
       <Link
         href={trialHref}
         className="block w-full py-2 text-center text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-[#2563eb] dark:hover:text-[#2563eb] underline underline-offset-2 hover:no-underline transition-colors"

@@ -261,7 +261,7 @@ export async function POST(request: Request) {
       if (process.env.OPENAI_API_KEY) {
         try {
           if (useSeo) {
-            const winner = await runZenithTripleJudge(openai, {
+            const winner = await runZenithTripleJudge({
               reviewComment: comment.trim(),
               reviewerName: reviewerName.trim(),
               rating: ratingNum,

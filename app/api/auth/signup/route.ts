@@ -122,7 +122,7 @@ export async function POST(request: Request) {
       });
     }
 
-    const html = getVerifyEmailHtml({ otpCode, confirmUrl: magicLink });
+    const html = getVerifyEmailHtml({ otpCode, confirmUrl: magicLink, email });
     const result = await sendEmail({
       to: email,
       subject: 'Confirmez votre compte REPUTEXA',

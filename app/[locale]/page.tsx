@@ -3,13 +3,14 @@
 import { useState } from 'react';
 import { Link } from '@/i18n/navigation';
 import { useTranslations, useLocale } from 'next-intl';
-import { Globe, ShieldCheck, MessageSquareWarning, Star, Zap, BarChart2, ChevronRight, Check } from 'lucide-react';
+import { Globe, ShieldCheck, MessageSquareWarning, Star, Zap, BarChart2, ChevronRight } from 'lucide-react';
 import { Chatbot } from '@/components/chatbot';
 import { LanguageSelector } from '@/components/language-selector';
 import { DemoDashboard } from '@/components/demo-dashboard';
 import { LandingDashboardMockup } from '@/components/landing/landing-dashboard-mockup';
 import { Logo } from '@/components/logo';
 import { LandingPricingSection } from '@/components/landing/landing-pricing-section';
+import { LandingGoogleFlywheel } from '@/components/landing/landing-google-flywheel';
 
 function StarIcon() {
   return (
@@ -35,7 +36,7 @@ const FAQ_KEYS = ['googleMaps', 'iaDetectable', 'installTime', 'gratuit14j'] as 
 
 export default function HomePage() {
   const t = useTranslations('HomePage');
-  const locale = useLocale();
+  const _locale = useLocale();
   const [openFaq, setOpenFaq] = useState<string | null>(null);
   const [openDemo, setOpenDemo] = useState(false);
 
@@ -56,7 +57,7 @@ export default function HomePage() {
               {t('nav.features')}
             </a>
             <a
-              href="#tarifs"
+              href="#pricing"
               className="text-sm text-white/60 hover:text-white transition-colors font-medium"
             >
               {t('nav.pricing')}
@@ -202,8 +203,11 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* TÉMOIGNAGES (blanc cassé) */}
-      <section id="témoignages" className="py-16 sm:py-20 bg-muted/40">
+      {/* CERCLE VERTUEUX — Réputation & Référencement Google */}
+      <LandingGoogleFlywheel />
+
+      {/* TÉMOIGNAGES (blanc) */}
+      <section id="témoignages" className="py-16 sm:py-20 bg-white">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div className="text-center mb-12">
             <h2 className="font-display text-4xl font-bold text-foreground mb-3">
@@ -280,10 +284,10 @@ export default function HomePage() {
 
       <LandingPricingSection />
 
-      {/* FAQ (blanc cassé) */}
+      {/* FAQ (blanc) */}
       <section
         id="faq"
-        className="scroll-mt-20 py-16 sm:py-20 px-4 sm:px-6 lg:px-8 bg-muted/40"
+        className="scroll-mt-20 py-16 sm:py-20 px-4 sm:px-6 lg:px-8 bg-white"
       >
         <div className="max-w-3xl mx-auto">
           <div className="text-center mb-12">

@@ -39,7 +39,7 @@ export function WelcomeZenithTrial({ loginUrl, settingsUrl, trialEndDate }: Welc
             <strong>Configurer WhatsApp</strong> — Reçois tes alertes avis négatifs en temps réel
           </li>
           <li style={listStyle}>
-            <strong>Tester le Consultant IA</strong> — Pose tes questions stratégiques 24/7
+            <strong>Tester les fonctionnalités avancées</strong> — Pose tes questions stratégiques 24/7
           </li>
         </ol>
       </Section>

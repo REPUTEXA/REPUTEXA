@@ -21,7 +21,8 @@ export function renderZenithEmail(
   buttonUrl: string,
   otpCode?: string,
   supportUrl?: string,
-  secondaryLink?: ZenithEmailSecondaryLink
+  secondaryLink?: ZenithEmailSecondaryLink,
+  otpEmail?: string
 ): string {
   const opts = {
     title,
@@ -31,6 +32,7 @@ export function renderZenithEmail(
     otpCode: otpCode && /^\d{6}$/.test(otpCode) ? otpCode : undefined,
     supportUrl: supportUrl ?? null,
     secondaryLink: secondaryLink ?? null,
+    otpEmail: otpEmail ?? null,
   };
 
   const logoImgUrl = `${LOGO_BASE}/logo-hd.png`;
@@ -41,10 +43,13 @@ export function renderZenithEmail(
     hasOtp
       ? `
     <div style="margin: 24px 0 0; text-align: center;">
-      <p style="margin: 0 0 8px; font-size: 14px; color: #64748b; font-weight: 600;">Votre code de vérification</p>
-      <p style="margin:0;font-size:32px;font-weight:800;letter-spacing:0.25em;color:#0f172a;font-family:'SF Mono',Monaco,'Courier New',Consolas,monospace;">${opts.otpCode}</p>
-      <p style="margin: 12px 0 0; font-size: 13px; color: #64748b;">Entrez ce code sur la page de confirmation.</p>
-      ${hasButton ? `<table role="presentation" cellpadding="0" cellspacing="0" style="margin:20px 0 0;"><tr><td><a href="${opts.buttonUrl}" style="display:inline-block;background-color:#2563eb;color:#ffffff !important;padding:14px 28px;border-radius:12px;font-weight:600;text-decoration:none;font-family:${FONT_FALLBACK};font-size:16px;border:none;">${opts.buttonText}</a></td></tr></table>` : ''}
+      <p style="margin: 0 0 12px; font-size: 14px; color: #64748b; font-weight: 600;">Votre code de vérification</p>
+      <a href="${LOGO_BASE.replace(/\/$/, '')}/fr/confirm-email?code=${opts.otpCode}${opts.otpEmail ? '&email=' + encodeURIComponent(opts.otpEmail) : ''}"
+         style="display:inline-block;font-size:40px;font-weight:800;letter-spacing:0.30em;color:#0f172a !important;font-family:'SF Mono',Monaco,'Courier New',Consolas,monospace;text-decoration:none;border-bottom:none;cursor:pointer;"
+         title="Cliquer pour valider automatiquement">${opts.otpCode}</a>
+      <p style="margin: 14px 0 0; font-size: 13px; color: #94a3b8;">👆 Cliquez sur le code pour valider automatiquement votre compte.</p>
+      <p style="margin: 8px 0 0; font-size: 12px; color: #cbd5e1;">Code valide 15 minutes. Si rien ne fonctionne, entrez les 6 chiffres manuellement.</p>
+      ${hasButton ? `<table role="presentation" cellpadding="0" cellspacing="0" style="margin:16px auto 0;"><tr><td><a href="${opts.buttonUrl}" style="display:inline-block;background-color:#2563eb;color:#ffffff !important;padding:14px 28px;border-radius:12px;font-weight:600;text-decoration:none;font-family:${FONT_FALLBACK};font-size:16px;border:none;">${opts.buttonText}</a></td></tr></table>` : ''}
     </div>`
       : hasButton
       ? `
@@ -312,7 +317,7 @@ export function getWelcomePaidHtml(params: {
   if (plan.includes('zenith')) {
     benefitsHtml = `
       <ul style="margin: 0 0 24px; padding-left: 20px; font-size: 14px; color: #334155; line-height: 1.7;">
-        <li style="margin-bottom: 8px;"><strong>Consultant IA 24/7</strong> — Posez vos questions stratégiques</li>
+        <li style="margin-bottom: 8px;"><strong>Support stratégique avancé</strong> — Posez vos questions stratégiques</li>
         <li style="margin-bottom: 8px;"><strong>Gestion totale</strong> — Multi-établissements, Boost SEO, Bouclier avis toxiques</li>
         <li style="margin-bottom: 8px;"><strong>IA de capture</strong> — Sollicitez les avis par WhatsApp</li>
       </ul>`;
@@ -369,7 +374,7 @@ export function getWelcomeZenithTrialHtml(params: {
       <ol style="margin: 0; padding-left: 20px; font-size: 14px; color: #334155; line-height: 1.8;">
         <li style="margin-bottom: 8px;"><strong>Connecter Google Business</strong> — Paramètres → Connexions → Connecter Google</li>
         <li style="margin-bottom: 8px;"><strong>Configurer WhatsApp</strong> — Reçois tes alertes avis négatifs en temps réel</li>
-        <li style="margin-bottom: 8px;"><strong>Tester le Consultant IA</strong> — Pose tes questions stratégiques 24/7</li>
+        <li style="margin-bottom: 8px;"><strong>Tester les fonctionnalités avancées</strong> — Pose tes questions stratégiques 24/7</li>
       </ol>
     </div>
     <p style="margin: 0 0 24px; font-size: 13px; color: #64748b; line-height: 1.5; background: #f8fafc; padding: 12px; border-radius: 8px; border: 1px solid #e2e8f0;">
@@ -439,7 +444,7 @@ export function getZenithTrialWelcomeEmailHtml(params: {
               <tr><td style="padding:12px 0 0 0;height:8px;"></td></tr>
               <tr><td style="padding:16px 20px;background:rgba(99,102,241,0.15);border-radius:12px;border-left:4px solid #8b5cf6;">
                 <p style="margin:0 0 4px;font-size:13px;font-weight:600;color:#a78bfa;">🧠 Stratégie</p>
-                <p style="margin:0;font-size:14px;color:#cbd5e1;line-height:1.5;">Pose ta première question à ton Consultant IA dédié.</p>
+                <p style="margin:0;font-size:14px;color:#cbd5e1;line-height:1.5;">Pose ta première question stratégique.</p>
               </td></tr>
             </table>
 
@@ -524,13 +529,13 @@ export function getReputexaOnboardingEmailHtml(data: ReputexaOnboardingEmailData
     </div>`;
   } else {
     headline = "Bienvenue dans l'élite de la réputation.";
-    intro = `${displayName}, tu as maintenant les mêmes outils que les plus grandes entreprises. Zénith, c'est la Triple Vérification, le Boost SEO et ton Consultant IA dédié.`;
+    intro = `${displayName}, tu as maintenant les mêmes outils que les plus grandes entreprises. Zénith, c'est la Triple Vérification, le Boost SEO et un accompagnement stratégique avancé.`;
     missionsHtml = `
     <div style="background: #f1f5f9; border-radius: 12px; padding: 20px; margin-bottom: 24px; border-left: 4px solid #2563eb;">
       <ol style="margin: 0; padding-left: 20px; font-size: 14px; color: #334155; line-height: 1.8;">
         <li style="margin-bottom: 8px;"><strong>🔍 Analyse</strong> — Connecte ton Google Business pour voir l'IA analyser tes avis.</li>
         <li style="margin-bottom: 8px;"><strong>📲 Réactivité</strong> — Configure tes alertes WhatsApp pour ne plus rien rater.</li>
-        <li style="margin-bottom: 8px;"><strong>🧠 Stratégie</strong> — Pose ta première question à ton Consultant IA dédié.</li>
+        <li style="margin-bottom: 8px;"><strong>🧠 Stratégie</strong> — Pose ta première question stratégique.</li>
       </ol>
     </div>`;
   }
@@ -730,10 +735,39 @@ export function getPasswordRecoveryEmailHtml(params: { resetUrl: string }) {
 }
 
 /**
+ * Email d'authentification unifié : changement d'email ou réinitialisation de mot de passe.
+ * Utilise le lien sécurisé généré côté serveur, envoyé via le service d'emailing transactionnel.
+ */
+export function getAuthEmailHtml(link: string, type: 'email_change' | 'password_reset'): string {
+  if (type === 'email_change') {
+    const content = `
+    <p style="margin: 0 0 16px;">Vous avez demandé la modification de votre adresse email. Cliquez sur le bouton ci-dessous pour confirmer votre nouvelle adresse.</p>
+    <p style="margin: 0 0 24px; font-size: 14px; color: #64748b;">Ce lien est valide 24 heures. Si vous n'êtes pas à l'origine de cette demande, ignorez cet email et votre adresse restera inchangée.</p>
+  `.trim();
+    return renderZenithEmail(
+      'Confirmez votre nouvel email',
+      content,
+      'Confirmer mon nouvel email',
+      link,
+    );
+  }
+  const content = `
+    <p style="margin: 0 0 16px;">Vous avez demandé la réinitialisation de votre mot de passe. Cliquez sur le bouton ci-dessous pour en choisir un nouveau.</p>
+    <p style="margin: 0 0 24px; font-size: 14px; color: #64748b;">Ce lien est valide 1 heure. Si vous n'êtes pas à l'origine de cette demande, ignorez cet email.</p>
+  `.trim();
+  return renderZenithEmail(
+    'Réinitialiser votre mot de passe',
+    content,
+    'Réinitialiser mon mot de passe',
+    link,
+  );
+}
+
+/**
  * Email de confirmation d'inscription — utilise renderZenithEmail.
  * Mode OTP : affiche le code à 6 chiffres (otpCode) à la place du bouton.
  */
-export function getVerifyEmailHtml(params: { confirmUrl?: string; otpCode?: string }) {
+export function getVerifyEmailHtml(params: { confirmUrl?: string; otpCode?: string; email?: string }) {
   const content = params.otpCode
     ? `
     <p style="margin: 0 0 16px;">Bienvenue ! Voici votre code de vérification pour activer votre compte REPUTEXA.</p>
@@ -748,7 +782,10 @@ export function getVerifyEmailHtml(params: { confirmUrl?: string; otpCode?: stri
     content,
     params.otpCode ? '' : (params.confirmUrl ? 'Confirmer mon email' : ''),
     params.otpCode ? '' : (params.confirmUrl || '#'),
-    params.otpCode
+    params.otpCode,
+    undefined,
+    undefined,
+    params.email
   );
 }
 
@@ -922,5 +959,79 @@ export function getExpirationEmailHtml(params: {
     content,
     `Activer mon abonnement ${params.planName}`,
     params.checkoutUrl
+  );
+}
+
+const DOCUMENT_TYPE_LABELS: Record<string, string> = {
+  cgu: 'Conditions Générales d\'Utilisation (CGU)',
+  politique_confidentialite: 'Politique de Confidentialité',
+  mentions_legales: 'Mentions Légales',
+};
+
+/**
+ * Email de notification : mise à jour des documents légaux.
+ * Envoyé en masse à tous les utilisateurs lors d'une nouvelle publication.
+ */
+export function getLegalUpdateEmailHtml(params: {
+  recipientName?: string;
+  documentTypes: string[];
+  summaryOfChanges: string;
+  effectiveDate: string;
+  legalPageUrl: string;
+}) {
+  const greeting = params.recipientName
+    ? `<p style="margin: 0 0 16px; font-size: 15px; color: #374151;">Bonjour <strong>${params.recipientName}</strong>,</p>`
+    : `<p style="margin: 0 0 16px; font-size: 15px; color: #374151;">Bonjour,</p>`;
+
+  const docList = params.documentTypes
+    .map((t) => DOCUMENT_TYPE_LABELS[t] ?? t)
+    .map(
+      (label) =>
+        `<li style="margin-bottom: 6px; color: #1e293b; font-size: 14px;">
+          <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#2563eb;margin-right:8px;vertical-align:middle;"></span>
+          ${label}
+        </li>`
+    )
+    .join('');
+
+  const content = `
+    ${greeting}
+    <p style="margin: 0 0 20px; font-size: 15px; color: #374151; line-height: 1.6;">
+      Nous mettons à jour nos documents juridiques. Ces changements entrent en vigueur le
+      <strong style="color: #0f172a;">${params.effectiveDate}</strong>.
+    </p>
+
+    <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px 24px; margin-bottom: 24px;">
+      <p style="margin: 0 0 12px; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #64748b;">
+        Documents mis à jour
+      </p>
+      <ul style="margin: 0; padding: 0; list-style: none;">
+        ${docList}
+      </ul>
+    </div>
+
+    <div style="background: #eff6ff; border-left: 4px solid #2563eb; border-radius: 0 8px 8px 0; padding: 16px 20px; margin-bottom: 24px;">
+      <p style="margin: 0 0 8px; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #1d4ed8;">
+        Résumé des changements
+      </p>
+      <p style="margin: 0; font-size: 14px; color: #1e40af; line-height: 1.6;">
+        ${params.summaryOfChanges}
+      </p>
+    </div>
+
+    <p style="margin: 0 0 8px; font-size: 14px; color: #374151; line-height: 1.6;">
+      En continuant à utiliser REPUTEXA après le <strong>${params.effectiveDate}</strong>, vous acceptez les nouvelles conditions.
+      Vous pouvez consulter l'intégralité des documents mis à jour en cliquant sur le bouton ci-dessous.
+    </p>
+    <p style="margin: 0 0 24px; font-size: 13px; color: #64748b; line-height: 1.6;">
+      Si vous avez des questions, notre équipe est disponible depuis votre espace client.
+    </p>
+  `.trim();
+
+  return renderZenithEmail(
+    'Mise à jour de nos conditions juridiques',
+    content,
+    'Consulter les documents légaux',
+    params.legalPageUrl
   );
 }

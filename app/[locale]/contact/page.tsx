@@ -202,22 +202,22 @@ export default function ContactPage() {
           </Link>
           <div className="flex items-center gap-4">
             <Link
-              href="/legal"
+              href="/legal/mentions-legales"
               className="text-sm text-slate-600 dark:text-slate-400 hover:text-[#2563eb] dark:hover:text-[#2563eb] font-medium transition-colors"
             >
               Mentions légales
             </Link>
             <Link
-              href="/privacy"
+              href="/legal/confidentialite"
               className="text-sm text-slate-600 dark:text-slate-400 hover:text-[#2563eb] dark:hover:text-[#2563eb] font-medium transition-colors"
             >
               Confidentialité
             </Link>
             <Link
-              href="/terms"
+              href="/legal/cgu"
               className="text-sm text-slate-600 dark:text-slate-400 hover:text-[#2563eb] dark:hover:text-[#2563eb] font-medium transition-colors"
             >
-              CGV
+              CGU
             </Link>
           </div>
         </div>

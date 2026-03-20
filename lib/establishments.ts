@@ -131,7 +131,6 @@ export function getProratedExpansionAmountAnnual(
   const currentAnnual = getTotalAnnualPrice(planSlug, currentCount);
   const newAnnual = getTotalAnnualPrice(planSlug, newCount);
   const additionalAnnual = newAnnual - currentAnnual;
-  const day = date.getDate();
   const daysInYear = 365;
   const dayOfYear = Math.floor(
     (date.getTime() - new Date(date.getFullYear(), 0, 0).getTime()) / (24 * 60 * 60 * 1000)

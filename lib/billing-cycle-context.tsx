@@ -35,21 +35,19 @@ type Props = {
   defaultCycle?: BillingInterval;
 };
 
-function getInitialCycle(): BillingInterval {
-  if (typeof window === 'undefined') return 'month';
-  const a = new URLSearchParams(window.location.search).get('annual');
-  return a === '1' ? 'year' : a === '0' ? 'month' : 'month';
-}
-
 /**
  * État global du cycle de facturation (Mensuel/Annuel) pour le catalogue.
  * Initialisé depuis ?annual=1|0 en URL. Au changement de cycle, met à jour l'URL (pricing / landing) pour que le choix survive au retour arrière depuis le Checkout.
+ *
+ * IMPORTANT : le state démarre toujours à 'month' pour que le rendu serveur
+ * et le premier rendu client soient identiques (évite l'erreur d'hydratation).
+ * La lecture de l'URL n'a lieu que dans useEffect (côté client seulement).
  */
 export function BillingCycleProvider({
   children,
-  defaultCycle = 'month',
+  defaultCycle: _defaultCycle = 'month',
 }: Props) {
-  const [billingCycle, setBillingCycleState] = useState<BillingInterval>(getInitialCycle);
+  const [billingCycle, setBillingCycleState] = useState<BillingInterval>('month');
   const setBillingCycle = useCallback((cycle: BillingInterval) => {
     setBillingCycleState(cycle);
     if (typeof window !== 'undefined') {

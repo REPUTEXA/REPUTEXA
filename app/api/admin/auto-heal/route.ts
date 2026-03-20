@@ -574,3 +574,4 @@ export async function POST(request: Request) {
     triggered_by: isAdmin ? 'admin_manual' : 'cron_sentinel',
   });
 }
+// Build trigger: 2026-03-20

@@ -24,7 +24,7 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
     const expansionAddCount = Math.min(
       15,
-      Math.max(1, Math.floor(Number(searchParams.get('expansionAddCount'))) || 0)
+      Math.max(1, Math.floor(Number(searchParams.get('expansionAddCount')) || 0))
     );
     if (expansionAddCount < 1) {
       return NextResponse.json(

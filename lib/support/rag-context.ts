@@ -433,7 +433,7 @@ export async function fetchRagContext(
     deepLegalSearch
       ? admin.rpc('match_legal_documents', { query_embedding: vec, match_count: 6 })
       : Promise.resolve({ data: null }),
-    admin.rpc('match_ai_learning_feedback', { query_embedding: vec, match_count: 5 })
+    Promise.resolve(admin.rpc('match_ai_learning_feedback', { query_embedding: vec, match_count: 5 }))
       .catch(() => ({ data: null })),
   ]);
 

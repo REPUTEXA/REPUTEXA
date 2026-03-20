@@ -203,14 +203,24 @@ async function executeGetUserLogs(
   const sections: string[] = [];
 
   // Profil
-  const { data: profile } = await admin
+  type ProfileRow = {
+    establishment_name: string | null;
+    phone: string | null;
+    subscription_plan: string | null;
+    subscription_status: string | null;
+    payment_status: string | null;
+    webhook_token: string | null;
+    api_key: string | null;
+    webhook_send_delay_minutes: number | null;
+  };
+  const { data: profile } = (await admin
     .from('profiles')
     .select(
       'establishment_name, phone, subscription_plan, subscription_status, ' +
       'payment_status, webhook_token, api_key, webhook_send_delay_minutes'
     )
     .eq('id', userId)
-    .maybeSingle();
+    .maybeSingle()) as { data: ProfileRow | null; error: unknown };
 
   if (profile) {
     const phone = String(profile.phone ?? '').trim();

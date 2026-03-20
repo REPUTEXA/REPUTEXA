@@ -49,7 +49,7 @@ export async function GET(request: Request) {
 
     if (error) throw error;
 
-    const tickets = (data ?? []).map((t) => ({ title: null, ...t }));
+    const tickets = (data ?? []).map((t) => ({ title: null, ...(t as unknown as Record<string, unknown>) }));
     return NextResponse.json({ tickets });
   } catch (e) {
     console.error('[api/support/tickets GET]', e);

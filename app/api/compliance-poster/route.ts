@@ -25,7 +25,7 @@ export async function GET(request: NextRequest) {
     const buffer = await generateCompliancePosterPdfBuffer(establishmentName, null);
     const filename = `affiche-conformite-${establishmentName.replace(/\s+/g, '-').slice(0, 30)}.pdf`;
 
-    return new NextResponse(buffer, {
+    return new NextResponse(buffer as unknown as BodyInit, {
       status: 200,
       headers: {
         'Content-Type': 'application/pdf',

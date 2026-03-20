@@ -37,9 +37,9 @@ async function pingDatabase(): Promise<ServiceResult> {
     const admin = createAdminClient();
     if (!admin) throw new Error('Service role key manquante');
     const { error } = await withTimeout(
-      admin.from('profiles').select('id', { head: true, count: 'exact' }),
+      Promise.resolve(admin.from('profiles').select('id', { head: true, count: 'exact' })),
       TIMEOUT_MS
-    );
+    ) as { error: { message?: string } | null };
     if (error) throw error;
     return { service: 'database', status: 'ok', latency_ms: Date.now() - start, message: 'Supabase OK' };
   } catch (e) {

@@ -514,7 +514,7 @@ export async function POST(request: Request) {
   }
 
   const healResults: HealResult[] = [];
-  for (const [service, incident] of serviceMap) {
+  for (const [service, incident] of Array.from(serviceMap.entries())) {
     console.info(`[auto-heal] Processing service: ${service} — ${incident.message}`);
 
     let result: HealResult;

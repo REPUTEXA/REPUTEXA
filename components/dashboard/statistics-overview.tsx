@@ -108,6 +108,7 @@ export function StatisticsOverview({
   planSlug,
 }: StatisticsOverviewProps) {
   const t = useTranslations('Statistics');
+  const [isMounted, setIsMounted] = useState(false);
   const [sentiment, setSentiment] = useState<{
     strengths: string[];
     improvements: string[];
@@ -117,6 +118,8 @@ export function StatisticsOverview({
     notEnoughData?: boolean;
   } | null>(null);
   const [sentimentError, setSentimentError] = useState<string | null>(null);
+
+  useEffect(() => { setIsMounted(true); }, []);
 
   const isPulseOrZenith = planSlug === 'pulse' || planSlug === 'zenith';
 
@@ -379,7 +382,7 @@ export function StatisticsOverview({
               <div className="flex h-full items-center justify-center text-xs text-slate-400">
                 {t('noCompareData')}
               </div>
-            ) : (
+            ) : isMounted ? (
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={comparisonData} margin={{ top: 8, right: 8, bottom: 0, left: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="rgb(226 232 240)" vertical={false} />
@@ -395,6 +398,8 @@ export function StatisticsOverview({
                   <Line type="monotone" dataKey="previous" stroke="#94a3b8" strokeWidth={2} dot={false} activeDot={{ r: 4 }} />
                 </LineChart>
               </ResponsiveContainer>
+            ) : (
+              <div className="h-full" />
             )}
           </div>
         </div>

@@ -59,7 +59,7 @@ async function checkDatabase(): Promise<ServiceStatus> {
     const admin = createAdminClient();
     if (!admin) throw new Error('Admin client non configuré (SUPABASE_SERVICE_ROLE_KEY manquante)');
     await withTimeout(
-      admin.from('profiles').select('id', { head: true, count: 'exact' }),
+      Promise.resolve(admin.from('profiles').select('id', { head: true, count: 'exact' })),
       TIMEOUT_MS
     );
     return { name: 'database', status: 'ok', latency_ms: Date.now() - start, message: 'Supabase OK' };

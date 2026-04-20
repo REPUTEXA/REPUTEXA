@@ -1,0 +1,11 @@
+{
+  "webhookPhysicalSampleLastPurchase": "Soin Kératine",
+  "webhookEcommerceSampleLastPurchase": "Commande #4521",
+  "legacyZenithTokenHint": "'<token-legacy>'",
+  "legacyZenithEndpoint": "POST {siteUrl}/api/webhooks/zenith\nx-reputexa-token: {tokenHint}\nContent-Type: application/json",
+  "webhookExampleFirstName": "Camille",
+  "webhookExamplePhone": "+33612345678",
+  "webhookEcommerceExampleStatus": "Livré",
+  "webhookEcommerceExampleTracking": "FR123456789FR",
+  "webhookEcommerceExampleSource": "Shopify / Stripe"
+}

@@ -1,0 +1,48 @@
+{
+  "SitemapPage": {
+    "title": "Plan du site",
+    "subtitle": "Toutes les pages REPUTEXA en un coup d’œil.",
+    "sections": [
+      {
+        "title": "Produit",
+        "links": [
+          { "href": "/", "label": "Accueil" },
+          { "href": "/#features", "label": "Fonctionnalités" },
+          { "href": "/#pricing", "label": "Tarifs" },
+          { "href": "/#testimonials", "label": "Avis clients" },
+          { "href": "/#faq", "label": "FAQ" },
+          { "href": "/pricing", "label": "Page Tarifs" },
+          { "href": "/login", "label": "Connexion" },
+          { "href": "/signup?mode=trial", "label": "Essai gratuit" }
+        ]
+      },
+      {
+        "title": "Ressources",
+        "links": [
+          { "href": "/blog", "label": "Blog" },
+          { "href": "/guides", "label": "Guides" },
+          { "href": "/api", "label": "API" },
+          { "href": "/statuts", "label": "Statuts" }
+        ]
+      },
+      {
+        "title": "Entreprise",
+        "links": [
+          { "href": "/about", "label": "À propos" },
+          { "href": "/careers", "label": "Carrières" },
+          { "href": "/investors", "label": "Investisseurs" },
+          { "href": "/sustainability", "label": "Développement durable" }
+        ]
+      },
+      {
+        "title": "Légal & support",
+        "links": [
+          { "href": "/contact", "label": "Contact" },
+          { "href": "/legal/mentions-legales", "label": "Mentions légales" },
+          { "href": "/legal/confidentialite", "label": "Confidentialité" },
+          { "href": "/legal/cgu", "label": "CGU" }
+        ]
+      }
+    ]
+  }
+}

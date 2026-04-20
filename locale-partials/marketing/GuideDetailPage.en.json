@@ -1,0 +1,41 @@
+{
+  "GuideDetailPage": {
+    "notFoundTitle": "Guide not found",
+    "notFoundBody": "This guide does not exist or has been moved.",
+    "backToGuides": "Back to guides",
+    "guides": {
+      "demarrage-rapide": {
+        "title": "Quick start: REPUTEXA in minutes",
+        "content": "Create your account, connect Google Business Profile, and get your first AI reply suggestions. Verification email arrives instantly; OAuth connects Google in seconds. Set your brand voice in settings so every suggestion matches your tone before you publish."
+      },
+      "optimiser-notation": {
+        "title": "Improve your Google rating: strategic playbook",
+        "content": "Reply to every review, celebrate positives, and turn negatives into trust signals. Ask satisfied guests for reviews at the right moment. REPUTEXA alerts you instantly so nothing waits, and AI drafts keep you consistent without burning time."
+      },
+      "reponses-ia-personnalisees": {
+        "title": "Tune AI replies to your brand voice",
+        "content": "Configure sector, tone, words to avoid, and signature phrases in your brand brief. The model mirrors review language and your rules on every draft. You always edit or approve before anything is published."
+      },
+      "conformite-rgpd": {
+        "title": "GDPR and public reviews",
+        "content": "Public reviews are personal data. REPUTEXA processes them as described in our privacy notice; model providers are configured for zero training on your content. End-customers keep GDPR rights; merchants remain responsible for their own lawful bases and notices."
+      },
+      "shield-center-mode-emploi": {
+        "title": "Shield Center: alerts and fake-review workflow",
+        "content": "Shield scores toxicity and authenticity on each review. Tune alert thresholds, read the authenticity signal, and use generated dispute briefs where appropriate. WhatsApp alerts on Pulse+ surface bad reviews immediately with a suggested reply you can adjust."
+      },
+      "multiplateforme-google-facebook-trustpilot": {
+        "title": "One inbox for Google, Facebook, Trustpilot",
+        "content": "Centralise reviews from the three connected platforms. Apply the same response discipline everywhere: fast acknowledgement, brand voice, and escalation when Shield flags risk. Platform quirks stay visible but your workflow stays unified."
+      },
+      "rapports-pdf-analyses": {
+        "title": "Read your monthly PDF like an analyst",
+        "content": "Each PDF summarises volume, sentiment, and themes. Compare months to see if operational changes moved the needle. Use Pulse/Zenith layers for richer commentary and weekly WhatsApp recaps alongside the monthly file."
+      },
+      "api-integration-avancee": {
+        "title": "Advanced webhook integration (ZENITH)",
+        "content": "Your inbound rtx_live_ webhook receives visit payloads from POS, Zapier, or booking systems. Zenith schedules the post-visit WhatsApp capture. Validate E.164 phone numbers, respect quiet hours, and never expose keys in front-end code."
+      }
+    }
+  }
+}

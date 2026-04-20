@@ -1,0 +1,22 @@
+category,key,value,source_notes
+brand,name,REPUTEXA,Nom affiché principal
+brand,shortName,REPUTEXA,Marque courte / PWA
+brand,defaultEstablishmentName,REPUTEXA,Repli terminal / wallet
+site,url,https://reputexa.fr,Canon SEO / metadataBase
+plan_price_eur,vision,59,Offre VISION mensuelle EUR
+plan_price_eur,pulse,97,Offre PULSE mensuelle EUR
+plan_price_eur,zenith,179,Offre ZENITH mensuelle EUR
+plan_price_usd,vision,65,Offre VISION mensuelle USD (locale EN)
+plan_price_usd,pulse,107,Offre PULSE mensuelle USD
+plan_price_usd,zenith,199,Offre ZENITH mensuelle USD
+service_slug_label,vision,VISION,Type de service / matrice produit
+service_slug_label,pulse,PULSE,Type de service
+service_slug_label,zenith,ZENITH,Type de service
+billing,annual_discount_rate,0.2,Remise facturation annuelle (-20%)
+billing,volume_tiers,"0;20;30;40;50",Paliers multi-établissements (%)
+partnership,luxury_brand,Swissvax,Partenaire luxe validé
+partnership,luxury_brand,Gtechniq,Partenaire luxe validé
+equipment_credit,starter_kit_price,450,Prix kit démarage (EUR)
+equipment_credit,repayment_rate,0.15,Taux de remboursement (crédit équipement)
+interface,email_sender_default,"REPUTEXA <contact@reputexa.fr>",Expéditeur e-mail par défaut
+interface,contact_subject_prefix,[REPUTEXA Contact],Préfixe sujet formulaire contact

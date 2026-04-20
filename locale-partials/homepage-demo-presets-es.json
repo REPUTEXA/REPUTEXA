@@ -1,0 +1,155 @@
+{
+  "reviewPresets": {
+    "positive": {
+      "variants": [
+        {
+          "sector": "bakery",
+          "business": "Panadería Miga Dorada",
+          "reviewer": "Laura S.",
+          "review": "Trato encantador en barra, cruasanes de mantequilla con punto justo de hojaldre. La bandeja de cumpleaños con etiqueta comestible quedó impecable: mi madre dijo que era el mejor roscón en años.",
+          "response": "Laura, gracias — comentarios así hacen que el equipo siga peleando cada mañana por el estándar artesanal. Nos alegra que el roscón y la bandeja sorprendieran; esperamos verla en la próxima celebración.",
+          "rating": 5,
+          "phone": "+34 915 555 014",
+          "city": "Madrid · Chamberí",
+          "seoContext": "panadería artesana cruasanes Chamberí Madrid"
+        },
+        {
+          "sector": "hotel",
+          "business": "Hotel Ría Atlántica",
+          "reviewer": "Miguel y Ana R.",
+          "review": "Desayuno con vistas al mar espectaculares, colchón firme tal como pedimos y la cesta de productos locales un detalle de diez. Recepción nos trazó rutas tranquilas sin gente — finde de desconexión perfecto.",
+          "response": "Miguel y Ana, gracias: que el desayuno con vistas y el colchón encajaran significa mucho. Encantados de que las rutas ayudaran; nos encantaría recibirles otra temporada junto al mar.",
+          "rating": 5,
+          "phone": "+34 986 555 019",
+          "city": "Sanxenxo",
+          "seoContext": "hotel boutique costa atlántica Galicia"
+        },
+        {
+          "sector": "auto",
+          "business": "Taller Vía Recta",
+          "reviewer": "Omar F.",
+          "review": "Revisión completa y neumáticos de invierno antes de ir a la nieve: todo enseñado en el elevador y la factura igual al presupuesto. Detectaron juego en el disco antes de mi viaje por autopista. Taller humano y sin presión, poco habitual.",
+          "response": "Omar, gracias — «mostrar piezas, cero sorpresas» es nuestra forma de generar confianza. Mejor pillar el juego del disco a tiempo; pase cuando quiera para una revisión exprés tras el viaje.",
+          "rating": 5,
+          "phone": "+34 913 555 016",
+          "city": "Madrid",
+          "seoContext": "taller mecánico transparente neumáticos Madrid"
+        }
+      ]
+    },
+    "negative": {
+      "variants": [
+        {
+          "sector": "salon",
+          "business": "Salón Bruma",
+          "reviewer": "Elena T.",
+          "review": "El corte no respetó las fotos y el vídeo que acordamos — el tono va descaminado. Me añadieron queratina a la cuenta sin avisar con claridad del precio. Salí peor que entré.",
+          "response": "Elena, lo sentimos de verdad: no acertar las referencias y cobrar un extra sin acuerdo previo está por debajo de nuestro listón. Nuestro peluquero jefe puede rehacer el trabajo o abonar el importe — escríbanos para concretar cita.",
+          "rating": 2,
+          "phone": "+34 933 555 019",
+          "city": "Barcelona · Eixample",
+          "seoContext": "peluquería corte color Eixample Barcelona"
+        },
+        {
+          "sector": "restaurant",
+          "business": "Asador Linaje",
+          "reviewer": "Carlos M.",
+          "review": "El chuletón llegó tibio, patatas pastosas y tres vinos que pedimos estaban «sin stock» sin carta alternativa. El camarero restó importancia hasta la cuenta; el local no pidió disculpas.",
+          "response": "Carlos, disculpas: un plato tibio y sala apurada no son aceptables. Nos gustaría volver a invitarle con el maître supervisando el servicio; escríbame en privado para buscar fecha.",
+          "rating": 2,
+          "phone": "+34 954 555 017",
+          "city": "Sevilla",
+          "seoContext": "restaurante brasa vinos Sevilla"
+        },
+        {
+          "sector": "e-commerce",
+          "business": "Tejidos Norte Online",
+          "reviewer": "Paula G.",
+          "review": "Prometieron antes de Reyes y llegó con once días de retraso y caja abollada. Atención tardó cuatro días en responder y me mandaron a un formulario genérico — era regalo para un baby shower.",
+          "response": "Paula, lamentamos el retraso y el soporte flojo: un regalo así debería tener prioridad. Responda con su número de pedido y activamos reenvío urgente y un gesto comercial en su próxima compra.",
+          "rating": 2,
+          "phone": "+34 944 555 014",
+          "city": "Bilbao",
+          "seoContext": "tienda online textil hogar envíos Bilbao"
+        }
+      ]
+    },
+    "hateful": {
+      "variants": [
+        {
+          "sector": "restaurant",
+          "business": "Restaurante Mirador 7",
+          "reviewer": "Iván P.",
+          "review": "Sois unos ladrones, el chef es un inútil y vuestros camareros no valen nada. Ojalá cerréis.",
+          "response": "Asunto: Solicitud de retirada — reseña con insultos personales (Google Reviews)\n\nEstimado equipo de Trust & Safety,\n\nSolicitamos la retirada de una reseña en Mirador 7 que incluye insultos y deseos de perjuicio económico sin relato objetivo verificable de la visita.\n\nRogamos aplicar la política sobre acoso y contenido de odio.\n\nAtentamente,\nDirección · Mirador 7",
+          "rating": 1,
+          "phone": "+34 972 555 018",
+          "city": "Girona",
+          "platformLabel": "Google Reviews",
+          "seoContext": "restaurante vistas Girona"
+        },
+        {
+          "sector": "barbershop",
+          "business": "Barbería Criterio",
+          "reviewer": "Usuario de Google",
+          "review": "Fuera de mi ciudad; local basura y gente racista tras los sillones.",
+          "response": "Asunto: Urgente — reseña de odio / discriminatoria\n\nA moderación de Google Reviews,\n\nBarbería Criterio ha recibido una reseña con graves insultos y acusaciones discriminatorias. Solicitamos revisión prioritaria y retirada según políticas de odio y acoso.\n\nSaludos cordiales,\nPropietario · Barbería Criterio",
+          "rating": 1,
+          "phone": "+34 915 555 013",
+          "city": "Madrid",
+          "platformLabel": "Google Reviews",
+          "seoContext": "barbería centro Madrid"
+        },
+        {
+          "sector": "hotel",
+          "business": "Hotel Cuatro Vientos",
+          "reviewer": "Jorge L.",
+          "review": "La peor noche: hotel cutre y cobardes al mando. Si nos cruzamos os lo digo a la cara.",
+          "response": "Asunto: Contenido intimidatorio — solicitud de retirada (Google Business)\n\nBuenas,\n\nLa reseña atribuida a Jorge L. contiene insultos colectivos y lenguaje que puede interpretarse como amenaza. Solicitamos retirada inmediata y revisión de cuenta.\n\nSeguimos disponibles para cualquier incidencia real de estancia vía recepción.\n\nAtentamente,\nDirección · Cuatro Vientos",
+          "rating": 1,
+          "phone": "+34 952 555 016",
+          "city": "Málaga",
+          "platformLabel": "Google Reviews",
+          "seoContext": "hotel boutique Málaga"
+        }
+      ]
+    }
+  },
+  "examples": {
+    "0": {
+      "sector": "salon",
+      "business": "Salón Bruma",
+      "reviewer": "Elena T.",
+      "review": "¡Desastre de corte! Enseñé una foto clara y el resultado no tiene nada que ver. Además me cobraron un tratamiento que no pedí. Estoy indignada.",
+      "response": "Elena, lamentamos de corazón que la experiencia no cumpliera lo esperado. La distancia entre el corte deseado y el resultado no es aceptable para nosotros. Nos gustaría hablar con usted para encontrar solución — contáctenos cuando pueda. — Equipo Salón Bruma"
+    },
+    "1": {
+      "sector": "restaurant",
+      "business": "Taberna del Foro",
+      "reviewer": "David R.",
+      "review": "Servicio caótico, 45 minutos esperando el entrante. El plato llegó frío y el camarero nos ignoró. No volvemos.",
+      "response": "David, le pedimos disculpas por la espera y un servicio por debajo de nuestro estándar. Su comentario nos ayuda a mejorar. Nos encantaría recibirle de nuevo — escríbanos en privado. — Taberna del Foro"
+    },
+    "2": {
+      "sector": "hotel",
+      "business": "Hotel Llanes Costa",
+      "reviewer": "Marta V.",
+      "review": "Habitación ruidosa, vistas al parking. Por el precio esperábamos mucho más. El desayuno correcto pero sin brillos.",
+      "response": "Marta, lamentamos que la estancia no cumpliera sus expectativas, sobre todo en tranquilidad y vistas. Tomamos nota para mejorar. Quedamos a su disposición para una próxima visita. — Hotel Llanes Costa"
+    },
+    "3": {
+      "sector": "spa",
+      "business": "Spa Umbral",
+      "reviewer": "Sergio P.",
+      "review": "Masaje con prisa, la terapeuta parecía mirar el reloj. Ambiente agradable pero experiencia floja para lo que pagué.",
+      "response": "Sergio, sentimos que el masaje no estuviera a la altura. La calidad es prioridad. Nos gustaría ofrecerle una segunda oportunidad — contáctenos para reprogramar. — Spa Umbral"
+    },
+    "4": {
+      "sector": "café",
+      "business": "Café Ribera",
+      "reviewer": "Lucía N.",
+      "review": "Pedido perdido, café tibio. Personal agobiado y nadie pidió perdón. Muy decepcionada.",
+      "response": "Lucía, disculpas: el fallo y la falta de respuesta no representan el servicio que buscamos. Escríbanos — con gusto le invitamos a un café en su próxima visita. — Café Ribera"
+    }
+  }
+}

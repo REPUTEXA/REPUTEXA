@@ -1,0 +1,8 @@
+nom_legal,service,role_donnees,url_dpa_ou_legal,date_acceptation_dpa_ou_cgu,notes
+Supabase Inc.,Supabase,Hébergement base PostgreSQL / Auth / stockage,,,Région projet : EU (à préciser)
+Stripe Payments Europe Ltd,Stripe,Paiement et abonnements,,,
+Resend Inc.,Resend,Envoi emails transactionnels,,,
+Twilio Inc.,Twilio,WhatsApp / SMS,,,
+Vercel Inc.,Vercel,Hébergement application Next.js,,,
+OpenAI / Anthropic,IA,Rédaction / transcription selon usage,,,Si clés API utilisées en prod
+Cloudflare Inc.,Turnstile / CDN,Captcha / protection,,,Si applicable

@@ -1,0 +1,168 @@
+/** Source française — HelpPage.categories + champs shell */
+export const helpPageFr = {
+  title: "Centre d'aide",
+  subtitle:
+    "Réponses à toutes vos questions sur REPUTEXA — IA, Shield Center, intégration et facturation.",
+  searchPlaceholder: 'Rechercher une question…',
+  questionsCount: '{count} questions',
+  contactChatTitle: 'Chat & Support',
+  contactChatMeta: 'Réponse en moins de 2h',
+  contactChatBody:
+    'Notre équipe est disponible du lundi au vendredi de 9h à 18h (CET) pour vous accompagner.',
+  contactChatCta: 'Ouvrir un ticket',
+  contactEmailTitle: 'Support par email',
+  contactEmailMeta: 'Délai moyen : 4h ouvrées',
+  contactEmailBody:
+    'Pour toute question technique ou demande de support, écrivez-nous directement.',
+  contactEmailCta: 'Ouvrir le formulaire de contact',
+  categories: [
+    {
+      id: 'ai',
+      iconKey: 'Bot',
+      label: 'Intelligence Artificielle',
+      color: 'text-violet-400',
+      faqs: [
+        {
+          question: "Comment l'IA génère-t-elle les réponses aux avis ?",
+          answer:
+            'REPUTEXA utilise Claude 3.5 Sonnet d\'Anthropic comme moteur principal de génération. En cas d\'indisponibilité, GPT-4o-mini d\'OpenAI prend automatiquement le relais (dual-engine avec bascule transparente). Chaque réponse applique des règles strictes : "effet miroir" (réutilisation des mots-clés de l\'avis), zéro hallucination, ton configuré dans votre ADN IA.',
+        },
+        {
+          question: "L'IA peut-elle adapter le ton selon mon identité de marque ?",
+          answer:
+            'Oui. Dans vos paramètres d\'établissement, vous pouvez définir un "Brief de marque" : secteur, ton (formel, chaleureux, premium…), éléments de langage à éviter et mots-clés récurrents. L\'IA intègre systématiquement ces consignes dans chaque suggestion.',
+        },
+        {
+          question: 'Les réponses sont-elles envoyées automatiquement ?',
+          answer:
+            'Oui, partiellement. Les avis positifs reçoivent une réponse automatique avec un délai humain simulé de 2 à 9 heures. Pour les avis négatifs : sur le plan VISION, la validation se fait depuis le dashboard ; sur les plans PULSE et ZENITH, l\'alerte mauvais avis est envoyée sur WhatsApp avec une suggestion de réponse que vous pouvez modifier ou publier. Une fois publiée, la réponse est placée dans une file d\'attente de 2 à 7 heures avant mise en ligne.',
+        },
+        {
+          question: "L'IA traite-t-elle les avis dans d'autres langues ?",
+          answer:
+            "Sur le plan VISION, l'IA répond dans la langue principale de votre établissement. Sur PULSE et ZENITH, la langue est détectée automatiquement pour chaque avis et la réponse est générée dans la même langue que l'avis original (français, anglais, espagnol, allemand, italien, etc.).",
+        },
+        {
+          question: "Quelle est la précision de l'analyse de toxicité ?",
+          answer:
+            "Notre modèle d'analyse atteint 97,4 % de précision sur notre benchmark interne (10 000 avis annotés manuellement). Le Shield Center distingue les avis négatifs légitimes des contenus abusifs, diffamatoires ou générés artificiellement.",
+        },
+      ],
+    },
+    {
+      id: 'shield',
+      iconKey: 'Shield',
+      label: 'Shield Center',
+      color: 'text-emerald-400',
+      faqs: [
+        {
+          question: "Qu'est-ce que le Shield Center ?",
+          answer:
+            "Le Shield Center est notre système de surveillance avancée qui analyse chaque avis reçu selon 14 indicateurs : toxicité, authenticité, intent frauduleux, sentiment, entités citées, etc. Il génère automatiquement des alertes lorsqu'un avis requiert une attention immédiate et peut signaler certains avis directement auprès de Google.",
+        },
+        {
+          question: 'Comment fonctionne la détection des faux avis ?',
+          answer:
+            "Notre algorithme croise plusieurs signaux : cohérence temporelle (pics anormaux d'avis), patterns linguistiques communs entre comptes, géolocalisation des évaluateurs, historique d'activité des profils. Un score d'authenticité est attribué à chaque avis, visible dans votre tableau de bord.",
+        },
+        {
+          question: 'Puis-je contester un avis directement depuis REPUTEXA ?',
+          answer:
+            "Le Bouclier IA prépare un dossier (motifs, formulation pour modérateurs) à coller dans le formulaire de signalement Google Business Profile. Google ne propose pas d'API publique pour supprimer un avis à votre place : l'envoi final se fait donc sur Google, après relecture de votre part.",
+        },
+        {
+          question: 'Les alertes WhatsApp sont-elles incluses dans tous les plans ?',
+          answer:
+            'Les alertes WhatsApp immédiates (avis négatifs) et le résumé hebdomadaire WhatsApp sont disponibles à partir du plan PULSE (97€/mois). Le plan VISION inclut uniquement les notifications par email. Sur ZENITH, le module AI Capture permet en plus d\'inviter automatiquement vos clients à laisser un avis via WhatsApp 30 minutes après leur visite.',
+        },
+      ],
+    },
+    {
+      id: 'integration',
+      iconKey: 'Plug',
+      label: 'Intégration & API',
+      color: 'text-blue-400',
+      faqs: [
+        {
+          question: 'Comment connecter mon compte Google Business Profile ?',
+          answer:
+            'Depuis votre tableau de bord → Paramètres → Plateformes, cliquez sur "Connecter Google". Une fenêtre d\'autorisation OAuth Google s\'ouvre — accordez l\'accès à la gestion de vos fiches (business.manage). La connexion s\'établit en 30 secondes et vos avis se synchronisent automatiquement. Aucune clé API manuelle n\'est requise.',
+        },
+        {
+          question: "Quelles plateformes d'avis sont connectées ?",
+          answer:
+            "REPUTEXA synchronise Google Business Profile, Facebook et Trustpilot. La connexion Google se fait via OAuth ; Facebook et Trustpilot via webhook. D'autres plateformes ne sont pas encore connectées — elles figurent dans notre feuille de route.",
+        },
+        {
+          question: 'Puis-je connecter REPUTEXA à mon logiciel de caisse (POS) ou Zapier ?',
+          answer:
+            'Oui, via le module AI Capture (exclusif ZENITH). Une clé d\'intégration (rtx_live_…) est générée dans vos Paramètres → Intégrations. Elle permet à vos systèmes POS (Square, SumUp) ou des outils no-code (Zapier, Make) d\'envoyer des données de visite à REPUTEXA, qui déclenche automatiquement une invitation WhatsApp 30 minutes après la visite.',
+        },
+        {
+          question: "Combien d'établissements puis-je gérer ?",
+          answer:
+            "Il n'y a pas de limite par plan sur le nombre d'établissements gérables — la tarification est déterminée par le nombre d'établissements actifs avec une remise dégressive : 1er à plein tarif, 2e à −20%, 3e à −30%, 4e à −40%, 5e et plus à −50%. Chaque établissement peut être géré depuis un tableau de bord unifié.",
+        },
+      ],
+    },
+    {
+      id: 'billing',
+      iconKey: 'CreditCard',
+      label: 'Facturation & Abonnement',
+      color: 'text-amber-400',
+      faqs: [
+        {
+          question: 'Puis-je changer de plan à tout moment ?',
+          answer:
+            'Oui. Vous pouvez upgrader ou downgrader depuis votre espace Paramètres → Abonnement. Les upgrades prennent effet immédiatement avec un calcul au prorata. Les downgrades s\'appliquent à la prochaine date de renouvellement.',
+        },
+        {
+          question: "L'essai gratuit inclut-il toutes les fonctionnalités ?",
+          answer:
+            "Oui, l'essai de 14 jours vous donne accès à l'ensemble du plan ZENITH (le plus complet) sans restriction. Aucune carte bancaire n'est requise pour démarrer.",
+        },
+        {
+          question: 'Quelle est la politique de remboursement ?',
+          answer:
+            "Si vous n'êtes pas satisfait dans les 30 premiers jours suivant votre souscription, nous vous remboursons intégralement. Aucune question posée. Contactez-nous à support@reputexa.fr.",
+        },
+      ],
+    },
+    {
+      id: 'stats',
+      iconKey: 'BarChart2',
+      label: 'Statistiques & Rapports',
+      color: 'text-pink-400',
+      faqs: [
+        {
+          question: 'Quelle est la fréquence de mise à jour des statistiques ?',
+          answer:
+            "Vos avis sont importés dès réception via webhook (en temps réel). Le tableau de bord reflète toujours les données les plus récentes disponibles. Les statistiques agrégées (note moyenne, évolution) sont recalculées à chaque chargement du dashboard.",
+        },
+        {
+          question: 'Puis-je exporter mes rapports en PDF ?',
+          answer:
+            "Oui. Chaque mois, un PDF « cabinet » (stats + textes IA selon votre plan) est généré : synthèse factuelle en Vision ; analyses, sentiment et tactiques en Pulse ; couche stratégique renforcée en Zénith. Vous le recevez par e-mail et pouvez le régénérer ou le télécharger depuis le centre d'archives du dashboard. Pulse et Zénith reçoivent en plus un récap hebdomadaire sur WhatsApp.",
+        },
+      ],
+    },
+    {
+      id: 'global',
+      iconKey: 'Globe',
+      label: 'Multilingue & International',
+      color: 'text-cyan-400',
+      faqs: [
+        {
+          question: 'REPUTEXA fonctionne-t-il pour des établissements hors de France ?',
+          answer:
+            'Oui. REPUTEXA est déployé en France, Belgique, Suisse, Espagne, Italie et Allemagne. Notre infrastructure est hébergée en Union européenne (Paris, Francfort) pour garantir la conformité RGPD dans tous les pays membres.',
+        },
+        {
+          question: "L'interface est-elle disponible en plusieurs langues ?",
+          answer:
+            "L'interface REPUTEXA est disponible en français, anglais, espagnol, allemand et italien. Vous pouvez changer la langue depuis vos paramètres ou le sélecteur en bas de page.",
+        },
+      ],
+    },
+  ],
+};

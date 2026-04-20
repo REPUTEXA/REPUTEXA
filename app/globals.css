@@ -1,0 +1,707 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: #f8f8fa;
+    --foreground: #282828;
+    --muted: 240 4% 48%;
+    --muted-foreground: #71717a;
+    --card: #ffffff;
+    --border: #e4e4e7;
+    --primary: #2563eb;
+    --navy: 217 45% 12%;
+  }
+  .dark {
+    --background: #020617;
+    --foreground: #f8fafc;
+    --muted: 215 20% 35%;
+    --muted-foreground: #94a3b8;
+    --card: #0f172a;
+    --border: #1e293b;
+  }
+}
+
+/* Apple-style shadow (soft, diffuse) */
+.shadow-apple {
+  box-shadow: 0 8px 30px rgb(0 0 0 / 0.04);
+}
+.dark .shadow-apple {
+  box-shadow: 0 8px 30px rgb(0 0 0 / 0.15);
+}
+
+/* Reset & base */
+html {
+  scroll-behavior: smooth;
+  transition: background-color 0.2s ease, color 0.2s ease;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Terminal caisse : le scroll est confiné à <main>, hauteur viewport fixe (souris + tactile). */
+.banano-terminal-shell {
+  height: 100vh;
+  max-height: 100vh;
+}
+@supports (height: 100dvh) {
+  .banano-terminal-shell {
+    height: 100dvh;
+    max-height: 100dvh;
+  }
+}
+
+/* Ancres #section : décalage sous le header sticky (pages légales) */
+html:has(.legal-docs-root) {
+  scroll-padding-top: 5.75rem;
+}
+@media (min-width: 1024px) {
+  html:has(.legal-docs-root) {
+    scroll-padding-top: 7.25rem;
+  }
+}
+
+/* Documentation légale — lecture longue, hiérarchie sobre */
+.legal-doc-body {
+  max-width: 42rem;
+}
+.legal-doc-body .legal-doc-intro,
+.legal-doc-section-inner {
+  font-size: 0.9375rem;
+  line-height: 1.7;
+  letter-spacing: 0.011em;
+}
+@media (min-width: 640px) {
+  .legal-doc-body .legal-doc-intro,
+  .legal-doc-section-inner {
+    font-size: 1rem;
+    line-height: 1.72;
+  }
+}
+.legal-doc-paragraph {
+  line-height: 1.72;
+  letter-spacing: 0.011em;
+  font-size: inherit;
+}
+.legal-doc-body > section {
+  margin-bottom: 2.75rem;
+}
+
+/* Safe area for iPhone notch/home indicator */
+@supports (padding: max(0px)) {
+  .safe-area-nav {
+    padding-left: max(1rem, env(safe-area-inset-left));
+    padding-right: max(1rem, env(safe-area-inset-right));
+  }
+  .safe-area-section {
+    padding-left: max(1rem, env(safe-area-inset-left));
+    padding-right: max(1rem, env(safe-area-inset-right));
+  }
+}
+
+/* Phone input (react-phone-number-input) - design Premium, popover élégant */
+.rpn-phone-wrapper .PhoneInput {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  border: none;
+}
+.rpn-phone-wrapper .PhoneInputCountry {
+  margin-left: 0.75rem;
+  margin-right: 0.25rem;
+}
+.rpn-phone-wrapper .PhoneInputCountrySelect {
+  font-size: 0.875rem;
+  padding: 0.35rem 1.5rem 0.35rem 0.5rem;
+  cursor: pointer;
+  background-color: rgb(248 250 252);
+  border: none;
+  border-radius: 0.5rem;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2364748b' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.5rem center;
+  color: rgb(51 65 85);
+}
+.dark .rpn-phone-wrapper .PhoneInputCountrySelect {
+  background-color: rgb(39 39 42);
+  color: rgb(228 228 231);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23a1a1aa' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+}
+.rpn-phone-wrapper .PhoneInputCountrySelect:focus {
+  outline: none;
+}
+.rpn-phone-wrapper .PhoneInputCountrySelect:focus-visible {
+  @apply ring-2 ring-[#2563eb] ring-offset-2 rounded-lg;
+  @apply ring-offset-slate-100;
+}
+.dark .rpn-phone-wrapper .PhoneInputCountrySelect:focus-visible {
+  @apply ring-[#60a5fa] ring-offset-zinc-900;
+}
+.rpn-phone-wrapper .PhoneInputCountryIcon {
+  width: 1.25em;
+  height: 0.875em;
+  color: rgb(51 65 85);
+}
+.dark .rpn-phone-wrapper:not(.rpn-on-dark-surface) .PhoneInputCountryIcon {
+  color: rgb(228 228 231);
+}
+.rpn-phone-wrapper.rpn-on-dark-surface .PhoneInputCountryIcon {
+  color: rgb(228 228 231);
+}
+.rpn-phone-wrapper .PhoneInputCountryIcon .PhoneInputCountryIconImg {
+  display: block;
+}
+.rpn-phone-wrapper .PhoneInputInput {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Champ téléphone sur carte sombre (formulaire légal, etc.) — lisibilité garantie */
+.rpn-phone-wrapper.rpn-on-dark-surface .PhoneInputInput,
+.rpn-phone-wrapper.rpn-on-dark-surface input.PhoneInputInput {
+  color: #fafafa;
+  -webkit-text-fill-color: #fafafa;
+  caret-color: #fafafa;
+}
+.rpn-phone-wrapper.rpn-on-dark-surface .PhoneInputInput::placeholder,
+.rpn-phone-wrapper.rpn-on-dark-surface input.PhoneInputInput::placeholder {
+  color: rgb(161 161 170);
+  -webkit-text-fill-color: rgb(161 161 170);
+}
+.rpn-phone-wrapper.rpn-on-dark-surface .PhoneInputCountrySelect {
+  background-color: rgb(39 39 42);
+  color: rgb(228 228 231);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23a1a1aa' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+}
+.rpn-phone-wrapper.rpn-on-dark-surface .PhoneInputCountrySelect:focus-visible {
+  --tw-ring-offset-color: rgb(24 24 27);
+}
+
+body {
+  @apply bg-background text-foreground antialiased font-sans;
+  font-feature-settings: "rlig" 1, "calt" 1;
+  letter-spacing: 0.01em;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+/* A11y — focus clavier visible (WCAG 2.4.7) : Tab sans perdre la cible */
+@layer base {
+  :where(
+      button:not([disabled]):not([aria-disabled="true"]),
+      [role="button"]:not([aria-disabled="true"]),
+      a[href],
+      input:not([type="hidden"]),
+      textarea,
+      select,
+      summary
+    ):focus-visible {
+    @apply outline-none ring-2 ring-[#2563eb] ring-offset-2 ring-offset-background;
+  }
+  .dark
+    :where(
+      button:not([disabled]):not([aria-disabled="true"]),
+      [role="button"]:not([aria-disabled="true"]),
+      a[href],
+      input:not([type="hidden"]),
+      textarea,
+      select,
+      summary
+    ):focus-visible {
+    @apply ring-[#60a5fa] ring-offset-zinc-950;
+  }
+}
+
+/* Glassmorphism utility */
+.glass {
+  @apply bg-white/5 backdrop-blur-xl border border-white/10;
+}
+
+.glass-card {
+  @apply bg-white/[0.03] backdrop-blur-xl border border-white/10 rounded-2xl;
+}
+
+/* Subtle noise texture */
+.noise-bg::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Shiny button */
+.shiny-button {
+  position: relative;
+  overflow: hidden;
+}
+
+.shiny-button::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.25),
+    transparent
+  );
+  transition: left 0.5s ease;
+}
+
+.shiny-button:hover::before {
+  left: 100%;
+}
+
+.shiny-button:hover {
+  box-shadow: 0 0 30px -5px rgba(99, 102, 241, 0.6), 0 0 60px -15px rgba(139, 92, 246, 0.4);
+}
+
+/* Chatbot CTA — pulse discret */
+.shiny-button-chat {
+  animation: chat-cta-pulse 2.5s ease-in-out infinite;
+}
+.shiny-button-chat:hover {
+  animation: none;
+  box-shadow: 0 0 20px -3px rgba(99, 102, 241, 0.7);
+}
+@keyframes chat-cta-pulse {
+  0%, 100% { box-shadow: 0 0 8px -2px rgba(99, 102, 241, 0.4); }
+  50% { box-shadow: 0 0 18px -2px rgba(99, 102, 241, 0.7); }
+}
+
+/* Typing dots */
+@keyframes typing-bounce {
+  0%, 60%, 100% { transform: translateY(0); }
+  30% { transform: translateY(-4px); }
+}
+.chat-typing-dot {
+  animation: typing-bounce 1.4s ease-in-out infinite;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgb(63 63 70);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgb(82 82 91);
+}
+
+/* Elite SaaS design tokens */
+.lovable-card {
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+  transition: transform 0.5s ease, box-shadow 0.5s ease;
+}
+.lovable-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.08);
+}
+
+.lovable-pill-btn {
+  border-radius: 9999px;
+}
+
+/* CTA shine on hover */
+.cta-shine {
+  position: relative;
+  overflow: hidden;
+}
+.cta-shine:hover {
+  opacity: 0.95;
+}
+.cta-shine::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.2) 50%, transparent 60%);
+  transform: translateX(-100%);
+  transition: transform 0.6s ease;
+}
+.cta-shine:hover::after {
+  transform: translateX(100%);
+}
+
+/* Gradient border for ZENITH (elite tier) */
+.gradient-border-card {
+  position: relative;
+  background: white;
+  border-radius: 1.5rem;
+}
+.gradient-border-card::before {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  border-radius: inherit;
+  padding: 2px;
+  background: linear-gradient(135deg, #6366f1, #8b5cf6, #6366f1);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0.6;
+}
+
+/* Centre de Commande - Typing effect (révélation progressive) */
+@keyframes typing-reveal {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-typing {
+  animation: typing-reveal 2.5s ease-out 0.5s forwards;
+  opacity: 0;
+}
+
+/* Centre de Commande - Flux scroll */
+@keyframes flux-scroll {
+  0%, 25% { transform: translateY(0); }
+  30% { transform: translateY(-2.5rem); }
+  55% { transform: translateY(-2.5rem); }
+  60% { transform: translateY(-5rem); }
+  85% { transform: translateY(-5rem); }
+  90% { transform: translateY(0); }
+  100% { transform: translateY(0); }
+}
+.animate-flux-scroll {
+  animation: flux-scroll 8s ease-in-out infinite;
+}
+
+/* Centre de Commande - Scan lumineux */
+@keyframes scan-glow {
+  0%, 100% { box-shadow: inset 0 0 20px rgba(59, 130, 246, 0); }
+  50% { box-shadow: inset 0 0 30px rgba(59, 130, 246, 0.3); }
+}
+.animate-scan-glow {
+  animation: scan-glow 2s ease-in-out infinite;
+}
+
+/* Bento Grid - Scan loupe animation */
+@keyframes scan-loupe-move {
+  0% { left: 0; }
+  100% { left: calc(100% - 2rem); }
+}
+.animate-scan-loupe-move {
+  animation: scan-loupe-move 3s ease-in-out infinite;
+}
+
+/* Spotlight + Film grain — cohérence visuelle globale */
+.page-spotlight {
+  position: relative;
+}
+.page-spotlight::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  top: -50%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 150%;
+  max-width: 1400px;
+  height: 80vh;
+  background: radial-gradient(
+    ellipse 80% 60% at 50% 0%,
+    rgba(37, 99, 235, 0.08) 0%,
+    rgba(37, 99, 235, 0.03) 40%,
+    transparent 70%
+  );
+  pointer-events: none;
+  z-index: 0;
+}
+.page-film-grain {
+  position: relative;
+}
+.page-film-grain::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='grain'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23grain)' opacity='0.035'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* RepuAI design tokens (design exactement pareil) */
+.gradient-primary {
+  background: linear-gradient(135deg, #2563eb 0%, #2563eb 50%, #2563eb 100%);
+}
+.gradient-hero {
+  background: linear-gradient(180deg, #0f1729 0%, #0c1222 50%, #0a0f1a 100%);
+}
+
+/* Hero + Dashboard: dégradé radial bleu-nuit fluide du haut à la fin du dashboard */
+.hero-dashboard-bg {
+  background: radial-gradient(
+    ellipse 120% 100% at 50% 0%,
+    #0b1221 0%,
+    #0a101a 35%,
+    #060a12 65%,
+    #030712 100%
+  );
+}
+
+/* Dashboard glow behind white card */
+.dashboard-glow {
+  position: relative;
+}
+.dashboard-glow::before {
+  content: "";
+  position: absolute;
+  inset: -64px;
+  background:
+    radial-gradient(circle at 20% 0%, rgba(59, 130, 246, 0.18), transparent 55%),
+    radial-gradient(circle at 80% 100%, rgba(139, 92, 246, 0.18), transparent 55%);
+  filter: blur(32px);
+  opacity: 0.9;
+  pointer-events: none;
+  z-index: -1;
+}
+
+/* Shimmer effect for CTA - runs every 3s */
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  15% { transform: translateX(100%); }
+  100% { transform: translateX(100%); }
+}
+.shimmer-cta {
+  animation: shimmer 3s ease-in-out infinite;
+}
+
+/* Soft CTA pulse (hero primary button) */
+@keyframes cta-pulse-soft {
+  0%, 100% {
+    transform: translateY(0) scale(1);
+    box-shadow: 0 10px 26px rgba(37, 99, 235, 0.18);
+  }
+  50% {
+    transform: translateY(-1px) scale(1.015);
+    box-shadow: 0 14px 34px rgba(37, 99, 235, 0.28);
+  }
+}
+.cta-pulse-soft {
+  animation: cta-pulse-soft 2.8s ease-in-out infinite;
+  will-change: transform, box-shadow;
+}
+
+/* Bannière urgence essai (< 48h) — clignotement doux */
+@keyframes pulse-slow {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.92; }
+}
+.animate-pulse-slow {
+  animation: pulse-slow 2s ease-in-out infinite;
+}
+
+/* Cadenas doré : shake au clic quand verrouillé */
+@keyframes lock-shake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-3px); }
+  40% { transform: translateX(3px); }
+  60% { transform: translateX(-2px); }
+  80% { transform: translateX(2px); }
+}
+.animate-lock-shake {
+  animation: lock-shake 0.4s ease-in-out;
+}
+
+/* World-Class: Button tactile feedback */
+.btn-tactile {
+  transition: transform 0.15s ease, box-shadow 0.2s ease;
+}
+.btn-tactile:active {
+  transform: scale(0.98);
+}
+
+/* Shield Center — Radar sweep animation */
+@keyframes radar-sweep {
+  0%   { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+.radar-sweep {
+  animation: radar-sweep 4s linear infinite;
+  transform-origin: center center;
+}
+
+/* Base clients / téléphone : pays — sans `align-self: stretch` géant sur le bloc pays */
+
+[data-dashboard="true"] .PhoneInputCountry {
+  align-self: center;
+}
+[data-dashboard="true"] .PhoneInputCountryIcon {
+  max-width: 2rem;
+  max-height: 1.25rem;
+}
+
+/* Dashboard: fond cohérent, contenu au-dessus des décors */
+.dashboard-main-bg {
+  isolation: isolate;
+  background-color: rgb(248 250 252);
+}
+.dark .dashboard-main-bg {
+  background-color: #030303;
+}
+
+/* Input 16px min - évite zoom iOS (dashboard) + Ultra-Premium dark inputs */
+[data-dashboard="true"] input[type="text"],
+[data-dashboard="true"] input[type="search"],
+[data-dashboard="true"] input[type="email"],
+[data-dashboard="true"] input[type="tel"],
+[data-dashboard="true"] textarea {
+  font-size: 16px;
+}
+@media (min-width: 640px) {
+  [data-dashboard="true"] input[type="text"],
+  [data-dashboard="true"] input[type="search"],
+  [data-dashboard="true"] input[type="email"],
+  [data-dashboard="true"] input[type="tel"] {
+    font-size: 0.875rem;
+  }
+  [data-dashboard="true"] textarea {
+    font-size: 0.875rem;
+  }
+}
+.dark [data-dashboard="true"] input[type="text"],
+.dark [data-dashboard="true"] input[type="search"],
+.dark [data-dashboard="true"] input[type="email"],
+.dark [data-dashboard="true"] input[type="tel"],
+.dark [data-dashboard="true"] textarea {
+  background-color: rgb(24 24 27);
+  color: rgb(244 244 245);
+  border-color: rgb(39 39 42);
+}
+
+/* Bottom sheet animation (mobile) */
+@keyframes bottom-sheet-in {
+  from {
+    transform: translateY(100%);
+    opacity: 0.8;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+.animate-bottom-sheet-in {
+  animation: bottom-sheet-in 0.3s cubic-bezier(0.32, 0.72, 0, 1) forwards;
+}
+
+/* Skeleton pulse */
+@keyframes skeleton-pulse {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 0.7; }
+}
+.animate-skeleton {
+  animation: skeleton-pulse 1.5s ease-in-out infinite;
+}
+
+/* Terminal caisse : client avec bon disponible */
+@keyframes banano-voucher-attn {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.42);
+  }
+  50% {
+    box-shadow: 0 0 0 14px rgba(16, 185, 129, 0);
+  }
+}
+.animate-banano-voucher-attn {
+  animation: banano-voucher-attn 2.4s ease-in-out infinite;
+}
+
+/* Landing — témoignages : bandeau horizontal (boucle douce ; pause au survol) */
+@keyframes testimonials-marquee-scroll {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+.animate-testimonials-marquee-scroll {
+  animation: testimonials-marquee-scroll 110s linear infinite;
+}
+.animate-testimonials-marquee-scroll:hover {
+  animation-play-state: paused;
+}
+@media (prefers-reduced-motion: reduce) {
+  .animate-testimonials-marquee-scroll {
+    animation: none;
+  }
+  .testimonials-marquee-viewport {
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+  .gradient-text {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-[#2563eb] via-[#2563eb] to-[#2563eb];
+  }
+  .text-gradient {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-[#2563eb] to-[#2563eb];
+  }
+}
+
+/* Page publique /verify/[id] — balayage laser discret */
+@keyframes verify-laser-sweep {
+  0% {
+    transform: translateY(-130%);
+    opacity: 0;
+  }
+  12% {
+    opacity: 0.5;
+  }
+  88% {
+    opacity: 0.45;
+  }
+  100% {
+    transform: translateY(130vh);
+    opacity: 0;
+  }
+}
+.verify-laser-line {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+.verify-laser-line::before {
+  content: '';
+  position: absolute;
+  left: -20%;
+  right: -20%;
+  height: 140px;
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    rgba(56, 189, 248, 0.12),
+    rgba(251, 191, 36, 0.15),
+    transparent
+  );
+  animation: verify-laser-sweep 3.2s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .verify-laser-line::before {
+    animation: none;
+    opacity: 0.2;
+  }
+}

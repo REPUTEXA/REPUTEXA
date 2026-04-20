@@ -1,0 +1,21 @@
+{
+  "section3Title": "Salute del flusso",
+  "webhookActive": "Webhook attivo",
+  "noKeyGenerated": "Nessuna chiave generata",
+  "queueTitle": "Coda",
+  "pendingSuffix": "in attesa",
+  "reviewsPublished": "Recensioni pubblicate",
+  "polishedPublishedSub": "testi rifiniti pubblicati",
+  "dashboardTitle": "Dashboard Zenith",
+  "statTotalFlow": "Flusso totale",
+  "statTotalFlowSub": "Clienti importati via webhook",
+  "statYes": "Risposte (SÌ)",
+  "statYesSubWaiting": "In attesa di risposte",
+  "statYesSubEngagement": "{pct}% di coinvolgimento",
+  "statNo": "Opt-out (NO)",
+  "statNoSubNone": "Nessun opt-out",
+  "statNoSubShare": "{pct}% del flusso totale",
+  "statGeneratedTitle": "Recensioni generate",
+  "statGeneratedSub": "Testo rifinito e pubblicato dal cliente",
+  "statTransform": "{pct}% di conversione"
+}

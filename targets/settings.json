@@ -1,0 +1,122 @@
+{
+  "version": 1,
+  "brand": {
+    "name": "REPUTEXA",
+    "shortName": "REPUTEXA",
+    "defaultEstablishmentName": "REPUTEXA"
+  },
+  "site": {
+    "url": "https://reputexa.fr",
+    "manifest": {
+      "description": "AI-powered reputation, WhatsApp review flows, and e-reputation protection for modern operators.",
+      "theme_color": "#2563eb",
+      "background_color": "#0f172a",
+      "start_url": "/",
+      "display": "standalone"
+    },
+    "organization": {
+      "instagram": "https://www.instagram.com/reputexaa/"
+    }
+  },
+  "plans": {
+    "slugLabels": {
+      "vision": "VISION",
+      "pulse": "PULSE",
+      "zenith": "ZENITH"
+    }
+  },
+  "billing": {
+    "annual_discount_rate": 0.2,
+    "volume_discounts_percent_by_seat_index": [0, 20, 30, 40],
+    "volume_discount_max_percent": 50,
+    "plans": {
+      "vision": {
+        "base_price_eur": 59,
+        "prices": {
+          "EUR": { "amount": 59, "stripePriceId": "price_VISION_EUR_ID" },
+          "USD": { "amount": 65, "stripePriceId": "price_VISION_USD_ID" },
+          "GBP": { "amount": 55, "stripePriceId": "price_VISION_GBP_ID" },
+          "JPY": { "amount": 9800, "stripePriceId": "price_VISION_JPY_ID" },
+          "CNY": { "amount": 450, "stripePriceId": "price_VISION_CNY_ID" },
+          "CHF": { "amount": 65, "stripePriceId": "price_VISION_CHF_ID" },
+          "CAD": { "amount": 85, "stripePriceId": "price_VISION_CAD_ID" },
+          "AUD": { "amount": 95, "stripePriceId": "price_VISION_AUD_ID" }
+        }
+      },
+      "pulse": {
+        "base_price_eur": 97,
+        "prices": {
+          "EUR": { "amount": 97, "stripePriceId": "price_PULSE_EUR_ID" },
+          "USD": { "amount": 109, "stripePriceId": "price_PULSE_USD_ID" },
+          "GBP": { "amount": 89, "stripePriceId": "price_PULSE_GBP_ID" },
+          "JPY": { "amount": 15800, "stripePriceId": "price_PULSE_JPY_ID" },
+          "CNY": { "amount": 740, "stripePriceId": "price_PULSE_CNY_ID" },
+          "CHF": { "amount": 109, "stripePriceId": "price_PULSE_CHF_ID" },
+          "CAD": { "amount": 139, "stripePriceId": "price_PULSE_CAD_ID" },
+          "AUD": { "amount": 155, "stripePriceId": "price_PULSE_AUD_ID" }
+        }
+      },
+      "zenith": {
+        "base_price_eur": 179,
+        "prices": {
+          "EUR": { "amount": 179, "stripePriceId": "price_ZENITH_EUR_ID" },
+          "USD": { "amount": 199, "stripePriceId": "price_ZENITH_USD_ID" },
+          "GBP": { "amount": 159, "stripePriceId": "price_ZENITH_GBP_ID" },
+          "JPY": { "amount": 29800, "stripePriceId": "price_ZENITH_JPY_ID" },
+          "CNY": { "amount": 1366, "stripePriceId": "price_ZENITH_CNY_ID" },
+          "CHF": { "amount": 199, "stripePriceId": "price_ZENITH_CHF_ID" },
+          "CAD": { "amount": 259, "stripePriceId": "price_ZENITH_CAD_ID" },
+          "AUD": { "amount": 285, "stripePriceId": "price_ZENITH_AUD_ID" }
+        }
+      }
+    }
+  },
+  "partnership": {
+    "luxury_brands": ["Swissvax", "Gtechniq"]
+  },
+  "equipment_credit": {
+    "starter_kit_price": 450,
+    "repayment_rate": 0.15,
+    "label_fr": "Crédit équipement",
+    "label_en": "Equipment credit"
+  },
+  "interface": {
+    "email_sender_default": "REPUTEXA <contact@reputexa.fr>",
+    "email_sender_strategic": "REPUTEXA | Flux Stratégique <contact@reputexa.fr>",
+    "contact_email_subject_prefix": "[{brand} Contact]",
+    "contact_html_heading_template": "Nouveau message depuis le formulaire {brand}",
+    "contact_inbox_email": "contact@reputexa.fr",
+    "contact_fallback_support_email": "contact@reputexa.fr",
+    "department_emails": {
+      "investors": "investors@reputexa.fr",
+      "careers": "recrutement@reputexa.fr",
+      "legal": "legal@reputexa.fr"
+    },
+    "department_labels": {
+      "investors": "Investisseurs",
+      "careers": "Recrutement",
+      "legal": "Legal & Conformité"
+    },
+    "department_from_display_templates": {
+      "investors": "{brand} | Direction Investisseurs",
+      "careers": "{brand} | Direction Recrutement",
+      "legal": "{brand} | Direction Juridique"
+    },
+    "department_fallback_from_display": "{brand}",
+    "department_message_subject_template": "[{brand} {department}] Message de {name}",
+    "resend_verified_base_address": "contact@reputexa.fr",
+    "resend_from_env_fallback": "REPUTEXA <contact@reputexa.fr>",
+    "footer_signature_fr": "- L'équipe REPUTEXA",
+    "info_broadcast_test_email_title_template": "[TEST] Diffusion information {brand}",
+    "info_broadcast_test_cta_template": "Ouvrir {brand}",
+    "newsletter_strategic_flux_welcome_subject_template": "Bienvenue dans le flux stratégique {brand}",
+    "newsletter_unsubscribe_confirmed_subject_template": "Désabonnement confirmé - {brand}",
+    "resend_newsletter_audience_name": "REPUTEXA_ALERTS"
+  },
+  "assets": {
+    "pwa_icons": [
+      { "src": "/reputexa-mark.svg", "type": "image/svg+xml", "sizes": "any", "purpose": "any" },
+      { "src": "/logo-hd.png", "type": "image/png", "sizes": "512x512", "purpose": "any" }
+    ]
+  }
+}

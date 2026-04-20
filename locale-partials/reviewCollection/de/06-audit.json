@@ -1,0 +1,15 @@
+{
+  "auditTitle": "Protokoll — woher kam die Kontaktaufnahme?",
+  "auditIntro": "Jede Zeile zeigt den Eingangsweg (Webhook mit API-Schlüssel oder Zenith), Empfangsdatum, bekannten Kontext und Status. Telefon teilweise maskiert; volle Details (z. B. IP) im DSGVO-Export (Einstellungen → Meine Daten herunterladen).",
+  "auditLoading": "Protokoll wird geladen…",
+  "auditColReceived": "Empfangen",
+  "auditColOrigin": "Herkunft",
+  "auditColClient": "Kundin / Kunde",
+  "auditColScheduled": "Geplant / gesendet",
+  "auditColStatus": "Status",
+  "auditEmpty": "Keine Einträge in diesem Zeitraum.",
+  "auditRetention": "Warteschlangen-IDs werden innerhalb von 120 Tagen anonymisiert oder gelöscht (aggregierte Statistiken können behalten werden). Eine neue WhatsApp-Kontaktaufnahme an dieselbe Nummer erfolgt frühestens 120 Tage nach Start der vorherigen Kampagne; danach ist ein neuer Versand möglich, sofern keine Abmeldung (STOP).",
+  "scheduledLine": "Gepl. {datetime}",
+  "sentLine": "Gesendet {datetime}",
+  "auditQueueRef": "Warteschlange #{id}…"
+}

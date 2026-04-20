@@ -1,0 +1,41 @@
+{
+  "ReportIssuePage": {
+    "title": "Problem melden",
+    "subtitle": "Helfen Sie uns, REPUTEXA zu verbessern — jedes Ticket wird in der Regel innerhalb von 4 Werktagen geprüft.",
+    "slaBanner": "Reaktionsziel: 4 Geschäftsstunden bei kritisch · 24h bei anderen Prioritäten.",
+    "bugTypeLabel": "Art des Problems",
+    "priorityLabel": "Priorität",
+    "issueTitleLabel": "Kurztitel",
+    "issueTitlePlaceholder": "z. B. Google-Bewertungen für Standort X synchronisieren nicht mehr",
+    "descriptionLabel": "Ausführliche Beschreibung",
+    "descriptionPlaceholder": "Beobachtetes vs. erwartetes Verhalten…",
+    "stepsLabel": "Schritte zur Reproduktion",
+    "stepsPlaceholder": "1. Dashboard öffnen\n2. Zu Bewertungen gehen\n3. Fehler sehen…",
+    "emailLabel": "Ihre E-Mail",
+    "emailPlaceholder": "du@beispiel.de",
+    "submit": "Bericht senden",
+    "submitting": "Wird gesendet…",
+    "footerNote": "Jeder Bericht wird bestätigt. SLA: 4 Geschäftsstunden für kritische Vorfälle.",
+    "toastSelect": "Bitte Problemtyp und Priorität wählen.",
+    "toastError": "Ein Fehler ist aufgetreten. Bitte erneut versuchen.",
+    "toastNetwork": "Netzwerkfehler. Verbindung prüfen.",
+    "successTitle": "Bericht gesendet",
+    "successSubtitle": "Danke — unser Team wurde benachrichtigt.",
+    "successHeading": "Wir haben es erhalten!",
+    "successLine": "Wir melden uns unter {email} innerhalb von 4 Geschäftsstunden.",
+    "successFoot": "Bei kritischen Produktionsvorfällen priorisiert der Support Ihr Ticket.",
+    "bugTypes": [
+      { "id": "ai-error", "label": "KI-Analysefehler", "desc": "Antwort falsch oder ohne Kontext" },
+      { "id": "sync-issue", "label": "Synchronisationsproblem", "desc": "Fehlende oder verspätete Bewertungen" },
+      { "id": "ui-bug", "label": "UI-Bug", "desc": "Layout, Navigation, Formulare" },
+      { "id": "billing-issue", "label": "Abrechnung", "desc": "Zahlung, Rechnung, Abo" },
+      { "id": "other", "label": "Sonstiges", "desc": "Alles andere" }
+    ],
+    "priorities": [
+      { "id": "low", "label": "Niedrig", "desc": "Kein täglicher Einfluss" },
+      { "id": "medium", "label": "Mittel", "desc": "Teilweise Einschränkung, Workaround möglich" },
+      { "id": "high", "label": "Hoch", "desc": "Blockiert wichtige Funktion" },
+      { "id": "critical", "label": "Kritisch", "desc": "Datenverlust oder Totalausfall" }
+    ]
+  }
+}

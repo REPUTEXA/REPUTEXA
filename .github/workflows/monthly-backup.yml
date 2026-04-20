@@ -1,0 +1,77 @@
+# Sauvegarde mensuelle « scellée » : tag daté + archive ZIP du dépôt + release GitHub.
+#
+# Note sur le calendrier : GitHub Actions ne propose pas d’intervalle roulant « tous les 30 jours ».
+# Le déclencheur ci-dessous exécute une sauvegarde le 1er de chaque mois à 02:00 UTC (~30 jours).
+# Utilisez workflow_dispatch pour une exécution manuelle à tout moment.
+#
+# Visibilité des releases : identique à celle du dépôt (dépôt privé → releases privées).
+
+name: Monthly source backup
+
+on:
+  schedule:
+    - cron: '0 2 1 * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: monthly-backup
+  cancel-in-progress: false
+
+jobs:
+  seal-and-release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout default branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Resolve tag and build source archive
+        id: meta
+        shell: bash
+        run: |
+          set -euo pipefail
+          DATE_UTC="$(date -u +%Y-%m-%d)"
+          BASE_TAG="archive-${DATE_UTC}"
+          TAG="${BASE_TAG}"
+
+          git fetch --tags --quiet origin || true
+          if git rev-parse -q --verify "refs/tags/${TAG}" >/dev/null 2>&1 \
+            || git ls-remote --exit-code --tags origin "refs/tags/${TAG}" >/dev/null 2>&1; then
+            TAG="${BASE_TAG}-r${GITHUB_RUN_NUMBER}"
+          fi
+
+          echo "tag=${TAG}" >> "${GITHUB_OUTPUT}"
+          ZIP_NAME="reputexa-source-${TAG}.zip"
+          echo "zip_name=${ZIP_NAME}" >> "${GITHUB_OUTPUT}"
+
+          # Arbre exact du commit HEAD (hors fichiers non suivis) — node_modules / .next absents s’ils sont ignorés par Git
+          git archive --format=zip --output="${ZIP_NAME}" HEAD
+
+          {
+            echo "## Archive source REPUTEXA"
+            echo
+            echo "- **Tag** : \`${TAG}\`"
+            echo "- **Commit** : \`${GITHUB_SHA}\`"
+            echo "- **Réf** : \`${GITHUB_REF}\`"
+            echo "- **Date (UTC)** : ${DATE_UTC}"
+            echo
+            echo "Archive ZIP générée avec \`git archive\` (fichiers suivis uniquement, sans dépendances locales ni artefacts de build non versionnés)."
+          } > "${RUNNER_TEMP}/release_notes.md"
+
+      - name: Create GitHub Release with ZIP
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.meta.outputs.tag }}
+          target_commitish: ${{ github.sha }}
+          name: REPUTEXA source — ${{ steps.meta.outputs.tag }}
+          body_path: ${{ runner.temp }}/release_notes.md
+          files: ${{ steps.meta.outputs.zip_name }}
+          draft: false
+          prerelease: false
+          fail_on_unmatched_files: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

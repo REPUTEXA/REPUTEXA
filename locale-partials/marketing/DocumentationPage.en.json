@@ -1,0 +1,131 @@
+{
+  "DocumentationPage": {
+    "title": "REPUTEXA documentation",
+    "subtitle": "Getting started and integration guide — aligned with how the platform actually works.",
+    "onboardingTitle": "Get started in 5 steps",
+    "onboardingBadge": "≈ 10 minutes",
+    "onboardingSteps": [
+      {
+        "number": "01",
+        "iconKey": "UserPlus",
+        "title": "Create your account",
+        "description": "Enter your business details: name, type, address, WhatsApp number, and email. A verification code is sent immediately.",
+        "detail": "Cloudflare Turnstile protects signup from bots. Phone numbers must be in international format (e.g. +33612345678)."
+      },
+      {
+        "number": "02",
+        "iconKey": "Mail",
+        "title": "Verify your email",
+        "description": "Open the message and enter the 6-digit code on the verification page. The code is valid for 15 minutes.",
+        "detail": "If you do not see the email, check spam. You can request a new code from /verify."
+      },
+      {
+        "number": "03",
+        "iconKey": "Globe",
+        "title": "Connect Google Business Profile",
+        "description": "Dashboard → Settings → Platforms → “Connect Google”. Complete Google OAuth and grant listing management. Reviews sync automatically.",
+        "detail": "REPUTEXA only requests business.manage. No access to your personal Google account is required."
+      },
+      {
+        "number": "04",
+        "iconKey": "Settings",
+        "title": "Configure your AI DNA",
+        "description": "Settings → AI DNA: choose tone (professional, warm, luxury, casual), reply length, and custom instructions. The AI preview updates live.",
+        "detail": "On ZENITH, Triple Judge produces three variants (empathy, storytelling, expertise) and picks the best one."
+      },
+      {
+        "number": "05",
+        "iconKey": "Smartphone",
+        "title": "Enable WhatsApp alerts",
+        "description": "Settings → Notifications: add your WhatsApp number and the alert threshold (e.g. reviews ≤ 3★). Negative reviews arrive with the suggested AI reply.",
+        "detail": "Available on PULSE and ZENITH. Alerts use Twilio with buttons to approve or edit replies from WhatsApp."
+      }
+    ],
+    "flowTitle": "Automatic processing flow",
+    "flowIntro": "Whenever a negative review is detected, REPUTEXA runs this pipeline automatically — no manual step on your side.",
+    "whatsappFlow": [
+      {
+        "step": "Negative review received",
+        "detail": "A customer posts ≤3★ on Google, Facebook, or Trustpilot."
+      },
+      {
+        "step": "Shield Center analysis",
+        "detail": "The AI scores toxicity (hate, spam, conflict of interest, doxxing) and computes authenticity."
+      },
+      {
+        "step": "AI generation (Claude 3.5 Sonnet)",
+        "detail": "A contextual reply is generated following your AI DNA."
+      },
+      {
+        "step": "WhatsApp alert",
+        "detail": "You get the review summary plus the suggested reply with Approve / Edit actions."
+      },
+      {
+        "step": "Publish with human-like delay",
+        "detail": "Approved replies go live after a 2–7h delay. Shield Center can prepare a dispute pack if the review looks fraudulent."
+      }
+    ],
+    "platformsTitle": "Connected platforms",
+    "tablePlatform": "Platform",
+    "tableProtocol": "Protocol",
+    "tableAvailability": "Availability",
+    "platforms": [
+      {
+        "name": "Google Business Profile",
+        "status": "OAuth 2.0 (business.manage)",
+        "available": "All plans"
+      },
+      {
+        "name": "Facebook",
+        "status": "Webhook sync",
+        "available": "All plans"
+      },
+      {
+        "name": "Trustpilot",
+        "status": "Webhook sync",
+        "available": "All plans"
+      }
+    ],
+    "platformsFootnote": "Google connections only use <code>business.manage</code> — no access to your personal Google account.",
+    "posTitle": "POS & Zapier integration",
+    "posBadge": "ZENITH only",
+    "posIntro": "REPUTEXA issues an inbound API key (<rtx>rtx_live_…</rtx>) in your Settings. Your POS (Square, SumUp) or Zapier/Make can POST visit data so REPUTEXA triggers AI Capture — a WhatsApp message 30 minutes after the visit inviting the customer to leave a review.",
+    "posCodeLabel": "Inbound webhook — POS visit payload",
+    "posSnippet": "POST https://reputexa.fr/api/webhooks/{your_rtx_live_key}\n\nContent-Type: application/json\n\n{\n  \"customerName\": \"Jane Doe\",\n  \"phone\": \"+33612345678\",\n  \"visitDate\": \"2026-03-22T14:30:00Z\",\n  \"establishmentId\": \"your_establishment_id\"\n}\n\n// REPUTEXA schedules WhatsApp automatically\n// 30 minutes after the visit to prompt for a review.\n// ZENITH-only feature (AI Capture).",
+    "posNote": "This key is for <strong>inbound webhooks</strong> (data into REPUTEXA). It is not used to read reviews or analytics from an external API.",
+    "keysTitle": "Where to find integration keys",
+    "keyCards": [
+      {
+        "label": "Inbound API key (POS/Zapier)",
+        "path": "Settings → Integrations → API key",
+        "plan": "ZENITH",
+        "planColor": "text-violet-400"
+      },
+      {
+        "label": "WhatsApp number for alerts",
+        "path": "Settings → Notifications → WhatsApp",
+        "plan": "PULSE+",
+        "planColor": "text-blue-400"
+      },
+      {
+        "label": "Google Business connection",
+        "path": "Settings → Platforms → Google",
+        "plan": "All",
+        "planColor": "text-emerald-400"
+      }
+    ],
+    "practicesTitle": "Best practices",
+    "practiceTips": [
+      "Configure AI DNA before the first reviews land so suggestions are calibrated immediately.",
+      "Enable WhatsApp alerts on a phone you monitor — it is the fastest channel for urgent reviews.",
+      "For POS webhooks, send visit data within 10 minutes after checkout; the 30-minute AI Capture timer starts when we receive the payload.",
+      "Never publish your rtx_live_ key. It is tied to billing for AI Capture usage.",
+      "Shield Center runs on every review automatically — use the Alerts dashboard for critical cases.",
+      "If a WhatsApp suggestion is wrong, tap Edit — corrections train future suggestions."
+    ],
+    "ctaTitle": "Ready to start?",
+    "ctaSubtitle": "Full ZENITH access for 14 days with no card. Your first AI reply is generated in under a minute after Google connects.",
+    "ctaPrimary": "Create my free account",
+    "ctaSecondary": "Help center"
+  }
+}

@@ -1,0 +1,51 @@
+<Window x:Class="ReputexaGhost.OverlayWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        WindowStyle="None"
+        AllowsTransparency="False"
+        Background="#01000000"
+        Topmost="True"
+        ShowInTaskbar="False"
+        Focusable="False"
+        Width="440" Height="280"
+        WindowStartupLocation="Manual">
+  <Border CornerRadius="16" Margin="12" Padding="16"
+          Background="#E6282830" BorderBrush="#66FFFFFF" BorderThickness="1">
+    <Grid Focusable="False">
+      <Grid.RowDefinitions>
+        <RowDefinition Height="Auto"/>
+        <RowDefinition Height="*"/>
+        <RowDefinition Height="Auto"/>
+        <RowDefinition Height="Auto"/>
+      </Grid.RowDefinitions>
+
+      <TextBlock x:Name="TitleText" Grid.Row="0" Foreground="White" FontSize="16" FontWeight="SemiBold"
+                 Text="Reputexa" Focusable="False" TextWrapping="Wrap"/>
+
+      <TextBlock x:Name="DetailText" Grid.Row="1" Margin="0,10,0,0" Foreground="#DDD" TextWrapping="Wrap"
+                 FontSize="13" VerticalAlignment="Top" Focusable="False"/>
+
+      <TextBlock x:Name="CountdownText" Grid.Row="2" Margin="0,10,0,0" Foreground="#FDE68A" FontSize="12"
+                 FontWeight="SemiBold" Visibility="Collapsed" Focusable="False"/>
+
+      <StackPanel x:Name="TransactPanel" Grid.Row="3" Margin="0,12,0,0" Visibility="Collapsed" Focusable="False">
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+          <Button x:Name="CancelTransactBtn" Content="Annuler" Padding="12,6" Margin="0,0,8,0"
+                  Click="CancelTransactBtn_OnClick" Focusable="True"/>
+          <Button x:Name="ValidateTransactBtn" Content="Valider la transaction" Padding="14,6"
+                  Background="#D97706" Foreground="#0F172A" FontWeight="SemiBold"
+                  Click="ValidateTransactBtn_OnClick" Focusable="True"/>
+        </StackPanel>
+      </StackPanel>
+
+      <StackPanel x:Name="SimpleDismissPanel" Grid.Row="3" Margin="0,12,0,0" HorizontalAlignment="Stretch"
+                  Focusable="False">
+        <Button x:Name="MacroInjectBtn" Content="Injecter macro caisse (montant ticket)" Padding="10,6"
+                Visibility="Collapsed" Margin="0,0,0,8" HorizontalAlignment="Stretch"
+                Click="MacroInjectBtn_OnClick" Focusable="True"/>
+        <Button x:Name="DismissBtn" Content="Fermer" Padding="14,6" HorizontalAlignment="Right"
+                Click="DismissBtn_OnClick" Focusable="True"/>
+      </StackPanel>
+    </Grid>
+  </Border>
+</Window>

@@ -1,0 +1,7 @@
+{
+  "ecommerceModalLead": "Attention :",
+  "ecommerceModalTitle": "L'envoi de WhatsApp en e-commerce nécessite l'ajout de la clause Article X dans vos CGV et une case à cocher dans votre checkout. Avez-vous bien configuré votre tunnel de commande ?",
+  "ecommerceModalWarning": "L'activation de vos campagnes sans ces mentions légales est sous votre entière responsabilité. Si la clause et la case à cocher ne sont pas réellement mises en place sur votre site, REPUTEXA ne saurait être tenue responsable des manquements liés à l'information ou au consentement.",
+  "ecommerceModalCta": "Je m'engage à configurer mon checkout",
+  "pageFooterLegal": "REPUTEXA est un prestataire technique (sous-traitant). L'usage de ce service implique l'acceptation de nos Conditions Générales d'Utilisation et de notre politique de confidentialité (Fidélité et Avis) ; la collecte du consentement et l'information des clients finaux relèvent du Responsable de traitement (commerçant)."
+}

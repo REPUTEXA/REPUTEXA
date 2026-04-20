@@ -1,0 +1,107 @@
+{
+  "GuidesPage": {
+    "title": "Guides & tutoriels",
+    "subtitle": "Tout ce qu'il faut pour maîtriser REPUTEXA et maximiser votre stratégie d'e-réputation.",
+    "statGuides": "Guides disponibles",
+    "statLevels": "Niveaux de difficulté",
+    "statMinutes": "De contenu total",
+    "totalMinutesValue": "91 min",
+    "featuredBadge": "Recommandé pour commencer",
+    "readGuide": "Lire le guide",
+    "ctaTitle": "Besoin d'un accompagnement personnalisé ?",
+    "ctaSubtitle": "Notre équipe et le Consultant IA Stratégique (ZENITH) peuvent vous accompagner sur votre cas spécifique.",
+    "ctaTrial": "Essai gratuit",
+    "ctaHelp": "Centre d'aide",
+    "levels": {
+      "beginner": "Débutant",
+      "intermediate": "Intermédiaire",
+      "advanced": "Avancé"
+    },
+    "categories": {
+      "all": "Tous",
+      "premiers-pas": "Premiers pas",
+      "strategie": "Stratégie",
+      "ia": "IA & personnalisation",
+      "conformite": "Conformité",
+      "shield": "Shield Center",
+      "multi": "Multi-plateformes",
+      "analytics": "Analytics",
+      "api": "API & intégrations"
+    },
+    "guides": [
+      {
+        "slug": "demarrage-rapide",
+        "iconKey": "Zap",
+        "readTime": "5 min",
+        "level": "beginner",
+        "category": "premiers-pas",
+        "featured": true,
+        "title": "Démarrage rapide : REPUTEXA en 5 minutes",
+        "description": "Créez votre compte, connectez votre fiche Google Business Profile et recevez vos premières suggestions de réponses IA. Tout ce qu'il faut pour être opérationnel immédiatement."
+      },
+      {
+        "slug": "optimiser-notation",
+        "iconKey": "BarChart2",
+        "readTime": "12 min",
+        "level": "intermediate",
+        "category": "strategie",
+        "title": "Optimiser sa notation Google : guide stratégique complet",
+        "description": "De 3,8 à 4,7 étoiles en 6 mois — les stratégies éprouvées pour augmenter votre note moyenne, maximiser le volume d'avis positifs et corriger les points critiques identifiés."
+      },
+      {
+        "slug": "reponses-ia-personnalisees",
+        "iconKey": "MessageSquare",
+        "readTime": "8 min",
+        "level": "intermediate",
+        "category": "ia",
+        "title": "Personnaliser les réponses IA selon votre identité de marque",
+        "description": "Comment configurer votre Brief de marque pour que chaque réponse IA reflète parfaitement votre ton, vos valeurs et votre style. Inclut des exemples par secteur."
+      },
+      {
+        "slug": "conformite-rgpd",
+        "iconKey": "Shield",
+        "readTime": "10 min",
+        "level": "intermediate",
+        "category": "conformite",
+        "title": "Conformité RGPD et gestion des avis clients",
+        "description": "Bonnes pratiques pour traiter les données personnelles dans vos avis et réponses, tout en restant pleinement conforme au cadre réglementaire européen."
+      },
+      {
+        "slug": "shield-center-mode-emploi",
+        "iconKey": "Bell",
+        "readTime": "15 min",
+        "level": "intermediate",
+        "category": "shield",
+        "title": "Shield Center : configurer vos alertes et gérer les faux avis",
+        "description": "Guide complet pour tirer parti du Shield Center — seuils d'alerte, interprétation des scores de toxicité, procédure de contestation Google et WhatsApp temps réel."
+      },
+      {
+        "slug": "multiplateforme-google-facebook-trustpilot",
+        "iconKey": "Globe",
+        "readTime": "9 min",
+        "level": "intermediate",
+        "category": "multi",
+        "title": "Gérer votre réputation sur Google, Facebook et Trustpilot",
+        "description": "Centraliser vos avis sur les trois plateformes connectées par REPUTEXA et appliquer les bonnes pratiques par écosystème."
+      },
+      {
+        "slug": "rapports-pdf-analyses",
+        "iconKey": "FileText",
+        "readTime": "7 min",
+        "level": "intermediate",
+        "category": "analytics",
+        "title": "Analyser vos rapports PDF mensuels comme un expert",
+        "description": "Comment lire et interpréter les 12 métriques clés de votre rapport REPUTEXA pour construire un plan d'action concret et mesurer votre progression mois après mois."
+      },
+      {
+        "slug": "api-integration-avancee",
+        "iconKey": "BookOpen",
+        "readTime": "20 min",
+        "level": "advanced",
+        "category": "api",
+        "title": "Intégration API avancée : connecter REPUTEXA à votre CRM",
+        "description": "Guide technique pour intégrer REPUTEXA dans votre écosystème : Zapier, Make, logiciels de caisse Square et SumUp. Inclut des exemples de webhook entrant et des patterns de gestion d'erreurs."
+      }
+    ]
+  }
+}

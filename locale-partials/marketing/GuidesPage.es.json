@@ -1,0 +1,38 @@
+{
+  "GuidesPage": {
+    "title": "Guías y tutoriales",
+    "subtitle": "Todo lo que necesitas para dominar REPUTEXA y tu estrategia de reseñas.",
+    "statGuides": "Guías disponibles",
+    "statLevels": "Niveles de dificultad",
+    "statMinutes": "Contenido total",
+    "totalMinutesValue": "91 min",
+    "featuredBadge": "Recomendado para empezar",
+    "readGuide": "Leer guía",
+    "ctaTitle": "¿Necesitas ayuda personalizada?",
+    "ctaSubtitle": "Nuestro equipo y el consultor estratégico IA (ZENITH) pueden acompañarte en tu caso.",
+    "ctaTrial": "Prueba gratuita",
+    "ctaHelp": "Centro de ayuda",
+    "levels": { "beginner": "Principiante", "intermediate": "Intermedio", "advanced": "Avanzado" },
+    "categories": {
+      "all": "Todos",
+      "premiers-pas": "Primeros pasos",
+      "strategie": "Estrategia",
+      "ia": "IA y voz de marca",
+      "conformite": "Cumplimiento",
+      "shield": "Shield Center",
+      "multi": "Multiplataforma",
+      "analytics": "Analítica",
+      "api": "API e integraciones"
+    },
+    "guides": [
+      { "slug": "demarrage-rapide", "iconKey": "Zap", "readTime": "5 min", "level": "beginner", "category": "premiers-pas", "featured": true, "title": "Inicio rápido: REPUTEXA en 5 minutos", "description": "Crea tu cuenta, conecta Google Business Profile y obtén las primeras respuestas sugeridas por IA." },
+      { "slug": "optimiser-notation", "iconKey": "BarChart2", "readTime": "12 min", "level": "intermediate", "category": "strategie", "title": "Mejorar tu nota en Google: guía completa", "description": "Estrategias para subir la media, ganar reseñas positivas y corregir puntos débiles." },
+      { "slug": "reponses-ia-personnalisees", "iconKey": "MessageSquare", "readTime": "8 min", "level": "intermediate", "category": "ia", "title": "Personalizar respuestas IA a tu marca", "description": "Configura tu brief de marca: tono, valores y estilo en cada borrador." },
+      { "slug": "conformite-rgpd", "iconKey": "Shield", "readTime": "10 min", "level": "intermediate", "category": "conformite", "title": "RGPD y reseñas de clientes", "description": "Buenas prácticas de datos personales en reseñas y respuestas públicas." },
+      { "slug": "shield-center-mode-emploi", "iconKey": "Bell", "readTime": "15 min", "level": "intermediate", "category": "shield", "title": "Shield Center: alertas y reseñas falsas", "description": "Umbrales, puntuación de toxicidad, disputa en Google y WhatsApp en tiempo real." },
+      { "slug": "multiplateforme-google-facebook-trustpilot", "iconKey": "Globe", "readTime": "9 min", "level": "intermediate", "category": "multi", "title": "Google, Facebook y Trustpilot", "description": "Centraliza las tres plataformas conectadas y aplica buenas prácticas por canal." },
+      { "slug": "rapports-pdf-analyses", "iconKey": "FileText", "readTime": "7 min", "level": "intermediate", "category": "analytics", "title": "Interpretar tus informes PDF mensuales", "description": "De las métricas clave a un plan de acción medible mes a mes." },
+      { "slug": "api-integration-avancee", "iconKey": "BookOpen", "readTime": "20 min", "level": "advanced", "category": "api", "title": "API avanzada: conectar REPUTEXA al CRM", "description": "Zapier, Make, TPV — webhooks, reintentos y manejo de errores." }
+    ]
+  }
+}

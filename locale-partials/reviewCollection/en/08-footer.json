@@ -1,0 +1,7 @@
+{
+  "ecommerceModalLead": "Attention:",
+  "ecommerceModalTitle": "Sending WhatsApp in e-commerce requires adding Article X wording to your terms and a checkbox in checkout. Have you configured your checkout flow?",
+  "ecommerceModalWarning": "Running campaigns without these legal elements is entirely your responsibility. If the clause and checkbox are not actually implemented on your site, REPUTEXA cannot be held liable for shortcomings related to information or consent.",
+  "ecommerceModalCta": "I commit to configuring my checkout",
+  "pageFooterLegal": "REPUTEXA is a technical provider (processor). Using this service implies acceptance of our Terms of Use, which state that collecting customer consent is solely the end user's responsibility."
+}

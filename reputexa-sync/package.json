@@ -1,0 +1,48 @@
+{
+  "name": "reputexa-sync",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Agent local : surveillance de tickets (.txt/.json) et envoi vers /api/banano/pilotage/ingest",
+  "main": "main.js",
+  "author": "Reputexa",
+  "scripts": {
+    "start": "electron .",
+    "generate-icon": "node scripts/generate-icon.cjs",
+    "predist": "node scripts/generate-icon.cjs",
+    "dist": "electron-builder --win --x64 --publish never"
+  },
+  "dependencies": {
+    "chokidar": "^4.0.3"
+  },
+  "devDependencies": {
+    "electron": "^33.2.0",
+    "electron-builder": "^25.1.8",
+    "jimp": "^0.22.12",
+    "to-ico": "^1.1.5"
+  },
+  "build": {
+    "appId": "com.reputexa.sync",
+    "productName": "Reputexa Sync",
+    "copyright": "Copyright © 2026 Reputexa",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "settings.html",
+      "lib/**/*"
+    ],
+    "win": {
+      "target": "nsis",
+      "icon": "build/icon.ico"
+    },
+    "nsis": {
+      "oneClick": true,
+      "allowToChangeInstallationDirectory": false,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Reputexa Sync"
+    }
+  }
+}

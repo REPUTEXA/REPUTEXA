@@ -1,0 +1,17 @@
+{
+  "trialEndingSoon": {
+    "title": "Ton essai ZENITH se termine dans 3 jours",
+    "cta": "Choisir mon plan définitif (PULSE / VISION)",
+    "secondaryCancel": "Annuler mon essai immédiatement",
+    "introChosen": "Bonjour{firstName}",
+    "introChosen2": "Tu as choisi de passer sur le plan <strong>{planLabel}</strong> à la fin de ton essai. Tu peux encore changer d'avis ici.",
+    "introZenith": "Bonjour{firstName}",
+    "introZenith2": "Ton essai gratuit <strong>ZENITH</strong> se termine dans <strong>{days}</strong>.",
+    "introZenith3": "Tu préfères <strong>Vision</strong> ou <strong>Pulse</strong> ? Choisis ton plan définitif ou annule en un clic depuis ton espace abonnement — tout est sur une seule page, sans quitter Reputexa.",
+    "charge": "Si tu ne modifies pas ton choix d'ici là, ton abonnement <strong>{planName}</strong> s'activera automatiquement le <strong>{trialEndDate}</strong> pour un montant de <strong>{planPrice}</strong>.",
+    "aboveBtnChosen": "Pour modifier ton choix de plan, clique sur le bouton ci-dessous.",
+    "aboveBtnZenith": "Tu profites actuellement du plan ZÉNITH. Si tu souhaites continuer avec une offre plus adaptée à ton budget (PULSE ou VISION), clique sur le bouton ci-dessous pour valider ton choix avant la fin de l'essai.",
+    "day": "jour",
+    "days": "jours"
+  }
+}

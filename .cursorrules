@@ -1,0 +1,29 @@
+# REPUTEXA - Cursor / AI project rules
+
+See `.cursor/rules/` for full rule files (including i18n).
+
+## STRICT TYPOGRAPHY RULE
+
+Do NOT use em-dashes or en-dashes under any circumstances (Unicode U+2014 and U+2013).
+
+Use ONLY the standard ASCII hyphen (-, U+002D) for lists, separators, and punctuation.
+
+This applies to both code comments and UI text.
+
+Wrong style to avoid (never output like this): `Phrase A — phrase B` ; `10–15` (long dashes). Prefer commas or ASCII hyphen in numeric ranges: `10-15`.
+
+External AIs (ChatGPT custom instructions, Claude project instructions): copy-paste block in `docs/AI_CHATGPT_CLAUDE_TYPOGRAPHY.md`.
+
+STRICT RULE: NO HARDCODED TEXT
+
+Zero Tolerance: Every string visible to the user (labels, buttons, toasts, tooltips) must be stored in messages/fr.json.
+
+Workflow: >    - Create the key in messages/fr.json first.
+
+Use the t('key') or m.key() function from our translation library in the code.
+
+NEVER write text like <span>Envoyer</span>. Use <span>{t('common.send')}</span>.
+
+Sync Command: After adding new keys, always remind the user to run npx tsx scripts/sync-all-messages-from-fr.ts to propagate keys to EUR, USD, CHF, CAD, AUD, etc.
+
+Contextual Keys: Group keys logically (ex: dashboard.team.stats.scans, staff.tasks.complete_success).

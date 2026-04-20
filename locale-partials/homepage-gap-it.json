@@ -1,0 +1,180 @@
+{
+  "landingFooter": {
+    "tagline": "Piattaforma di reputazione con IA per chi vuole crescere.",
+    "colResources": "Risorse",
+    "colHelp": "Assistenza",
+    "colCompany": "Azienda",
+    "colProduct": "Prodotto",
+    "linkDocumentation": "Documentazione",
+    "linkBlog": "Blog",
+    "linkGuides": "Guide",
+    "linkApi": "API",
+    "linkStatuts": "Informazioni societarie",
+    "linkRegistre": "Registro Art. 30 (CSV)",
+    "linkHelpCenter": "Centro assistenza",
+    "linkContact": "Contatti",
+    "linkReport": "Segnala un problema",
+    "linkDataRights": "Diritti sui dati (clienti finali)",
+    "linkSecurity": "Sicurezza e GDPR",
+    "linkAbout": "Chi siamo",
+    "linkNews": "Notizie",
+    "linkCareers": "Lavora con noi",
+    "linkInvestors": "Investitori",
+    "linkSustainability": "Sostenibilità",
+    "linkPricing": "Prezzi",
+    "linkFeatures": "Funzionalità",
+    "linkTestimonials": "Testimonianze",
+    "linkFreeTrial": "Prova gratuita",
+    "linkLogin": "Accedi",
+    "legalMentions": "Note legali",
+    "legalPrivacy": "Privacy",
+    "legalTerms": "Condizioni d'uso",
+    "legalCookies": "Cookie",
+    "legalSitemap": "Mappa del sito",
+    "rightsLine": "© 2026 REPUTEXA, Inc. Tutti i diritti riservati.",
+    "legalNavAria": "Link legali",
+    "brandAria": "REPUTEXA home",
+    "impressum": "Impressum"
+  },
+  "hero": {
+    "euCompliance": {
+      "badge": "Conformità UE certificata",
+      "subtitle": "Programma privacy monitorato dal nostro AI Legal Guardian — allineato a GDPR e standard UE di protezione dei dati.",
+      "authorityLine": "L'autorità di controllo dipende da dove è stabilita la tua attività; la documentazione segue le linee guida EDPB.",
+      "pending": "Monitoraggio Guardian attivo",
+      "notOk": "Ultima revisione: vedi l'informativa privacy."
+    },
+    "ukCompliance": {
+      "badge": "UK GDPR e Data Protection Act 2018",
+      "subtitle": "Il monitoraggio Guardian include orientamenti ICO e temi UK (es. recensioni fuorvianti online).",
+      "authorityLine": "Autorità di controllo: Information Commissioner's Office (ICO) — ico.org.uk",
+      "pending": "Monitoraggio Guardian attivo",
+      "notOk": "Ultima revisione: vedi l'informativa privacy per il programma UK."
+    }
+  },
+  "tunnel": {
+    "badge": "Percorso cliente WhatsApp",
+    "title": "Il tunnel conversazionale REPUTEXA",
+    "subtitle": "Obiettivo: migliorare prima di tutto — feedback onesto per affinare il servizio, non un secco «lasciaci una recensione». Dopo la visita, se dice sì, si arriva a un testo pronto da incollare; l'ultima parola è sempre al cliente.",
+    "steps": {
+      "1": {
+        "title": "Primo contatto (momento giusto)",
+        "body": "Dopo l'acquisto, con il ritardo che imposti, un messaggio cordiale sul miglioramento: due minuti per dire cosa ha funzionato o no, con sì/no esplicito. Rifiuto o STOP: ringraziamento, stop al flusso, numero bloccato per questa raccolta (durata secondo le tue impostazioni, spesso 120 giorni o permanente)."
+      },
+      "2": {
+        "title": "Contesto → domanda umana",
+        "body": "Se dice sì, il messaggio successivo usa contesto (servizio, ordine) e invita a qualche parola su cosa ha convinto o no — conversazionale, non modulo."
+      },
+      "3": {
+        "title": "Bozza recensione pronta",
+        "body": "Con il feedback, l'IA può proporre un testo breve fedele alle sue parole. Il cliente modifica come vuole (testo, voce) finché non va bene."
+      },
+      "4": {
+        "title": "Pubblicazione rapida",
+        "body": "Dopo l'ok: copia, apre Google o TripAdvisor, incolla, stelle, invia."
+      },
+      "5": {
+        "title": "Ringraziamento",
+        "body": "Ultimo messaggio: grazie, promemoria su riuso dei contatti e conservazione dati fino alla cancellazione indicata in negozio (spesso ~120 giorni)."
+      }
+    },
+    "demoOnline": "online",
+    "demoTitle": "Simulazione WhatsApp",
+    "demoRefresh": "Nuovo scenario",
+    "demoLoading": "Generazione conversazione…",
+    "demoError": "Impossibile generare la demo ora.",
+    "demoEnginesDual": "Scenario: OpenAI + Claude (anteprima IA).",
+    "demoEnginesClaude": "Scenario generato con Claude.",
+    "demoEnginesOpenAI": "Scenario generato con OpenAI.",
+    "demoStaticFallback": "Esempio statico — configura le API sul server per una simulazione a ogni caricamento.",
+    "demoChipsHint": "Scegli un percorso:",
+    "chipRandom": "Casuale",
+    "chipHappyFull": "Sì → percorso completo",
+    "chipDeclineFirst": "No grazie",
+    "chipHappyWithEdit": "Diverse modifiche",
+    "chipStopAfterYes": "Stop a metà",
+    "scenarioLine": "Scenario: {name}",
+    "scenario_decline_first": "Rifiuta subito",
+    "scenario_happy_full": "Sì, percorso completo",
+    "scenario_happy_with_edit": "Più modifiche alla bozza",
+    "scenario_stop_after_yes": "Sì poi stop"
+  },
+  "googleFlywheel": {
+    "badge": "Algoritmo Google",
+    "headline": "Perché la reputazione è il tuo migliore motore di ricerca",
+    "subtitle": "Comportamento documentato di Google Business Profile.",
+    "step1": {
+      "trigger": "Più recensioni",
+      "title": "Credibilità",
+      "result": "Fiducia con i clienti che confrontano le attività prima di scegliere."
+    },
+    "step2": {
+      "trigger": "Risposte regolari",
+      "title": "Segnale per Google",
+      "result": "Google rileva attività e servizio reattivo — segnali positivi sul punteggio."
+    },
+    "step3": {
+      "trigger": "Ranking",
+      "title": "In cima ai risultati",
+      "result": "Salita naturale nei risultati senza annunci a pagamento."
+    },
+    "equation": "Più recensioni e più risposte, meglio Google ti posiziona.",
+    "equationSource": "Linee guida ufficiali Google Business Profile",
+    "cta": "Migliora il mio posizionamento Google"
+  },
+  "howItWorks": {
+    "cards": {
+      "multilingue": {
+        "badge": "Incluso PULSE • ZENITH",
+        "title": "Risposta locale, portata globale",
+        "desc": "L'IA risponde nella lingua dei clienti con tono naturale. Vision si concentra sulla lingua del tuo mercato."
+      },
+      "bouclier": {
+        "badge": "Incluso PULSE • ZENITH",
+        "title": "Protezione del brand 24/7",
+        "desc": "Rilevamento di insulti e recensioni false; richiesta di rimozione verso Google per proteggere la reputazione."
+      },
+      "whatsapp": {
+        "badge": "Incluso PULSE • ZENITH",
+        "title": "Reattività d'urto",
+        "desc": "Notifica WhatsApp immediata solo per recensioni negative, per intervenire prima che si diffonda."
+      },
+      "capture": {
+        "badge": "Esclusivo ZENITH",
+        "title": "Generatore 5 stelle",
+        "desc": "L'IA contatta i clienti via WhatsApp dopo la visita per raccogliere la recensione. Non lasciare il voto al caso."
+      },
+      "boostSeo": {
+        "badge": "Esclusivo ZENITH",
+        "title": "SEO locale",
+        "desc": "Parole chiave strategiche nelle risposte per aiutare il posizionamento locale su Google."
+      },
+      "reporting": {
+        "badge": "Incluso VISION • PULSE • ZENITH",
+        "title": "Visione strategica",
+        "desc": "Report mensili con grafici e sentiment. Decisioni guidate dai dati."
+      }
+    }
+  },
+  "faq": {
+    "headline": "Domande frequenti",
+    "items": {
+      "googleMaps": {
+        "q": "L'IA può davvero aiutarmi su Google Maps?",
+        "a": "Sì. Google premia chi risponde rapidamente e usa parole chiave pertinenti. Il piano ZENITH inserisce strategicamente queste parole nelle risposte."
+      },
+      "iaDetectable": {
+        "q": "I clienti si accorgeranno che è IA?",
+        "a": "No: modelli addestrati su risposte reali; tono umano e professionale. Obiettivo: superare i test di naturalità."
+      },
+      "installTime": {
+        "q": "Quanto tempo serve per l'installazione?",
+        "a": "Meno di 2 minuti: colleghi Google Business e l'IA analizza subito le recensioni. Tutto dal dashboard, senza software da installare."
+      },
+      "gratuit14j": {
+        "q": "È davvero gratis 14 giorni? Senza carta?",
+        "a": "Sì: accesso completo senza carta per provare l'impatto. Se non ti convince, non devi fare nulla."
+      }
+    }
+  }
+}

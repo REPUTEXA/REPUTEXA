@@ -1,0 +1,15 @@
+{
+  "auditTitle": "Journal — d'où vient la sollicitation ?",
+  "auditIntro": "Chaque ligne indique la voie d'entrée (webhook clé API ou Zenith), la date de réception, le contexte connu et le statut. Téléphone partiellement masqué ici ; détail complet (ex. IP) dans l'export RGPD (Paramètres → Télécharger mes données).",
+  "auditLoading": "Chargement du journal…",
+  "auditColReceived": "Reçu",
+  "auditColOrigin": "Origine",
+  "auditColClient": "Client",
+  "auditColScheduled": "Programmé / envoyé",
+  "auditColStatus": "Statut",
+  "auditEmpty": "Aucune entrée sur cette période.",
+  "auditRetention": "Les identifiants de la file sont anonymisés ou effacés au plus tard à 120 jours (statistiques agrégées pouvant être conservées). Une nouvelle sollicitation WhatsApp pour le même numéro n'est pas envoyée avant 120 jours après le début de la précédente campagne ; passé ce délai, un nouvel envoi redevient possible hors opposition (STOP).",
+  "scheduledLine": "Prog. {datetime}",
+  "sentLine": "Envoyé {datetime}",
+  "auditQueueRef": "file #{id}…"
+}

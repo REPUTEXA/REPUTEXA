@@ -1,0 +1,21 @@
+{
+  "section3Title": "Prozessgesundheit",
+  "webhookActive": "Webhook aktiv",
+  "noKeyGenerated": "Kein Schlüssel erzeugt",
+  "queueTitle": "Warteschlange",
+  "pendingSuffix": "ausstehend",
+  "reviewsPublished": "Veröffentlichte Bewertungen",
+  "polishedPublishedSub": "überarbeitete Texte veröffentlicht",
+  "dashboardTitle": "Zenith-Dashboard",
+  "statTotalFlow": "Gesamtfluss",
+  "statTotalFlowSub": "Per Webhook importierte Kundinnen und Kunden",
+  "statYes": "Antworten (JA)",
+  "statYesSubWaiting": "Warten auf Antworten",
+  "statYesSubEngagement": "{pct} % Engagement",
+  "statNo": "Abmeldungen (NEIN)",
+  "statNoSubNone": "Keine Abmeldungen",
+  "statNoSubShare": "{pct} % des Gesamtflusses",
+  "statGeneratedTitle": "Erzeugte Bewertungen",
+  "statGeneratedSub": "Überarbeiteter Text & vom Kunden veröffentlicht",
+  "statTransform": "{pct} % Konversion"
+}

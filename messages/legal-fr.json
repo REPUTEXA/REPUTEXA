@@ -1,0 +1,292 @@
+{
+  "Legal": {
+    "nav": {
+      "mentions": "Mentions légales",
+      "privacy": "Confidentialité",
+      "terms": "CGU",
+      "contact": "Contact",
+      "toc": "Table des matières"
+    },
+    "layoutComplianceGateMessage": "Accès restreint : veuillez valider la case de conformité RGPD dans vos réglages pour débloquer ces ressources.",
+    "layoutComplianceGateCta": "Valider dans Banano",
+    "mentionsLegales": {
+      "title": "Mentions légales",
+      "metaTitle": "Mentions légales | REPUTEXA",
+      "metaDescription": "Mentions légales REPUTEXA : éditeur, hébergement LCEN art. 6, prestataires, Impressum, CNIL, médiation consommation, propriété intellectuelle.",
+      "intro": "Conformément à la loi n° 2004-575 du 21 juin 2004 pour la confiance dans l'économie numérique (LCEN) et au Règlement général sur la protection des données (RGPD), les présentes mentions légales identifient l'éditeur du site reputexa.fr, les prestataires techniques, les modalités de contact et les voies de recours. Elles sont rédigées pour être complétées par la politique de confidentialité (Fidélité et Avis) et les conditions générales d'utilisation.\n\nDernière mise à jour : avril 2026 — version 1.3.",
+      "toc": [
+        {
+          "id": "editeur",
+          "label": "1. Éditeur du site"
+        },
+        {
+          "id": "impressum",
+          "label": "2. Impressum (informations légales)"
+        },
+        {
+          "id": "directeur",
+          "label": "3. Directeur de la publication"
+        },
+        {
+          "id": "hebergeur",
+          "label": "4. Hébergement et prestataires techniques"
+        },
+        {
+          "id": "droit",
+          "label": "5. Droit applicable"
+        },
+        {
+          "id": "prop-intel",
+          "label": "6. Propriété intellectuelle"
+        },
+        {
+          "id": "liens",
+          "label": "7. Liens hypertextes"
+        },
+        {
+          "id": "cnil",
+          "label": "8. Autorité de contrôle et réclamations"
+        },
+        {
+          "id": "mediation",
+          "label": "9. Médiation de la consommation (UE)"
+        },
+        {
+          "id": "contact",
+          "label": "10. Contact"
+        }
+      ],
+      "editeur_title": "1. Éditeur du site",
+      "editeur_content": "Le site reputexa.fr est édité par REPUTEXA, société en cours d'immatriculation ou immatriculée en France (forme juridique, dénomination exacte, adresse du siège social, numéro SIREN/SIRET, numéro de TVA intracommunautaire le cas échéant : à compléter dès l'immatriculation et affichés en tête de cette section). En attendant : coordonnées de contact professionnel : contact@reputexa.fr. Capital social : le cas échéant, indiqué après immatriculation.",
+      "impressum_title": "2. Impressum (informations légales)",
+      "impressum_content": "Conformément aux exigences applicables en Allemagne (§ 5 TMG) et dans l'Union européenne, l'Impressum reprend les informations d'éditeur ci-dessus (dénomination, siège, contact). Les présentes mentions valent Impressum pour l'ensemble des utilisateurs, y compris ceux situés en Allemagne. Contact : contact@reputexa.fr.",
+      "directeur_title": "3. Directeur de la publication",
+      "directeur_content": "Le directeur de la publication est la personne physique identifiée comme telle auprès de l'hébergeur et de l'autorité compétente (fondateur / représentant légal de REPUTEXA). Nom et qualité : à compléter après constitution de la société.",
+      "hebergeur_title": "4. Hébergement et prestataires techniques",
+      "hebergeur_content": "Conformément à l'article 6-I-2° de la LCEN, sont précisés les éléments suivants. Application web (front et API) : Vercel Inc., 340 S Lemon Ave #4133, Walnut, CA 91789, États-Unis — site et mentions légales : vercel.com/legal ; le déploiement peut être opéré via l'entité européenne Vercel Netherlands B.V. selon votre zone de facturation. Données applicatives (base PostgreSQL, authentification, stockage associé au projet) : Supabase — projet configuré en région Union européenne (eu-*) lorsque disponible ; politique de confidentialité et DPA : supabase.com. Envoi d'e-mails transactionnels : Resend — resend.com/legal. Paiements : Stripe Payments Europe Ltd ou entité Stripe applicable selon votre pays — stripe.com/legal. Messagerie WhatsApp (plan Zenith / alertes) : Twilio Inc. ou filiale applicable — twilio.com/legal. Fournisseurs d'IA (suggestions de texte) : OpenAI / Anthropic selon les clés API configurées — traitements encadrés par les conditions et DPA de ces éditeurs. Les sous-traitants sont contractuellement tenus au secret et à la sécurité des données (RGPD, art. 28). Les données des comptes marchands sont en principe hébergées dans l'UE ; certains traitements (ex. API IA) peuvent impliquer des transferts encadrés (clauses contractuelles types, politiques des fournisseurs). Détail : Politique de confidentialité. Les fonctionnalités fondées sur l'IA peuvent produire des erreurs ; les contenus générés sont indicatifs — CGU (article 5) et politique de confidentialité (section 8).",
+      "droit_title": "5. Droit applicable",
+      "droit_content": "Le droit applicable est le droit français. Sans préjudice des dispositions impératives du pays de résidence de l'utilisateur dans l'Union européenne, les présentes mentions et le site sont régis par le droit français. Les utilisateurs consommateurs résidant dans l'UE conservent les droits que leur accordent les dispositions impératives de leur État de résidence.",
+      "prop_intel_title": "6. Propriété intellectuelle",
+      "prop_intel_content": "La plateforme REPUTEXA, l'outil logiciel SaaS (fonctionnalités, code, architecture, documentation associée) et l'ensemble du contenu du site (textes, graphismes, logos, bases de données) constituent la propriété exclusive de REPUTEXA et sont protégés par le droit d'auteur, le droit des marques et les droits voisins. Toute reproduction, représentation ou exploitation non autorisée constitue une contrefaçon passible de poursuites.",
+      "liens_title": "7. Liens hypertextes",
+      "liens_content": "Le site peut contenir des liens vers des sites tiers. REPUTEXA n'exerce aucun contrôle sur ces sites et décline toute responsabilité quant à leur contenu. La création de liens vers reputexa.fr est soumise à l'accord préalable de l'éditeur.",
+      "cnil_title": "8. Autorité de contrôle et réclamations",
+      "cnil_content": "Pour toute question relative aux données personnelles, vous pouvez contacter : contact@reputexa.fr. Vous disposez du droit d'introduire une réclamation auprès de la CNIL (Commission Nationale de l'Informatique et des Libertés), 3 Place de Fontenoy — TSA 80715 — 75334 PARIS CEDEX 07, France — www.cnil.fr — si vous estimez que le traitement de vos données ne respecte pas le RGPD. Si vous résidez dans un autre État membre de l'UE, vous pouvez saisir l'autorité de protection des données de votre pays.",
+      "mediation_title": "9. Médiation de la consommation (UE)",
+      "mediation_content": "Conformément aux articles L.612-1 et suivants du Code de la consommation, tout consommateur a le droit de recourir gratuitement à un médiateur de la consommation en vue de la résolution amiable du litige qui l'oppose à un professionnel. Après démarche préalable écrite auprès de REPUTEXA restée infructueuse, le consommateur peut saisir le médiateur compétent dont l'identité sera précisée sur cette page une fois le dispositif formalisé (ou le médiateur sectoriel ou généraliste dont relève REPUTEXA). Plateforme européenne de règlement en ligne des litiges (RLL) : https://ec.europa.eu/consumers/odr/",
+      "contact_title": "10. Contact",
+      "contact_content": "Pour toute question relative aux présentes mentions légales : contact@reputexa.fr."
+    },
+    "confidentialite": {
+      "title": "Politique de confidentialité",
+      "metaTitle": "Politique de confidentialité | REPUTEXA",
+      "metaDescription": "Politique de confidentialité RGPD : fidélité et avis, finalités, sous-traitants, durées, multi-établissements, STOP, import, IA.",
+      "intro": "Dernière mise à jour : avril 2026. Version : 1.3 — politique unique « Fidélité & Avis ». Ce document décrit les traitements de données personnels liés à la sollicitation d'avis (WhatsApp, file technique) et au programme de fidélité (points, récompenses, anniversaires, caisse et terminal). Il est cohérent avec le registre des activités de traitement (article 30 RGPD) publié sur ce site. Les fonctionnalités d'IA peuvent produire des sorties erronées : elles sont indicatives et doivent être validées par l'Utilisateur avant diffusion (voir section 8). Aucun dispositif ne garantit une sécurité ou une conformité absolues ; REPUTEXA applique des mesures proportionnées et met à jour cette politique lorsque les traitements ou la réglementation évoluent.",
+      "toc": [
+        {
+          "id": "responsable",
+          "label": "1. Responsable du traitement"
+        },
+        {
+          "id": "roles-rgpd",
+          "label": "2. Rôles et Responsabilités (RGPD)"
+        },
+        {
+          "id": "donnees",
+          "label": "3. Données collectées"
+        },
+        {
+          "id": "locale",
+          "label": "4. Détection de la langue (indicatif téléphonique)"
+        },
+        {
+          "id": "finalites",
+          "label": "5. Finalités et bases légales"
+        },
+        {
+          "id": "sous-traitants",
+          "label": "6. Sous-traitants (Data Processors)"
+        },
+        {
+          "id": "zenith-captation",
+          "label": "7. Plan Zenith — Collecte d'avis et données clients finaux"
+        },
+        {
+          "id": "ia",
+          "label": "8. Garantie IA — Données non utilisées pour l'entraînement"
+        },
+        {
+          "id": "securite",
+          "label": "9. Sécurité et Localisation des Données"
+        },
+        {
+          "id": "cookies",
+          "label": "10. Cookies et traceurs"
+        },
+        {
+          "id": "transferts",
+          "label": "11. Transferts hors de l'UE"
+        },
+        {
+          "id": "durees",
+          "label": "12. Durées de conservation"
+        },
+        {
+          "id": "violations",
+          "label": "13. Violations de données et notification"
+        },
+        {
+          "id": "portabilite",
+          "label": "14. Portabilité, export et suppression de compte"
+        },
+        {
+          "id": "droits",
+          "label": "15. Vos droits"
+        },
+        {
+          "id": "contact",
+          "label": "16. Nous contacter"
+        }
+      ],
+      "responsable_title": "1. Responsable du traitement",
+      "responsable_content": "Le responsable du traitement des données personnelles au sens des articles 4 et 26 RGPD est REPUTEXA, éditeur du site reputexa.fr, dont le siège est établi en France. Les traitements sont documentés dans le registre des activités de traitement (article 30 RGPD), accessible sur ce site. REPUTEXA applique les principes de minimisation des données, de limitation de la conservation et de limitation des finalités.\n\nPour toute question relative au traitement : contact@reputexa.fr.",
+      "roles_rgpd_title": "2. Rôles et Responsabilités (RGPD)",
+      "roles_rgpd_content": "REPUTEXA est responsable du traitement pour les données relatives à la gestion de ses propres clients (comptes utilisateurs, facturation, support). REPUTEXA agit en qualité de sous-traitant technique (article 28 du RGPD) pour le compte de ses Utilisateurs (Commerçants) pour : l'envoi de sollicitations WhatsApp, la file d'attente d'avis, les programmes de fidélité et récompenses (points, paliers, cadeaux d'anniversaire, campagnes associées), l'import de listes clients et les fonctionnalités de caisse ou terminal connectés, sur instruction documentée du marchand (paramètres du compte, règles de fidélité, fichiers importés). Le Commerçant reste seul responsable de la stratégie de fidélité, des barèmes, des messages validés et des bases légales envers ses propres clients. Les données des clients finaux ne sont traitées que pour exécuter ces instructions. Le traitement peut être mutualisé entre les différents établissements appartenant au même Responsable de traitement afin de permettre au client de bénéficier de ses avantages dans l'ensemble du réseau (points utilisables sur plusieurs boutiques du même exploitant, selon configuration). Les traces de consentement ou de refus (STOP) peuvent être conservées pour preuve de conformité (journalisation technique).",
+      "donnees_title": "3. Données collectées",
+      "donnees_content": "Nous collectons notamment : adresse e-mail professionnelle pour le compte et l'authentification ; identifiants de facturation et données de paiement traitées par Stripe ; contenu des avis et données issues de votre fiche Google Business Profile lorsque vous connectez l'API Google ; nom, prénom, téléphone professionnel, nom de l'établissement, adresse ; préférence de langue ; données techniques (adresse IP, journaux serveur, identifiants de session, cookies strictement nécessaires au fonctionnement et à la sécurité). Pour le plan Zenith et la fidélité : données transmises par vos systèmes (caisse, e-commerce, terminal) via webhooks ou saisie (prénom, téléphone, contexte d'achat ou montant, nombre d'articles le cas échéant, statut de livraison le cas échéant), solde ou historique de points et récompenses, date de naissance ou mois d'anniversaire lorsque vous les collectez pour des avantages liés, adresse postale ou ville si vous les enregistrez pour la relation client. Importation de fichiers (CSV, Excel, etc.) : les colonnes que vous mappez (identité, téléphone, achats, etc.) sont traitées pour alimenter votre base programme fidélité ou vos campagnes, sous votre responsabilité quant à la licéité de la collecte initiale (voir aussi nos CGU, clause import).",
+      "locale_title": "4. Détection de la langue (indicatif téléphonique)",
+      "locale_content": "Afin d'améliorer votre expérience utilisateur et de vous proposer une interface, des communications et un support dans votre langue, nous pouvons déduire une préférence de langue à partir de l'indicatif de votre numéro de téléphone (par exemple +33 pour la France, +39 pour l'Italie, +34 pour l'Espagne, +49 pour l'Allemagne). Cette information est utilisée uniquement pour personnaliser la langue de l'interface, des e-mails et du portail de paiement. Vous pouvez à tout moment modifier la langue dans les paramètres de votre compte.",
+      "finalites_title": "5. Finalités et bases légales",
+      "finalites_content": "Les données sont traitées pour : l'exécution du contrat et la fourniture du service (compte, abonnement, fonctionnalités souscrites) ; la gestion du programme de fidélité du Commerçant : calcul et suivi des points, attribution des récompenses (paliers, anniversaires, offres ponctuelles), personnalisation de la relation client, pilotage multi-sites lorsque le même Responsable de traitement exploite plusieurs établissements ; l'intérêt légitime (sécurité, prévention de la fraude, amélioration du service, mesure d'audience technique anonymisée le cas échéant) ; le consentement lorsque requis (sollicitations WhatsApp, cookies non essentiels, communications commerciales selon votre configuration) ; les obligations légales (conservation comptable et fiscale des factures, réponse aux autorités). Les finalités précises à l'égard des clients finaux sont définies et communiquées par le Commerçant (point de vente, CGV, politique du magasin).",
+      "sous_traitants_title": "6. Sous-traitants (Data Processors)",
+      "sous_traitants_content": "Vos données peuvent être traitées par les sous-traitants suivants, dans le strict cadre de leur mission et sur instruction documentée : Stripe (paiements, abonnements, facturation) ; Resend (e-mails transactionnels) ; OpenAI et/ou Anthropic (génération de suggestions de réponses, transcription audio le cas échéant) ; Supabase (base de données, authentification — projet en région UE) ; Vercel (hébergement de l'application) ; Google (OAuth, API Google Business Profile) ; Twilio et/ou Meta (WhatsApp selon configuration) ; Cloudflare (Turnstile si activé). Ces prestataires sont liés par des clauses contractuelles types (RGPD) ou équivalents conformément à leurs DPA publics. La liste des sous-traitants peut évoluer : mise à jour de la présente politique ou de votre espace d'information.",
+      "zenith_captation_title": "7. Plan Zenith — Collecte d'avis et données clients finaux",
+      "zenith_captation_content": "Le plan Zenith inclut la collecte automatisée d'avis (« IA de Capture ») et peut être combiné à des messages liés au programme de fidélité (avantages, rappels) selon les règles configurées par le Commerçant. Les contacts WhatsApp respectent les finalités et l'information préalable définies par le Commerçant (commerce physique ou, pour la boutique en ligne, après livraison lorsque le webhook transmet le statut adapté). REPUTEXA agit en qualité de sous-traitant (article 28 RGPD) ; le Commerçant reste responsable du traitement des données de ses clients. Pour un même numéro et le même compte marchand, une nouvelle campagne de sollicitation d'avis n'est pas déclenchée avant 120 jours après le début de la précédente (sauf règle affichée ou paramétrage contraire). Les données conservées dans la file d'attente technique aux fins de sollicitation d'avis sont des données à durée courte : elles sont anonymisées ou supprimées au plus 120 jours après leur entrée dans la file (sous réserve des traces d'opposition ou obligations légales), conformément au paramétrage opérationnel du service. À l'issue du délai anti-re-sollicitation, un nouvel envoi d'invitation à avis peut à nouveau être programmé pour ce numéro s'il n'est pas en liste d'opposition. Les données de fidélité (historique de points, compte actif) suivent des durées distinctes — voir section « Durées de conservation ». Réponse « STOP » ou refus : arrêt des messages selon les mécanismes techniques ; une opposition large ou une demande de retrait total peut entraîner la clôture du compte fidélité et la perte des avantages non utilisés, dans les conditions fixées par le Commerçant et précisées dans la section « Vos droits ». Journalisation des consentements/refus : traces techniques à des fins de preuve.",
+      "ia_title": "8. Garantie IA et validation humaine",
+      "ia_content": "Les contenus transmis pour la génération de suggestions (réponses aux avis, brouillons de messages WhatsApp ou SMS, contexte d'établissement) sont traités par des fournisseurs d'IA (OpenAI, Anthropic ou équivalents) uniquement pour fournir la fonctionnalité. Sous réserve des politiques contractuelles en vigueur, REPUTEXA configure les usages conformément aux options « no training » / zéro rétention lorsque disponibles. Vous devez vérifier les DPA des fournisseurs pour le détail juridique. Ne transmettez pas de données inutiles ou sensibles.\n\nLes sorties des modèles peuvent être incorrectes, incomplètes ou inadaptées au contexte ; elles ne constituent pas un conseil juridique, fiscal, commercial ou de gestion de la réputation délivré par REPUTEXA.\n\nL'Utilisateur (Commerçant) reconnaît que les contenus générés par l'IA sont des suggestions sujettes à erreur. Le Responsable de traitement reste maître de la validation finale avant envoi ou publication. REPUTEXA ne saurait être tenue responsable des conséquences liées à une diffusion sans contrôle humain suffisant (engagements commerciaux, remises, promesses, erreurs de langage ou de fond), sous réserve des obligations légales impératives. Limites contractuelles et exclusions de responsabilité complémentaires : voir les CGU (article « Responsabilité »).",
+      "securite_title": "9. Sécurité et Localisation des Données",
+      "securite_content": "Les données sont traitées avec chiffrement en transit (TLS) et mesures de sécurité au repos conformes aux usages du secteur (hébergement managé de type Supabase). Le projet est configuré en région Union européenne lorsque possible. Pour le Plan Zenith, l'accès aux données des clients finaux des Commerçants est limité par conception (traitements automatisés, séparation des environnements).\n\nREPUTEXA met en œuvre une politique de sécurité proportionnée au risque : gestion des accès, mises à jour des dépendances, surveillance des journaux applicatifs dans la mesure permise par l'offre, et réponse aux incidents selon des procédures internes. Aucun système n'est infaillible ; en cas d'incident de sécurité susceptible d'affecter des données personnelles, les mesures prévues au paragraphe « Violations de données » s'appliquent.\n\nRegistre des activités de traitement (article 30 RGPD) : https://reputexa.fr/docs/registre-rgpd-reputexa.html (adapter le domaine si besoin).",
+      "cookies_title": "10. Cookies et traceurs",
+      "cookies_content": "Nous utilisons des cookies et stockage local strictement nécessaires au fonctionnement du service (session, préférences de sécurité, éventuellement captcha Cloudflare Turnstile). Tout cookie ou traceur non indispensable à la fourniture du service fera l'objet de votre consentement préalable lorsque la réglementation l'exige (bandeau de consentement). Vous pouvez configurer votre navigateur pour refuser les cookies ; certaines fonctionnalités peuvent alors être dégradées.",
+      "transferts_title": "11. Transferts hors de l'UE",
+      "transferts_content": "Lorsque des sous-traitants sont situés hors de l'Union européenne ou que des traitements y sont effectués (ex. fournisseurs d'IA américains), les transferts sont encadrés par les instruments prévus par le RGPD : clauses contractuelles types de la Commission européenne, mesures supplémentaires le cas échéant, et politiques des fournisseurs. Vous pouvez demander une copie des garanties applicables à contact@reputexa.fr.",
+      "durees_title": "12. Durées de conservation",
+      "durees_content": "Nous distinguons les durées selon la finalité :\n\nDonnées de sollicitation d'avis (file d'attente technique Zenith, hors compte fidélité actif) : conservation courte — les éléments identifiants nécessaires à la campagne sont anonymisés ou supprimés au plus 120 jours après leur entrée dans la file, sauf données agrégées ou statistiques sans identification directe ; une nouvelle invitation à laisser un avis pour un même numéro (non opposé) ne redevient possible qu'après l'écoulement du délai anti-re-sollicitation décrit à la section Zenith (120 jours depuis le début de la précédente campagne).\n\nDonnées de fidélité (programme de points, récompenses, historique chez le Commerçant) : conservation pendant toute la durée d'activité du compte fidélité du client auprès du Commerçant sur la plateforme. Compte réputé inactif en l'absence d'achat qualifié ou d'interaction de fidélité enregistrée pendant trente-six (36) mois consécutifs ; à l'issue, les données peuvent être supprimées ou anonymisées selon les procédures du Commerçant et les réglages du service, sous réserve d'information préalable du client lorsque la loi l'exige et des listes d'opposition.\n\nCompte utilisateur marchand et facturation : durée du contrat plus obligations comptables et fiscales (souvent dix ans pour les pièces justificatives, selon le droit applicable).\n\nListe d'opposition (STOP) : conservation du numéro ou de son empreinte pour ne plus solliciter, sans limite de durée contractuelle fixée pour l'opposition elle-même.\n\nJournaux de consentement : conservation pour preuve de conformité, durée raisonnable au regard des litiges. Les durées peuvent être ajustées pour respecter une obligation légale ou une décision de justice.",
+      "violations_title": "13. Violations de données et notification",
+      "violations_content": "En cas de violation de données personnelles susceptible d'engendrer un risque pour les droits et libertés des personnes, REPUTEXA documente l'incident, analyse les causes et, lorsque la réglementation l'exige, notifie l'autorité de contrôle compétente (dont la CNIL en France) dans les délais prévus par le RGPD, et informe les personnes concernées lorsque la violation est susceptible d'engendrer un risque élevé. Les procédures internes visent à limiter l'impact réseau et applicatif. Les détails opérationnels (journaux techniques, adresses IP internes) peuvent être communiqués aux autorités dans le cadre d'une obligation légale ou d'une demande fondée, mais ne sont pas publiés sur ce site.",
+      "portabilite_title": "14. Portabilité, export et suppression de compte",
+      "portabilite_content": "Depuis les Paramètres de votre compte, vous pouvez télécharger un export structuré de vos données (JSON) et demander la suppression définitive de votre compte conformément au RGPD. L'export inclut notamment le profil, les avis, la file d'attente, la liste noire, les données de fidélité gérées via votre compte marchand et les journaux de consentement associés. La suppression du compte entraîne la suppression ou l'anonymisation des données associées sous réserve des obligations légales de conservation.",
+      "droits_title": "15. Vos droits",
+      "droits_content": "Conformément au RGPD, vous disposez des droits d'accès, de rectification, d'effacement, à la limitation du traitement, à la portabilité, d'opposition (notamment pour le marketing) et du droit de définir des directives relatives au sort de vos données après votre décès (sous le droit français). Pour les comptes marchands : contact@reputexa.fr. Pour les clients finaux d'un magasin utilisant REPUTEXA : adressez-vous d'abord au Commerçant ; vous pouvez aussi utiliser le formulaire d'effacement hébergé sur ce site (lien en bas de la présente page). Vous pouvez introduire une réclamation auprès de la CNIL (cnil.fr) ou de l'autorité de contrôle de votre pays de résidence. Les mineurs ne doivent pas utiliser le service sans l'autorisation de leur titulaire de l'autorité parentale.\n\nWhatsApp, STOP et fidélité : répondre STOP met fin aux messages automatiques de ce type envoyés via le canal concerné. Si vous exigez un retrait complet de toutes les listes de contact du Commerçant ou l'effacement de votre compte fidélité, l'arrêt des sollicitations peut s'accompagner de la clôture du compte programme et de la perte des points ou avantages non utilisés, dans le respect du règlement de fidélité du Commerçant et des textes applicables ; demandez-le au point de vente ou via les coordonnées indiquées sur l'affiche d'information.\n\nDécisions automatisées et profilage (article 22 RGPD) : les suggestions générées par l'IA sont des propositions à valider par le professionnel avant envoi ou publication ; elles ne produisent pas d'effet juridique vis-à-vis du consommateur final sans validation humaine côté Commerçant.",
+      "contact_title": "16. Nous contacter",
+      "contact_content": "Pour toute question relative à la protection de vos données : contact@reputexa.fr. Délai de réponse : nous nous efforçons de répondre dans un délai d'un mois, pouvant être prolongé de deux mois en cas de complexité, conformément au RGPD.",
+      "client_finaux_erasure_notice": "Si vous avez été sollicité par WhatsApp dans le cadre du service REPUTEXA pour le compte d’un commerce et souhaitez demander l’effacement de vos données sans passer par WhatsApp (STOP), vous pouvez utiliser le formulaire dédié (même numéro que celui utilisé chez le commerçant) :",
+      "client_finaux_erasure_cta": "Effacement des données — clients finaux"
+    },
+      "dataRightsClient": {
+      "metaTitle": "Effacement des données | Clients finaux | REPUTEXA",
+      "metaDescription": "Demandez l’effacement des données liées au numéro utilisé pour avis ou fidélité REPUTEXA (sans compte marchand, hors WhatsApp STOP).",
+      "title": "Données personnelles — clients finaux",
+      "subtitle": "Ce formulaire s’adresse aux personnes contactées via REPUTEXA pour le compte d’un commerce, sans compte sur ce site.",
+      "formIntro": "Indiquez le numéro de téléphone concerné (au même format qu’en caisse ou sur le bon de commande). Nous traiterons les traces correspondantes dans nos systèmes (file d’avis, listes d’opposition, journalisation associée, et le cas échéant données de fidélité hébergées pour le compte du Commerçant), dans les limites techniques et légales et selon les instructions reçues du Responsable de traitement. Pour l’avis seul : sans opposition, une nouvelle demande WhatsApp pour ce numéro (même commerce) n’est en principe pas envoyée tant qu’il ne s’est pas écoulé 120 jours depuis le début de la précédente campagne. Une demande d’effacement large peut entraîner la clôture du programme fidélité et la perte des avantages associés côté commerce — voir la politique Fidélité et Avis et le règlement du magasin.",
+      "phoneLabel": "Numéro de mobile",
+      "phonePlaceholder": "ex. +33612345678",
+      "phoneHint": "Format international recommandé. Les demandes sont protégées par un contrôle anti-robot.",
+      "submit": "Envoyer la demande",
+      "submitting": "Envoi en cours…",
+      "success": "Votre demande a été enregistrée. Les données associées à ce numéro dans nos systèmes de sollicitation ont été effacées ou traitées conformément à notre politique.",
+      "errorGeneric": "Impossible de traiter la demande pour le moment. Réessayez plus tard ou écrivez à contact@reputexa.fr.",
+      "turnstileRequired": "Veuillez valider la vérification de sécurité.",
+      "footnote": "Pour les comptes marchands REPUTEXA, les exports et suppressions se gèrent depuis Paramètres. En cas d’urgence : contact@reputexa.fr.",
+      "privacyLink": "Politique de confidentialité",
+      "privacyLinkLocaleHint": "Les liens ci-dessous s’orientent vers la langue déduite de l’indicatif du numéro (ex. +39 → italien, +49 → allemand). Saisissez d’abord votre numéro au format international.",
+      "dataRightsSameFormLink": "Cette page (demande d’effacement) dans cette langue"
+    },
+    "cgu": {
+      "title": "Conditions générales d'utilisation",
+      "metaTitle": "Conditions générales d'utilisation | REPUTEXA",
+      "metaDescription": "CGU REPUTEXA. Service SaaS, plans Vision Pulse Zenith, facturation Stripe, résiliation, force majeure, médiation, droit français.",
+      "intro": "Dernière mise à jour : avril 2026. Version : 1.3. Les présentes Conditions générales d'utilisation (CGU) constituent le contrat cadre entre REPUTEXA et l'utilisateur du service. Elles couvrent l'usage de la plateforme d'e-réputation, de la collecte d'avis (y compris Zenith), des outils d'IA conversationnelle et des fonctionnalités de fidélité multi-canal. Elles s'appliquent à tout abonnement souscrit sur reputexa.fr, sans préjudice des droits impérables des consommateurs. La politique de confidentialité (version Fidélité et Avis) et les mentions légales font partie intégrante de la documentation contractuelle. REPUTEXA exploite des modèles d'intelligence artificielle : leurs sorties peuvent être inexactes ou inadaptées ; toute suggestion produite par le service doit être relue et validée par l'Utilisateur avant envoi ou publication (voir article 5).",
+      "toc": [
+        {
+          "id": "objet",
+          "label": "1. Objet et acceptation"
+        },
+        {
+          "id": "plans",
+          "label": "2. Plans et différenciation du service"
+        },
+        {
+          "id": "langue",
+          "label": "3. Clause de différenciation — Langue des réponses IA"
+        },
+        {
+          "id": "facturation",
+          "label": "4. Facturation, TVA et Stripe"
+        },
+        {
+          "id": "responsabilite",
+          "label": "5. Responsabilité et Obligations de l'Utilisateur"
+        },
+        {
+          "id": "droit",
+          "label": "6. Droit applicable et juridiction"
+        },
+        {
+          "id": "zenith_obligations",
+          "label": "7. Plan Zenith — Obligations du Commerçant et limitation de responsabilité"
+        },
+        {
+          "id": "annexe-fidelite",
+          "label": "Annexe — Modèle d'information clients (fidélité, caisse, WhatsApp)"
+        },
+        {
+          "id": "modifications",
+          "label": "8. Modification des CGU et du service"
+        },
+        {
+          "id": "mediation",
+          "label": "9. Médiation et litiges consommateurs"
+        },
+        {
+          "id": "suspension",
+          "label": "10. Suspension, résiliation et fin d'abonnement"
+        },
+        {
+          "id": "force-majeure",
+          "label": "11. Force majeure"
+        },
+        {
+          "id": "contact",
+          "label": "12. Contact"
+        }
+      ],
+      "objet_title": "1. Objet et acceptation",
+      "objet_content": "Les présentes CGU définissent les modalités d'accès et d'utilisation du service REPUTEXA, plateforme SaaS d'e-réputation. En créant un compte ou en souscrivant à un abonnement, vous acceptez sans réserve les présentes conditions.",
+      "plans_title": "2. Plans et différenciation du service",
+      "plans_content": "REPUTEXA propose plusieurs offres d'abonnement (Vision, Pulse, Zenith et extensions éventuelles). Les fonctionnalités (agrégation d'avis, réponses IA, alertes, reporting, programme de fidélité, terminal ou caisse connectée, import de fichiers clients) varient selon le plan et les modules activés. La description détaillée est disponible sur la page Tarifs.",
+      "langue_title": "3. Clause de différenciation — Langue des réponses IA",
+      "langue_content": "Par disposition contractuelle, la langue des réponses générées par l'IA est différenciée selon le plan souscrit : Plan Vision : les réponses aux avis sont générées exclusivement dans la langue de l'établissement (langue du profil utilisateur). Le service ne propose pas de réponses dans d'autres langues. Plans Pulse et Zénith : le service est polyglotte ; les réponses sont générées de manière native dans la langue de l'avis du client (détection automatique de la langue de l'avis et réponse dans cette même langue). Cette clause fait partie intégrante des conditions du service et ne peut être modifiée qu'en cas de changement de plan.",
+      "facturation_title": "4. Facturation, TVA et Stripe",
+      "facturation_content": "Les prix affichés sont indiqués hors taxes (HT). La TVA est calculée et appliquée automatiquement par Stripe selon le pays de l'acheteur et les règles en vigueur (TVA intracommunautaire, taux local, etc.). Le paiement est collecté par Stripe (cartes, SEPA, moyens locaux). L'abonnement est récurrent (mensuel ou annuel). Tout mois entamé est dû ; en cas de résiliation, aucun remboursement au prorata des jours restants sauf disposition légale impérative ou bonne volonté commerciale indiquée sur le site. Les factures sont disponibles dans l'espace client et via le portail Stripe.",
+      "responsabilite_title": "5. Responsabilité et Obligations de l'Utilisateur",
+      "responsabilite_content": "REPUTEXA fournit un outil logiciel et intervient en qualité de prestataire technique et sous-traitant au sens du RGPD pour les traitements confiés par le marchand. L'Utilisateur (Commerçant) est seul responsable de la licéité de ses propres traitements (bases légales, information et consentements, affichage en point de vente, règlement de fidélité) et du contenu qu'il publie, valide ou transmet. REPUTEXA ne saurait être tenue responsable des manquements de l'Utilisateur aux obligations RGPD, ePrivacy ou au droit de la concurrence. Le service est fourni « en l'état » ; REPUTEXA met en œuvre des efforts raisonnables de disponibilité sans garantie de résultat ni d'absence d'erreur. Sauf fraude ou dol prouvé, la responsabilité de REPUTEXA est limitée aux montants effectivement payés par l'Utilisateur au cours des douze (12) mois précédant le fait générateur, sauf disposition légale impérative contraire.\n\nIntelligence artificielle — nature du service et limites : REPUTEXA exploite des modèles d'intelligence artificielle (prestataires techniques tiers) pour générer des propositions automatisées (notamment réponses aux avis, brouillons de messages). Ces systèmes peuvent produire des erreurs, imprécisions, formulations inadaptées ou des contenus ne correspondant pas au contexte réel ou à l'intention du Commerçant. L'Utilisateur en prend expressément acte.\n\nNon-responsabilité IA : les contenus générés par l'IA sont fournis uniquement à titre de suggestions et doivent être relus, adaptés et validés par l'Utilisateur avant tout envoi ou publication. Le Commerçant reste seul responsable des textes qu'il diffuse et des effets de leur utilisation au regard du droit des consommateurs, de la concurrence et de la réputation. Sauf dol ou fraude prouvé, REPUTEXA ne saurait être tenue responsable des dommages directs ou indirects résultant de l'utilisation ou de la diffusion de suggestions d'IA (y compris erreurs factuelles, maladresses, incompréhensions ou propos potentiellement inappropriés), ni des engagements commerciaux pouvant en découler ; les limitations et le plafond de responsabilité prévus au présent article s'appliquent pleinement, sous réserve des dispositions légalement impératives.\n\nValeur des points : les points de fidélité cumulés n'ont aucune valeur marchande ou monétaire. Ils ne peuvent en aucun cas être convertis en espèces ou faire l'objet d'un remboursement. Le Commerçant se réserve le droit de modifier les barèmes de récompenses à tout moment, sous réserve d'en informer ses clients conformément au droit applicable. REPUTEXA ne convertit pas les points en espèces.\n\nImportation de données tierces : lors de l'utilisation de la fonction d'importation de fichiers clients, le Commerçant garantit avoir collecté les données de manière licite et disposer du droit de les transférer sur la plateforme REPUTEXA. REPUTEXA décline toute responsabilité en cas d'importation de listes de contacts n'ayant pas donné leur consentement préalable ou ne reposant pas sur une autre base légale appropriée.\n\nPour les données des clients finaux (sollicitation d'avis, messagerie, fidélité), l'Utilisateur est le responsable du traitement et REPUTEXA agit sur ses instructions documentées. L'Utilisateur s'engage à un usage loyal des canaux : respect de la finalité annoncée au client (avis, fidélité, récompenses) et des règles anti-spam applicables.\n\nLorsque l'Utilisateur active des fonctionnalités de motivation d'équipe ou de classement interne, il garantit l'exactitude des informations saisies (identités ou pseudonymes) et informe préalablement les personnes concernées conformément au droit du travail et aux usages de l'entreprise (y compris, le cas échéant, les instances représentatives). Ces fonctionnalités sont conçues comme des outils de valorisation (objectifs collectifs, récompenses) et non comme un dispositif de surveillance sanctionnante des personnes ; toute utilisation détournée à des fins disciplinaires relève de la seule responsabilité de l'Utilisateur. Les liens de partage d'équipe doivent être limités aux personnes autorisées ; ils sont fournis sous forme de liens sécurisés non indexés par les moteurs de recherche.",
+      "droit_title": "6. Droit applicable et juridiction",
+      "droit_content": "Les présentes CGU sont soumises au droit français. Pour les professionnels, à défaut d'accord amiable, compétence attribuée aux tribunaux compétents de Paris, sous réserve des règles de compétence matérielle. Le client consommateur résidant dans l'Union européenne peut saisir les tribunaux de son lieu de résidence ou ceux de Paris, conformément au règlement Bruxelles I bis. Pour les litiges de faible monteur, les tribunaux d'instance ou de proximité peuvent être compétents selon le droit français.",
+      "zenith_obligations_title": "7. Plan Zenith — Obligations du Commerçant et limitation de responsabilité",
+      "zenith_obligations_content": "L'activation du plan Zenith et l'utilisation de la collecte automatisée d'avis via WhatsApp (« IA de Capture »), éventuellement combinée à des messages de fidélité, imposent au Commerçant une information claire et préalable. Conformément aux articles 13 et 14 du RGPD et à l'article L.34-5 du Code des postes et des communications électroniques, le Commerçant doit informer ses clients (point de vente, checkout en ligne, CGV) : (1) de la collecte du numéro ; (2) des finalités (fidélité, récompenses, sollicitation d'avis via REPUTEXA selon le cas) ; (3) du droit d'opposition (STOP et conséquences éventuelles sur le compte programme). Pour l'e-commerce, une case de consentement distincte peut être requise avant tout envoi. Cette obligation incombe au Commerçant en tant que responsable de traitement. REPUTEXA, en sous-traitant technique, ne peut être tenue responsable des manquements du Commerçant.\n\nLe dispositif intègre des garde-fous de fréquence et une liste d'opposition (STOP). Les messages doivent rester proportionnés aux finalités annoncées. Les suggestions rédigées par l'IA doivent être validées par le Commerçant avant envoi.",
+      "annexe_fidelite_title": "Annexe — Modèle d'information clients (fidélité, caisse, WhatsApp)",
+      "annexe_fidelite_content": "Le texte ci-dessous est un modèle de transparence à insérer dans votre règlement de fidélité, formulaire d'inscription ou affichage en caisse. Remplacez [Nom du magasin] par votre enseigne et indiquez le lien vers votre politique de confidentialité unique (idéalement la même URL que l'affiche REPUTEXA « Fidélité et Avis »). Aide-mémoire : faites valider par votre conseil.\n\nEn rejoignant le programme de fidélité et en communiquant vos données à [Nom du magasin], vous êtes informé(e) que votre numéro et votre historique d'achat peuvent être utilisés pour gérer vos points, vos récompenses (paliers, avantages d'anniversaire), vous contacter sur votre compte et, le cas échéant, vous solliciter pour une enquête de satisfaction, selon notre politique de confidentialité.\n\nSi vous faites partie d'un réseau de magasins exploités par le même responsable, vos avantages peuvent être mutualisés entre ces boutiques sauf mention contraire au comptoir.\n\nLes points de fidélité n'ont pas de valeur monétaire : ils ne sont pas convertibles en espèces ni remboursables. La boutique peut adapter le barème des récompenses en vous informant comme prévu par la loi.\n\nLorsque nous utilisons WhatsApp (collecte d'avis ou messages liés au programme), l'outil technique REPUTEXA peut être utilisé pour l'envoi. Répondre STOP met fin aux messages ; un retrait total peut entraîner la clôture du compte fidélité et la perte des points non utilisés, comme précisé au comptoir.\n\nConformément au RGPD, vous disposez des droits d'accès, de rectification, d'effacement, d'opposition, à la limitation et à la portabilité ; contactez les coordonnées figurant dans notre politique de confidentialité.",
+      "modifications_title": "8. Modification des CGU et du service",
+      "modifications_content": "REPUTEXA peut modifier les présentes CGU, les tarifs ou les fonctionnalités du service. Les utilisateurs seront informés par tout moyen approprié (e-mail, notification sur le site, bandeau). La poursuite de l'utilisation du service après information vaut acceptation des nouvelles conditions, sauf droit de résiliation dans les délais prévus par la loi. En cas de modification substantielle défavorable, le consommateur peut résilier sans frais dans les conditions légales.",
+      "mediation_title": "9. Médiation et litiges consommateurs",
+      "mediation_content": "Le consommateur peut recourir gratuitement à un médiateur de la consommation conformément au Code de la consommation, après tentative de résolution amiable directe avec REPUTEXA. L'identité du médiateur sera précisée sur le site une fois le dispositif formalisé. Plateforme européenne RLL : https://ec.europa.eu/consumers/odr/",
+      "suspension_title": "10. Suspension, résiliation et fin d'abonnement",
+      "suspension_content": "L'abonnement est résiliable selon les modalités prévues par Stripe et les offres affichées au moment de la souscription. En cas de défaut de paiement, d'usage manifestement abusif du service (tentative de contournement des limites, atteinte à la sécurité, utilisation contraire aux CGU) ou d'impossibilité technique durable imputable à un tiers, REPUTEXA peut suspendre ou résilier l'accès après mise en demeure lorsque la situation le permet. À la fin du contrat, l'accès au service cesse ; les données du compte marchand sont traitées conformément à la politique de confidentialité (export, suppression, conservation légale). Les données des clients finaux traitées pour le compte du marchand (Zenith) relèvent des instructions du responsable de traitement (le marchand) dans la limite du techniquement possible.",
+      "force_majeure_title": "11. Force majeure",
+      "force_majeure_content": "REPUTEXA ne saurait être tenue responsable de l'inexécution ou de la mauvaise exécution de ses obligations lorsque celle-ci est due à un cas de force majeure ou à un événement hors de son contrôle raisonnable (pannes généralisées d'infrastructure Internet, catastrophes, conflits, décisions des autorités ou des prestataires essentiels, cyberattaques de grande ampleur malgré des mesures de sécurité appropriées). Le service peut être interrompu temporairement pour maintenance planifiée ou d'urgence ; une information raisonnable sera fournie lorsque les circonstances le permettent.",
+      "contact_title": "12. Contact",
+      "contact_content": "Pour toute question relative aux présentes CGU : contact@reputexa.fr."
+    }
+  }
+}

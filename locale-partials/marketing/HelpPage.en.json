@@ -1,0 +1,146 @@
+{
+  "HelpPage": {
+    "title": "Help center",
+    "subtitle": "Answers to your questions about REPUTEXA — AI, Shield Center, integrations, and billing.",
+    "searchPlaceholder": "Search a question…",
+    "questionsCount": "{count} questions",
+    "contactChatTitle": "Chat & support",
+    "contactChatMeta": "Response in under 2h",
+    "contactChatBody": "Our team is available Monday–Friday, 9am–6pm (CET), to help you.",
+    "contactChatCta": "Open a ticket",
+    "contactEmailTitle": "Email support",
+    "contactEmailMeta": "Average reply: 4 business hours",
+    "contactEmailBody": "For technical questions or support requests, write to us directly.",
+    "contactEmailCta": "Open the contact form",
+    "categories": [
+      {
+        "id": "ai",
+        "iconKey": "Bot",
+        "label": "Artificial intelligence",
+        "color": "text-violet-400",
+        "faqs": [
+          {
+            "question": "How does the AI generate review replies?",
+            "answer": "REPUTEXA uses Anthropic Claude 3.5 Sonnet as the primary generation engine. If it is unavailable, OpenAI GPT-4o-mini takes over automatically (dual engine with seamless failover). Every reply follows strict rules: “mirror effect” (reuse keywords from the review), zero hallucination, tone set in your AI DNA."
+          },
+          {
+            "question": "Can the AI adapt tone to my brand identity?",
+            "answer": "Yes. In your establishment settings you can define a brand brief: sector, tone (formal, warm, premium…), phrases to avoid, and recurring keywords. The AI applies these instructions in every suggestion."
+          },
+          {
+            "question": "Are replies sent automatically?",
+            "answer": "Partly. Positive reviews get an automatic reply with a simulated human delay of 2–9 hours. For negative reviews: on VISION, you validate from the dashboard; on PULSE and ZENITH, a bad-review alert is sent to WhatsApp with a suggested reply you can edit or publish. Once published, the reply is queued for 2–7 hours before going live."
+          },
+          {
+            "question": "Does the AI handle reviews in other languages?",
+            "answer": "On VISION, the AI replies in your establishment’s main language. On PULSE and ZENITH, language is detected per review and the reply is generated in the same language as the original (French, English, Spanish, German, Italian, etc.)."
+          },
+          {
+            "question": "How accurate is toxicity analysis?",
+            "answer": "Our analysis model reaches 97.4% accuracy on our internal benchmark (10,000 manually labeled reviews). Shield Center separates legitimate negative reviews from abusive, defamatory, or synthetic content."
+          }
+        ]
+      },
+      {
+        "id": "shield",
+        "iconKey": "Shield",
+        "label": "Shield Center",
+        "color": "text-emerald-400",
+        "faqs": [
+          {
+            "question": "What is Shield Center?",
+            "answer": "Shield Center is our advanced monitoring stack that scores every review against 14 signals: toxicity, authenticity, fraudulent intent, sentiment, named entities, and more. It raises alerts when a review needs immediate attention and can prepare reports for Google."
+          },
+          {
+            "question": "How does fake review detection work?",
+            "answer": "Our algorithm combines temporal coherence (abnormal review spikes), linguistic patterns across accounts, reviewer geolocation, and profile history. Each review gets an authenticity score visible in your dashboard."
+          },
+          {
+            "question": "Can I dispute a review directly from REPUTEXA?",
+            "answer": "The AI shield prepares a case (grounds and wording for moderators) to paste into the Google Business Profile reporting form. Google offers no public API to remove a review on your behalf—the final submission stays on Google after your review."
+          },
+          {
+            "question": "Are WhatsApp alerts included in every plan?",
+            "answer": "Instant negative-review alerts and the weekly WhatsApp digest are available from PULSE ([[PX:pulse:mo]]). VISION includes email notifications only. On ZENITH, AI Capture can also send a WhatsApp invite 30 minutes after a visit."
+          }
+        ]
+      },
+      {
+        "id": "integration",
+        "iconKey": "Plug",
+        "label": "Integration & API",
+        "color": "text-blue-400",
+        "faqs": [
+          {
+            "question": "How do I connect Google Business Profile?",
+            "answer": "In the dashboard → Settings → Platforms, click “Connect Google”. An OAuth window opens—grant business.manage. Connection takes ~30 seconds and reviews sync automatically. No manual API key is required."
+          },
+          {
+            "question": "Which review platforms are connected?",
+            "answer": "REPUTEXA syncs Google Business Profile, Facebook, and Trustpilot. Google uses OAuth; Facebook and Trustpilot use webhooks. Other platforms are on our roadmap."
+          },
+          {
+            "question": "Can I connect REPUTEXA to my POS or Zapier?",
+            "answer": "Yes, via AI Capture (ZENITH only). An integration key (rtx_live_…) is generated under Settings → Integrations. Your POS (Square, SumUp) or no-code tools (Zapier, Make) can POST visit payloads so REPUTEXA schedules a WhatsApp invite 30 minutes after the visit."
+          },
+          {
+            "question": "How many establishments can I manage?",
+            "answer": "There is no per-plan cap on establishments—billing scales with active locations using tiered discounts: 1st full price, 2nd −20%, 3rd −30%, 4th −40%, 5+ −50%. All can be managed from one dashboard."
+          }
+        ]
+      },
+      {
+        "id": "billing",
+        "iconKey": "CreditCard",
+        "label": "Billing & subscription",
+        "color": "text-amber-400",
+        "faqs": [
+          {
+            "question": "Can I change plans anytime?",
+            "answer": "Yes. Upgrade or downgrade under Settings → Subscription. Upgrades apply immediately with proration; downgrades apply at the next renewal."
+          },
+          {
+            "question": "Does the free trial include everything?",
+            "answer": "Yes—the 14-day trial unlocks the full ZENITH plan with no feature limits. No card is required to start."
+          },
+          {
+            "question": "What is your refund policy?",
+            "answer": "If you are not satisfied within the first 30 days after subscribing, we refund in full—no questions. Contact support@reputexa.fr."
+          }
+        ]
+      },
+      {
+        "id": "stats",
+        "iconKey": "BarChart2",
+        "label": "Statistics & reports",
+        "color": "text-pink-400",
+        "faqs": [
+          {
+            "question": "How often do statistics update?",
+            "answer": "Reviews import in real time via webhooks. The dashboard always reflects the latest data. Aggregates (average rating, trends) recompute on each dashboard load."
+          },
+          {
+            "question": "Can I export reports to PDF?",
+            "answer": "Yes. Each month a “cabinet-style” PDF (stats + AI narratives per plan) is generated: factual summary on Vision; analysis and tactics on Pulse; deeper strategy on Zenith. You receive it by email and can regenerate or download it from the dashboard archive. Pulse and Zenith also get a weekly recap on WhatsApp."
+          }
+        ]
+      },
+      {
+        "id": "global",
+        "iconKey": "Globe",
+        "label": "Multilingual & international",
+        "color": "text-cyan-400",
+        "faqs": [
+          {
+            "question": "Does REPUTEXA work outside France?",
+            "answer": "Yes. REPUTEXA is available in France, Belgium, Switzerland, Spain, Italy, and Germany. Infrastructure is hosted in the EU (Paris, Frankfurt) for GDPR-aligned processing."
+          },
+          {
+            "question": "Is the interface available in several languages?",
+            "answer": "The REPUTEXA UI is available in French, English, Spanish, German, and Italian. Change it from your settings or the footer language selector."
+          }
+        ]
+      }
+    ]
+  }
+}

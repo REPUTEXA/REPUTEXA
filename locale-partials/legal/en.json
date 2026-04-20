@@ -1,0 +1,12 @@
+{
+  "confidentialite": {
+    "client_finaux_erasure_notice": "If you were contacted via WhatsApp through REPUTEXA on behalf of a business and want to request erasure of your data without using WhatsApp (STOP), you can use the dedicated form (same number as used with the merchant):",
+    "client_finaux_erasure_cta": "Data erasure — end customers"
+  },
+  "consentWhatsAppEcommerce": "I agree to receive a single WhatsApp invitation from {establishment} via technical partner REPUTEXA to share my feedback after receiving my order. I understand I may withdraw consent at any time (UK GDPR / Data Protection Act 2018).",
+  "consentWhatsAppPhysical": "I agree to receive one WhatsApp message from {establishment}, via REPUTEXA, for a short service feedback request after my visit. I can reply STOP at any time at no cost.",
+  "authorityReference": "Supervisory authority: Information Commissioner’s Office (ICO) — ico.org.uk",
+  "legalBasisSummary": "Lawful basis: consent (UK GDPR Article 6(1)(a)) for sending the message; further details in our privacy notice. You have rights of access, rectification, erasure, restriction, objection, and the right to complain to the ICO.",
+  "dpaRoleClarification": "The business is the controller for customer relationship data; REPUTEXA processes data as a processor on documented instructions (UK GDPR Article 28).",
+  "posterLegalFrame": "UK GDPR and the Data Protection Act 2018. Supervisory authority: ICO (ico.org.uk)."
+}

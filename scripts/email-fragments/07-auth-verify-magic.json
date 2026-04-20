@@ -1,0 +1,41 @@
+{
+  "trialReminder3Days": {
+    "title": "Plus que 3 jours pour sécuriser votre réputation",
+    "greetingFallback": "Bonjour",
+    "body1": "Bonjour {firstName}, votre période d'essai arrive bientôt à son terme.",
+    "benefitsWithCount": "Vous avez déjà répondu à <strong>{count}</strong> avis avec notre IA.",
+    "benefitsDefault": "Notre IA est prête à protéger votre réputation 24/7.",
+    "body2": "Ne perdez pas l'accès à la <strong>Triple Vérification</strong> et au <strong>Boost SEO</strong>.",
+    "cta": "Activer mon plan {planName}"
+  },
+  "magicLink": {
+    "title": "Votre lien de connexion REPUTEXA",
+    "body1": "Bonjour — vous avez demandé un accès à votre espace REPUTEXA.",
+    "body2": "Connexion <strong>sans mot de passe</strong> : un clic sur le bouton ci-dessous ouvre une session sécurisée.",
+    "body3": "Ce lien est valide environ une heure. Si vous n'êtes pas à l'origine de cette demande, ignorez cet e-mail.",
+    "cta": "Accéder à mon compte"
+  },
+  "bananoPinReset": {
+    "title": "Réinitialiser votre code PIN Banano",
+    "body1": "Vous avez demandé à réinitialiser le <strong>code PIN patron</strong> de votre terminal Banano (collecte d'avis et fidélité). Ce code déverrouille l'interface sur tablette ou écran.",
+    "body2": "Ce lien est valide environ une heure et ne peut servir qu'une fois. Si vous n'êtes pas à l'origine de cette demande, ignorez cet e-mail : votre code actuel reste inchangé.",
+    "cta": "Choisir mon nouveau code"
+  },
+  "authEmailChange": {
+    "title": "Confirmez votre nouvel email",
+    "body1": "Vous avez demandé la modification de votre adresse email. Cliquez sur le bouton ci-dessous pour confirmer votre nouvelle adresse.",
+    "body2": "Ce lien est valide 24 heures. Si vous n'êtes pas à l'origine de cette demande, ignorez cet email et votre adresse restera inchangée.",
+    "cta": "Confirmer mon nouvel email"
+  },
+  "verifyEmail": {
+    "title": "Confirmez votre adresse email",
+    "titleOtp": "Confirmez votre adresse email",
+    "otpIntro": "Bienvenue ! Voici votre code de vérification pour activer votre compte REPUTEXA.",
+    "otpHint": "Ce code est valide 15 minutes. Si vous n'avez pas créé de compte, ignorez cet email.",
+    "linkIntro": "Bienvenue ! Cliquez sur le bouton ci-dessous pour activer votre compte REPUTEXA.",
+    "linkHint": "Ce lien est valide 24 heures. Si vous n'avez pas créé de compte, ignorez cet email.",
+    "ctaConfirm": "Confirmer mon email",
+    "subject": "Confirmez votre compte REPUTEXA",
+    "resendSubject": "Nouveau code de vérification REPUTEXA"
+  }
+}

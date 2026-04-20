@@ -1,0 +1,40 @@
+{
+  "profiles": {
+    "restaurant": {
+      "label": "Restaurant & dining",
+      "example": "Send ~45 min after the meal"
+    },
+    "bakery": {
+      "label": "Bakery / pastry",
+      "example": "Send ~2h after purchase"
+    },
+    "beauty": {
+      "label": "Beauty & care",
+      "example": "Send ~3h after the appointment"
+    },
+    "garage": {
+      "label": "Auto garage",
+      "example": "Send ~24h after vehicle handover"
+    },
+    "hotel": {
+      "label": "Hospitality",
+      "example": "Send ~2h after check-out"
+    },
+    "artisan": {
+      "label": "Trades / contractor",
+      "example": "Send ~4h after work finishes"
+    },
+    "fast_service": {
+      "label": "Quick service / takeaway",
+      "example": "Send ~20 min after purchase"
+    },
+    "custom": {
+      "label": "Custom (free delay)",
+      "example": "You set the exact delay in minutes"
+    },
+    "ecommerce": {
+      "label": "Online store *",
+      "example": "After delivery (carrier scan)"
+    }
+  }
+}

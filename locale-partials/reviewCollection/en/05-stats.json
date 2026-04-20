@@ -1,0 +1,21 @@
+{
+  "section3Title": "Workflow health",
+  "webhookActive": "Webhook active",
+  "noKeyGenerated": "No key generated",
+  "queueTitle": "Queue",
+  "pendingSuffix": "pending",
+  "reviewsPublished": "Reviews published",
+  "polishedPublishedSub": "polished texts published",
+  "dashboardTitle": "Zenith dashboard",
+  "statTotalFlow": "Total flow",
+  "statTotalFlowSub": "Customers imported via webhook",
+  "statYes": "Replies (YES)",
+  "statYesSubWaiting": "Waiting for replies",
+  "statYesSubEngagement": "{pct}% engagement",
+  "statNo": "Opt-outs (NO)",
+  "statNoSubNone": "No opt-outs",
+  "statNoSubShare": "{pct}% of total flow",
+  "statGeneratedTitle": "Reviews generated",
+  "statGeneratedSub": "Polished text & published by the customer",
+  "statTransform": "{pct}% conversion"
+}

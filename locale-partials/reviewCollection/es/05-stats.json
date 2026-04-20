@@ -1,0 +1,21 @@
+{
+  "section3Title": "Salud del flujo",
+  "webhookActive": "Webhook activo",
+  "noKeyGenerated": "Ninguna clave generada",
+  "queueTitle": "Cola",
+  "pendingSuffix": "pendientes",
+  "reviewsPublished": "Reseñas publicadas",
+  "polishedPublishedSub": "textos pulidos publicados",
+  "dashboardTitle": "Panel Zenith",
+  "statTotalFlow": "Flujo total",
+  "statTotalFlowSub": "Clientes importados vía webhook",
+  "statYes": "Respuestas (SÍ)",
+  "statYesSubWaiting": "Esperando respuestas",
+  "statYesSubEngagement": "{pct} % de interacción",
+  "statNo": "Bajas (NO)",
+  "statNoSubNone": "Sin bajas",
+  "statNoSubShare": "{pct} % del flujo total",
+  "statGeneratedTitle": "Reseñas generadas",
+  "statGeneratedSub": "Texto pulido y publicado por el cliente",
+  "statTransform": "{pct} % de conversión"
+}

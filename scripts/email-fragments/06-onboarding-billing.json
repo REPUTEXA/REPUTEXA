@@ -1,0 +1,41 @@
+{
+  "onboarding": {
+    "visionHeadline": "Bravo pour ce premier pas.",
+    "visionIntro": "{displayName}, tu as fait le choix de prendre ta réputation en main. Vision te donne l'essentiel : réponses IA aux avis et tableau de bord pour ne plus laisser un avis sans réponse.",
+    "visionLi1": "<strong>🔍 Premier pas</strong> — Connecte ton Google Business dans Paramètres pour que l'IA analyse tes avis.",
+    "pulseHeadline": "Tu es prêt à réagir en temps réel.",
+    "pulseIntro": "{displayName}, Pulse ajoute la puissance des alertes et de l'analyse de sentiment. Reste réactif et garde le contrôle.",
+    "pulseLi1": "<strong>🔍 Analyse</strong> — Connecte ton Google Business pour voir l'IA analyser tes avis.",
+    "pulseLi2": "<strong>📲 Réactivité</strong> — Configure tes alertes WhatsApp pour ne plus rien rater.",
+    "zenithHeadline": "Bienvenue dans l'élite de la réputation.",
+    "zenithIntro": "{displayName}, tu as maintenant les mêmes outils que les plus grandes entreprises. Zénith, c'est la Triple Vérification, le Boost SEO et un accompagnement stratégique avancé.",
+    "zenithLi1": "<strong>🔍 Analyse</strong> — Connecte ton Google Business pour voir l'IA analyser tes avis.",
+    "zenithLi2": "<strong>📲 Réactivité</strong> — Configure tes alertes WhatsApp pour ne plus rien rater.",
+    "zenithLi3": "<strong>🧠 Stratégie</strong> — Pose ta première question stratégique.",
+    "yearThanks": "Merci pour ton engagement sur la durée : tu bénéficies de -20% sur l'année. On est à tes côtés pour les 12 prochains mois.",
+    "nextStepsTitle": "Tes prochaines étapes",
+    "trialGiftTitle": "🎁 Ton essai Zénith est 100% libre",
+    "trialGiftBody": "Tu peux annuler en un clic à tout moment depuis <a href=\"{settingsUrl}\" style=\"color: #2563eb; text-decoration: none;\">tes paramètres</a> pour ne pas être prélevé. Si tu adores Reputexa mais que tu préfères un plan plus léger (PULSE ou VISION) à la fin de l'essai, tu pourras changer d'offre très simplement avant la fin des 14 jours.",
+    "trialEndsLine": "Ton essai se termine le <strong>{trialEndDate}</strong>.",
+    "trialCancelLink": "Pas convaincu ? <a href=\"{settingsUrl}\" style=\"color: #2563eb; text-decoration: none;\">Annuler mon essai immédiatement</a>",
+    "invoiceLink": "<a href=\"{invoiceUrl}\" style=\"color: #2563eb; text-decoration: none;\">Voir ma facture</a>"
+  },
+  "monthlyInvoice": {
+    "title": "Votre facture Reputexa — {monthYear}",
+    "body": "Merci de votre fidélité. Votre paiement a bien été traité.",
+    "cta": "Télécharger la facture"
+  },
+  "paymentFailed": {
+    "title": "Paiement échoué — Mettez à jour votre moyen de paiement",
+    "body1": "Oups, votre paiement a échoué. Votre accès à Reputexa risque d'être suspendu si le règlement n'est pas effectué.",
+    "body2": "Cliquez sur le bouton ci-dessous pour accéder à votre portail de facturation sécurisé Stripe, où vous pouvez mettre à jour votre carte et régler les factures en attente.",
+    "ctaPortal": "Ouvrir mon portail de facturation",
+    "secondaryBilling": "Gérer mon abonnement dans Reputexa"
+  },
+  "paymentActionRequired": {
+    "title": "Action requise : Validez votre paiement",
+    "body1": "Action requise : votre banque demande une validation supplémentaire pour finaliser votre paiement (3D Secure).",
+    "body2": "Cliquez sur le bouton ci-dessous pour ouvrir la page Stripe sécurisée, valider l'opération (code SMS / app bancaire), puis revenir sur Reputexa.",
+    "cta": "Valider mon paiement sécurisé"
+  }
+}

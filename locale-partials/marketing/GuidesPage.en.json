@@ -1,0 +1,107 @@
+{
+  "GuidesPage": {
+    "title": "Guides & tutorials",
+    "subtitle": "Everything you need to master REPUTEXA and your review strategy.",
+    "statGuides": "Guides available",
+    "statLevels": "Difficulty levels",
+    "statMinutes": "Total learning time",
+    "totalMinutesValue": "91 min",
+    "featuredBadge": "Recommended to start",
+    "readGuide": "Read guide",
+    "ctaTitle": "Need tailored help?",
+    "ctaSubtitle": "Our team and the ZENITH strategic AI consultant can support your specific situation.",
+    "ctaTrial": "Free trial",
+    "ctaHelp": "Help centre",
+    "levels": {
+      "beginner": "Beginner",
+      "intermediate": "Intermediate",
+      "advanced": "Advanced"
+    },
+    "categories": {
+      "all": "All",
+      "premiers-pas": "Getting started",
+      "strategie": "Strategy",
+      "ia": "AI & brand voice",
+      "conformite": "Compliance",
+      "shield": "Shield Center",
+      "multi": "Multi-platform",
+      "analytics": "Analytics",
+      "api": "API & integrations"
+    },
+    "guides": [
+      {
+        "slug": "demarrage-rapide",
+        "iconKey": "Zap",
+        "readTime": "5 min",
+        "level": "beginner",
+        "category": "premiers-pas",
+        "featured": true,
+        "title": "Quick start: REPUTEXA in 5 minutes",
+        "description": "Create your account, connect Google Business Profile, and get your first AI reply suggestions — operational fast."
+      },
+      {
+        "slug": "optimiser-notation",
+        "iconKey": "BarChart2",
+        "readTime": "12 min",
+        "level": "intermediate",
+        "category": "strategie",
+        "title": "Improve your Google rating: full playbook",
+        "description": "Proven moves to lift average rating, grow positive volume, and fix weak spots the data surfaces."
+      },
+      {
+        "slug": "reponses-ia-personnalisees",
+        "iconKey": "MessageSquare",
+        "readTime": "8 min",
+        "level": "intermediate",
+        "category": "ia",
+        "title": "Shape AI replies around your brand voice",
+        "description": "Set your brand brief so every draft matches tone, values, and sector — with examples."
+      },
+      {
+        "slug": "conformite-rgpd",
+        "iconKey": "Shield",
+        "readTime": "10 min",
+        "level": "intermediate",
+        "category": "conformite",
+        "title": "GDPR and customer reviews",
+        "description": "Handle personal data in public reviews while staying aligned with EU rules."
+      },
+      {
+        "slug": "shield-center-mode-emploi",
+        "iconKey": "Bell",
+        "readTime": "15 min",
+        "level": "intermediate",
+        "category": "shield",
+        "title": "Shield Center: alerts & fake reviews",
+        "description": "Thresholds, toxicity scores, Google dispute flow, and real-time WhatsApp."
+      },
+      {
+        "slug": "multiplateforme-google-facebook-trustpilot",
+        "iconKey": "Globe",
+        "readTime": "9 min",
+        "level": "intermediate",
+        "category": "multi",
+        "title": "Reputation across Google, Facebook, Trustpilot",
+        "description": "Centralise the three connected platforms and apply the right play per ecosystem."
+      },
+      {
+        "slug": "rapports-pdf-analyses",
+        "iconKey": "FileText",
+        "readTime": "7 min",
+        "level": "intermediate",
+        "category": "analytics",
+        "title": "Read your monthly PDF reports like a pro",
+        "description": "Twelve headline metrics decoded into an action plan you can track month over month."
+      },
+      {
+        "slug": "api-integration-avancee",
+        "iconKey": "BookOpen",
+        "readTime": "20 min",
+        "level": "advanced",
+        "category": "api",
+        "title": "Advanced API: plug REPUTEXA into your CRM",
+        "description": "Zapier, Make, Square, SumUp — inbound webhooks, retries, and error patterns."
+      }
+    ]
+  }
+}

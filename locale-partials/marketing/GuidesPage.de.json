@@ -1,0 +1,38 @@
+{
+  "GuidesPage": {
+    "title": "Guides & Tutorials",
+    "subtitle": "Alles, was Sie brauchen, um REPUTEXA und Ihre Review-Strategie zu meistern.",
+    "statGuides": "Verfügbare Guides",
+    "statLevels": "Schwierigkeitsgrade",
+    "statMinutes": "Gesamtlaufzeit",
+    "totalMinutesValue": "91 Min.",
+    "featuredBadge": "Einstieg empfohlen",
+    "readGuide": "Guide lesen",
+    "ctaTitle": "Persönliche Begleitung nötig?",
+    "ctaSubtitle": "Unser Team und der ZENITH-Strategieberater (IA) unterstützen Sie im Einzelfall.",
+    "ctaTrial": "Kostenlos testen",
+    "ctaHelp": "Hilfe-Center",
+    "levels": { "beginner": "Einsteiger", "intermediate": "Fortgeschritten", "advanced": "Experte" },
+    "categories": {
+      "all": "Alle",
+      "premiers-pas": "Erste Schritte",
+      "strategie": "Strategie",
+      "ia": "KI & Markenstimme",
+      "conformite": "Compliance",
+      "shield": "Shield Center",
+      "multi": "Multi-Plattform",
+      "analytics": "Analytics",
+      "api": "API & Integrationen"
+    },
+    "guides": [
+      { "slug": "demarrage-rapide", "iconKey": "Zap", "readTime": "5 Min.", "level": "beginner", "category": "premiers-pas", "featured": true, "title": "Schnellstart: REPUTEXA in 5 Minuten", "description": "Konto anlegen, Google Business Profile verbinden und erste KI-Antwortvorschläge erhalten." },
+      { "slug": "optimiser-notation", "iconKey": "BarChart2", "readTime": "12 Min.", "level": "intermediate", "category": "strategie", "title": "Google-Bewertung strategisch verbessern", "description": "Bewährtes Vorgehen für mehr Sterne, mehr Volumen und gezielte Korrekturen." },
+      { "slug": "reponses-ia-personnalisees", "iconKey": "MessageSquare", "readTime": "8 Min.", "level": "intermediate", "category": "ia", "title": "KI-Antworten an die Marke anpassen", "description": "Markenbrief mit Ton, Werten und Stil — inkl. Branchenbeispiele." },
+      { "slug": "conformite-rgpd", "iconKey": "Shield", "readTime": "10 Min.", "level": "intermediate", "category": "conformite", "title": "DSGVO und Kundenbewertungen", "description": "Datenschutz in öffentlichen Reviews und Antworten im EU-Rahmen." },
+      { "slug": "shield-center-mode-emploi", "iconKey": "Bell", "readTime": "15 Min.", "level": "intermediate", "category": "shield", "title": "Shield Center: Alerts & Fake-Reviews", "description": "Schwellen, Toxizitätsscore, Google-Vorgehen und WhatsApp-Echtzeit." },
+      { "slug": "multiplateforme-google-facebook-trustpilot", "iconKey": "Globe", "readTime": "9 Min.", "level": "intermediate", "category": "multi", "title": "Google, Facebook und Trustpilot", "description": "Drei verbundene Plattformen — ein gemeinsamer Qualitätsstandard." },
+      { "slug": "rapports-pdf-analyses", "iconKey": "FileText", "readTime": "7 Min.", "level": "intermediate", "category": "analytics", "title": "Monats-PDF wie ein Profi lesen", "description": "Zwölf Kernmetriken in einen klaren Aktionsplan übersetzen." },
+      { "slug": "api-integration-avancee", "iconKey": "BookOpen", "readTime": "20 Min.", "level": "advanced", "category": "api", "title": "API-Fortgeschritten: REPUTEXA ins CRM", "description": "Zapier, Make, Kassensysteme — Webhooks, Retries, Fehlerbehandlung." }
+    ]
+  }
+}

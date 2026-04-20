@@ -1,0 +1,155 @@
+{
+  "reviewPresets": {
+    "positive": {
+      "variants": [
+        {
+          "sector": "bakery",
+          "business": "Bäckerei Goldkrume",
+          "reviewer": "Anna K.",
+          "review": "Herzlicher Tresen, Buttercroissants mit perfekter Kruste. Die Geburtstagsplatte mit essbarem Namensschild war top — meine Mutter meinte, so ein Gebäck hätte sie Jahre nicht mehr gegessen.",
+          "response": "Anna, danke — solches Feedback treibt unsere Bäcker jeden Morgen an. Schön, dass Platte und Gebäck überzeugt haben; bis zur nächsten Feier bei uns.",
+          "rating": 5,
+          "phone": "+49 30 555 01420",
+          "city": "Berlin · Prenzlauer Berg",
+          "seoContext": "Handwerksbäckerei Croissants Berlin Prenzlauer Berg"
+        },
+        {
+          "sector": "hotel",
+          "business": "Hotel Deichlicht",
+          "reviewer": "Thomas & Mara S.",
+          "review": "Frühstück mit Deichblick, Matratze genau wie bestellt und der Snackkorb eine tolle Geste. Die Rezeption hat ruhige Spazierwege aufgezeichnet — perfektes kurzes Entspannungswochenende.",
+          "response": "Thomas und Mara, danke: dass Frühstück mit Blick und Matratzenwahl passten, freut uns sehr. Schön, dass die Wegtipps halfen — wir würden Sie gern wieder am Wasser begrüßen.",
+          "rating": 5,
+          "phone": "+49 40 555 01910",
+          "city": "Hamburg",
+          "seoContext": "Boutiquehotel Deichnähe Hamburg"
+        },
+        {
+          "sector": "auto",
+          "business": "Werkstatt Geradlinig",
+          "reviewer": "Deniz Y.",
+          "review": "Inspektion plus Winterreifen vor der Skisaison — alles auf der Hebebühne erklärt, Rechnung wie Angebot. Spiel an der Bremsscheibe vor dem Autobahn-Trip entdeckt. Menschliche Werkstatt ohne Druck, selten.",
+          "response": "Deniz, danke — «Teile zeigen, keine Überraschungen» ist unser Versprechen. Gut, dass wir das Spiel früh sahen; schauen Sie nach der Fahrt kurz vorbei.",
+          "rating": 5,
+          "phone": "+49 89 555 01620",
+          "city": "München",
+          "seoContext": "ehrliche Autowerkstatt Winterreifen München"
+        }
+      ]
+    },
+    "negative": {
+      "variants": [
+        {
+          "sector": "salon",
+          "business": "Salon Kontur",
+          "reviewer": "Julia W.",
+          "review": "Schnitt entsprach weder Fotos noch Video wie vereinbart — Ton liegt falsch. Keratin wurde nachgerechnet ohne klaren Preishinweis. Ich ging frustrierter als ich kam.",
+          "response": "Julia, es tut uns leid: Referenzen zu verfehlen und Zusatz ohne klare Absprache liegt unter unserem Anspruch. Unser Chefstylist kann nachbessern oder erstatten — schreiben Sie uns für einen Termin.",
+          "rating": 2,
+          "phone": "+49 69 555 01990",
+          "city": "Frankfurt · Innenstadt",
+          "seoContext": "Friseur Farbe Präzision Frankfurt"
+        },
+        {
+          "sector": "restaurant",
+          "business": "Restaurant Alsterlicht",
+          "reviewer": "Markus B.",
+          "review": "Steak lauwarm, Pommes matschig, drei Weine «nicht verfügbar» ohne Alternativkarte. Bedienung winkte ab bis zur Rechnung — keine Entschuldigung vom Service.",
+          "response": "Markus, Entschuldigung: lauwarme Hauptspeise und hektisches Personal sind nicht akzeptabel. Wir würden Sie gern erneut einladen mit erfahrenem Serviceleiter — schreiben Sie uns privat für einen Termin.",
+          "rating": 2,
+          "phone": "+49 40 555 01770",
+          "city": "Hamburg",
+          "seoContext": "Restaurant Steak Wein Hamburg"
+        },
+        {
+          "sector": "e-commerce",
+          "business": "Leinenwerk Nord",
+          "reviewer": "Sarah H.",
+          "review": "Lieferung vor Weihnachten versprochen, kam elf Tage zu spät mit zerdrückter Box. Support meldete sich vier Tage später und schickte mich zum Standardformular — Geschenk zur Babyparty.",
+          "response": "Sarah, der Versand und die Betreuung enttäuschten uns selbst — so ein Geschenk hat Vorrang. Antworten Sie mit Bestellnummer, wir schicken Ersatz per Express und ein Kulanzguthaben.",
+          "rating": 2,
+          "phone": "+49 221 555 01400",
+          "city": "Köln",
+          "seoContext": "Online Heimtextil schnelle Lieferung Köln"
+        }
+      ]
+    },
+    "hateful": {
+      "variants": [
+        {
+          "sector": "restaurant",
+          "business": "Restaurant Seeblick 12",
+          "reviewer": "Felix R.",
+          "review": "Ihr seid Diebe, der Koch lächerlich und Service wertlos. Hoffe ihr macht dicht.",
+          "response": "Betreff: Antrag auf Entfernung — persönlich beleidigende Rezension (Google Rezensionen)\n\nSehr geehrtes Trust-&-Safety-Team,\n\nwir beantragen die Entfernung einer Rezension zu Seeblick 12 mit Schmähung und wirtschaftlichem Schaden ohne überprüfbaren Besuchsbericht.\n\nBitte Richtlinien zu Belästigung und Hassinhalten anwenden.\n\nMit freundlichen Grüßen\nGeschäftsführung · Seeblick 12",
+          "rating": 1,
+          "phone": "+49 89 555 01820",
+          "city": "München",
+          "platformLabel": "Google Rezensionen",
+          "seoContext": "Restaurant am Wasser München"
+        },
+        {
+          "sector": "barbershop",
+          "business": "Barbershop Linie K",
+          "reviewer": "Google-Nutzer",
+          "review": "Verpisst euch aus meiner Stadt; laden ist Müll, hinter den Stühlen rassistischer Müll.",
+          "response": "Betreff: Dringend — hasserfüllende / diskriminierende Rezension\n\nAn die Moderation Google Rezensionen,\n\nBarbershop Linie K hat eine Rezension mit schweren Beleidigungen und diskriminierenden Vorwürfen erhalten. Bitte um priorisierte Prüfung und Entfernung nach Hass- und Belästigungsrichtlinien.\n\nMit freundlichen Grüßen\nInhaber · Linie K",
+          "rating": 1,
+          "phone": "+49 30 555 01390",
+          "city": "Berlin",
+          "platformLabel": "Google Rezensionen",
+          "seoContext": "Barbershop Berlin Mitte"
+        },
+        {
+          "sector": "hotel",
+          "business": "Hotel Alpenruh",
+          "reviewer": "Kevin M.",
+          "review": "Schlimmste Nacht ever — Hotel ist eine Rattenfalle mit Feiglingen. Wenn wir uns sehen, reden wir «richtig».",
+          "response": "Betreff: Einschüchterung — Entfernungsantrag (Google Business)\n\nGuten Tag,\n\ndie Kevin M. zugeschriebene Rezension enthält Sammelbeleidigungen und sprachliche Andeutungen körperlicher Drohung. Bitte um umgehende Entfernung und Kontoprüfung.\n\nFür echte Aufenthaltsprobleme bleiben wir über die Rezeption erreichbar.\n\nFreundliche Grüße\nLeitung · Alpenruh",
+          "rating": 1,
+          "phone": "+49 89 555 01600",
+          "city": "München",
+          "platformLabel": "Google Rezensionen",
+          "seoContext": "Boutiquehotel München Zentrum"
+        }
+      ]
+    }
+  },
+  "examples": {
+    "0": {
+      "sector": "salon",
+      "business": "Salon Kontur",
+      "reviewer": "Julia W.",
+      "review": "Komplettes Schnitt-Desaster! Genaues Foto gezeigt und das Ergebnis passt null. Plus Behandlung berechnet, die ich nicht wollte. Wirklich sauer.",
+      "response": "Julia, es tut uns sehr leid, dass wir Ihre Erwartungen verfehlt haben. Abstand zwischen Wunschschnitt und Ergebnis ist für uns inakzeptabel. Wir möchten mit Ihnen Lösungen besprechen — melden Sie sich. — Team Salon Kontur"
+    },
+    "1": {
+      "sector": "restaurant",
+      "business": "Weinstube am Markt",
+      "reviewer": "Paul D.",
+      "review": "Chaos-Service, 45 Minuten auf die Vorspeise. Speise kalt, Kellner ignoriert uns. Nie wieder.",
+      "response": "Paul, entschuldigen Sie die Wartezeit und den Service unter unserem Niveau. Ihr Feedback hilft uns. Gern begrüßen wir Sie erneut — schreiben Sie uns privat. — Weinstube am Markt"
+    },
+    "2": {
+      "sector": "hotel",
+      "business": "Hotel Kiefernblick",
+      "reviewer": "Laura M.",
+      "review": "Lautes Zimmer, Blick auf Parkplatz. Für den Preis erwarteten wir viel mehr. Frühstück okay, aber nicht herausragend.",
+      "response": "Laura, schade, dass Ruhe und Aussicht nicht passten. Wir nehmen das auf, um zu verbessern. Bei einem nächsten Aufenthalt melden Sie sich gern. — Hotel Kiefernblick"
+    },
+    "3": {
+      "sector": "spa",
+      "business": "Spa Quellzeit",
+      "reviewer": "Jonas T.",
+      "review": "Massage gehetzt, Therapeutin wirkte genervt. Ambiente schön, Erlebnis für den Preis enttäuschend.",
+      "response": "Jonas, leider entsprach die Massage nicht unserem Anspruch. Qualität steht bei uns oben. Wir bieten gern eine zweite Chance — kontaktieren Sie uns. — Spa Quellzeit"
+    },
+    "4": {
+      "sector": "café",
+      "business": "Café Uferlos",
+      "reviewer": "Nina B.",
+      "review": "Bestellung verloren, Kaffee lauwarm. Team überfordert, niemand entschuldigte sich. Sehr enttäuscht.",
+      "response": "Nina, sorry: Fehler und fehlende Reaktion entsprechen nicht unserem Anspruch. Melden Sie sich — wir laden zum Kaffee ein beim nächsten Besuch. — Café Uferlos"
+    }
+  }
+}

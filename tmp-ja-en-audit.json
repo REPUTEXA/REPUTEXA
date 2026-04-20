@@ -1,0 +1,66 @@
+[
+  [
+    "Api.summaryChangesRequired",
+    "summary_of_changes is required."
+  ],
+  [
+    "Api.errors.webhookPhoneRequired",
+    "phone フィールドは必須です。"
+  ],
+  [
+    "Dashboard.settings.simulationBrandReplace",
+    "the establishment"
+  ],
+  [
+    "Dashboard.reviewCollection.delayNextDay",
+    "the next day"
+  ],
+  [
+    "Dashboard.reviewCollection.copyItemClause",
+    "the clause"
+  ],
+  [
+    "Dashboard.reviewCollection.copyItemJsonExample",
+    "the JSON example"
+  ],
+  [
+    "Dashboard.bananoParametres.establishmentNameFallback",
+    "not set — “our team” will be used when sending"
+  ],
+  [
+    "Dashboard.bananoLoyaltySettings.periodsTypicalHint",
+    "click = apply · double-click = adjust dates"
+  ],
+  [
+    "Dashboard.bananoCrmImport.preview_detected_phone",
+    "phone «{name}»"
+  ],
+  [
+    "Dashboard.bananoAutomationCompose.fallback_periode",
+    "the period in question"
+  ],
+  [
+    "Dashboard.adminBlackBoxArchive.emptyWindowRetentionEnv",
+    "the BLACK_BOX_HOT_RETENTION_DAYS window"
+  ],
+  [
+    "Dashboard.baseClients.introDetailRest",
+    "click a table row to open the panel (full history, edit, delete). Direct link:"
+  ],
+  [
+    "ApiAdmin.codeRequired",
+    "code requis."
+  ],
+  [
+    "ApiAdmin.codeGuardianCodeSnippetRequired",
+    "code required (snippet to audit)."
+  ],
+  [
+    "ApiAdmin.legalPublishSummaryRequired",
+    "summary_of_changes が必要です"
+  ],
+  [
+    "Admin.ghostProtocol.findings.sastNewFunctionTitle",
+    "new Function() を検出"
+  ]
+]

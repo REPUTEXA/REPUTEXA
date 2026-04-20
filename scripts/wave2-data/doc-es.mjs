@@ -1,0 +1,116 @@
+export const documentationPageEs = {
+  title: 'Documentación REPUTEXA',
+  subtitle: 'Guía de inicio e integración según el funcionamiento real de la plataforma.',
+  onboardingTitle: 'Primeros pasos en 5 etapas',
+  onboardingBadge: '≈ 10 minutos',
+  onboardingSteps: [
+    {
+      number: '01',
+      iconKey: 'UserPlus',
+      title: 'Crea tu cuenta',
+      description:
+        'Introduce nombre, tipo, dirección, WhatsApp y email. Recibirás un código de verificación al instante.',
+      detail:
+        'Cloudflare Turnstile protege el registro. El teléfono debe estar en formato internacional (ej. +34600111222).',
+    },
+    {
+      number: '02',
+      iconKey: 'Mail',
+      title: 'Verifica tu email',
+      description:
+        'Abre el mensaje e introduce el código de 6 dígitos. Válido 15 minutos.',
+      detail:
+        'Si no llega, revisa spam. Puedes pedir otro código en /verify.',
+    },
+    {
+      number: '03',
+      iconKey: 'Globe',
+      title: 'Conecta Google Business Profile',
+      description:
+        'Panel → Ajustes → Plataformas → “Conectar Google”. Completa OAuth y concede la gestión de fichas. Las reseñas se sincronizan solas.',
+      detail:
+        'REPUTEXA solo pide business.manage. No accede a tu cuenta personal de Google.',
+    },
+    {
+      number: '04',
+      iconKey: 'Settings',
+      title: 'Configura tu ADN de IA',
+      description:
+        'Ajustes → ADN IA: tono, longitud e instrucciones. La simulación se actualiza en vivo.',
+      detail:
+        'En ZENITH, Triple Juez genera tres variantes y elige la mejor.',
+    },
+    {
+      number: '05',
+      iconKey: 'Smartphone',
+      title: 'Activa alertas WhatsApp',
+      description:
+        'Ajustes → Notificaciones: número y umbral (ej. ≤3★). Los malos comentarios llegan con la respuesta sugerida.',
+      detail:
+        'Disponible en PULSE y ZENITH con botones Aprobar / Editar desde Twilio.',
+    },
+  ],
+  flowTitle: 'Flujo automático',
+  flowIntro:
+    'Cuando se detecta una reseña negativa, REPUTEXA ejecuta este flujo sin que tengas que intervenir.',
+  whatsappFlow: [
+    { step: 'Reseña negativa recibida', detail: 'El cliente publica ≤3★ en Google, Facebook o Trustpilot.' },
+    { step: 'Análisis Shield Center', detail: 'La IA evalúa toxicidad y autenticidad.' },
+    { step: 'Generación IA (Claude 3.5 Sonnet)', detail: 'Respuesta contextual según tu ADN.' },
+    { step: 'Alerta WhatsApp', detail: 'Resumen + borrador con Aprobar / Editar.' },
+    {
+      step: 'Publicación con retraso humano',
+      detail: 'Tras aprobar, publicación en 2–7 h. Posible dossier si hay fraude.',
+    },
+  ],
+  platformsTitle: 'Plataformas conectadas',
+  tablePlatform: 'Plataforma',
+  tableProtocol: 'Protocolo',
+  tableAvailability: 'Disponibilidad',
+  platforms: [
+    { name: 'Google Business Profile', status: 'OAuth 2.0 (business.manage)', available: 'Todos los planes' },
+    { name: 'Facebook', status: 'Webhook', available: 'Todos los planes' },
+    { name: 'Trustpilot', status: 'Webhook', available: 'Todos los planes' },
+  ],
+  platformsFootnote:
+    'Google solo usa <code>business.manage</code> — sin acceso a tu cuenta personal.',
+  posTitle: 'Integración POS y Zapier',
+  posBadge: 'Solo ZENITH',
+  posIntro:
+    'REPUTEXA emite una clave entrante (<rtx>rtx_live_…</rtx>) en Ajustes. Tu TPV o Zapier/Make puede enviar datos de visita para disparar AI Capture: WhatsApp 30 min después invitando a reseñar.',
+  posCodeLabel: 'Webhook entrante — visita POS',
+  posSnippet: `POST https://reputexa.fr/api/webhooks/{tu_clave_rtx_live}
+
+Content-Type: application/json
+
+{
+  "customerName": "María García",
+  "phone": "+34600111222",
+  "visitDate": "2026-03-22T14:30:00Z",
+  "establishmentId": "tu_id"
+}
+
+// REPUTEXA programa WhatsApp 30 min tras la visita.
+// Solo ZENITH (AI Capture).`,
+  posNote:
+    'La clave sirve para <strong>webhooks entrantes</strong>. No sirve para leer reseñas o estadísticas por API externa.',
+  keysTitle: 'Dónde están las claves',
+  keyCards: [
+    { label: 'Clave API entrante (POS/Zapier)', path: 'Ajustes → Integraciones → Clave API', plan: 'ZENITH', planColor: 'text-violet-400' },
+    { label: 'WhatsApp para alertas', path: 'Ajustes → Notificaciones → WhatsApp', plan: 'PULSE+', planColor: 'text-blue-400' },
+    { label: 'Google Business', path: 'Ajustes → Plataformas → Google', plan: 'Todos', planColor: 'text-emerald-400' },
+  ],
+  practicesTitle: 'Buenas prácticas',
+  practiceTips: [
+    'Configura el ADN IA antes de las primeras reseñas.',
+    'Activa WhatsApp en un número que mires a menudo.',
+    'Envía el webhook POS en los 10 min tras el cobro.',
+    'No publiques tu rtx_live_.',
+    'Shield Center trabaja solo — revisa Alertas para lo crítico.',
+    'Si la sugerencia falla, usa Editar para enseñar al modelo.',
+  ],
+  ctaTitle: '¿Listo para empezar?',
+  ctaSubtitle: 'ZENITH completo 14 días sin tarjeta. Primera respuesta IA en menos de un minuto tras conectar Google.',
+  ctaPrimary: 'Crear cuenta gratis',
+  ctaSecondary: 'Centro de ayuda',
+};

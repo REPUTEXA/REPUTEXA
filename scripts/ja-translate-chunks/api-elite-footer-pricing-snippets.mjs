@@ -1,0 +1,40 @@
+/** EliteMonthlyPdf + landing language hint fix */
+export default {
+  'EliteMonthlyPdf.coverSubtitle': '戦略的 eレピュテーション報告書',
+  'EliteMonthlyPdf.coverTitleGroup': 'グループ報告書',
+  'EliteMonthlyPdf.footerStrategic':
+    'REPUTEXA · 戦略的 eレピュテーション報告書 · {monthLabel} · {page}/{totalPages} ページ',
+  'EliteMonthlyPdf.footerConfidential':
+    'REPUTEXA · 機密報告書 · {monthLabel} · {page}/{totalPages} ページ',
+  'EliteMonthlyPdf.footerEstablishment':
+    'REPUTEXA · {establishmentName} · {monthLabel} · {page}/{totalPages} ページ',
+  'EliteMonthlyPdf.sectionOverview': '概要',
+  'EliteMonthlyPdf.statAvgRating': '平均評価',
+  'EliteMonthlyPdf.statTotalReviews': '口コミ合計',
+  'EliteMonthlyPdf.statPositive': 'ポジティブ（4〜5★）',
+  'EliteMonthlyPdf.barPrev': '前期',
+  'EliteMonthlyPdf.barCurrent': '当期',
+  'EliteMonthlyPdf.evolutionTitle': '推移',
+  'EliteMonthlyPdf.chartAvgRating': '平均評価',
+  'EliteMonthlyPdf.chartVolume': '口コミ件数',
+  'EliteMonthlyPdf.unitReviews': '件',
+  'EliteMonthlyPdf.platformSection': 'プラットフォーム別',
+  'EliteMonthlyPdf.platformLine': '• {name}: {count} 件',
+  'EliteMonthlyPdf.groupComparisonTitle': 'グループ比較',
+  'EliteMonthlyPdf.groupLine': '{trophy}{name}: {avg}/5 · {total} 件',
+  'EliteMonthlyPdf.visionDisclaimer':
+    'Visionプラン — 事実スナップショットとKPI（詳細な戦略アドバイスは含みません）。',
+  'EliteMonthlyPdf.sectionInsights': '戦略インサイト',
+  'EliteMonthlyPdf.insightStrength': '強み',
+  'EliteMonthlyPdf.insightOpportunity': '主要な機会',
+  'EliteMonthlyPdf.kpisTitle': '主要KPI',
+  'EliteMonthlyPdf.sentimentSection': 'お客様の声',
+  'EliteMonthlyPdf.sentimentLove': '言及された強み',
+  'EliteMonthlyPdf.sentimentHate': '摩擦と繰り返しのテーマ',
+  'EliteMonthlyPdf.sectionActionOrTactics': 'アクションプラン',
+  'EliteMonthlyPdf.sectionTacticsOnly': '成長タクティクス',
+  'EliteMonthlyPdf.stepLabel': 'ステップ {n}',
+  'EliteMonthlyPdf.sectionPredictive': '予測分析',
+  'EliteMonthlyPdf.sectionBenchmark': '業界ベンチマーク',
+  'EliteMonthlyPdf.nextMonthTitle': '戦略的アドバイス — 翌月',
+};

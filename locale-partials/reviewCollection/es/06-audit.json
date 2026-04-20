@@ -1,0 +1,15 @@
+{
+  "auditTitle": "Registro — ¿de dónde vino el contacto?",
+  "auditIntro": "Cada línea muestra la vía de entrada (webhook con clave API o Zenith), la fecha de recepción, el contexto conocido y el estado. Teléfono parcialmente enmascarado; el detalle completo (p. ej. IP) en la exportación RGPD (Ajustes → Descargar mis datos).",
+  "auditLoading": "Cargando registro…",
+  "auditColReceived": "Recibido",
+  "auditColOrigin": "Origen",
+  "auditColClient": "Cliente",
+  "auditColScheduled": "Programado / enviado",
+  "auditColStatus": "Estado",
+  "auditEmpty": "No hay entradas en este periodo.",
+  "auditRetention": "Los identificadores de cola se anonimizan o borran en un plazo de 120 días (las estadísticas agregadas pueden conservarse). No se envía un nuevo contacto por WhatsApp al mismo número hasta 120 días después del inicio de la campaña anterior; después, un nuevo envío es posible salvo baja del usuario (STOP).",
+  "scheduledLine": "Prog. {datetime}",
+  "sentLine": "Enviado {datetime}",
+  "auditQueueRef": "cola n.º {id}…"
+}

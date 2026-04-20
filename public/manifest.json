@@ -1,0 +1,19 @@
+{
+  "name": "REPUTEXA",
+  "short_name": "REPUTEXA",
+  "description": "AI-powered reputation, WhatsApp review flows, and e-reputation protection for modern operators.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#0f172a",
+  "theme_color": "#2563eb",
+  "lang": "fr",
+  "icons": [
+    {
+      "src": "/reputexa-mark.svg",
+      "type": "image/svg+xml",
+      "sizes": "any",
+      "purpose": "any"
+    }
+  ]
+}

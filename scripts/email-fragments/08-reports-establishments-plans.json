@@ -1,0 +1,47 @@
+{
+  "monthlyReport": {
+    "title": "Votre rapport mensuel — {monthLabel}",
+    "greeting": "Bonjour{establishment}",
+    "footer": "Votre rapport {monthLabel} est disponible. Consultez les insights IA et le PDF complet ci-dessous.",
+    "cta": "Voir mon rapport",
+    "comparisonTitle": "📊 Comparaison du Groupe",
+    "trophy": "🏆 ",
+    "ratingSuffix": "/5",
+    "reviewsSuffix": " avis"
+  },
+  "establishmentAdded": {
+    "title": "Nouvel établissement activé",
+    "body1": "Votre nouvel établissement <strong>{name}</strong> est activé.",
+    "body2": "Votre prochaine facture mensuelle s'élèvera à <strong>{amount}€</strong>/mois.",
+    "cta": "Voir mes établissements"
+  },
+  "establishmentDeleted": {
+    "title": "Suppression confirmée — Établissement retiré",
+    "body1": "Nous vous confirmons la suppression de l'établissement <strong style=\"color: #0f172a;\">{name}</strong> de votre compte. L'accès aux données associées a été retiré.",
+    "labelNewMonthly": "Nouveau montant mensuel",
+    "perMonth": "/mois",
+    "effectiveFrom": "Réduction effective à partir du",
+    "footer": "La prochaine facture reflétera automatiquement cette réduction. Vous pouvez gérer vos établissements à tout moment depuis votre tableau de bord.",
+    "cta": "Accéder à mes établissements"
+  },
+  "upgradeConfirmation": {
+    "title": "Confirmation de mise à niveau",
+    "greeting": "Bonjour{establishment}",
+    "body1": "Votre abonnement a été mis à niveau vers le plan <strong>{planName}</strong>. Les nouvelles fonctionnalités sont immédiatement accessibles.",
+    "body2": "Le prorata a été calculé automatiquement. Vous trouverez le détail sur votre prochaine facture Stripe.",
+    "cta": "Accéder au dashboard"
+  },
+  "downgradeConfirmation": {
+    "title": "Changement de forfait — vos données sont conservées",
+    "body1": "Votre abonnement a été mis à jour.",
+    "body2": "Vos données sont conservées, mais vos accès sont désormais limités à <strong>{quantity} emplacement(s)</strong>. Les établissements au-delà de ce quota sont temporairement désactivés et réactivés automatiquement si vous augmentez à nouveau votre forfait.",
+    "body3": "Un crédit a été appliqué à votre compte Stripe pour la partie non utilisée de votre ancien forfait.",
+    "cta": "Voir mon dashboard"
+  },
+  "expiration": {
+    "title": "Votre essai REPUTEXA est terminé",
+    "greeting": "Bonjour{establishment}",
+    "body": "Votre période d'essai de 14 jours est arrivée à son terme. Pour continuer à protéger votre réputation avec l'IA, activez votre abonnement en un clic.",
+    "cta": "Activer mon abonnement {planName}"
+  }
+}

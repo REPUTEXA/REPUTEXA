@@ -1,0 +1,24 @@
+{
+  "planSelection": {
+    "fr": {
+      "title": "Confirmation de votre choix de plan",
+      "hello": "Bonjour,",
+      "confirm": "Nous vous confirmons que votre choix pour le plan <strong>{planName}</strong> a bien été enregistré pour la suite de votre abonnement.",
+      "noChange": "<strong>Ce qui change pour vous :</strong> Absolument rien pour l'instant. Vous conservez l'intégralité de vos accès au plan ZÉNITH à titre gracieux jusqu'à la fin de votre période d'essai, le <strong>{trialEndDate}</strong>.",
+      "charge": "Le premier prélèvement de <strong>{planPrice}</strong> n'interviendra qu'à cette date, sur le plan que vous venez de sélectionner.",
+      "closing": "Nous restons à votre entière disposition pour vous accompagner dans la croissance de votre établissement.",
+      "cta": "Accéder à mon dashboard",
+      "lossNote": "💡 <em>En passant sur ce plan à la fin de votre essai, vous n'aurez plus accès aux fonctionnalités exclusives du plan ZÉNITH mais uniquement à celles du plan {planName}.</em>"
+    },
+    "en": {
+      "title": "Plan selection confirmed",
+      "hello": "Hello,",
+      "confirm": "We confirm that your choice of the <strong>{planName}</strong> plan has been recorded for your future subscription.",
+      "noChange": "<strong>What changes for you:</strong> Nothing for now. You keep full access to the ZENITH plan at no charge until the end of your trial period on <strong>{trialEndDate}</strong>.",
+      "charge": "The first charge of <strong>{planPrice}</strong> will only occur on that date, for the plan you have just selected.",
+      "closing": "We remain at your disposal to support the growth of your business.",
+      "cta": "Go to my dashboard",
+      "lossNote": "💡 <em>By switching to this plan at the end of your trial, you will no longer have access to ZENITH-only features—only those of the {planName} plan.</em>"
+    }
+  }
+}

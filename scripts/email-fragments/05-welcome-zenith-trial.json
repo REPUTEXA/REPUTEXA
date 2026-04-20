@@ -1,0 +1,26 @@
+{
+  "welcomeZenithTrial": {
+    "title": "C'est parti ! Tes 14 jours d'accès Total Zénith commencent.",
+    "intro": "Bienvenue dans l'élite de la réputation. Tu as maintenant les mêmes outils que les plus grandes entreprises.",
+    "missionsTitle": "Tes 3 missions pour démarrer :",
+    "li1": "<strong>Connecter Google Business</strong> — Paramètres → Connexions → Connecter Google",
+    "li2": "<strong>Configurer WhatsApp</strong> — Reçois tes alertes avis négatifs en temps réel",
+    "li3": "<strong>Tester les fonctionnalités avancées</strong> — Pose tes questions stratégiques 24/7",
+    "trialEnd": "Ton essai se termine le <strong>{date}</strong>. Annulation en un clic dans <a href=\"{settingsUrl}\" style=\"color: #2563eb; text-decoration: none;\">tes paramètres</a>."
+  },
+  "zenithTrialDark": {
+    "htmlLang": "fr",
+    "badge": "Plan Zénith — Essai 14 jours",
+    "h1": "🚀 C'est parti ! Tes 14 jours d'accès Total Zénith commencent.",
+    "intro": "Bienvenue dans l'élite de la réputation, <strong style=\"color:#f8fafc;\">{displayName}</strong>. Tu as maintenant les mêmes outils que les plus grandes entreprises.",
+    "missionsHeading": "Tes 3 missions prioritaires",
+    "m1Title": "🔍 Analyse",
+    "m1Body": "Connecte ton Google Business pour voir l'IA analyser tes avis.",
+    "m2Title": "📲 Réactivité",
+    "m2Body": "Configure tes alertes WhatsApp pour ne plus rien rater.",
+    "m3Title": "🧠 Stratégie",
+    "m3Body": "Pose ta première question stratégique.",
+    "trialBox": "Ton essai se termine le <strong style=\"color:#e2e8f0;\">{trialEndDate}</strong>. Si tu n'es pas convaincu, tu peux annuler en un clic dans <a href=\"{settingsUrl}\" style=\"color:#a78bfa;text-decoration:none;font-weight:600;\">tes paramètres</a>. Zéro stress, zéro engagement forcé."
+  }
+}
+

@@ -1,0 +1,12 @@
+{
+  "confidentialite": {
+    "client_finaux_erasure_notice": "Se è stato contattato via WhatsApp tramite REPUTEXA per conto di un esercizio e desidera richiedere la cancellazione dei suoi dati senza usare WhatsApp (STOP), può usare il modulo dedicato (stesso numero usato presso il commerciante):",
+    "client_finaux_erasure_cta": "Cancellazione dati — clienti finali"
+  },
+  "consentWhatsAppEcommerce": "Acconsento a ricevere un'unica invito via WhatsApp da parte di {establishment} tramite il partner tecnico REPUTEXA per esprimere la mia opinione dopo la ricezione dell'ordine. Posso revocare il consenso in qualsiasi momento (GDPR e Codice privacy).",
+  "consentWhatsAppPhysical": "Acconsento a ricevere un solo messaggio WhatsApp da {establishment}, tramite REPUTEXA, per un breve feedback dopo la visita. Posso rispondere STOP in qualsiasi momento senza oneri.",
+  "authorityReference": "Autorità di controllo: Garante per la protezione dei dati personali — www.garanteprivacy.it",
+  "legalBasisSummary": "Base giuridica: consenso espresso (art. 6(1)(a) GDPR) per l'invio; ulteriori informazioni nell'informativa privacy. Diritti di accesso, rettifica, cancellazione, limitazione, opposizione e reclamo al Garante.",
+  "dpaRoleClarification": "L'esercizio è titolare del trattamento; REPUTEXA opera come responsabile del trattamento secondo istruzioni documentate (art. 28 GDPR).",
+  "posterLegalFrame": "GDPR (UE 2016/679) e Codice privacy (D.lgs. 196/2003 e s.m.i.). Autorità: Garante (www.garanteprivacy.it)."
+}

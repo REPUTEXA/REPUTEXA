@@ -1,0 +1,12 @@
+{
+  "confidentialite": {
+    "client_finaux_erasure_notice": "Si le contactaron por WhatsApp a través de REPUTEXA en nombre de un establecimiento y desea solicitar el borrado de sus datos sin usar WhatsApp (STOP), puede usar el formulario dedicado (mismo número que con el comercio):",
+    "client_finaux_erasure_cta": "Borrado de datos — clientes finales"
+  },
+  "consentWhatsAppEcommerce": "Acepto recibir una única invitación por WhatsApp de parte de {establishment} a través del socio técnico REPUTEXA para opinar tras recibir mi pedido. Puedo retirar el consentimiento en cualquier momento (RGPD y LO 3/2018).",
+  "consentWhatsAppPhysical": "Acepto recibir un único mensaje de WhatsApp de {establishment}, mediante REPUTEXA, para una breve valoración tras mi visita. Puedo responder STOP en cualquier momento sin coste.",
+  "authorityReference": "Autoridad de control: Agencia Española de Protección de Datos (AEPD) — www.aepd.es",
+  "legalBasisSummary": "Base jurídica: consentimiento expreso (art. 6(1)(a) RGPD) para el envío; información adicional en la política de privacidad. Derechos de acceso, rectificación, supresión, limitación, oposición y reclamación ante la AEPD.",
+  "dpaRoleClarification": "El establecimiento es responsable del tratamiento; REPUTEXA actúa como encargado del tratamiento con instrucciones documentadas (art. 28 RGPD).",
+  "posterLegalFrame": "RGPD (UE 2016/679) y LO 3/2018. Autoridad: AEPD (www.aepd.es)."
+}

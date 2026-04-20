@@ -1,0 +1,38 @@
+{
+  "welcomeLegacy": {
+    "title": "Bienvenue chez REPUTEXA !",
+    "greeting": "Bonjour{establishment}",
+    "trialIntro": "Votre essai de 14 jours est activé. Voici comment démarrer :",
+    "guideTitle": "Guide : Connecter Google My Business",
+    "step1": "Rendez-vous sur <a href=\"https://business.google.com\" style=\"color: #2563eb;\">Google Business Profile</a>",
+    "step2": "Sélectionnez votre établissement ou créez votre fiche",
+    "step3": "Dans le tableau de bord REPUTEXA, allez dans Paramètres → Connexions",
+    "step4": "Cliquez sur « Connecter Google » et autorisez l'accès",
+    "footer": "Une fois connecté, l'IA commencera à protéger votre réputation."
+  },
+  "welcomeElite": {
+    "titleWithName": "Bienvenue dans l'élite de la réputation, {firstName} 🛡️",
+    "titleNoName": "Bienvenue dans l'élite de la réputation 🛡️",
+    "line1": "Félicitations pour avoir choisi le bouclier REPUTEXA.{firstNamePart}",
+    "line1NamePart": " {firstName},",
+    "line2": "Pendant que vous lisez ce mail, notre IA scanne déjà vos avis pour sécuriser votre établissement.",
+    "line3": "Le cœur de l'expérience : recevez vos alertes en temps réel sur WhatsApp. Un simple clic pour rester protégé 24/7.",
+    "ctaWhatsApp": "Configurer WhatsApp"
+  },
+  "trialGift": {
+    "title": "Vos 14 jours de protection Totale commencent maintenant.",
+    "intro": "Vous avez désormais accès au <strong>Plan Zenith</strong> — notre niveau le plus élevé.",
+    "powersTitle": "Super-pouvoirs activés :",
+    "li1": "<strong>Boost SEO IA</strong> — Optimisez votre visibilité Google Maps",
+    "li2": "<strong>Réponses Luxe indétectables</strong> — Triple rédaction, ton maître d'hôtel",
+    "li3": "<strong>Bouclier Anti-Haine</strong> — Détection et suppression des avis toxiques",
+    "highlight": "Nous allons optimiser votre visibilité Google Maps gratuitement pendant 2 semaines."
+  },
+  "trialEndProtection": {
+    "title": "Votre essai se termine bientôt",
+    "greeting": "Bonjour{firstName}",
+    "body1": "Votre essai REPUTEXA se termine bientôt. Le <strong>premier prélèvement</strong> aura lieu dans <strong>3 jours</strong>, sauf si vous annulez votre abonnement depuis votre espace client.",
+    "body2": "Si vous souhaitez continuer à protéger votre réputation, aucune action n'est requise. Sinon, vous pouvez annuler en un clic à tout moment.",
+    "cta": "Gérer mon abonnement"
+  }
+}

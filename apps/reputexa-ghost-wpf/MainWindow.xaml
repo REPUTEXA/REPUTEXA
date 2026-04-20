@@ -1,0 +1,55 @@
+<Window x:Class="ReputexaGhost.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Reputexa Ghost"
+        Height="520" Width="560"
+        WindowStartupLocation="CenterScreen"
+        Background="#FF121212">
+  <Grid Margin="16">
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto"/>
+      <RowDefinition Height="Auto"/>
+      <RowDefinition Height="Auto"/>
+      <RowDefinition Height="Auto"/>
+      <RowDefinition Height="Auto"/>
+      <RowDefinition Height="Auto"/>
+      <RowDefinition Height="*"/>
+      <RowDefinition Height="Auto"/>
+    </Grid.RowDefinitions>
+
+    <TextBlock Grid.Row="0" Foreground="White" FontSize="20" FontWeight="SemiBold"
+               Text="Agent Ghost — Marketing OS (caisse)"/>
+    <TextBlock Grid.Row="1" Margin="0,8,0,0" Foreground="#AAA" TextWrapping="Wrap"
+               Text="REP-… → API, overlay DWM, macro SendInput, sniffer spool (TOTAL TTC)."/>
+
+    <StackPanel Grid.Row="2" Margin="0,16,0,0">
+      <TextBlock Foreground="#CCC" Text="URL API (ex. https://votre-domaine.com)"/>
+      <TextBox x:Name="BaseUrlBox" Margin="0,4,0,0" Padding="6" Background="#1E1E1E" Foreground="White"/>
+    </StackPanel>
+
+    <StackPanel Grid.Row="3" Margin="0,12,0,0">
+      <TextBlock Foreground="#CCC" Text="Jeton Agent (Bearer)"/>
+      <PasswordBox x:Name="TokenBox" Margin="0,4,0,0" Padding="6" Background="#1E1E1E" Foreground="White"/>
+    </StackPanel>
+
+    <StackPanel Grid.Row="4" Margin="0,12,0,0" Orientation="Horizontal" VerticalAlignment="Center">
+      <TextBlock Foreground="#CCC" Text="Montant test macro {EUROS}" VerticalAlignment="Center"/>
+      <TextBox x:Name="MacroEurosBox" Width="72" Margin="10,0,0,0" Padding="6" Background="#1E1E1E" Foreground="White" Text="10,50"/>
+      <Button x:Name="TestMacroBtn" Margin="10,0,0,0" Padding="12,6" Content="Tester SendInput" Click="TestMacroBtn_OnClick"/>
+      <TextBlock x:Name="MacroStatusText" Margin="14,0,0,0" Foreground="#8AC" VerticalAlignment="Center" Text="Macro : 0 étape"/>
+    </StackPanel>
+
+    <StackPanel Grid.Row="5" Margin="0,10,0,0" Orientation="Horizontal">
+      <Button x:Name="SnifferToggleBtn" Content="Démarrer sniffer ticket (spool)" Padding="12,6" Click="SnifferToggleBtn_OnClick"/>
+    </StackPanel>
+
+    <ScrollViewer Grid.Row="6" Margin="0,12,0,0" VerticalScrollBarVisibility="Auto">
+      <TextBlock x:Name="LogBlock" Foreground="#8F8" TextWrapping="Wrap" FontFamily="Consolas" FontSize="11"/>
+    </ScrollViewer>
+
+    <StackPanel Grid.Row="7" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,12,0,0">
+      <Button x:Name="LearnMacroBtn" Content="Apprentissage macro" Padding="12,6" Margin="0,0,8,0" Click="LearnMacroBtn_OnClick"/>
+      <Button x:Name="HookToggleBtn" Content="Démarrer le hook REP-" Padding="12,6" Click="HookToggleBtn_OnClick"/>
+    </StackPanel>
+  </Grid>
+</Window>

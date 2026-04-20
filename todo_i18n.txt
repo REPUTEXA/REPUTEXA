@@ -1,0 +1,3 @@
+Obsolete ESLint snapshot (2026-04-10). Regenerate with:
+  npx eslint "components/**/*.tsx" 2>&1 | findstr /i literal
+Last check: `npx eslint "components/**/*.tsx" --quiet` → 0 errors (warnings only in a few files).

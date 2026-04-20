@@ -1,0 +1,13 @@
+{
+  "$schema": "Remplacements exacts (search) → clé fr.json. Pas de scan automatique : éditez ce fichier à la main ou via agent.",
+  "replacements": [
+    {
+      "file": "components/exemple/MonComposant.tsx",
+      "search": "Texte français exact à remplacer",
+      "replace": "{t('maCle.section.label')}",
+      "frJson": {
+        "maCle": { "section": { "label": "Texte français exact à remplacer" } }
+      }
+    }
+  ]
+}

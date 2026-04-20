@@ -1,0 +1,15 @@
+{
+  "auditTitle": "Registro — da dove proviene il contatto?",
+  "auditIntro": "Ogni riga mostra la via di ingresso (webhook con chiave API o Zenith), la data di ricezione, il contesto noto e lo stato. Telefono parzialmente mascherato; dettaglio completo (es. IP) nell’esportazione GDPR (Impostazioni → Scarica i miei dati).",
+  "auditLoading": "Caricamento registro…",
+  "auditColReceived": "Ricevuto",
+  "auditColOrigin": "Origine",
+  "auditColClient": "Cliente",
+  "auditColScheduled": "Programmato / inviato",
+  "auditColStatus": "Stato",
+  "auditEmpty": "Nessuna voce in questo periodo.",
+  "auditRetention": "Gli identificativi di coda sono anonimizzati o cancellati entro 120 giorni (le statistiche aggregate possono essere conservate). Un nuovo contatto WhatsApp sullo stesso numero non viene inviato fino a 120 giorni dopo l’inizio della campagna precedente; dopo, un nuovo invio è possibile salvo opt-out dell’utente (STOP).",
+  "scheduledLine": "Prog. {datetime}",
+  "sentLine": "Inviato {datetime}",
+  "auditQueueRef": "coda #{id}…"
+}

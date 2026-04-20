@@ -1,0 +1,14 @@
+{
+  "AuthEmails": {
+    "zenith": {
+      "htmlLang": "fr",
+      "otpVerificationTitle": "Votre code de vérification",
+      "otpClickHint": "👆 Cliquez sur le code pour valider automatiquement votre compte.",
+      "otpValidityHint": "Code valide 15 minutes. Si rien ne fonctionne, entrez les 6 chiffres manuellement.",
+      "otpCodeLinkTitle": "Cliquer pour valider automatiquement",
+      "teamSignoff": "— L'équipe REPUTEXA",
+      "supportHelp": "Besoin d'aide ? Contactez le support",
+      "notConvincedPrefix": "Pas convaincu ?"
+    }
+  }
+}

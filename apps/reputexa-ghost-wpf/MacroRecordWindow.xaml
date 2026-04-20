@@ -1,0 +1,24 @@
+<Window x:Class="ReputexaGhost.MacroRecordWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Apprentissage macro"
+        Height="220" Width="480"
+        WindowStartupLocation="CenterOwner"
+        Background="#FF1E1E1E"
+        ResizeMode="NoResize">
+  <Grid Margin="20">
+    <Grid.RowDefinitions>
+      <RowDefinition Height="*"/>
+      <RowDefinition Height="Auto"/>
+    </Grid.RowDefinitions>
+    <StackPanel Grid.Row="0">
+      <TextBlock Foreground="White" FontSize="15" FontWeight="SemiBold" TextWrapping="Wrap"
+                 Text="Effectuez exactement la séquence sur la caisse (clavier)."/>
+      <TextBlock Margin="0,12,0,0" Foreground="#AAA" TextWrapping="Wrap"
+                 Text="Astuce : pour saisir le montant, enregistrez une touche fonction puis modifiez le JSON pour remplacer les chiffres par une étape texte {EUROS}."/>
+      <TextBlock x:Name="CountBlock" Margin="0,16,0,0" Foreground="#8CF" FontSize="14"
+                 Text="Touches enregistrées : 0 — Échap pour terminer"/>
+    </StackPanel>
+    <Button Grid.Row="1" HorizontalAlignment="Right" Content="Annuler" Padding="16,8" Click="Cancel_OnClick"/>
+  </Grid>
+</Window>

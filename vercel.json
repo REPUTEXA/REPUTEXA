@@ -1,0 +1,112 @@
+{
+  "crons": [
+    {
+      "path": "/api/cron/send-messages",
+      "schedule": "*/15 * * * *"
+    },
+    {
+      "path": "/api/cron/send-zenith-messages",
+      "schedule": "*/15 * * * *"
+    },
+    {
+      "path": "/api/cron/publish-scheduled-reviews",
+      "schedule": "0 8 * * *"
+    },
+    {
+      "path": "/api/cron/trial-emails",
+      "schedule": "0 8 * * *"
+    },
+    {
+      "path": "/api/cron/trial-reminder",
+      "schedule": "0 8 * * *"
+    },
+    {
+      "path": "/api/cron/weekly-insight",
+      "schedule": "0 8 * * 1"
+    },
+    {
+      "path": "/api/cron/monthly-report",
+      "schedule": "0 8 1 * *"
+    },
+    {
+      "path": "/api/cron/compliance-bundle-monthly",
+      "schedule": "20 8 1 * *"
+    },
+    {
+      "path": "/api/cron/banano-pilotage-performance-report",
+      "schedule": "0 8 1 * *"
+    },
+    {
+      "path": "/api/cron/banano-voucher-month-archives",
+      "schedule": "0 8 1 * *"
+    },
+    {
+      "path": "/api/cron/sentinel",
+      "schedule": "*/10 * * * *"
+    },
+    {
+      "path": "/api/cron/blog-forge-draft",
+      "schedule": "0 20 * * 1"
+    },
+    {
+      "path": "/api/cron/newsletter",
+      "schedule": "0 9 * * 2"
+    },
+    {
+      "path": "/api/cron/omni-recursive-scan",
+      "schedule": "30 */8 * * *"
+    },
+    {
+      "path": "/api/cron/legal-guardian",
+      "schedule": "0 6 * * 1"
+    },
+    {
+      "path": "/api/cron/admin-council-digest",
+      "schedule": "0 * * * *"
+    },
+    {
+      "path": "/api/cron/sentinel-360",
+      "schedule": "0 7 * * *"
+    },
+    {
+      "path": "/api/cron/banano-loyalty-automation",
+      "schedule": "0 9 * * *"
+    },
+    {
+      "path": "/api/cron/banano-staff-allowance",
+      "schedule": "15 7 1 * *"
+    },
+    {
+      "path": "/api/cron/banano-manual-whatsapp",
+      "schedule": "*/15 * * * *"
+    },
+    {
+      "path": "/api/cron/security-random-audit",
+      "schedule": "*/15 * * * *"
+    },
+    {
+      "path": "/api/cron/sentinel-vault",
+      "schedule": "0 3 * * *"
+    },
+    {
+      "path": "/api/cron/ia-forge-batch",
+      "schedule": "0 21 * * 0"
+    },
+    {
+      "path": "/api/cron/black-box-archive",
+      "schedule": "45 2 * * *"
+    },
+    {
+      "path": "/api/cron/broadcast-scheduled",
+      "schedule": "*/5 * * * *"
+    },
+    {
+      "path": "/api/cron/banano-loyalty-idempotency-prune",
+      "schedule": "15 4 * * *"
+    },
+    {
+      "path": "/api/cron/outreach-active-countries",
+      "schedule": "25 */4 * * *"
+    }
+  ]
+}

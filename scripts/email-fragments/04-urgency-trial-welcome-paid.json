@@ -1,0 +1,35 @@
+{
+  "urgency": {
+    "title": "Votre Bouclier IA expire bientôt",
+    "greeting": "Bonjour{establishment}",
+    "body": "Il ne reste plus que <strong style=\"color: #2563eb;\">{days}</strong> avant la fin de votre essai. Sans action, vous perdrez la protection automatique de votre e-réputation.",
+    "promoTitle": "Code promo <strong>-10%</strong> :",
+    "promoCode": "REPUTEXA10",
+    "promoHint": "À utiliser sur la page de paiement.",
+    "cta": "Activer mon abonnement — -10%",
+    "day": "jour",
+    "days": "jours"
+  },
+  "welcomeTrial14": {
+    "title": "Bienvenue — Vos 14 jours gratuits REPUTEXA",
+    "greeting": "Bonjour{establishment}",
+    "body1": "Bienvenue chez REPUTEXA ! Vos <strong>14 jours gratuits</strong> sur le plan <strong>{planName}</strong> sont activés. Aucun prélèvement aujourd'hui.",
+    "body2": "Le premier prélèvement interviendra dans 14 jours, sauf annulation de votre part. Vous pouvez annuler à tout moment depuis votre espace client."
+  },
+  "welcomePaid": {
+    "title": "Bienvenue — {planName} activé",
+    "greeting": "Bonjour{establishment}",
+    "thanks": "Merci pour votre confiance. Votre abonnement <strong>{planName}</strong> est actif. Votre surveillance 24/7 est activée.",
+    "benefitsTitle": "Vos avantages :",
+    "invoiceNote": "Votre facture vous a été envoyée par email.",
+    "zenithLi1": "<strong>Support stratégique avancé</strong> — Posez vos questions stratégiques",
+    "zenithLi2": "<strong>Gestion totale</strong> — Multi-établissements, Boost SEO, Bouclier avis toxiques",
+    "zenithLi3": "<strong>IA de capture</strong> — Sollicitez les avis par WhatsApp",
+    "pulseLi1": "<strong>Rapports détaillés</strong> — PDF mensuel + Recap WhatsApp hebdo",
+    "pulseLi2": "<strong>Réactivité</strong> — Alertes avis négatifs en temps réel",
+    "pulseLi3": "<strong>Bouclier avis toxiques</strong> — Détection et signalement auto",
+    "visionLi1": "<strong>L'essentiel</strong> — Réponses IA en langue locale",
+    "visionLi2": "<strong>IA intelligente</strong> — Rédaction automatique des réponses",
+    "visionLi3": "<strong>Rapport PDF mensuel</strong> — Suivi de votre e-réputation"
+  }
+}

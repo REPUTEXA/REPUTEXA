@@ -1,0 +1,11 @@
+{
+  "webhookPhysicalSampleLastPurchase": "Tratamiento queratina",
+  "webhookEcommerceSampleLastPurchase": "Pedido n.º 4521",
+  "legacyZenithTokenHint": "'<legacy-token>'",
+  "legacyZenithEndpoint": "POST {siteUrl}/api/webhooks/zenith\nx-reputexa-token: {tokenHint}\nContent-Type: application/json",
+  "webhookExampleFirstName": "Laura",
+  "webhookExamplePhone": "+34612345678",
+  "webhookEcommerceExampleStatus": "Entregado",
+  "webhookEcommerceExampleTracking": "ES123456789ES",
+  "webhookEcommerceExampleSource": "Shopify / Stripe"
+}

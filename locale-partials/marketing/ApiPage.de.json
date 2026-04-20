@@ -1,0 +1,103 @@
+{
+  "ApiPage": {
+    "title": "REPUTEXA API",
+    "subtitle": "Binden Sie REPUTEXA ein, um nach jedem Besuch automatisch Review-Einladungen zu starten.",
+    "noticeTitle": "Was die API wirklich macht",
+    "noticeBody": "Die REPUTEXA-API ist ein <strong>eingehender Webhook</strong>: er empfängt Besuchsdaten von POS, Zapier oder Buchung und startet <strong>AI Capture</strong> — WhatsApp 30 Minuten nach dem Besuch zur Google-Bewertung.<br/><br/>Es gibt noch keine öffentliche <em>Lese</em>-API (GET /reviews …). Daten liegen im <link>REPUTEXA-Dashboard</link>.",
+    "useCasesTitle": "Anwendungsfälle",
+    "useCases": [
+      {
+        "iconKey": "ShoppingCart",
+        "title": "Kasse / POS",
+        "description": "Square, SumUp, Lightspeed … Nach jedem Verkauf POST — AI Capture plant WhatsApp +30 Min.",
+        "badge": "ZENITH",
+        "badgeColor": "bg-violet-500/20 text-violet-400"
+      },
+      {
+        "iconKey": "Zap",
+        "title": "Zapier / Make",
+        "description": "Shopify, WooCommerce, Airtable, Formulare. Jeder bestätigte Besuch ruft Ihren Endpoint.",
+        "badge": "ZENITH",
+        "badgeColor": "bg-violet-500/20 text-violet-400"
+      },
+      {
+        "iconKey": "Smartphone",
+        "title": "Reservierung",
+        "description": "TheFork, Resy, Eigenbau. Einladung 30 Min. nach Reservierungszeit, ohne Klick.",
+        "badge": "ZENITH",
+        "badgeColor": "bg-violet-500/20 text-violet-400"
+      }
+    ],
+    "keySectionTitle": "Integrationsschlüssel holen",
+    "keyIntro": "Der Schlüssel (<rtx>rtx_live_…</rtx>) entsteht mit ZENITH. Im Dashboard einsehbar und rotierbar.",
+    "keySteps": [
+      {
+        "step": "1",
+        "label": "Dashboard → Einstellungen"
+      },
+      {
+        "step": "2",
+        "label": "Bereich Integrationen"
+      },
+      {
+        "step": "3",
+        "label": "rtx_live_… kopieren"
+      }
+    ],
+    "keyFootnote": "ZENITH nötig. DOMINATOR behält Zugriff.",
+    "endpointTitle": "Endpoint-Dokumentation",
+    "endpointDoc": "POST https://reputexa.fr/api/webhooks/{rtx_live}\n\nContent-Type: application/json\n\n{\n  \"customerName\": \"Max Mustermann\",\n  \"phone\": \"+491701234567\",\n  \"visitDate\": \"2026-03-22T14:30:00Z\",\n  \"establishmentId\": \"ihre_id\"\n}\n\n// 200 OK — AI Capture eingeplant\n// 401 — ungültiger Schlüssel\n// 422 — Validierung",
+    "securityTitle": "Sicherheit & Limits",
+    "securityRules": [
+      {
+        "iconKey": "Lock",
+        "text": "rtx_live_ gehört zum Konto — nie ins öffentliche Frontend."
+      },
+      {
+        "iconKey": "Shield",
+        "text": "Schlüsselprüfung, E.164, mindestens 120 Tage zwischen Kampagnen pro Nummer."
+      },
+      {
+        "iconKey": "AlertTriangle",
+        "text": "Versand 09:00–21:00 Uhr Paris."
+      },
+      {
+        "iconKey": "CheckCircle",
+        "text": "Gleiche Nummer max. alle 5 Minuten."
+      }
+    ],
+    "errorCodesTitle": "Antwortcodes",
+    "errorCodes": [
+      {
+        "code": "200",
+        "desc": "Angenommen — in Warteschlange"
+      },
+      {
+        "code": "401",
+        "desc": "rtx_live_ fehlt oder ungültig"
+      },
+      {
+        "code": "403",
+        "desc": "AI Capture nicht im Plan (ZENITH)"
+      },
+      {
+        "code": "409",
+        "desc": "Deduplizierung"
+      },
+      {
+        "code": "422",
+        "desc": "Validierung"
+      },
+      {
+        "code": "429",
+        "desc": "Rate-Limit"
+      }
+    ],
+    "zapierTitle": "Zapier-Beispiel",
+    "zapierExample": "Trigger: Bestellung bezahlt\nAction: Webhook POST mit JSON (Name, Telefon E.164, Datum, establishmentId)\n→ WhatsApp +30 Min.",
+    "ctaTitle": "POS / Zapier aktivieren",
+    "ctaSubtitle": "AI Capture nur mit ZENITH. 14-Tage-Test.",
+    "ctaPrimary": "ZENITH testen",
+    "ctaSecondary": "Einstiegsleitfaden"
+  }
+}

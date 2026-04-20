@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Registre des Activités de Traitement — REPUTEXA</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: #f8fafc;
+      color: #1e293b;
+      padding: 2rem 1rem;
+      line-height: 1.6;
+    }
+    .wrapper { max-width: 960px; margin: 0 auto; }
+    header { margin-bottom: 2.5rem; }
+    header h1 {
+      font-size: 1.75rem;
+      font-weight: 700;
+      color: #0f172a;
+      letter-spacing: -0.02em;
+    }
+    header p { color: #64748b; margin-top: 0.5rem; font-size: 0.9rem; }
+    .badge {
+      display: inline-block;
+      background: #dbeafe;
+      color: #1d4ed8;
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 0.25rem 0.75rem;
+      border-radius: 999px;
+      margin-top: 0.75rem;
+      letter-spacing: 0.02em;
+    }
+    section { margin-bottom: 3rem; }
+    section h2 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #0f172a;
+      margin-bottom: 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 2px solid #2563eb;
+    }
+    .grid-header {
+      display: grid;
+      grid-template-columns: 1fr 2fr;
+      gap: 0;
+      background: #1e293b;
+      color: #f8fafc;
+      border-radius: 8px 8px 0 0;
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .grid-header div { padding: 0.65rem 1rem; }
+    .grid-row {
+      display: grid;
+      grid-template-columns: 1fr 2fr;
+      gap: 0;
+      border-left: 1px solid #e2e8f0;
+      border-right: 1px solid #e2e8f0;
+      border-bottom: 1px solid #e2e8f0;
+    }
+    .grid-row:last-child { border-radius: 0 0 8px 8px; }
+    .grid-row:nth-child(even) { background: #f1f5f9; }
+    .grid-row:nth-child(odd) { background: #ffffff; }
+    .cell { padding: 0.65rem 1rem; font-size: 0.875rem; }
+    .cell-label {
+      color: #475569;
+      font-weight: 600;
+      border-right: 1px solid #e2e8f0;
+      font-size: 0.8rem;
+    }
+    .cell-value { color: #1e293b; }
+    .highlight { color: #2563eb; font-weight: 600; }
+    .tag {
+      display: inline-block;
+      background: #dcfce7;
+      color: #166534;
+      font-size: 0.7rem;
+      font-weight: 600;
+      padding: 0.15rem 0.5rem;
+      border-radius: 4px;
+      margin: 0.1rem 0;
+    }
+    .tag.blue { background: #dbeafe; color: #1d4ed8; }
+    .tag.orange { background: #fff7ed; color: #c2410c; }
+    footer {
+      margin-top: 3rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid #e2e8f0;
+      color: #94a3b8;
+      font-size: 0.8rem;
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+    @media (max-width: 600px) {
+      .grid-header, .grid-row { grid-template-columns: 1fr; }
+      .grid-header div:first-child { border-radius: 8px 8px 0 0; }
+      .cell-label { border-right: none; border-bottom: 1px solid #e2e8f0; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrapper">
+    <header>
+      <h1>Registre des Activités de Traitement</h1>
+      <p>Document de conformité CNIL — Article 30 du Règlement Général sur la Protection des Données (RGPD)</p>
+      <span class="badge">REPUTEXA &mdash; Version 1.0 &mdash; Mars 2026</span>
+      <p style="margin-top: 1rem; font-size: 0.85rem; color: #475569; max-width: 720px;">
+        Export tableur (contrôle CNIL, article 30 RGPD) : <a href="/docs/registre-traitements-art30-reputexa.csv" style="color:#2563eb;font-weight:600">registre-traitements-art30-reputexa.csv</a>
+        — à ouvrir dans Excel ou LibreOffice ; compléter les mentions propres à votre organisation.
+      </p>
+    </header>
+
+    <!-- Traitement 1 -->
+    <section>
+      <h2>Traitement n° 1 &mdash; Gestion des comptes commerçants</h2>
+      <div class="grid-header">
+        <div>Champ</div>
+        <div>Valeur</div>
+      </div>
+      <div class="grid-row">
+        <div class="cell cell-label">Responsable du traitement</div>
+        <div class="cell cell-value"><span class="highlight">REPUTEXA</span> — reputexa.fr — contact@reputexa.fr</div>
+      </div>
+      <div class="grid-row">
+        <div class="cell cell-label">Finalité</div>
+        <div class="cell cell-value">Création et gestion des comptes utilisateurs, authentification, accès au tableau de bord, facturation.</div>
+      </div>
+      <div class="grid-row">
+        <div class="cell cell-label">Données traitées</div>
+        <div class="cell cell-value">Adresse e-mail, nom, prénom, nom d'établissement, numéro de téléphone professionnel, adresse postale, données de facturation (transmises à Stripe).</div>
+      </div>
+      <div class="grid-row">
+        <div class="cell cell-label">Base légale</div>
+        <div class="cell cell-value"><span class="tag">Exécution du contrat</span> Article 6(1)(b) RGPD</div>
+      </div>
+      <div class="grid-row">
+        <div class="cell cell-label">Personnes concernées</div>
+        <div class="cell cell-value">Commerçants abonnés à REPUTEXA (personne physique ou morale représentante).</div>
+      </div>
+      <div class="grid-row">
+        <div class="cell cell-label">Localisation des données</div>
+        <div class="cell cell-value"><span class="tag blue">Union Européenne</span> Supabase (UE) — Vercel (UE) — Stripe (UE/USA, clauses contractuelles types)</div>
+      </div>
+      <div class="grid-row">
+        <div class="cell cell-label">Durée de conservation</div>
+        <div class="cell cell-value">Durée du contrat + 3 ans (obligations comptables et légales). Suppression à la demande dans le délai légal.</div>
+      </div>
+      <div class="grid-row">
+        <div class="cell cell-label">Sous-traitants</div>
+        <div class="cell cell-value">Supabase (BDD), Vercel (hébergement), Stripe (paiements), Resend (e-mails transactionnels).</div>
+      </div>
+      <div class="grid-row">
+        <div class="cell cell-label">Mesures de sécurité</div>
+        <div class="cell cell-value">Chiffrement au repos (AES-256), chiffrement en transit (TLS 1.2+), authentification OAuth2/OTP, accès restreint par rôle.</div>
+      </div>
+    </section>
+
+    <!-- Traitement 2 -->
+    <section>
+      <h2>Traitement n° 2 &mdash; Génération de réponses IA aux avis</h2>
+      <div class="grid-header">
+        <div>Champ</div>
+        <div>Valeur</div>
+      </div>
+      <div class="grid-row">
+        <div class="cell cell-label">Responsable du traitement</div>
+        <div class="cell cell-value"><span class="highlight">REPUTEXA</span></div>
+      </div>
+      <div class="grid-row">
+        <div class="cell cell-label">Finalité</div>
+        <div class="cell cell-value">Analyse du contenu des avis clients Google et génération automatique de suggestions de réponses personnalisées via IA.</div>
+      </div>
+      <div class="grid-row">
+        <div class="cell cell-label">Données traitées</div>
+        <div class="cell cell-value">Texte des avis (contenu public Google), note, pseudo/prénom de l'auteur de l'avis, nom et profil de l'établissement.</div>
+      </div>
+      <div class="grid-row">
+        <div class="cell cell-label">Base légale</div>
+        <div class="cell cell-value"><span class="tag">Intérêt légitime</span> Article 6(1)(f) RGPD — amélioration de la réputation du commerçant, données publiques.</div>
+      </div>
+      <div class="grid-row">
+        <div class="cell cell-label">Personnes concernées</div>
+        <div class="cell cell-value">Clients finaux des commerçants ayant publié un avis public sur Google.</div>
+      </div>
+      <div class="grid-row">
+        <div class="cell cell-label">Localisation des données</div>
+        <div class="cell cell-value"><span class="tag blue">Union Européenne</span> Supabase (UE). Modèles IA : OpenAI (USA, clauses contractuelles types) / Anthropic (USA, CCT). Les données ne sont pas utilisées pour l'entraînement des modèles.</div>
+      </div>
+      <div class="grid-row">
+        <div class="cell cell-label">Durée de conservation</div>
+        <div class="cell cell-value">Durée de l'abonnement du commerçant. Les suggestions générées sont stockées jusqu'à suppression du compte.</div>
+      </div>
+      <div class="grid-row">
+        <div class="cell cell-label">Sous-traitants</div>
+        <div class="cell cell-value">OpenAI Inc. / Anthropic PBC (traitement IA, sous DPA avec opt-out entraînement), Google LLC (API Google Business Profile).</div>
+      </div>
+      <div class="grid-row">
+        <div class="cell cell-label">Mesures de sécurité</div>
+        <div class="cell cell-value">Transmission chiffrée via API HTTPS. Clés API stockées en variables d'environnement serveur. Aucun accès humain aux données d'avis individuels.</div>
+      </div>
+    </section>
+
+    <!-- Traitement 3 — ZENITH -->
+    <section>
+      <h2>Traitement n° 3 &mdash; Sollicitation automatisée d'avis clients (Plan Zenith — IA de Capture)</h2>
+      <div class="grid-header">
+        <div>Champ</div>
+        <div>Valeur</div>
+      </div>
+      <div class="grid-row">
+        <div class="cell cell-label">Responsable du traitement</div>
+        <div class="cell cell-value"><span class="highlight">Le Commerçant</span> (abonné Plan Zenith). REPUTEXA agit en qualité de <strong>sous-traitant</strong> au sens de l'Article 28 RGPD.</div>
+      </div>
+      <div class="grid-row">
+        <div class="cell cell-label">Finalité</div>
+        <div class="cell cell-value">Sollicitation automatisée d'avis clients par message WhatsApp dans les 30 minutes suivant une transaction enregistrée via Webhook ou API Zapier.</div>
+      </div>
+      <div class="grid-row">
+        <div class="cell cell-label">Données traitées</div>
+        <div class="cell cell-value"><strong>Prénom</strong> et <strong>Numéro de téléphone mobile</strong> des clients finaux du commerçant, transmis par Webhook/Zapier.</div>
+      </div>
+      <div class="grid-row">
+        <div class="cell cell-label">Base légale</div>
+        <div class="cell cell-value">
+          <span class="tag">Intérêt légitime</span> Suivi de transaction commerciale — Article 6(1)(f) RGPD.<br />
+          <span class="tag blue">Consentement</span> Opt-out garanti via le mot-clé « STOP » — Article 6(1)(a) RGPD.
+        </div>
+      </div>
+      <div class="grid-row">
+        <div class="cell cell-label">Personnes concernées</div>
+        <div class="cell cell-value">Clients finaux des commerçants abonnés au Plan Zenith ayant effectué une transaction.</div>
+      </div>
+      <div class="grid-row">
+        <div class="cell cell-label">Localisation des données</div>
+        <div class="cell cell-value"><span class="tag blue">Union Européenne</span> Base de données Supabase hébergée en UE. Les numéros de téléphone ne quittent pas l'UE.</div>
+      </div>
+      <div class="grid-row">
+        <div class="cell cell-label">Durée de conservation</div>
+        <div class="cell cell-value"><span class="tag orange">120 jours maximum</span> pour les données identifiantes en file : anonymisation ou suppression dans les systèmes REPUTEXA au plus tard à cette échéance. Intervalle minimal entre deux campagnes de sollicitation pour le même numéro : 120 jours depuis le début de la précédente ; passé ce délai, une nouvelle sollicitation est possible hors liste d'opposition. Suppression immédiate sur réception du mot-clé « STOP ».</div>
+      </div>
+      <div class="grid-row">
+        <div class="cell cell-label">Droit d'opposition</div>
+        <div class="cell cell-value">Réponse « <strong>STOP</strong> » à tout message WhatsApp reçu → inscription immédiate et automatique sur liste noire (blacklist), cessation définitive des envois.</div>
+      </div>
+      <div class="grid-row">
+        <div class="cell cell-label">Sous-traitants</div>
+        <div class="cell cell-value">Meta Platforms Ireland Ltd. (WhatsApp Business API) — contrat DPA conforme RGPD. Supabase (stockage temporaire UE).</div>
+      </div>
+      <div class="grid-row">
+        <div class="cell cell-label">Mesures de sécurité</div>
+        <div class="cell cell-value">Chiffrement AES-256 au repos, TLS en transit. Processus 100% automatisé : <strong>aucun humain n'a accès aux données des clients finaux</strong>. Journalisation des envois et des opt-outs.</div>
+      </div>
+      <div class="grid-row">
+        <div class="cell cell-label">Obligation du commerçant</div>
+        <div class="cell cell-value">Le commerçant est tenu d'informer ses clients au moment de la transaction de la collecte de leur numéro de téléphone, de l'objet (sollicitation d'avis par WhatsApp via REPUTEXA) et de leur droit d'opposition (STOP). REPUTEXA est exonéré de toute responsabilité en cas de manquement du commerçant à cette obligation d'information.</div>
+      </div>
+    </section>
+
+    <footer>
+      <span>REPUTEXA &mdash; Registre RGPD v1.0 &mdash; Mars 2026</span>
+      <span>Contact DPO : <a href="mailto:contact@reputexa.fr" style="color:#2563eb">contact@reputexa.fr</a></span>
+    </footer>
+  </div>
+</body>
+</html>

@@ -1,0 +1,41 @@
+{
+  "ReportIssuePage": {
+    "title": "Report an issue",
+    "subtitle": "Help us improve REPUTEXA — every report is reviewed by our engineering team within 4 business hours.",
+    "slaBanner": "Response target: 4 business hours for critical · 24h for other priorities.",
+    "bugTypeLabel": "Issue type",
+    "priorityLabel": "Priority level",
+    "issueTitleLabel": "Short title",
+    "issueTitlePlaceholder": "E.g. Google reviews for location X stopped syncing",
+    "descriptionLabel": "Detailed description",
+    "descriptionPlaceholder": "What happened vs. what you expected…",
+    "stepsLabel": "Steps to reproduce",
+    "stepsPlaceholder": "1. Open dashboard\n2. Go to Reviews\n3. See error…",
+    "emailLabel": "Your email",
+    "emailPlaceholder": "you@example.com",
+    "submit": "Send report",
+    "submitting": "Sending…",
+    "footerNote": "Each report is acknowledged. SLA: 4 business hours for critical incidents.",
+    "toastSelect": "Choose an issue type and a priority.",
+    "toastError": "Something went wrong. Try again.",
+    "toastNetwork": "Network error. Check your connection.",
+    "successTitle": "Report sent",
+    "successSubtitle": "Thank you — our team has been notified.",
+    "successHeading": "We received it!",
+    "successLine": "We’ll reach you at {email} within 4 business hours with an update.",
+    "successFoot": "For production-critical incidents, support prioritizes your ticket.",
+    "bugTypes": [
+      { "id": "ai-error", "label": "AI analysis error", "desc": "Incorrect or off-context reply" },
+      { "id": "sync-issue", "label": "Sync problem", "desc": "Missing or delayed reviews" },
+      { "id": "ui-bug", "label": "UI bug", "desc": "Layout, navigation, forms" },
+      { "id": "billing-issue", "label": "Billing", "desc": "Payment, invoice, subscription" },
+      { "id": "other", "label": "Other", "desc": "Anything else" }
+    ],
+    "priorities": [
+      { "id": "low", "label": "Low", "desc": "No daily impact" },
+      { "id": "medium", "label": "Medium", "desc": "Partial annoyance, workaround exists" },
+      { "id": "high", "label": "High", "desc": "Blocks an important workflow" },
+      { "id": "critical", "label": "Critical", "desc": "Data loss or full outage" }
+    ]
+  }
+}

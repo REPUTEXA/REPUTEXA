@@ -1,0 +1,41 @@
+{
+  "ReportIssuePage": {
+    "title": "Signaler un problème",
+    "subtitle": "Aidez-nous à améliorer REPUTEXA — chaque rapport est analysé par notre équipe technique sous 4 heures ouvrées.",
+    "slaBanner": "Temps de réponse garanti : 4h ouvrées pour les priorités critiques · 24h pour les autres niveaux.",
+    "bugTypeLabel": "Type de problème",
+    "priorityLabel": "Niveau de priorité",
+    "issueTitleLabel": "Titre du problème",
+    "issueTitlePlaceholder": "Ex. : Les avis Google de l'établissement X ne se synchronisent plus",
+    "descriptionLabel": "Description détaillée",
+    "descriptionPlaceholder": "Décrivez le comportement observé et le comportement attendu…",
+    "stepsLabel": "Étapes pour reproduire le problème",
+    "stepsPlaceholder": "1. Aller sur le tableau de bord\n2. Cliquer sur Avis\n3. Observer l'erreur…",
+    "emailLabel": "Votre adresse email",
+    "emailPlaceholder": "vous@exemple.com",
+    "submit": "Envoyer le rapport",
+    "submitting": "Envoi en cours…",
+    "footerNote": "Notre équipe support traite chaque rapport avec accusé de réception. Délai SLA : 4h ouvrées pour les incidents critiques.",
+    "toastSelect": "Sélectionnez un type de problème et un niveau de priorité.",
+    "toastError": "Une erreur est survenue. Réessayez.",
+    "toastNetwork": "Erreur réseau. Vérifiez votre connexion et réessayez.",
+    "successTitle": "Rapport envoyé",
+    "successSubtitle": "Merci pour votre signalement — notre équipe technique en prend note.",
+    "successHeading": "Rapport reçu !",
+    "successLine": "Nous vous contacterons à {email} dans les 4 heures ouvrées pour vous tenir informé de l'avancement.",
+    "successFoot": "Pour les incidents critiques en production, notre équipe support surveille votre dossier en priorité.",
+    "bugTypes": [
+      { "id": "ai-error", "label": "Erreur d'analyse IA", "desc": "Réponse incorrecte ou hors-contexte" },
+      { "id": "sync-issue", "label": "Problème de synchronisation", "desc": "Avis manquants ou en retard" },
+      { "id": "ui-bug", "label": "Bug d'interface", "desc": "Affichage, navigation, formulaire" },
+      { "id": "billing-issue", "label": "Problème de facturation", "desc": "Paiement, facture, abonnement" },
+      { "id": "other", "label": "Autre", "desc": "Tout autre type de problème" }
+    ],
+    "priorities": [
+      { "id": "low", "label": "Faible", "desc": "N'impacte pas mon activité quotidienne" },
+      { "id": "medium", "label": "Moyen", "desc": "Gêne partielle, un contournement existe" },
+      { "id": "high", "label": "Élevé", "desc": "Bloque une fonctionnalité importante" },
+      { "id": "critical", "label": "Critique", "desc": "Perte de données ou interruption totale" }
+    ]
+  }
+}

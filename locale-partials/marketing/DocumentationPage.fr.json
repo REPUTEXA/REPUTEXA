@@ -1,0 +1,131 @@
+{
+  "DocumentationPage": {
+    "title": "Documentation REPUTEXA",
+    "subtitle": "Guide de démarrage et d'intégration — basé sur le fonctionnement réel de la plateforme.",
+    "onboardingTitle": "Démarrage en 5 étapes",
+    "onboardingBadge": "≈ 10 minutes",
+    "onboardingSteps": [
+      {
+        "number": "01",
+        "iconKey": "UserPlus",
+        "title": "Créer votre compte",
+        "description": "Renseignez les informations de votre établissement : nom, type, adresse, numéro WhatsApp et email. Un code de vérification est envoyé immédiatement à votre adresse email.",
+        "detail": "La validation Cloudflare Turnstile protège l'inscription contre les bots. Le numéro de téléphone doit être au format international (ex : +33612345678)."
+      },
+      {
+        "number": "02",
+        "iconKey": "Mail",
+        "title": "Vérifier votre email",
+        "description": "Ouvrez l'email reçu et saisissez le code à 6 chiffres sur la page de vérification. Ce code est valable 15 minutes.",
+        "detail": "Si vous ne recevez pas l'email, vérifiez vos spams. Vous pouvez demander un nouveau code depuis la page /verify."
+      },
+      {
+        "number": "03",
+        "iconKey": "Globe",
+        "title": "Connecter Google Business Profile",
+        "description": "Dans votre tableau de bord → Paramètres → Plateformes, cliquez sur \"Connecter Google\". Une fenêtre OAuth Google s'ouvre — autorisez l'accès à la gestion de vos fiches. Vos avis sont synchronisés automatiquement.",
+        "detail": "REPUTEXA demande uniquement l'autorisation business.manage. Aucun accès à votre compte Google personnel n'est requis."
+      },
+      {
+        "number": "04",
+        "iconKey": "Settings",
+        "title": "Configurer votre ADN IA",
+        "description": "Dans Paramètres → ADN IA, définissez le ton (professionnel, chaleureux, luxueux, décontracté), la longueur des réponses et vos instructions spécifiques. L'IA génère une simulation en temps réel.",
+        "detail": "Sur le plan ZENITH, le système Triple Juge génère 3 variantes (empathie, storytelling, expertise) et sélectionne automatiquement la meilleure."
+      },
+      {
+        "number": "05",
+        "iconKey": "Smartphone",
+        "title": "Activer les alertes WhatsApp",
+        "description": "Dans Paramètres → Notifications, renseignez votre numéro WhatsApp et définissez le seuil d'alerte (ex : avis ≤ 3 étoiles). Vous recevrez chaque mauvais avis directement sur WhatsApp avec la réponse IA suggérée.",
+        "detail": "Disponible sur PULSE et ZENITH. Les alertes sont envoyées via Twilio avec des boutons interactifs pour approuver ou modifier la réponse directement depuis WhatsApp."
+      }
+    ],
+    "flowTitle": "Flux de traitement automatique",
+    "flowIntro": "Dès qu'un avis négatif est détecté, REPUTEXA déclenche automatiquement ce pipeline — aucune action de votre part n'est requise.",
+    "whatsappFlow": [
+      {
+        "step": "Avis négatif reçu",
+        "detail": "Un client laisse un avis ≤ 3 étoiles sur Google, Facebook ou Trustpilot."
+      },
+      {
+        "step": "Analyse Shield Center",
+        "detail": "L'IA analyse la toxicité (haine, spam, conflit d'intérêt, doxxing) et génère un score d'authenticité."
+      },
+      {
+        "step": "Génération IA (Claude 3.5 Sonnet)",
+        "detail": "Une réponse contextualisée est générée automatiquement, respectant votre ADN IA configuré."
+      },
+      {
+        "step": "Alerte WhatsApp",
+        "detail": "Vous recevez le résumé de l'avis + la réponse suggérée avec 2 boutons : Approuver ou Modifier."
+      },
+      {
+        "step": "Publication avec délai humain",
+        "detail": "Si approuvée, la réponse est publiée avec un délai simulé (2–7h) pour un rendu naturel. Le Shield Center génère un rapport de contestation si l'avis est frauduleux."
+      }
+    ],
+    "platformsTitle": "Plateformes connectées",
+    "tablePlatform": "Plateforme",
+    "tableProtocol": "Protocole",
+    "tableAvailability": "Disponibilité",
+    "platforms": [
+      {
+        "name": "Google Business Profile",
+        "status": "OAuth 2.0 (business.manage)",
+        "available": "Tous les plans"
+      },
+      {
+        "name": "Facebook",
+        "status": "Synchronisation webhook",
+        "available": "Tous les plans"
+      },
+      {
+        "name": "Trustpilot",
+        "status": "Synchronisation webhook",
+        "available": "Tous les plans"
+      }
+    ],
+    "platformsFootnote": "La connexion Google utilise uniquement l'autorisation <code>business.manage</code> — aucun accès à votre compte Google personnel.",
+    "posTitle": "Intégration POS & Zapier",
+    "posBadge": "Exclusif ZENITH",
+    "posIntro": "REPUTEXA génère une clé d'API d'entrée (<rtx>rtx_live_…</rtx>) visible dans vos Paramètres. Elle permet à vos systèmes externes (logiciel de caisse, Zapier, Make) d'envoyer des données de visite à REPUTEXA, qui déclenche automatiquement le module AI Capture — un message WhatsApp envoyé au client 30 minutes après sa visite pour l'inviter à laisser un avis.",
+    "posCodeLabel": "Webhook entrant — données de visite POS",
+    "posSnippet": "POST https://reputexa.fr/api/webhooks/{votre_cle_rtx_live}\n\nContent-Type: application/json\n\n{\n  \"customerName\": \"Marie Dupont\",\n  \"phone\": \"+33612345678\",\n  \"visitDate\": \"2026-03-22T14:30:00Z\",\n  \"establishmentId\": \"votre_etablissement_id\"\n}\n\n// REPUTEXA programme automatiquement un message WhatsApp\n// 30 minutes après la visite pour inviter au dépôt d'avis.\n// Fonctionnalité exclusive ZENITH (AI Capture).",
+    "posNote": "Cette clé est pour les <strong>webhooks entrants</strong> (données vers REPUTEXA). Elle n'est pas utilisée pour lire vos avis ou vos statistiques via une API externe.",
+    "keysTitle": "Où trouver vos clés d'intégration",
+    "keyCards": [
+      {
+        "label": "Clé API entrante (POS/Zapier)",
+        "path": "Paramètres → Intégrations → Clé API",
+        "plan": "ZENITH",
+        "planColor": "text-violet-400"
+      },
+      {
+        "label": "Numéro WhatsApp pour alertes",
+        "path": "Paramètres → Notifications → WhatsApp",
+        "plan": "PULSE+",
+        "planColor": "text-blue-400"
+      },
+      {
+        "label": "Connexion Google Business",
+        "path": "Paramètres → Plateformes → Google",
+        "plan": "Tous",
+        "planColor": "text-emerald-400"
+      }
+    ],
+    "practicesTitle": "Bonnes pratiques",
+    "practiceTips": [
+      "Configurez votre ADN IA (ton + instructions) avant de recevoir vos premiers avis pour que les suggestions soient immédiatement calibrées.",
+      "Activez les alertes WhatsApp sur votre numéro personnel ou professionnel — c'est le canal le plus rapide pour traiter un avis en urgence.",
+      "Pour le webhook POS, envoyez les données de visite dans les 10 minutes après le départ du client, pas plus tard — le délai 30min de l'AI Capture est calculé depuis la réception du webhook.",
+      "Ne partagez jamais votre clé rtx_live_ publiquement. Elle est liée à votre compte et régit la facturation de vos activations AI Capture.",
+      "Le Shield Center analyse automatiquement chaque avis reçu — aucune configuration nécessaire. Consultez le tableau de bord Alertes pour les cas critiques.",
+      "En cas de réponse IA incorrecte via WhatsApp, utilisez le bouton \"Modifier\" — votre correction est mémorisée pour améliorer les prochaines suggestions."
+    ],
+    "ctaTitle": "Prêt à démarrer ?",
+    "ctaSubtitle": "Accès complet ZENITH pendant 14 jours, sans carte bancaire. Votre premier avis IA est généré en moins de 60 secondes après connexion de Google.",
+    "ctaPrimary": "Créer mon compte gratuitement",
+    "ctaSecondary": "Centre d'aide"
+  }
+}

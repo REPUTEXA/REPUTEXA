@@ -1,0 +1,17 @@
+{
+  "GuideDetailPage": {
+    "notFoundTitle": "Guía no encontrada",
+    "notFoundBody": "Esta guía no existe o se ha movido.",
+    "backToGuides": "Volver a las guías",
+    "guides": {
+      "demarrage-rapide": { "title": "Inicio rápido con REPUTEXA", "content": "Crea la cuenta, conecta Google Business Profile y obtén las primeras respuestas sugeridas por IA. Verifica el email, autoriza OAuth y ajusta el tono en ajustes." },
+      "optimiser-notation": { "title": "Mejorar la nota en Google", "content": "Responde a todas las reseñas, pide opiniones en el momento adecuado y trata las negativas con profesionalidad. REPUTEXA alerta y redacta borradores; tú publicas." },
+      "reponses-ia-personnalisees": { "title": "Personalizar respuestas IA a tu marca", "content": "Configura sector, tono y palabras a evitar. Cada borrador sigue tu brief y refleja el vocabulario de la reseña. Siempre puedes editar antes de publicar." },
+      "conformite-rgpd": { "title": "RGPD y reseñas públicas", "content": "Las reseñas son datos personales. El tratamiento se describe en la política de privacidad. El establecimiento es responsable de informar y basar legalmente sus campañas." },
+      "shield-center-mode-emploi": { "title": "Shield Center: alertas y revisiones dudosas", "content": "Evalúa toxicidad y autenticidad, ajusta umbrales y usa los informes cuando proceda. WhatsApp (Pulse+) acelera la respuesta a reseñas críticas." },
+      "multiplateforme-google-facebook-trustpilot": { "title": "Google, Facebook y Trustpilot unificados", "content": "Un solo flujo para centralizar opiniones y mantener un estándar de respuesta coherente en todas las plataformas conectadas." },
+      "rapports-pdf-analyses": { "title": "Interpretar el PDF mensual", "content": "Compara volumen y sentimiento mes a mes, detecta temas recurrentes y vincúlalos con cambios operativos. Pulse/Zenith añaden capas de análisis y resúmenes." },
+      "api-integration-avancee": { "title": "Integración webhook avanzada (ZENITH)", "content": "El webhook rtx_live_ recibe visitas desde POS o Zapier y programa el WhatsApp posvisita. Usa E.164, respeta horarios y nunca expongas claves en el cliente." }
+    }
+  }
+}

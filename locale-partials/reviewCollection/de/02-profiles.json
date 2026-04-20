@@ -1,0 +1,40 @@
+{
+  "profiles": {
+    "restaurant": {
+      "label": "Restaurant & Gastronomie",
+      "example": "~45 Min. nach dem Essen senden"
+    },
+    "bakery": {
+      "label": "Bäckerei / Konditorei",
+      "example": "~2 Std. nach dem Kauf senden"
+    },
+    "beauty": {
+      "label": "Schönheit & Pflege",
+      "example": "~3 Std. nach dem Termin senden"
+    },
+    "garage": {
+      "label": "Autowerkstatt",
+      "example": "~24 Std. nach Fahrzeugübergabe senden"
+    },
+    "hotel": {
+      "label": "Hotellerie",
+      "example": "~2 Std. nach dem Check-out senden"
+    },
+    "artisan": {
+      "label": "Handwerk / Auftragnehmer",
+      "example": "~4 Std. nach Arbeitsende senden"
+    },
+    "fast_service": {
+      "label": "Schnelldienst / To-go",
+      "example": "~20 Min. nach dem Kauf senden"
+    },
+    "custom": {
+      "label": "Individuell (freie Verzögerung)",
+      "example": "Sie legen die genaue Verzögerung in Minuten fest"
+    },
+    "ecommerce": {
+      "label": "Onlineshop *",
+      "example": "Nach Zustellung (Scan des Versanddienstes)"
+    }
+  }
+}

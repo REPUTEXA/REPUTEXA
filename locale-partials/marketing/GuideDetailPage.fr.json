@@ -1,0 +1,41 @@
+{
+  "GuideDetailPage": {
+    "notFoundTitle": "Guide non trouvé",
+    "notFoundBody": "Ce guide n'existe pas ou a été déplacé.",
+    "backToGuides": "Retour aux guides",
+    "guides": {
+      "demarrage-rapide": {
+        "title": "Démarrage rapide : REPUTEXA en 5 minutes",
+        "content": "Créez votre compte, connectez votre fiche Google Business Profile et recevez vos premières suggestions de réponses IA. Tout ce qu'il faut pour être opérationnel immédiatement : vérifiez l'email, autorisez OAuth, puis affinez le ton dans vos paramètres."
+      },
+      "optimiser-notation": {
+        "title": "Optimiser sa notation Google : guide stratégique complet",
+        "content": "De la gestion des avis négatifs à la demande d'avis aux clients satisfaits, chaque interaction influence votre note. REPUTEXA vous alerte et propose des brouillons ; vous gardez le contrôle éditorial pour monter durablement votre moyenne."
+      },
+      "reponses-ia-personnalisees": {
+        "title": "Personnaliser les réponses IA selon votre identité de marque",
+        "content": "Définissez secteur, ton, interdits et expressions signature dans votre brief. L'IA les applique à chaque brouillon tout en reflétant le vocabulaire de l'avis. Chaque message reste modifiable avant publication."
+      },
+      "conformite-rgpd": {
+        "title": "Conformité RGPD et gestion des avis clients",
+        "content": "Les avis sont des données personnelles. REPUTEXA documente les traitements dans la politique de confidentialité ; vos clients finaux conservent leurs droits. Vous restez responsable des bases légales de vos campagnes et de l'information des personnes."
+      },
+      "shield-center-mode-emploi": {
+        "title": "Shield Center : alertes et faux avis",
+        "content": "Analysez la toxicité et l'authenticité, ajustez les seuils d'alerte et utilisez les dossiers de contestation générés lorsque c'est pertinent. Les alertes WhatsApp (Pulse+) vous font réagir vite sur les avis sensibles."
+      },
+      "multiplateforme-google-facebook-trustpilot": {
+        "title": "Google, Facebook et Trustpilot dans un seul flux",
+        "content": "Centralisez vos avis et appliquez la même exigence de réponse. Gardez une vision transverse même si chaque réseau a ses règles ; REPUTEXA synchronise et priorise ce qui compte pour votre réputation."
+      },
+      "rapports-pdf-analyses": {
+        "title": "Analyser vos rapports PDF mensuels comme un expert",
+        "content": "Lisez les tendances de volume et de sentiment, identifiez les thèmes récurrents et reliez-les à vos actions terrain. Les plans supérieurs enrichissent le commentaire et ajoutent des récapitulatifs hebdomadaires sur WhatsApp."
+      },
+      "api-integration-avancee": {
+        "title": "Intégration API avancée : CRM, Zapier, caisse",
+        "content": "Le webhook entrant rtx_live_ (ZENITH) reçoit les données de visite et déclenche l'invitation WhatsApp différée. Respectez le format E.164, les fenêtres horaires et la politique anti-sollicitation ; gardez vos clés uniquement côté serveur."
+      }
+    }
+  }
+}

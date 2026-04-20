@@ -1,0 +1,12 @@
+{
+  "confidentialite": {
+    "client_finaux_erasure_notice": "Si vous avez été sollicité par WhatsApp dans le cadre du service REPUTEXA pour le compte d’un commerce et souhaitez demander l’effacement de vos données sans passer par WhatsApp (STOP), vous pouvez utiliser le formulaire dédié (même numéro que celui utilisé chez le commerçant) :",
+    "client_finaux_erasure_cta": "Effacement des données — clients finaux"
+  },
+  "consentWhatsAppEcommerce": "J'accepte de recevoir une invitation unique par WhatsApp de la part de {establishment} via notre partenaire technique REPUTEXA pour partager mon avis après réception de ma commande. Je peux retirer mon consentement à tout moment (article 7 du RGPD).",
+  "consentWhatsAppPhysical": "J'accepte de recevoir un unique message WhatsApp émanant de {establishment}, via REPUTEXA, afin de me solliciter pour un retour d'expérience après ma visite. Je peux répondre STOP à tout moment sans frais.",
+  "authorityReference": "Autorité de contrôle : Commission nationale de l'informatique et des libertés (CNIL) — www.cnil.fr",
+  "legalBasisSummary": "Fondement : consentement explicite (article 6(1)(a) du RGPD) pour l'envoi du message ; informations complémentaires dans notre politique de confidentialité. Vous disposez des droits d'accès, de rectification, d'effacement, de limitation, d'opposition et du droit d'introduire une réclamation auprès de la CNIL.",
+  "dpaRoleClarification": "L'établissement agit en qualité de responsable de traitement pour la relation client ; REPUTEXA agit en tant que sous-traitant agissant sur instruction documentée, conformément à l'article 28 du RGPD.",
+  "posterLegalFrame": "Texte d'information : RGPD (UE 2016/679) et loi « Informatique et Libertés ». Autorité : CNIL (www.cnil.fr)."
+}

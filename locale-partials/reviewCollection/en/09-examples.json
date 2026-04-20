@@ -1,0 +1,11 @@
+{
+  "webhookPhysicalSampleLastPurchase": "Keratin treatment",
+  "webhookEcommerceSampleLastPurchase": "Order #4521",
+  "legacyZenithTokenHint": "'<legacy-token>'",
+  "legacyZenithEndpoint": "POST {siteUrl}/api/webhooks/zenith\nx-reputexa-token: {tokenHint}\nContent-Type: application/json",
+  "webhookExampleFirstName": "Sophie",
+  "webhookExamplePhone": "+447911123456",
+  "webhookEcommerceExampleStatus": "Delivered",
+  "webhookEcommerceExampleTracking": "GB123456789GB",
+  "webhookEcommerceExampleSource": "Shopify / Stripe"
+}

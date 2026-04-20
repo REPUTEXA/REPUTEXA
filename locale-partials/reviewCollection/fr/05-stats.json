@@ -1,0 +1,21 @@
+{
+  "section3Title": "Santé du Workflow",
+  "webhookActive": "Webhook actif",
+  "noKeyGenerated": "Aucune clé générée",
+  "queueTitle": "File d'attente",
+  "pendingSuffix": "en attente",
+  "reviewsPublished": "Avis publiés",
+  "polishedPublishedSub": "textes sublimés et publiés",
+  "dashboardTitle": "Tableau de Bord Zenith",
+  "statTotalFlow": "Flux Total",
+  "statTotalFlowSub": "Clients importés via Webhook",
+  "statYes": "Réponses (OUI)",
+  "statYesSubWaiting": "En attente de réponses",
+  "statYesSubEngagement": "{pct}% d'engagement",
+  "statNo": "Désinscriptions (NON)",
+  "statNoSubNone": "Aucune désinscription",
+  "statNoSubShare": "{pct}% du flux total",
+  "statGeneratedTitle": "Avis Générés",
+  "statGeneratedSub": "Texte sublimé & publié par le client",
+  "statTransform": "{pct}% de transformation"
+}

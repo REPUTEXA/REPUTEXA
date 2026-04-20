@@ -1,0 +1,28 @@
+{
+  "confidentialite": {
+    "client_finaux_erasure_notice": "Wenn Sie über WhatsApp im Rahmen von REPUTEXA im Auftrag eines Unternehmens kontaktiert wurden und die Löschung Ihrer Daten ohne WhatsApp (STOP) beantragen möchten, nutzen Sie das Formular (gleiche Rufnummer wie beim Händler):",
+    "client_finaux_erasure_cta": "Datenlöschung — Endkundinnen und Endkunden"
+  },
+  "consentWhatsAppEcommerce": "Ich willige ein, eine einmalige WhatsApp-Einladung von {establishment} über den technischen Partner REPUTEXA zu erhalten, um nach Erhalt meiner Bestellung Feedback zu geben. Ich kann diese Einwilligung jederzeit mit Wirkung für die Zukunft widerrufen (Art. 7 DSGVO).",
+  "consentWhatsAppPhysical": "Ich willige ein, eine einzelne WhatsApp-Nachricht von {establishment} über REPUTEXA zu erhalten, um nach meinem Besuch kurz nachzufragen, wie der Service war. Ich kann jederzeit STOP antworten, ohne dass hierfür Kosten entstehen.",
+  "authorityReference": "Zuständige Aufsichtsbehörde: die für den Verantwortlichen zuständige Landesdatenschutzbehörde (Übersicht: www.bfdi.bund.de).",
+  "legalBasisSummary": "Rechtsgrundlage: Einwilligung gemäß Art. 6 Abs. 1 lit. a DSGVO für den Versand; weitere Informationen in der Datenschutzerklärung. Betroffenenrechte nach Art. 15–22 DSGVO sowie Beschwerderecht bei der Aufsichtsbehörde.",
+  "dpaRoleClarification": "Das Unternehmen ist für die Kundenbeziehung Verantwortlicher; REPUTEXA verarbeitet personenbezogene Daten als Auftragsverarbeiter gemäß Art. 28 DSGVO auf dokumentierte Weisung.",
+  "posterLegalFrame": "DSGVO und BDSG. Zuständige Landesdatenschutzaufsicht (www.bfdi.bund.de). Pflichtangaben siehe Impressum.",
+  "impressum": {
+    "pageTitle": "Impressum",
+    "intro": "Pflichtangaben gemäß § 5 Digitale-Dienste-Gesetz (DDG) in Verbindung mit § 18 Abs. 2 MStV und den einschlägigen Vorschriften des Telemediengesetzes (TMG), soweit anwendbar.",
+    "providerHeading": "Diensteanbieter",
+    "contactHeading": "Kontakt",
+    "registerHeading": "Handelsregister / Registerangaben",
+    "vatHeading": "Umsatzsteuer-Identifikationsnummer",
+    "representationHeading": "Vertretungsberechtigte Person / Geschäftsführung",
+    "supervisoryHeading": "Datenschutz",
+    "hostingHeading": "Hosting",
+    "disputeHeading": "EU-Streitschlichtung und Verbraucherstreitbeilegung",
+    "disputeBody": "Die Europäische Kommission stellt eine Plattform zur Online-Streitbeilegung (OS) bereit: https://ec.europa.eu/consumers/odr/. Wir sind zur Teilnahme an einem Streitbeilegungsverfahren vor einer Verbraucherschlichtungsstelle weder verpflichtet noch bereit, soweit nicht gesetzlich anders vorgeschrieben.",
+    "liabilityNote": "Haftungsausschluss: Trotz sorgfältiger inhaltlicher Kontrolle übernehmen wir keine Haftung für die Inhalte externer Links. Für den Inhalt der verlinkten Seiten sind ausschließlich deren Betreiber verantwortlich.",
+    "placeholderHint": "Die folgenden Einzelangaben sind aus rechtlichen Gründen vollständig über die Server-Umgebungsvariablen (LEGAL_PUBLISHER_*, LEGAL_HOSTING_LINE, etc.) zu pflegen, bis sie hier automatisch erscheinen.",
+    "placeholderShort": "Angabe gemäß TMG/DDG erforderlich — bitte LEGAL_PUBLISHER_* in der Serverkonfiguration setzen"
+  }
+}

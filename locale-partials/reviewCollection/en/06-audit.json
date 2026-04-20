@@ -1,0 +1,15 @@
+{
+  "auditTitle": "Log — where did the outreach come from?",
+  "auditIntro": "Each line shows the entry path (API-key webhook or Zenith), receipt date, known context and status. Phone partially masked here; full detail (e.g. IP) in the GDPR export (Settings → Download my data).",
+  "auditLoading": "Loading log…",
+  "auditColReceived": "Received",
+  "auditColOrigin": "Origin",
+  "auditColClient": "Customer",
+  "auditColScheduled": "Scheduled / sent",
+  "auditColStatus": "Status",
+  "auditEmpty": "No entries in this period.",
+  "auditRetention": "Queue identifiers are anonymised or erased within 120 days (aggregated stats may be kept). A new WhatsApp outreach for the same number is not sent until 120 days after the previous campaign started; after that, a new send is possible unless the user opted out (STOP).",
+  "scheduledLine": "Sched. {datetime}",
+  "sentLine": "Sent {datetime}",
+  "auditQueueRef": "queue #{id}…"
+}

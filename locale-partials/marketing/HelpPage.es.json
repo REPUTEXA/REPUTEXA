@@ -1,0 +1,146 @@
+{
+  "HelpPage": {
+    "title": "Centro de ayuda",
+    "subtitle": "Respuestas sobre REPUTEXA: IA, Shield Center, integraciones y facturación.",
+    "searchPlaceholder": "Buscar una pregunta…",
+    "questionsCount": "{count} preguntas",
+    "contactChatTitle": "Chat y soporte",
+    "contactChatMeta": "Respuesta en menos de 2 h",
+    "contactChatBody": "Nuestro equipo está disponible de lunes a viernes, 9:00–18:00 (CET).",
+    "contactChatCta": "Abrir un ticket",
+    "contactEmailTitle": "Soporte por email",
+    "contactEmailMeta": "Tiempo medio: 4 h laborables",
+    "contactEmailBody": "Para consultas técnicas o soporte, escríbenos directamente.",
+    "contactEmailCta": "Abrir el formulario de contacto",
+    "categories": [
+      {
+        "id": "ai",
+        "iconKey": "Bot",
+        "label": "Inteligencia artificial",
+        "color": "text-violet-400",
+        "faqs": [
+          {
+            "question": "¿Cómo genera la IA las respuestas a las reseñas?",
+            "answer": "REPUTEXA usa Claude 3.5 Sonnet de Anthropic como motor principal. Si no está disponible, GPT-4o-mini de OpenAI asume automáticamente (doble motor con conmutación transparente). Cada respuesta sigue reglas estrictas: “efecto espejo” (reutilizar palabras clave de la reseña), cero alucinaciones, tono definido en tu ADN de IA."
+          },
+          {
+            "question": "¿Puede la IA adaptar el tono a mi marca?",
+            "answer": "Sí. En los ajustes del establecimiento puedes definir un brief: sector, tono (formal, cercano, premium…), frases a evitar y palabras clave. La IA aplica estas instrucciones en cada sugerencia."
+          },
+          {
+            "question": "¿Se envían las respuestas automáticamente?",
+            "answer": "En parte. Las reseñas positivas reciben respuesta automática con un retraso simulado de 2–9 h. Para las negativas: en VISION validas desde el panel; en PULSE y ZENITH recibes alerta en WhatsApp con una sugerencia editable. Tras publicar, la respuesta entra en cola 2–7 h antes de publicarse."
+          },
+          {
+            "question": "¿La IA gestiona reseñas en otros idiomas?",
+            "answer": "En VISION responde en el idioma principal del establecimiento. En PULSE y ZENITH detecta el idioma de cada reseña y genera la respuesta en el mismo idioma (francés, inglés, español, alemán, italiano, etc.)."
+          },
+          {
+            "question": "¿Qué precisión tiene el análisis de toxicidad?",
+            "answer": "Nuestro modelo alcanza 97,4 % de precisión en nuestro benchmark interno (10 000 reseñas etiquetadas). Shield Center separa reseñas negativas legítimas de contenido abusivo, difamatorio o sintético."
+          }
+        ]
+      },
+      {
+        "id": "shield",
+        "iconKey": "Shield",
+        "label": "Shield Center",
+        "color": "text-emerald-400",
+        "faqs": [
+          {
+            "question": "¿Qué es Shield Center?",
+            "answer": "Shield Center es nuestro sistema de monitorización que analiza cada reseña con 14 indicadores: toxicidad, autenticidad, intención fraudulenta, sentimiento, entidades citadas, etc. Genera alertas inmediatas y puede preparar informes para Google."
+          },
+          {
+            "question": "¿Cómo funciona la detección de reseñas falsas?",
+            "answer": "Cruzamos coherencia temporal (picos anómalos), patrones lingüísticos entre cuentas, geolocalización del revisor e historial del perfil. Cada reseña recibe una puntuación de autenticidad visible en tu panel."
+          },
+          {
+            "question": "¿Puedo impugnar una reseña desde REPUTEXA?",
+            "answer": "El escudo IA prepara un dossier (motivos y redacción para moderadores) para pegar en el formulario de denuncia de Google Business Profile. Google no ofrece API pública para borrar reseñas por ti: el envío final es en Google tras tu revisión."
+          },
+          {
+            "question": "¿Las alertas de WhatsApp están en todos los planes?",
+            "answer": "Las alertas instantáneas y el resumen semanal en WhatsApp están desde PULSE ([[PX:pulse:mo]]). VISION solo incluye email. En ZENITH, AI Capture puede enviar invitación por WhatsApp 30 min después de la visita."
+          }
+        ]
+      },
+      {
+        "id": "integration",
+        "iconKey": "Plug",
+        "label": "Integración y API",
+        "color": "text-blue-400",
+        "faqs": [
+          {
+            "question": "¿Cómo conecto Google Business Profile?",
+            "answer": "En el panel → Ajustes → Plataformas, pulsa “Conectar Google”. Se abre OAuth; concede business.manage. La conexión tarda ~30 s y las reseñas se sincronizan solas. No hace falta clave API manual."
+          },
+          {
+            "question": "¿Qué plataformas de reseñas están conectadas?",
+            "answer": "REPUTEXA sincroniza Google Business Profile, Facebook y Trustpilot. Google vía OAuth; Facebook y Trustpilot vía webhooks. Otras plataformas están en la hoja de ruta."
+          },
+          {
+            "question": "¿Puedo conectar el TPV o Zapier?",
+            "answer": "Sí, con AI Capture (solo ZENITH). Se genera una clave rtx_live_… en Ajustes → Integraciones. Tu TPV (Square, SumUp) o Zapier/Make puede enviar datos de visita y REPUTEXA programa WhatsApp 30 min después."
+          },
+          {
+            "question": "¿Cuántos establecimientos puedo gestionar?",
+            "answer": "No hay límite por plan: la facturación escala con ubicaciones activas y descuentos por volumen: 1.º precio completo, 2.º −20 %, 3.º −30 %, 4.º −40 %, 5.º y más −50 %. Todo desde un único panel."
+          }
+        ]
+      },
+      {
+        "id": "billing",
+        "iconKey": "CreditCard",
+        "label": "Facturación y suscripción",
+        "color": "text-amber-400",
+        "faqs": [
+          {
+            "question": "¿Puedo cambiar de plan en cualquier momento?",
+            "answer": "Sí. Mejora o reduce en Ajustes → Suscripción. Las subidas aplican al instante con prorrateo; las bajadas en la próxima renovación."
+          },
+          {
+            "question": "¿La prueba gratuita incluye todo?",
+            "answer": "Sí: 14 días con el plan ZENITH completo sin límites. No necesitas tarjeta para empezar."
+          },
+          {
+            "question": "¿Cuál es la política de reembolso?",
+            "answer": "Si no estás satisfecho en los primeros 30 días, reembolso íntegro sin preguntas. Escribe a support@reputexa.fr."
+          }
+        ]
+      },
+      {
+        "id": "stats",
+        "iconKey": "BarChart2",
+        "label": "Estadísticas e informes",
+        "color": "text-pink-400",
+        "faqs": [
+          {
+            "question": "¿Con qué frecuencia se actualizan las estadísticas?",
+            "answer": "Las reseñas entran en tiempo real vía webhooks. El panel siempre muestra lo último. Los agregados (nota media, tendencias) se recalculan al cargar."
+          },
+          {
+            "question": "¿Puedo exportar informes en PDF?",
+            "answer": "Sí. Cada mes se genera un PDF “tipo despacho” (estadísticas + textos IA según plan): resumen en Vision; análisis en Pulse; capa estratégica en Zenith. Lo recibes por email y puedes regenerarlo desde el archivo del panel. Pulse y Zenith también reciben resumen semanal por WhatsApp."
+          }
+        ]
+      },
+      {
+        "id": "global",
+        "iconKey": "Globe",
+        "label": "Multilingüe e internacional",
+        "color": "text-cyan-400",
+        "faqs": [
+          {
+            "question": "¿Funciona REPUTEXA fuera de Francia?",
+            "answer": "Sí. Está desplegado en Francia, Bélgica, Suiza, España, Italia y Alemania. La infraestructura está en la UE (París, Fráncfort) alineada con el RGPD."
+          },
+          {
+            "question": "¿La interfaz tiene varios idiomas?",
+            "answer": "La interfaz está en francés, inglés, español, alemán e italiano. Cámbiala en ajustes o en el selector del pie de página."
+          }
+        ]
+      }
+    ]
+  }
+}

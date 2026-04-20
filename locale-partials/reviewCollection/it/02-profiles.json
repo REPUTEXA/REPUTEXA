@@ -1,0 +1,40 @@
+{
+  "profiles": {
+    "restaurant": {
+      "label": "Ristorante & ristorazione",
+      "example": "Invia ~45 min dopo il pasto"
+    },
+    "bakery": {
+      "label": "Panificio / pasticceria",
+      "example": "Invia ~2 h dopo l’acquisto"
+    },
+    "beauty": {
+      "label": "Bellezza & cura",
+      "example": "Invia ~3 h dopo l’appuntamento"
+    },
+    "garage": {
+      "label": "Officina auto",
+      "example": "Invia ~24 h dopo la consegna del veicolo"
+    },
+    "hotel": {
+      "label": "Ospitalità",
+      "example": "Invia ~2 h dopo il check-out"
+    },
+    "artisan": {
+      "label": "Artigiani / imprenditore",
+      "example": "Invia ~4 h al termine dei lavori"
+    },
+    "fast_service": {
+      "label": "Servizio veloce / asporto",
+      "example": "Invia ~20 min dopo l’acquisto"
+    },
+    "custom": {
+      "label": "Personalizzato (ritardo libero)",
+      "example": "Imposti il ritardo esatto in minuti"
+    },
+    "ecommerce": {
+      "label": "Negozio online *",
+      "example": "Dopo la consegna (scansione corriere)"
+    }
+  }
+}

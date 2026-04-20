@@ -1,0 +1,131 @@
+{
+  "DocumentationPage": {
+    "title": "REPUTEXA-Dokumentation",
+    "subtitle": "Einstieg und Integration — entsprechend der echten Plattform.",
+    "onboardingTitle": "Start in 5 Schritten",
+    "onboardingBadge": "≈ 10 Minuten",
+    "onboardingSteps": [
+      {
+        "number": "01",
+        "iconKey": "UserPlus",
+        "title": "Konto erstellen",
+        "description": "Name, Typ, Adresse, WhatsApp und E-Mail angeben. Verifizierungscode kommt sofort.",
+        "detail": "Cloudflare Turnstile schützt vor Bots. Telefon im internationalen Format (+49…)."
+      },
+      {
+        "number": "02",
+        "iconKey": "Mail",
+        "title": "E-Mail bestätigen",
+        "description": "Code aus der Mail auf der Verify-Seite eingeben. 15 Minuten gültig.",
+        "detail": "Spam prüfen oder neuen Code unter /verify anfordern."
+      },
+      {
+        "number": "03",
+        "iconKey": "Globe",
+        "title": "Google Business verbinden",
+        "description": "Dashboard → Einstellungen → Plattformen → „Google verbinden“. OAuth mit business.manage. Reviews synchronisieren automatisch.",
+        "detail": "REPUTEXA benötigt nur business.manage, keinen privaten Google-Zugang."
+      },
+      {
+        "number": "04",
+        "iconKey": "Settings",
+        "title": "KI-DNA konfigurieren",
+        "description": "Einstellungen → KI-DNA: Ton, Länge, Anweisungen. Live-Vorschau.",
+        "detail": "Bei ZENITH erzeugt Triple Judge drei Varianten und wählt die beste."
+      },
+      {
+        "number": "05",
+        "iconKey": "Smartphone",
+        "title": "WhatsApp-Alerts aktivieren",
+        "description": "Einstellungen → Benachrichtigungen: Nummer + Schwelle (z. B. ≤3★). Negative Reviews inkl. KI-Vorschlag.",
+        "detail": "PULSE und ZENITH, Twilio-Buttons zum Freigeben oder Bearbeiten."
+      }
+    ],
+    "flowTitle": "Automatischer Ablauf",
+    "flowIntro": "Bei negativem Review startet REPUTEXA diese Pipeline ohne Ihre manuelle Aktion.",
+    "whatsappFlow": [
+      {
+        "step": "Negatives Review eingegangen",
+        "detail": "≤3★ auf Google, Facebook oder Trustpilot."
+      },
+      {
+        "step": "Shield-Center-Analyse",
+        "detail": "KI bewertet Toxizität und Echtheit."
+      },
+      {
+        "step": "KI-Generierung (Claude 3.5 Sonnet)",
+        "detail": "Antwort passend zur KI-DNA."
+      },
+      {
+        "step": "WhatsApp-Alert",
+        "detail": "Zusammenfassung + Vorschlag mit Freigabe / Bearbeiten."
+      },
+      {
+        "step": "Veröffentlichung mit Verzögerung",
+        "detail": "2–7 Std., ggf. Widerspruchsmappe."
+      }
+    ],
+    "platformsTitle": "Angebundene Plattformen",
+    "tablePlatform": "Plattform",
+    "tableProtocol": "Protokoll",
+    "tableAvailability": "Verfügbarkeit",
+    "platforms": [
+      {
+        "name": "Google Business Profile",
+        "status": "OAuth 2.0 (business.manage)",
+        "available": "Alle Pläne"
+      },
+      {
+        "name": "Facebook",
+        "status": "Webhook",
+        "available": "Alle Pläne"
+      },
+      {
+        "name": "Trustpilot",
+        "status": "Webhook",
+        "available": "Alle Pläne"
+      }
+    ],
+    "platformsFootnote": "Google nutzt nur <code>business.manage</code> — kein Zugriff auf das private Google-Konto.",
+    "posTitle": "POS & Zapier",
+    "posBadge": "Nur ZENITH",
+    "posIntro": "REPUTEXA erstellt einen eingehenden Schlüssel (<rtx>rtx_live_…</rtx>) unter Einstellungen. POS oder Zapier/Make POSTet Besuchsdaten → AI Capture: WhatsApp 30 Min. nach Besuch.",
+    "posCodeLabel": "Eingehender Webhook — POS-Besuch",
+    "posSnippet": "POST https://reputexa.fr/api/webhooks/{rtx_live_schluessel}\n\nContent-Type: application/json\n\n{\n  \"customerName\": \"Max Mustermann\",\n  \"phone\": \"+491701234567\",\n  \"visitDate\": \"2026-03-22T14:30:00Z\",\n  \"establishmentId\": \"ihre_id\"\n}\n\n// WhatsApp 30 Min. nach Besuch.\n// Nur ZENITH (AI Capture).",
+    "posNote": "Schlüssel für <strong>eingehende Webhooks</strong>. Nicht zum Auslesen von Reviews/Analytics über externe APIs.",
+    "keysTitle": "Wo Sie Schlüssel finden",
+    "keyCards": [
+      {
+        "label": "Eingehende API (POS/Zapier)",
+        "path": "Einstellungen → Integrationen → API-Schlüssel",
+        "plan": "ZENITH",
+        "planColor": "text-violet-400"
+      },
+      {
+        "label": "WhatsApp für Alerts",
+        "path": "Einstellungen → Benachrichtigungen → WhatsApp",
+        "plan": "PULSE+",
+        "planColor": "text-blue-400"
+      },
+      {
+        "label": "Google Business",
+        "path": "Einstellungen → Plattformen → Google",
+        "plan": "Alle",
+        "planColor": "text-emerald-400"
+      }
+    ],
+    "practicesTitle": "Best Practices",
+    "practiceTips": [
+      "KI-DNA vor den ersten Reviews einrichten.",
+      "WhatsApp auf einem gut erreichbaren Gerät aktivieren.",
+      "POS-Webhook innerhalb von 10 Min. nach Checkout senden.",
+      "rtx_live_ nicht veröffentlichen.",
+      "Shield Center läuft automatisch — Alerts prüfen.",
+      "Bei Fehlern „Bearbeiten“ nutzen, um nachzulernen."
+    ],
+    "ctaTitle": "Bereit loszulegen?",
+    "ctaSubtitle": "14 Tage voller ZENITH ohne Karte. Erste KI-Antwort unter einer Minute nach Google-Verbindung.",
+    "ctaPrimary": "Kostenloses Konto",
+    "ctaSecondary": "Hilfe-Center"
+  }
+}

@@ -1,0 +1,155 @@
+{
+  "reviewPresets": {
+    "positive": {
+      "variants": [
+        {
+          "sector": "bakery",
+          "business": "Panificio Grano d’Oro",
+          "reviewer": "Giulia R.",
+          "review": "Bancone caloroso, cornetti al burro che si sbriciolano giusti. Il vassoio di compleanno con targhetta commestibile era impeccabile — mia mamma ha detto che non mangiava pasticceria così buona da anni.",
+          "response": "Giulia, grazie — feedback così spinge i nostri panettieri ogni mattina. Siamo felici che vassoio e dolci abbiano convinto; alla prossima festa!",
+          "rating": 5,
+          "phone": "+39 06 555 0142",
+          "city": "Roma · Monti",
+          "seoContext": "panificio artigianale cornetti Monti Roma"
+        },
+        {
+          "sector": "hotel",
+          "business": "Hotel Riva Ligure",
+          "reviewer": "Marco e Sara V.",
+          "review": "Colazione vista mare strepitosa, materasso rigido come richiesto e cesto snack locale un pensiero gentile. La reception ha segnato passeggiate tranquille — weekend lento perfetto.",
+          "response": "Marco e Sara, grazie: sapere che colazione con vista e scelta del materasso hanno funzionato conta molto. Felici che i suggerimenti abbiano aiutato; vi aspettiamo ancora sul mare.",
+          "rating": 5,
+          "phone": "+39 010 555 0191",
+          "city": "Genova",
+          "seoContext": "boutique hotel waterfront Genova"
+        },
+        {
+          "sector": "auto",
+          "business": "Officina Binario Fisso",
+          "reviewer": "Ahmed B.",
+          "review": "Tagliando completo e gomme invernali prima della neve: tutto mostrato sul ponte, fattura come il preventivo. Hanno trovato gioco al disco prima del viaggio in autostrada. Officina umana senza pressione, raro.",
+          "response": "Ahmed, grazie — «mostrare i pezzi, zero sorprese» è il nostro modo di fare fiducia. Meglio intercettare il gioco presto; passi quando vuole per un controllo rapido post viaggio.",
+          "rating": 5,
+          "phone": "+39 02 555 0162",
+          "city": "Milano",
+          "seoContext": "officina onesta gomme invernali Milano"
+        }
+      ]
+    },
+    "negative": {
+      "variants": [
+        {
+          "sector": "salon",
+          "business": "Salone Contorno",
+          "reviewer": "Francesca M.",
+          "review": "Il taglio non rispettava foto e video concordati — tono sbagliato. Cheratina in più in conto senza avviso chiaro sul prezzo. Sono uscita peggio di come sono entrata.",
+          "response": "Francesca, ci dispiace: mancare i riferimenti e addebitare un extra senza accordo non è al nostro livello. Il nostro stilista senior può sistemare o rimborsare — scriva per fissare.",
+          "rating": 2,
+          "phone": "+39 02 555 0199",
+          "city": "Milano · Brera",
+          "seoContext": "salone taglio colore Brera Milano"
+        },
+        {
+          "sector": "restaurant",
+          "business": "Trattoria Lume",
+          "reviewer": "Luca P.",
+          "review": "Bistecca tiepida, patate molle e tre vini «non disponibili» senza lista alternativa. Cameriere ha minimizzato fino al conto — nessuna scusa dalla sala.",
+          "response": "Luca, ci scusiamo: secondi tiepidi e sala affrettata non vanno bene. Vorremmo ospitarla di nuovo con il caposala — messaggio in privato per una data.",
+          "rating": 2,
+          "phone": "+39 055 555 0177",
+          "city": "Firenze",
+          "seoContext": "ristorante bistecca vini Firenze"
+        },
+        {
+          "sector": "e-commerce",
+          "business": "Biancheria Casa Online",
+          "reviewer": "Elena C.",
+          "review": "Promesso prima delle feste, arrivato con undici giorni di ritardo e scatola ammaccata. Assistenza ritarda quattro giorni e mi manda a un modulo generico — era regalo per un baby shower.",
+          "response": "Elena, ci dispiace per ritardo e supporto fiacco — un regalo così ha priorità. Risponda con numero ordine: risparmio celere e credito sulla prossima spesa.",
+          "rating": 2,
+          "phone": "+39 051 555 0140",
+          "city": "Bologna",
+          "seoContext": "e-commerce biancheria spedizioni Bologna"
+        }
+      ]
+    },
+    "hateful": {
+      "variants": [
+        {
+          "sector": "restaurant",
+          "business": "Ristorante Terrazza 9",
+          "reviewer": "Matteo L.",
+          "review": "Siete ladri, lo chef è ridicolo e i camerieri inutili. Spero chiudiate.",
+          "response": "Oggetto: Richiesta rimozione — recensione personalmente offensiva (Google Recensioni)\n\nGentile Trust & Safety,\n\nchiediamo la rimozione di una recensione su Terrazza 9 con linguaggio offensivo e auguri di danno economico senza resoconto verificabile della visita.\n\nSi prega di applicare le policy su molestie e contenuti d’odio.\n\nCordiali saluti,\nDirezione · Terrazza 9",
+          "rating": 1,
+          "phone": "+39 06 555 0182",
+          "city": "Roma",
+          "platformLabel": "Google Recensioni",
+          "seoContext": "ristorante terrazza Roma"
+        },
+        {
+          "sector": "barbershop",
+          "business": "Barberia Taglio Netto",
+          "reviewer": "Utente Google",
+          "review": "Sparatevi dalla mia città; locale spazzatura e razzismo dietro le poltrone.",
+          "response": "Oggetto: Urgente — recensione d’odio / discriminatoria\n\nAlla moderazione Google Recensioni,\n\nTaglio Netto ha ricevuto una recensione con insulti gravi e accuse discriminatorie. Chiediamo revisione prioritaria e rimozione secondo policy su odio e molestie.\n\nDistinti saluti,\nTitolare · Taglio Netto",
+          "rating": 1,
+          "phone": "+39 06 555 0139",
+          "city": "Roma",
+          "platformLabel": "Google Recensioni",
+          "seoContext": "barberia centro Roma"
+        },
+        {
+          "sector": "hotel",
+          "business": "Hotel Cortile Stretto",
+          "reviewer": "Daniele F.",
+          "review": "Notte da incubo: albergo squallido e gestione vigliacca. Se ci vediamo di persona la dico chiara.",
+          "response": "Oggetto: Contenuto minaccioso — richiesta rimozione (Google Business)\n\nBuongiorno,\n\nla recensione attribuita a Daniele F. contiene insulti collettivi e linguaggio interpretabile come minaccia. Chiediamo rimozione immediata e verifica account.\n\nRestiamo disponibili per problemi reali di soggiorno via reception.\n\nCordiali saluti,\nDirezione · Cortile Stretto",
+          "rating": 1,
+          "phone": "+39 02 555 0160",
+          "city": "Milano",
+          "platformLabel": "Google Recensioni",
+          "seoContext": "boutique hotel Milano centro"
+        }
+      ]
+    }
+  },
+  "examples": {
+    "0": {
+      "sector": "salon",
+      "business": "Salone Contorno",
+      "reviewer": "Francesca M.",
+      "review": "Taglio disastroso! Foto precisa mostrata e il risultato non c’entra niente. In più trattamento addebitato senza averlo chiesto. Sono disgustata.",
+      "response": "Francesca, ci dispiace profondamente. La distanza tra desiderio e risultato per noi è inaccettabile. Vorremmo parlarne per trovare una soluzione — ci contatti. — Team Salone Contorno"
+    },
+    "1": {
+      "sector": "restaurant",
+      "business": "Osteria del Pozzo",
+      "reviewer": "Roberto D.",
+      "review": "Servizio disastroso, 45 minuti per l’antipasto. Piatto freddo, cameriere ci ignora. Mai più.",
+      "response": "Roberto, ci scusiamo per attesa e servizio sotto standard. Il suo feedback conta. Ci farebbe piacere riaverla — scriva in privato. — Osteria del Pozzo"
+    },
+    "2": {
+      "sector": "hotel",
+      "business": "Hotel Pini Azzurri",
+      "reviewer": "Chiara L.",
+      "review": "Camera rumorosa, vista parcheggio. Per quel prezzo ci aspettavamo molto di più. Colazione ok ma non eccezionale.",
+      "response": "Chiara, ci dispiace che soggiorno, silenzio e vista non abbiano convinto. Notiamo per migliorare. Contattaci per un prossimo viaggio. — Hotel Pini Azzurri"
+    },
+    "3": {
+      "sector": "spa",
+      "business": "Spa Linea Verde",
+      "reviewer": "Alberto T.",
+      "review": "Massaggio affrettato, operatrice sembrava di fretta. Atmosfera carina ma esperienza deludente per il prezzo.",
+      "response": "Alberto, ci dispiace che il massaggio non fosse all’altezza. La qualità è la priorità. Vorremmo offrirle un’altra occasione — contattaci. — Spa Linea Verde"
+    },
+    "4": {
+      "sector": "café",
+      "business": "Caffè delle Rive",
+      "reviewer": "Silvia B.",
+      "review": "Ordine perso, caffè tiepido. Staff sopraffatto, nessuno ha chiesto scusa. Molto delusa.",
+      "response": "Silvia, ci scusiamo: errore e mancanza di reattività non sono il nostro livello. Scrivici — le offriamo un caffè al prossimo passaggio. — Caffè delle Rive"
+    }
+  }
+}

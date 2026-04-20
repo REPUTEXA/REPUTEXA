@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Reputexa Sync</title>
+    <style>
+      :root {
+        font-family: system-ui, sans-serif;
+        font-size: 14px;
+        color: #1a1a1a;
+        background: #f4f4f5;
+      }
+      body {
+        margin: 0;
+        padding: 20px;
+        max-width: 520px;
+      }
+      h1 {
+        font-size: 1.1rem;
+        font-weight: 600;
+        margin: 0 0 16px;
+      }
+      h2 {
+        font-size: 0.95rem;
+        font-weight: 600;
+        margin: 20px 0 8px;
+        color: #0f172a;
+      }
+      label {
+        display: block;
+        margin-top: 12px;
+        font-weight: 500;
+      }
+      input[type='text'],
+      input[type='password'],
+      select {
+        width: 100%;
+        box-sizing: border-box;
+        margin-top: 4px;
+        padding: 8px 10px;
+        border: 1px solid #d4d4d8;
+        border-radius: 6px;
+        background: #fff;
+      }
+      .row {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        margin-top: 4px;
+      }
+      .row input[type='text'] {
+        flex: 1;
+      }
+      button {
+        margin-top: 16px;
+        padding: 8px 14px;
+        border-radius: 6px;
+        border: 1px solid #d4d4d8;
+        background: #fff;
+        cursor: pointer;
+      }
+      button.primary {
+        background: #16a34a;
+        color: #fff;
+        border-color: #15803d;
+      }
+      .log {
+        margin-top: 20px;
+        padding: 10px;
+        background: #fff;
+        border: 1px solid #e4e4e7;
+        border-radius: 6px;
+        height: 120px;
+        overflow: auto;
+        font-size: 12px;
+        white-space: pre-wrap;
+        font-family: ui-monospace, monospace;
+      }
+      .hint {
+        font-size: 12px;
+        color: #71717a;
+        margin-top: 4px;
+      }
+      .shift-box {
+        padding: 12px;
+        border-radius: 8px;
+        border: 1px solid #bbf7d0;
+        background: #f0fdf4;
+        margin-bottom: 4px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Reputexa Sync</h1>
+
+    <div class="shift-box">
+      <h2 style="margin-top: 0">Prise de poste</h2>
+      <p class="hint" style="margin-top: 0">
+        Obligatoire : ces informations sont envoyées avec chaque ticket (terminal_id, staff_name) pour le
+        pilotage et le rapprochement Wallet.
+      </p>
+      <label for="terminalSelect">Caisse (terminal_id)</label>
+      <select id="terminalSelect" aria-label="Caisse">
+        <option value="">— Choisir —</option>
+        <option value="caisse-1">Caisse 1</option>
+        <option value="caisse-2">Caisse 2</option>
+        <option value="caisse-3">Caisse 3</option>
+        <option value="caisse-4">Caisse 4</option>
+        <option value="caisse-5">Caisse 5</option>
+        <option value="caisse-6">Caisse 6</option>
+      </select>
+      <label for="staffName">Nom de l&apos;équipier</label>
+      <input type="text" id="staffName" placeholder="ex. Marie" maxlength="120" autocomplete="name" />
+      <button type="button" class="primary" id="btnStartService">Démarrer le service</button>
+    </div>
+
+    <h2>Configuration technique</h2>
+    <label for="watchFolder">Dossier des tickets</label>
+    <div class="row">
+      <input type="text" id="watchFolder" readonly placeholder="Choisir un dossier" />
+      <button type="button" id="btnFolder">Parcourir</button>
+    </div>
+    <label for="baseUrl">URL du site (sans slash final)</label>
+    <input type="text" id="baseUrl" placeholder="https://votre-domaine.tld" />
+    <label for="apiKey">Clé API (identique à BANANO_PILOTAGE_INGEST_SECRET)</label>
+    <input type="password" id="apiKey" autocomplete="off" />
+    <p class="hint">La clé est stockée localement dans le profil utilisateur de l&apos;app.</p>
+    <label id="openAtLoginWrap">
+      <input type="checkbox" id="openAtLogin" />
+      Lancer au démarrage de Windows
+    </label>
+    <div>
+      <button type="button" class="primary" id="btnSave">Enregistrer tout</button>
+      <button type="button" id="btnScan">Scanner le dossier maintenant</button>
+    </div>
+    <div class="log" id="log"></div>
+    <script>
+      const $ = (id) => document.getElementById(id);
+      const logEl = $('log');
+      function appendLog(line) {
+        logEl.textContent += line + '\n';
+        logEl.scrollTop = logEl.scrollHeight;
+      }
+      window.reputexaSync.onLog(appendLog);
+
+      function ensureTerminalOption(value) {
+        const v = (value || '').trim();
+        if (!v) return;
+        const sel = $('terminalSelect');
+        for (let i = 0; i < sel.options.length; i++) {
+          if (sel.options[i].value === v) return;
+        }
+        const o = document.createElement('option');
+        o.value = v;
+        o.textContent = v;
+        sel.appendChild(o);
+      }
+
+      function getShiftPayload() {
+        return {
+          terminalId: $('terminalSelect').value.trim(),
+          staffName: $('staffName').value.trim(),
+        };
+      }
+
+      async function refresh() {
+        const c = await window.reputexaSync.getConfig();
+        $('watchFolder').value = c.watchFolder || '';
+        $('baseUrl').value = c.baseUrl || '';
+        $('apiKey').value = c.apiKey || '';
+        $('openAtLogin').checked = !!c.openAtLogin;
+        const p = c.platform || '';
+        $('openAtLoginWrap').style.display = p === 'win32' ? '' : 'none';
+        const tid = typeof c.terminalId === 'string' ? c.terminalId : '';
+        const staff = typeof c.staffName === 'string' ? c.staffName : '';
+        ensureTerminalOption(tid);
+        $('terminalSelect').value = tid.trim();
+        $('staffName').value = staff;
+      }
+
+      $('btnFolder').onclick = async () => {
+        const p = await window.reputexaSync.pickFolder();
+        if (p) $('watchFolder').value = p;
+      };
+
+      async function saveAll(requireShift) {
+        const shift = getShiftPayload();
+        if (requireShift && (!shift.terminalId || !shift.staffName)) {
+          appendLog('[config] Indiquez la caisse et le nom de l’équipier.');
+          return;
+        }
+        await window.reputexaSync.setConfig({
+          watchFolder: $('watchFolder').value.trim(),
+          baseUrl: $('baseUrl').value.trim(),
+          apiKey: $('apiKey').value.trim(),
+          openAtLogin: $('openAtLogin').checked,
+          terminalId: shift.terminalId,
+          staffName: shift.staffName,
+        });
+        appendLog('[config] Enregistré.');
+      }
+
+      $('btnSave').onclick = async () => {
+        await saveAll(true);
+      };
+      $('btnStartService').onclick = async () => {
+        await saveAll(true);
+      };
+      $('btnScan').onclick = async () => {
+        await window.reputexaSync.scanFolder();
+      };
+      refresh();
+    </script>
+  </body>
+</html>

@@ -1,0 +1,17 @@
+{
+  "GuideDetailPage": {
+    "notFoundTitle": "Leitfaden nicht gefunden",
+    "notFoundBody": "Dieser Leitfaden existiert nicht oder wurde verschoben.",
+    "backToGuides": "Zurück zu den Guides",
+    "guides": {
+      "demarrage-rapide": { "title": "Schnellstart mit REPUTEXA", "content": "Konto anlegen, Google Business Profile verbinden und erste KI-Antwortvorschläge erhalten. E-Mail bestätigen, OAuth erlauben, Tonfall in den Einstellungen feinjustieren." },
+      "optimiser-notation": { "title": "Google-Bewertung strategisch verbessern", "content": "Antworten Sie auf alle Reviews, holen Sie Feedback zur richtigen Zeit ein und bleiben Sie bei kritischen Stimmen professionell. REPUTEXA warnt und liefert Entwürfe — Sie entscheiden die Veröffentlichung." },
+      "reponses-ia-personnalisees": { "title": "KI-Antworten an Ihre Marke anpassen", "content": "Branche, Ton, No-Gos und Leitbegriffe im Brief hinterlegen. Jeder Entwurf folgt diesen Regeln und spiegelt die Review-Sprache. Vor dem Posten immer prüfen." },
+      "conformite-rgpd": { "title": "DSGVO und öffentliche Bewertungen", "content": "Bewertungen sind personenbezogene Daten. Verarbeitung siehe Datenschutzerklärung. Gewerbetreibende bleiben für Rechtsgrundlagen und Information ihrer Kundschaft verantwortlich." },
+      "shield-center-mode-emploi": { "title": "Shield Center: Alerts & Fake-Reviews", "content": "Toxizität und Authentizität bewerten, Schwellen setzen und bei Bedarf moderationsreife Unterlagen nutzen. WhatsApp-Alerts (Pulse+) bei kritischen Reviews." },
+      "multiplateforme-google-facebook-trustpilot": { "title": "Google, Facebook, Trustpilot zentral", "content": "Ein gemeinsamer Workflow für alle angebundenen Plattformen, damit Antwortqualität und Reaktionszeit überall stimmen." },
+      "rapports-pdf-analyses": { "title": "Monats-PDF richtig lesen", "content": "Volumen und Stimmungsverlauf vergleichen, wiederkehrende Themen erkennen und mit Maßnahmen verknüpfen. Höhere Pläne liefern tiefere Kommentare und wöchentliche WhatsApp-Recaps." },
+      "api-integration-avancee": { "title": "Webhook-Integration (ZENITH)", "content": "Der rtx_live_-Webhook nimmt Visitendaten von POS oder Zapier entgegen und plant den WhatsApp-Follow-up. E.164 nutzen, Ruhezeiten einhalten, Schlüssel nur serverseitig." }
+    }
+  }
+}

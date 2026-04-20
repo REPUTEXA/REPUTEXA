@@ -1,0 +1,41 @@
+{
+  "ReportIssuePage": {
+    "title": "Segnala un problema",
+    "subtitle": "Aiutaci a migliorare REPUTEXA: ogni segnalazione viene esaminata dal team tecnico entro circa 4 ore lavorative.",
+    "slaBanner": "Obiettivo di risposta: 4 ore lavorative per priorità critica · 24 h per le altre.",
+    "bugTypeLabel": "Tipo di problema",
+    "priorityLabel": "Livello di priorità",
+    "issueTitleLabel": "Titolo breve",
+    "issueTitlePlaceholder": "Es.: Le recensioni Google del punto vendita X non si sincronizzano più",
+    "descriptionLabel": "Descrizione dettagliata",
+    "descriptionPlaceholder": "Comportamento osservato vs atteso…",
+    "stepsLabel": "Passaggi per riprodurre",
+    "stepsPlaceholder": "1. Apri la dashboard\n2. Vai su Recensioni\n3. Vedi l’errore…",
+    "emailLabel": "La tua email",
+    "emailPlaceholder": "tu@esempio.it",
+    "submit": "Invia segnalazione",
+    "submitting": "Invio in corso…",
+    "footerNote": "Ogni segnalazione riceve un riscontro. SLA: 4 ore lavorative per incidenti critici.",
+    "toastSelect": "Seleziona tipo di problema e priorità.",
+    "toastError": "Si è verificato un errore. Riprova.",
+    "toastNetwork": "Errore di rete. Controlla la connessione.",
+    "successTitle": "Segnalazione inviata",
+    "successSubtitle": "Grazie — il nostro team è stato avvisato.",
+    "successHeading": "Ricevuto!",
+    "successLine": "Ti contatteremo a {email} entro 4 ore lavorative con un aggiornamento.",
+    "successFoot": "Per incidenti critici in produzione, il supporto dà priorità al tuo ticket.",
+    "bugTypes": [
+      { "id": "ai-error", "label": "Errore analisi IA", "desc": "Risposta errata o fuori contesto" },
+      { "id": "sync-issue", "label": "Problema di sincronizzazione", "desc": "Recensioni mancanti o in ritardo" },
+      { "id": "ui-bug", "label": "Bug interfaccia", "desc": "Layout, navigazione, moduli" },
+      { "id": "billing-issue", "label": "Fatturazione", "desc": "Pagamento, fattura, abbonamento" },
+      { "id": "other", "label": "Altro", "desc": "Ogni altro caso" }
+    ],
+    "priorities": [
+      { "id": "low", "label": "Bassa", "desc": "Nessun impatto quotidiano" },
+      { "id": "medium", "label": "Media", "desc": "Disagio parziale, esiste un workaround" },
+      { "id": "high", "label": "Alta", "desc": "Blocca una funzione importante" },
+      { "id": "critical", "label": "Critica", "desc": "Perdita dati o interruzione totale" }
+    ]
+  }
+}

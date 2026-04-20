@@ -1,0 +1,41 @@
+{
+  "ReportIssuePage": {
+    "title": "Reportar un problema",
+    "subtitle": "Ayúdanos a mejorar REPUTEXA: cada informe lo revisa ingeniería en unas 4 horas laborables.",
+    "slaBanner": "Objetivo de respuesta: 4 horas laborables (crítico) · 24 h para el resto.",
+    "bugTypeLabel": "Tipo de problema",
+    "priorityLabel": "Prioridad",
+    "issueTitleLabel": "Título breve",
+    "issueTitlePlaceholder": "Ej.: Las reseñas de Google del local X dejaron de sincronizarse",
+    "descriptionLabel": "Descripción detallada",
+    "descriptionPlaceholder": "Qué ocurre y qué esperabas…",
+    "stepsLabel": "Pasos para reproducirlo",
+    "stepsPlaceholder": "1. Abrir el panel\n2. Ir a Reseñas\n3. Ver el error…",
+    "emailLabel": "Tu email",
+    "emailPlaceholder": "tu@ejemplo.com",
+    "submit": "Enviar informe",
+    "submitting": "Enviando…",
+    "footerNote": "Cada informe queda registrado. SLA: 4 horas laborables para incidentes críticos.",
+    "toastSelect": "Elige tipo de problema y prioridad.",
+    "toastError": "Ha ocurrido un error. Inténtalo de nuevo.",
+    "toastNetwork": "Error de red. Comprueba la conexión.",
+    "successTitle": "Informe enviado",
+    "successSubtitle": "Gracias: nuestro equipo ha sido notificado.",
+    "successHeading": "¡Recibido!",
+    "successLine": "Te escribiremos a {email} en unas 4 horas laborables con una actualización.",
+    "successFoot": "Para incidentes críticos en producción, soporte prioriza tu ticket.",
+    "bugTypes": [
+      { "id": "ai-error", "label": "Error del análisis IA", "desc": "Respuesta incorrecta o fuera de contexto" },
+      { "id": "sync-issue", "label": "Problema de sincronización", "desc": "Reseñas faltantes o retrasadas" },
+      { "id": "ui-bug", "label": "Bug de interfaz", "desc": "Maquetación, navegación, formularios" },
+      { "id": "billing-issue", "label": "Facturación", "desc": "Pago, factura, suscripción" },
+      { "id": "other", "label": "Otro", "desc": "Cualquier otro caso" }
+    ],
+    "priorities": [
+      { "id": "low", "label": "Baja", "desc": "Sin impacto diario" },
+      { "id": "medium", "label": "Media", "desc": "Molestia parcial, hay workaround" },
+      { "id": "high", "label": "Alta", "desc": "Bloquea algo importante" },
+      { "id": "critical", "label": "Crítica", "desc": "Pérdida de datos o caída total" }
+    ]
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "legalDocTypes": {
+    "cgu": "Conditions Générales d'Utilisation (CGU)",
+    "politique_confidentialite": "Politique de Confidentialité",
+    "mentions_legales": "Mentions Légales"
+  },
+  "legalUpdate": {
+    "title": "Mise à jour de nos conditions juridiques",
+    "greetingNamed": "Bonjour <strong>{name}</strong>,",
+    "greetingGeneric": "Bonjour,",
+    "intro": "Nous mettons à jour nos documents juridiques. Ces changements entrent en vigueur le <strong style=\"color: #0f172a;\">{effectiveDate}</strong>.",
+    "updatedDocsTitle": "Documents mis à jour",
+    "summaryTitle": "Résumé des changements",
+    "acceptNote": "En continuant à utiliser REPUTEXA après le <strong>{effectiveDate}</strong>, vous acceptez les nouvelles conditions. Vous pouvez consulter l'intégralité des documents mis à jour en cliquant sur le bouton ci-dessous.",
+    "questionsNote": "Si vous avez des questions, notre équipe est disponible depuis votre espace client.",
+    "cta": "Consulter les documents légaux"
+  }
+}

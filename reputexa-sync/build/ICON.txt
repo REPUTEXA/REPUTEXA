@@ -1,0 +1,21 @@
+Icône Windows (Reputexa Sync)
+=============================
+
+Fichier attendu par electron-builder : icon.ico (chemin : build/icon.ico)
+
+Dimensions / format
+-------------------
+- Le fichier doit être au format .ico (pas seulement un PNG renommé).
+- Inclure plusieurs tailles dans le même .ico pour un rendu net : au minimum
+  16, 32, 48, 256 px ; idéalement aussi 24, 64, 128 px.
+- La taille « principale » pour l’installateur NSIS / raccourcis est souvent
+  256×256 ; electron-builder recommande une icône contenant au moins 256×256.
+
+Génération du placeholder (vert) dans le dépôt
+----------------------------------------------
+  npm run generate-icon
+
+Remplacement pour la marque finale
+----------------------------------
+Remplacez build/icon.ico par votre fichier dessiné (export depuis votre outil
+de design en .ico multi-résolution, ou PNG 1024×1024 converti en .ico).

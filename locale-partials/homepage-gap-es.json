@@ -1,0 +1,180 @@
+{
+  "landingFooter": {
+    "tagline": "Plataforma de reputación con IA para negocios que quieren crecer.",
+    "colResources": "Recursos",
+    "colHelp": "Ayuda",
+    "colCompany": "Empresa",
+    "colProduct": "Producto",
+    "linkDocumentation": "Documentación",
+    "linkBlog": "Blog",
+    "linkGuides": "Guías",
+    "linkApi": "API",
+    "linkStatuts": "Información corporativa",
+    "linkRegistre": "Registro art. 30 (CSV)",
+    "linkHelpCenter": "Centro de ayuda",
+    "linkContact": "Contacto",
+    "linkReport": "Informar de un problema",
+    "linkDataRights": "Derechos de datos (clientes finales)",
+    "linkSecurity": "Seguridad y RGPD",
+    "linkAbout": "Quiénes somos",
+    "linkNews": "Noticias",
+    "linkCareers": "Empleo",
+    "linkInvestors": "Inversores",
+    "linkSustainability": "Sostenibilidad",
+    "linkPricing": "Precios",
+    "linkFeatures": "Funciones",
+    "linkTestimonials": "Testimonios",
+    "linkFreeTrial": "Prueba gratuita",
+    "linkLogin": "Iniciar sesión",
+    "legalMentions": "Aviso legal",
+    "legalPrivacy": "Privacidad",
+    "legalTerms": "Condiciones de uso",
+    "legalCookies": "Cookies",
+    "legalSitemap": "Mapa del sitio",
+    "rightsLine": "© 2026 REPUTEXA, Inc. Todos los derechos reservados.",
+    "legalNavAria": "Enlaces legales",
+    "brandAria": "Inicio REPUTEXA",
+    "impressum": "Impressum"
+  },
+  "hero": {
+    "euCompliance": {
+      "badge": "Conformidad UE certificada",
+      "subtitle": "Programa de privacidad supervisado por nuestro AI Legal Guardian — alineado con el RGPD y estándares UE.",
+      "authorityLine": "Su autoridad supervisora depende de dónde esté establecido su negocio; la documentación sigue la orientación del EDPB.",
+      "pending": "Supervisión Guardian activa",
+      "notOk": "Última revisión: consulte la política de privacidad."
+    },
+    "ukCompliance": {
+      "badge": "UK GDPR y Data Protection Act 2018",
+      "subtitle": "El Guardian incluye orientación del ICO y temas UK (p. ej. reseñas engañosas).",
+      "authorityLine": "Autoridad: Information Commissioner's Office (ICO) — ico.org.uk",
+      "pending": "Supervisión Guardian activa",
+      "notOk": "Última revisión: consulte la política de privacidad UK."
+    }
+  },
+  "tunnel": {
+    "badge": "Recorrido cliente WhatsApp",
+    "title": "El túnel conversacional REPUTEXA",
+    "subtitle": "Objetivo: mejorar primero — feedback honesto para afinar el servicio, no un «déjenos una reseña» brusco. Tras la visita, si dicen sí, se ofrece texto listo para pegar; la última palabra es del cliente.",
+    "steps": {
+      "1": {
+        "title": "Primer contacto",
+        "body": "Tras la compra, con el retraso que configure — un mensaje cordial: dos minutos para decir qué funcionó o no, con sí/no explícito. Rechazo o STOP: gracias, sin más seguimiento; el número queda bloqueado para esta campaña (duración según aviso, a menudo 120 días o permanente)."
+      },
+      "2": {
+        "title": "Contexto → pregunta humana",
+        "body": "Si dicen sí, el siguiente mensaje usa contexto del ticket o servicio y pide unas palabras sobre qué encajó o no — conversacional."
+      },
+      "3": {
+        "title": "Borrador listo",
+        "body": "Con el feedback, la IA puede sugerir texto corto fiel a sus palabras; el cliente edita todo lo que quiera hasta estar conforme."
+      },
+      "4": {
+        "title": "Publicar rápido",
+        "body": "Tras el ok: copiar, abrir Google o TripAdvisor, pegar, estrellas, enviar."
+      },
+      "5": {
+        "title": "Gracias",
+        "body": "Último mensaje claro: gracias, no reutilizaremos el contacto para esta campaña; datos tratados hasta borrado según plazo indicado (≈120 días)."
+      }
+    },
+    "demoOnline": "en línea",
+    "demoTitle": "Simulación WhatsApp",
+    "demoRefresh": "Nuevo escenario",
+    "demoLoading": "Generando conversación…",
+    "demoError": "No se pudo generar la demo.",
+    "demoEnginesDual": "Escenario: OpenAI + Claude (vista previa IA).",
+    "demoEnginesClaude": "Escenario generado con Claude.",
+    "demoEnginesOpenAI": "Escenario generado con OpenAI.",
+    "demoStaticFallback": "Ejemplo estático — configure las API en el servidor para simular en cada carga.",
+    "demoChipsHint": "Elija un tipo de recorrido:",
+    "chipRandom": "Aleatorio",
+    "chipHappyFull": "Sí → recorrido completo",
+    "chipDeclineFirst": "No gracias",
+    "chipHappyWithEdit": "Varias correcciones",
+    "chipStopAfterYes": "Parar a mitad",
+    "scenarioLine": "Escenario: {name}",
+    "scenario_decline_first": "Rechaza al abrir",
+    "scenario_happy_full": "Sí, recorrido completo",
+    "scenario_happy_with_edit": "Varias ediciones del borrador",
+    "scenario_stop_after_yes": "Sí y luego stop"
+  },
+  "googleFlywheel": {
+    "badge": "Algoritmo Google",
+    "headline": "Por qué su reputación es su mejor motor de búsqueda",
+    "subtitle": "Comportamiento documentado de Google Business Profile.",
+    "step1": {
+      "trigger": "Más reseñas",
+      "title": "Credibilidad",
+      "result": "Genera confianza con clientes que comparan antes de elegir."
+    },
+    "step2": {
+      "trigger": "Respuestas sistemáticas",
+      "title": "Señal positiva",
+      "result": "Google detecta actividad y servicio reactivo."
+    },
+    "step3": {
+      "trigger": "Mejor posición",
+      "title": "Arriba en resultados",
+      "result": "Su negocio sube en resultados sin depender solo de anuncios."
+    },
+    "equation": "Más reseñas y más respuestas = mejor posicionamiento.",
+    "equationSource": "Guías oficiales Google Business Profile",
+    "cta": "Mejorar mi posicionamiento en Google"
+  },
+  "howItWorks": {
+    "cards": {
+      "multilingue": {
+        "badge": "Incluido PULSE • ZENITH",
+        "title": "Respuesta local, alcance global",
+        "desc": "La IA responde en el idioma del cliente con tono natural. Vision se centra en su mercado local."
+      },
+      "bouclier": {
+        "badge": "Incluido PULSE • ZENITH",
+        "title": "Protección de marca 24/7",
+        "desc": "Detección de insultos y reseñas falsas; solicitud de eliminación a Google."
+      },
+      "whatsapp": {
+        "badge": "Incluido PULSE • ZENITH",
+        "title": "Reactividad inmediata",
+        "desc": "Alerta WhatsApp instantánea solo para malas reseñas."
+      },
+      "capture": {
+        "badge": "Exclusivo ZENITH",
+        "title": "Generador 5 estrellas",
+        "desc": "La IA contacta por WhatsApp tras la visita para captar la reseña."
+      },
+      "boostSeo": {
+        "badge": "Exclusivo ZENITH",
+        "title": "SEO local",
+        "desc": "Palabras clave estratégicas en cada respuesta."
+      },
+      "reporting": {
+        "badge": "Incluido VISION • PULSE • ZENITH",
+        "title": "Visión estratégica",
+        "desc": "Informes mensuales con gráficos y análisis de sentimiento."
+      }
+    }
+  },
+  "faq": {
+    "headline": "Preguntas frecuentes",
+    "items": {
+      "googleMaps": {
+        "q": "¿La IA puede ayudarme a rankear mejor en Google Maps?",
+        "a": "Sí. Google valora respuestas rápidas y palabras clave. El plan ZENITH las integra en sus respuestas."
+      },
+      "iaDetectable": {
+        "q": "¿Mis clientes notarán que es IA?",
+        "a": "No: tono cálido y profesional, entrenado con respuestas reales."
+      },
+      "installTime": {
+        "q": "¿Cuánto tarda la configuración?",
+        "a": "Menos de 2 minutos: conecta Google Business y la IA analiza al instante. Todo en el panel."
+      },
+      "gratuit14j": {
+        "q": "¿14 días gratis sin tarjeta?",
+        "a": "Sí: acceso completo para probar el impacto. Si no convence, no debe hacer nada."
+      }
+    }
+  }
+}

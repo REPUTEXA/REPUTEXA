@@ -63,7 +63,7 @@ Output: only this middle paragraph, no greeting line and no sign-off.
  * pour un ton mémoire / complicité — sortie dans la langue du profil marchand.
  */
 export async function personalizeLoyaltyAutomationMiddle(args: {
-  scenario: 'lost_client' | 'birthday' | 'vip_of_month';
+  scenario: 'lost_client' | 'birthday' | 'vip_of_month' | 'new_client_welcome';
   commerceName: string;
   prenom: string;
   baseMiddle: string;
